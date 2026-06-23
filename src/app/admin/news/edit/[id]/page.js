@@ -1,0 +1,28 @@
+import { supabase } from "@/lib/supabase";
+import AdminNewsEditForm from "@/components/AdminNewsEditForm";
+
+export default async function EditNewsPage({ params }) {
+  const { id } = await params;
+
+  const { data: news } = await supabase
+    .from("news")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  return (
+    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-20 text-white">
+      <div className="mx-auto max-w-4xl">
+        <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
+          Adminbereich
+        </p>
+
+        <h1 className="mt-4 text-5xl font-black">
+          News bearbeiten
+        </h1>
+
+        <AdminNewsEditForm news={news} />
+      </div>
+    </main>
+  );
+}

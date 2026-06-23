@@ -1,15 +1,36 @@
-export default function Home() {
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+export default async function Home() {
+  const { data: teams, error } = await supabase
+    .from("teams")
+    .select("*")
+    .order("sort_order");
+
+  const { data: latestNews } = await supabase
+    .from("news")
+    .select("*")
+    .eq("is_published", true)
+    .lte("published_at", new Date().toISOString())
+    .order("published_at", { ascending: false })
+    .limit(3);
+
   return (
     <main className="min-h-screen bg-[#101014] text-white">
       <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-red-500">
-              DJK/VfL
-            </p>
-            <h1 className="text-lg font-bold">
-              Giesenkirchen 05/09 e.V.
-            </h1>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
+          <div className="flex items-center gap-4">
+            <img
+              src="https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/logos/Giesenkirchen.png"
+              alt="DJK/VfL Giesenkirchen 05/09 e.V."
+              className="h-20 w-20 object-contain"
+            />
+
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-red-500">
+                DJK/VfL
+              </p>
+              <h1 className="text-lg font-bold">Giesenkirchen 05/09 e.V.</h1>
+            </div>
           </div>
 
           <nav className="hidden gap-6 text-sm font-semibold uppercase text-white/80 lg:flex">
@@ -86,6 +107,93 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+      <section className="bg-[#101014] px-6 py-24">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
+            Fußballabteilung
+          </p>
+
+          <section className="bg-[#101014] px-6 py-24">
+            <div className="mx-auto max-w-7xl">
+              <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
+                Aktuelles
+              </p>
+
+              <div className="mt-4 flex items-end justify-between gap-6">
+                <h2 className="text-4xl font-black md:text-5xl">
+                  Neueste News
+                </h2>
+
+                <Link
+                  href="/news"
+                  className="hidden rounded-full border border-white/20 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white/80 md:block"
+                >
+                  Alle News
+                </Link>
+              </div>
+
+              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {latestNews?.map((item) => (
+                  <Link href={`/news/${item.slug}`} key={item.id}>
+                    <article className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 transition hover:border-red-500/50 hover:bg-white/10">
+                      {item.image_url && (
+                        <div className="flex h-56 items-center justify-center bg-white/5 p-6">
+                          <img
+                            src={item.image_url}
+                            alt={item.title_de}
+                            className="h-full w-full object-contain"
+                          />
+                        </div>
+                      )}
+
+                      <div className="p-6">
+                        <p className="text-xs uppercase tracking-[0.25em] text-red-400">
+                          {item.category}
+                        </p>
+
+                        <h3 className="mt-4 text-2xl font-black">
+                          {item.title_de}
+                        </h3>
+
+                        <p className="mt-4 text-white/60">{item.teaser_de}</p>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <h2 className="mt-4 text-4xl font-black md:text-5xl">
+            Unsere Mannschaften
+          </h2>
+
+          {error && (
+            <p className="mt-6 text-red-400">
+              Mannschaften konnten nicht geladen werden.
+            </p>
+          )}
+
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {teams?.map((team) => (
+              <div
+                key={team.slug}
+                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:bg-white/10"
+              >
+                <p className="text-xs uppercase tracking-[0.25em] text-white/50">
+                  {team.age_group}
+                </p>
+                <h3 className="mt-4 min-h-[96px] text-2xl font-black leading-tight">
+                  {team.name_de}
+                </h3>
+                <p className="mt-4 text-sm text-white/60">
+                  Mannschaftsseite folgt.
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
