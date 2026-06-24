@@ -1,7 +1,7 @@
 import BackButton from "@/components/BackButton";
-import AdminNewsForm from "@/components/AdminNewsForm";
+import AdminTeamsForm from "@/components/AdminTeamsForm";
 
-export default function NewNewsPage() {
+export default function NewTeamPage() {
   return (
     <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-20 text-white">
       <div className="mx-auto max-w-4xl">
@@ -11,12 +11,12 @@ export default function NewNewsPage() {
               Adminbereich
             </p>
 
-            <h1 className="mt-4 text-5xl font-black">Neue News</h1>
+            <h1 className="mt-4 text-5xl font-black">Neue Mannschaft</h1>
           </div>
 
           <BackButton />
         </div>
-        <AdminNewsForm />
+        <AdminTeamsForm />
       </div>
     </main>
   );

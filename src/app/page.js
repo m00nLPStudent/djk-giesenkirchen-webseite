@@ -4,6 +4,7 @@ export default async function Home() {
   const { data: teams, error } = await supabase
     .from("teams")
     .select("*")
+    .eq("is_active", true)
     .order("sort_order");
 
   const { data: latestNews } = await supabase
