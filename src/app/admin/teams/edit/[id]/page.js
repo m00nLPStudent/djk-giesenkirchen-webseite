@@ -1,6 +1,7 @@
-import BackButton from "@/components/BackButton";
+import AdminLayout from "@/components/admin/layout/AdminLayout";
+import AdminTeamsForm from "@/components/admin/teams/AdminTeamsForm";
+import BackButton from "@/components/admin/ui/BackButton";
 import { supabase } from "@/lib/supabase";
-import AdminTeamsForm from "@/components/AdminTeamsForm";
 
 export default async function EditTeamPage({ params }) {
   const { id } = await params;
@@ -12,21 +13,9 @@ export default async function EditTeamPage({ params }) {
     .single();
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-20 text-white">
-      <div className="mx-auto max-w-4xl">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-              Adminbereich
-            </p>
-
-            <h1 className="mt-4 text-5xl font-black">Neue Mannschaft</h1>
-          </div>
-
-          <BackButton />
-        </div>
-        <AdminTeamsForm team={team} />
-      </div>
-    </main>
+    <AdminLayout title="Mannschaft bearbeiten" subtitle="Mannschaften">
+      <BackButton />
+      <AdminTeamsForm team={team} />
+    </AdminLayout>
   );
 }

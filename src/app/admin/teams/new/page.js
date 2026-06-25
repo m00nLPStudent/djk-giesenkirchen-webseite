@@ -1,23 +1,12 @@
-import BackButton from "@/components/BackButton";
-import AdminTeamsForm from "@/components/AdminTeamsForm";
+import AdminLayout from "@/components/admin/layout/AdminLayout";
+import AdminTeamsForm from "@/components/admin/teams/AdminTeamsForm";
+import BackButton from "@/components/admin/ui/BackButton";
 
 export default function NewTeamPage() {
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-20 text-white">
-      <div className="mx-auto max-w-4xl">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-              Adminbereich
-            </p>
-
-            <h1 className="mt-4 text-5xl font-black">Neue Mannschaft</h1>
-          </div>
-
-          <BackButton />
-        </div>
-        <AdminTeamsForm />
-      </div>
-    </main>
+    <AdminLayout title="Neue Mannschaft" subtitle="Mannschaften">
+      <BackButton />
+      <AdminTeamsForm />
+    </AdminLayout>
   );
 }

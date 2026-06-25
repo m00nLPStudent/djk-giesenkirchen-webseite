@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import DeleteNewsButton from "@/components/DeleteNewsButton";
+import DeleteNewsButton from "@/components/admin/ui/DeleteNewsButton";
 
 function getNewsStatus(item) {
   const now = new Date();
