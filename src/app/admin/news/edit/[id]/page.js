@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminNewsEditForm from "@/components/admin/news/AdminNewsEditForm";
+import { AdminNewsEditForm } from "@/components/admin/news";
 import BackButton from "@/components/admin/ui/BackButton";
 import { supabase } from "@/lib/supabase";
 

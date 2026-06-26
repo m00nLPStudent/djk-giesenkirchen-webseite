@@ -2,18 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-
-function createSlug(text) {
-  return text
-    .toLowerCase()
-    .replaceAll("ä", "ae")
-    .replaceAll("ö", "oe")
-    .replaceAll("ü", "ue")
-    .replaceAll("ß", "ss")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
+import TeamLogoUpload from "../components/TeamLogoUpload";
+import { createSlug } from "../utils/slug";
+import { uploadTeamImage, saveTeam } from "../services/teams.service";
 
 export default function AdminTeamsForm({ team }) {
   const router = useRouter();
@@ -47,41 +38,25 @@ export default function AdminTeamsForm({ team }) {
   }
 
   async function uploadImage(file) {
-    if (!file) return;
-
-    const fileName = `teams/${Date.now()}-${file.name}`;
-
-    const { error } = await supabase.storage
-      .from("media")
-      .upload(fileName, file);
+    const { data, error } = await uploadTeamImage(file, "teams");
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    const { data } = supabase.storage.from("media").getPublicUrl(fileName);
-
-    updateField("team_image_url", data.publicUrl);
+    updateField("team_image_url", data);
   }
 
   async function uploadContactImage(file) {
-    if (!file) return;
-
-    const fileName = `contacts/${Date.now()}-${file.name}`;
-
-    const { error } = await supabase.storage
-      .from("media")
-      .upload(fileName, file);
+    const { data, error } = await uploadTeamImage(file, "contacts");
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    const { data } = supabase.storage.from("media").getPublicUrl(fileName);
-
-    updateField("contact_image_url", data.publicUrl);
+    updateField("contact_image_url", data);
   }
 
   async function handleSubmit(event) {
@@ -102,9 +77,7 @@ export default function AdminTeamsForm({ team }) {
       is_active: form.is_active,
     };
 
-    const { error } = team?.id
-      ? await supabase.from("teams").update(payload).eq("id", team.id)
-      : await supabase.from("teams").insert(payload);
+    const { error } = await saveTeam(payload, team?.id ?? null);
 
     setLoading(false);
 
@@ -214,7 +187,7 @@ export default function AdminTeamsForm({ team }) {
           />
         </div>
 
-        <div>
+        <div className="mt-6">
           <label className="mb-2 block text-sm font-bold uppercase tracking-[0.25em] text-white/60">
             Ansprechpartner Bild
           </label>
@@ -229,6 +202,7 @@ export default function AdminTeamsForm({ team }) {
             />
           </label>
         </div>
+
         {form.contact_image_url && (
           <div className="mt-4">
             <div className="mb-3 flex items-center gap-4">
@@ -255,45 +229,11 @@ export default function AdminTeamsForm({ team }) {
         </p>
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-          Mannschaftsbild
-        </label>
-
-        <label className="inline-flex cursor-pointer items-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
-          Bild auswählen
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => uploadImage(e.target.files?.[0])}
-            className="hidden"
-          />
-        </label>
-      </div>
-
-      {form.team_image_url && (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm uppercase tracking-[0.25em] text-white/50">
-              Bildvorschau
-            </p>
-
-            <button
-              type="button"
-              onClick={() => updateField("team_image_url", "")}
-              className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10"
-            >
-              Bild entfernen
-            </button>
-          </div>
-
-          <img
-            src={form.team_image_url}
-            alt="Mannschaftsbild"
-            className="max-h-72 w-full rounded-xl object-contain"
-          />
-        </div>
-      )}
+      <TeamLogoUpload
+        imageUrl={form.team_image_url}
+        onUpload={uploadImage}
+        onRemove={() => updateField("team_image_url", "")}
+      />
 
       <div>
         <label className="mb-2 block text-sm font-bold uppercase tracking-[0.25em] text-white/60">

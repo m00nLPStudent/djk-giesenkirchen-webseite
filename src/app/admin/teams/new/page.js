@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminTeamsForm from "@/components/admin/teams/AdminTeamsForm";
+import { AdminTeamsForm } from "@/components/admin/teams";
 import BackButton from "@/components/admin/ui/BackButton";
 
 export default function NewTeamPage() {

@@ -2,21 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-
-function createSlug(text) {
-  return text
-    .toLowerCase()
-    .replaceAll("ä", "ae")
-    .replaceAll("ö", "oe")
-    .replaceAll("ü", "ue")
-    .replaceAll("ß", "ss")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
+import NewsImageUpload from "../components/NewsImageUpload";
+import { createSlug } from "../utils/slug";
+import { uploadNewsImage, createNews } from "../services/news.service";
 
 export default function AdminNewsForm() {
   const router = useRouter();
+
   const [form, setForm] = useState({
     title_de: "",
     title_en: "",
@@ -40,25 +32,14 @@ export default function AdminNewsForm() {
   }
 
   async function uploadImage(file) {
-    if (!file) return;
-
-    const fileName = `news/${Date.now()}-${file.name}`;
-
-    const { error } = await supabase.storage
-      .from("media")
-      .upload(fileName, file);
+    const { data, error } = await uploadNewsImage(file);
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    const { data } = supabase.storage.from("media").getPublicUrl(fileName);
-
-    setForm((current) => ({
-      ...current,
-      image_url: data.publicUrl,
-    }));
+    updateField("image_url", data);
   }
 
   async function handleSubmit(event) {
@@ -73,7 +54,7 @@ export default function AdminNewsForm() {
         : new Date().toISOString()
       : null;
 
-    const { error } = await supabase.from("news").insert({
+    const { error } = await createNews({
       ...form,
       slug,
       author: "DJK/VfL Giesenkirchen",
@@ -147,25 +128,12 @@ export default function AdminNewsForm() {
         onChange={(e) => updateField("content_en", e.target.value)}
         className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
       />
-      <div>
-        <label className="mb-2 block text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-          Beitragsbild
-        </label>
 
-        <label className="inline-flex cursor-pointer items-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
-          Bild auswählen
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => uploadImage(e.target.files?.[0])}
-            className="hidden"
-          />
-        </label>
-
-        <p className="mt-3 text-sm text-white/40">
-          Das Bild wird automatisch hochgeladen und als Bild-URL gespeichert.
-        </p>
-      </div>
+      <NewsImageUpload
+        imageUrl={form.image_url}
+        onUpload={uploadImage}
+        onRemove={() => updateField("image_url", "")}
+      />
 
       <label className="flex items-center gap-3 text-white/70">
         <input
@@ -189,8 +157,8 @@ export default function AdminNewsForm() {
         />
 
         <p className="mt-2 text-sm text-white/40">
-          Leer lassen = Entwurf. Datum in der Zukunft = geplante
-          Veröffentlichung.
+          Leer lassen = direkte Veröffentlichung. Datum in der Zukunft =
+          geplante Veröffentlichung.
         </p>
       </div>
 

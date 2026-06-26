@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminTeamsList from "@/components/admin/teams/AdminTeamsList";
+import { AdminTeamsList, TeamStats } from "@/components/admin/teams";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
@@ -8,6 +8,25 @@ export default async function AdminTeamsPage() {
     .from("teams")
     .select("*")
     .order("sort_order", { ascending: true });
+
+  const { data: players } = await supabase.from("players").select("is_active");
+
+  const { count: playersCount } = await supabase
+    .from("players")
+    .select("*", { count: "exact", head: true });
+
+  const teamList = teams || [];
+
+  const playerList = players || [];
+
+  const activePlayers = playerList.filter((player) => player.is_active).length;
+
+  const inactivePlayers = playerList.filter(
+    (player) => !player.is_active,
+  ).length;
+
+  const active = teamList.filter((team) => team.is_active).length;
+  const inactive = teamList.filter((team) => !team.is_active).length;
 
   return (
     <AdminLayout title="Mannschaften verwalten" subtitle="Adminbereich">
@@ -20,7 +39,14 @@ export default async function AdminTeamsPage() {
         </Link>
       </div>
 
-      <AdminTeamsList teams={teams || []} />
+      <TeamStats
+        total={teamList.length}
+        activePlayers={activePlayers}
+        inactivePlayers={inactivePlayers}
+        openPayments={0}
+      />
+
+      <AdminTeamsList teams={teamList} />
     </AdminLayout>
   );
 }

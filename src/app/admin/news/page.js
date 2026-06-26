@@ -1,13 +1,41 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminNewsList from "@/components/admin/news/AdminNewsList";
+import { AdminNewsList, NewsStats } from "@/components/admin/news";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+
+function getNewsStatus(item) {
+  const now = new Date();
+
+  if (!item.is_published) {
+    return "entwurf";
+  }
+
+  if (item.published_at && new Date(item.published_at) > now) {
+    return "geplant";
+  }
+
+  return "veroeffentlicht";
+}
 
 export default async function AdminNewsPage() {
   const { data: news } = await supabase
     .from("news")
     .select("*")
     .order("created_at", { ascending: false });
+
+  const newsList = news || [];
+
+  const published = newsList.filter(
+    (item) => getNewsStatus(item) === "veroeffentlicht",
+  ).length;
+
+  const planned = newsList.filter(
+    (item) => getNewsStatus(item) === "geplant",
+  ).length;
+
+  const drafts = newsList.filter(
+    (item) => getNewsStatus(item) === "entwurf",
+  ).length;
 
   return (
     <AdminLayout title="News verwalten" subtitle="Adminbereich">
@@ -20,7 +48,14 @@ export default async function AdminNewsPage() {
         </Link>
       </div>
 
-      <AdminNewsList news={news || []} />
+      <NewsStats
+        total={newsList.length}
+        published={published}
+        planned={planned}
+        drafts={drafts}
+      />
+
+      <AdminNewsList news={newsList} />
     </AdminLayout>
   );
 }
