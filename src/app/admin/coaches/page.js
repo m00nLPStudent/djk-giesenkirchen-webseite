@@ -6,13 +6,14 @@ import Link from "next/link";
 export default async function AdminCoachesPage() {
   const { data: coaches } = await supabase
     .from("coaches")
-    .select("*")
+    .select("*, teams(id, name_de, slug)")
     .order("sort_order", { ascending: true });
 
   const coachList = coaches || [];
 
   const active = coachList.filter((coach) => coach.is_active).length;
   const inactive = coachList.filter((coach) => !coach.is_active).length;
+  const assignedTeams = coachList.filter((coach) => coach.team_id).length;
 
   return (
     <AdminLayout title="Trainer verwalten" subtitle="Adminbereich">
@@ -29,7 +30,7 @@ export default async function AdminCoachesPage() {
         total={coachList.length}
         active={active}
         inactive={inactive}
-        assignedTeams={0}
+        assignedTeams={assignedTeams}
       />
 
       <AdminCoachesList coaches={coachList} />
