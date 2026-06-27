@@ -13,7 +13,7 @@ export const POSITION_EN = {
   Außenverteidiger: "Full-back",
   "Defensives Mittelfeld": "Defensive midfield",
   "Zentrales Mittelfeld": "Central midfield",
-  "Offensives Mittelfeld": "Central midfield",
+  "Offensives Mittelfeld": "Attacking midfield",
   "Linkes Mittelfeld": "Left midfield",
   "Rechtes Mittelfeld": "Right midfield",
   Linksaußen: "Left winger",
