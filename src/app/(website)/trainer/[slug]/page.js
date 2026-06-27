@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ProfileDetailsCard from "@/components/website/profile/ProfileDetailsCard";
 import {
   CoachProfileHeader,
   CoachProfileImageCard,
-  CoachProfileStatsGrid,
   getCoachContact,
   getCoachFullName,
   getCountry,
@@ -29,10 +29,10 @@ export default async function CoachProfilePage({ params }) {
   const team = getTeam(coach);
   const contact = getCoachContact(coach);
 
-  const stats = [
+  const details = [
     { label: "Funktion", value: coach.role },
     { label: "Mannschaft", value: team?.name_de || coach.team_name || "Keine Mannschaft" },
-    { label: "Lizenz", value: coach.license, type: "license" },
+    { label: "Lizenz", value: coach.license },
     {
       label: "E-Mail",
       value: coach.email,
@@ -75,7 +75,7 @@ export default async function CoachProfilePage({ params }) {
               />
 
               <div className="mt-10 flex flex-1">
-                <CoachProfileStatsGrid stats={stats} />
+                <ProfileDetailsCard title="Trainerdaten" items={details} />
               </div>
             </div>
           </div>
