@@ -1,15 +1,18 @@
+import { FormGrid } from "@/components/admin/forms";
 import { coachLicenses, coachRoles } from "../../constants/CoachOptions";
 import { SelectInput } from "./CoachFormField";
 
 export default function CoachRoleFields({ form, errors, teams = [], updateField }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <FormGrid>
       <SelectInput
+        label="Funktion"
+        required
         value={form.role}
         onChange={(event) => updateField("role", event.target.value)}
         error={errors.role}
       >
-        <option value="">Funktion auswählen *</option>
+        <option value="">Funktion auswählen</option>
         {coachRoles.map((role) => (
           <option key={role} value={role}>
             {role}
@@ -17,10 +20,10 @@ export default function CoachRoleFields({ form, errors, teams = [], updateField 
         ))}
       </SelectInput>
 
-      <select
+      <SelectInput
+        label="Mannschaft"
         value={form.team_id}
         onChange={(event) => updateField("team_id", event.target.value)}
-        className="h-14 w-full rounded-2xl border border-white/10 bg-[#18181d] px-4 text-white outline-none focus:border-red-500"
       >
         <option value="">Keine Mannschaft zugeordnet</option>
         {teams.map((team) => (
@@ -28,19 +31,19 @@ export default function CoachRoleFields({ form, errors, teams = [], updateField 
             {team.name_de}
           </option>
         ))}
-      </select>
+      </SelectInput>
 
-      <select
+      <SelectInput
+        label="Lizenz"
         value={form.license}
         onChange={(event) => updateField("license", event.target.value)}
-        className="h-14 w-full rounded-2xl border border-white/10 bg-[#18181d] px-4 text-white outline-none focus:border-red-500 md:col-start-2"
       >
         {coachLicenses.map((license) => (
           <option key={license} value={license}>
             {license}
           </option>
         ))}
-      </select>
-    </div>
+      </SelectInput>
+    </FormGrid>
   );
 }
