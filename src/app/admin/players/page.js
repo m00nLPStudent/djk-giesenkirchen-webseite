@@ -1,9 +1,13 @@
 import Link from "next/link";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminPlayersList, PlayerStats } from "@/components/admin/players";
+import PlayerNationalityList from "@/components/admin/players/stats/PlayerNationalityList";
+import { getPlayerStats } from "@/components/admin/players/stats/playerStats.helpers";
 import { supabase } from "@/lib/supabase";
 
-export default async function AdminPlayersPage() {
+export default async function AdminPlayersPage({ searchParams }) {
+  const params = await searchParams;
+
   const { data: players } = await supabase
     .from("players")
     .select("*, teams(id, name_de, slug)")
@@ -11,12 +15,14 @@ export default async function AdminPlayersPage() {
     .order("last_name", { ascending: true });
 
   const playerList = players || [];
+  const stats = getPlayerStats(playerList);
 
-  const active = playerList.filter((player) => player.is_active).length;
-  const inactive = playerList.length - active;
-  const goalkeepers = playerList.filter((player) =>
-    (player.position_de || "").toLowerCase().includes("tor"),
-  ).length;
+  const initialFilters = {
+    statusFilter: params?.status || "all",
+    nationalityFilter: params?.nationality || "all",
+  };
+
+  const showNationalities = params?.view === "nationalities";
 
   return (
     <AdminLayout title="Spieler verwalten" subtitle="Adminbereich">
@@ -30,13 +36,17 @@ export default async function AdminPlayersPage() {
       </div>
 
       <PlayerStats
-        total={playerList.length}
-        active={active}
-        inactive={inactive}
-        goalkeepers={goalkeepers}
+        total={stats.total}
+        inactive={stats.inactive}
+        nationalityCount={stats.nationalityCount}
+        openContributions={stats.openContributions}
       />
 
-      <AdminPlayersList players={playerList} />
+      {showNationalities && (
+        <PlayerNationalityList nationalities={stats.nationalities} />
+      )}
+
+      <AdminPlayersList players={playerList} initialFilters={initialFilters} />
     </AdminLayout>
   );
 }
