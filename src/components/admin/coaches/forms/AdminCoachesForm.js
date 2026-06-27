@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { COUNTRIES } from "@/constants";
+import { normalizeGermanPhoneNumber } from "@/lib/phone";
 import CoachImageUpload from "../components/CoachImageUpload";
 import { createSlug } from "../utils/slug";
 import {
@@ -129,6 +130,8 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
       ...form,
       name: fullName,
       slug,
+      phone: normalizeGermanPhoneNumber(form.phone),
+      whatsapp: normalizeGermanPhoneNumber(form.whatsapp),
       image_url: form.image_url || COACH_PLACEHOLDER_IMAGE,
       team_id: form.team_id || null,
       sort_order: Number(form.sort_order),
@@ -251,6 +254,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
             placeholder="Telefonnummer *"
             value={form.phone}
             onChange={(e) => updateField("phone", e.target.value)}
+            onBlur={(e) => updateField("phone", normalizeGermanPhoneNumber(e.target.value))}
             className={inputClass("phone")}
           />
           <ErrorText field="phone" />
@@ -263,6 +267,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
             placeholder="WhatsApp-Nummer *"
             value={form.whatsapp}
             onChange={(e) => updateField("whatsapp", e.target.value)}
+            onBlur={(e) => updateField("whatsapp", normalizeGermanPhoneNumber(e.target.value))}
             className={inputClass("whatsapp")}
           />
           <ErrorText field="whatsapp" />
