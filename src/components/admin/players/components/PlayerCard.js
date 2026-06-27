@@ -1,6 +1,23 @@
 import Link from "next/link";
-import { getCountryLabel } from "@/constants";
+import { COUNTRIES } from "@/constants";
 import PlayerStatusBadge from "./PlayerStatusBadge";
+
+function getNationalityLabel(value) {
+  if (!value) return "";
+
+  const normalizedValue = String(value).trim().toLowerCase();
+  const country = COUNTRIES.find((item) => {
+    return (
+      item.iso.toLowerCase() === normalizedValue ||
+      item.de.toLowerCase() === normalizedValue ||
+      item.en.toLowerCase() === normalizedValue
+    );
+  });
+
+  if (!country) return value;
+
+  return `${country.flag} ${country.de}`;
+}
 
 export default function PlayerCard({ player }) {
   const fullName =
@@ -8,9 +25,7 @@ export default function PlayerCard({ player }) {
     "Unbekannter Spieler";
 
   const teamName = player.teams?.name_de || "Keine Mannschaft";
-  const nationalityLabel = player.nationality
-    ? getCountryLabel(player.nationality)
-    : "";
+  const nationalityLabel = getNationalityLabel(player.nationality);
 
   return (
     <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[120px_1fr]">
