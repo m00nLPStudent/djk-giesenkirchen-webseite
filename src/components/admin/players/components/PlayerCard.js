@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { COUNTRIES } from "@/constants";
+import { COUNTRIES, getGenderLabel } from "@/constants";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
 function getNationality(value) {
@@ -38,6 +38,7 @@ export default function PlayerCard({ player }) {
   const teamName = player.teams?.name_de || "Keine Mannschaft";
   const teamSlug = player.teams?.slug;
   const nationality = getNationality(player.nationality);
+  const genderLabel = getGenderLabel(player.gender);
   const profileUrl = teamSlug ? `/fussball/${teamSlug}/spieler/${player.id}` : null;
 
   return (
@@ -63,6 +64,12 @@ export default function PlayerCard({ player }) {
           {player.position_de && (
             <span className="rounded-full bg-red-600/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
               {player.position_de}
+            </span>
+          )}
+
+          {genderLabel && (
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white/60">
+              {genderLabel}
             </span>
           )}
 
