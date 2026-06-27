@@ -37,10 +37,9 @@ export async function savePlayer(player, id = null) {
     year_group: player.year_group || null,
     strong_foot: player.strong_foot || null,
     nationality: player.nationality || null,
+    gender: player.gender || null,
     is_captain: player.is_captain ?? false,
   };
-
-  console.log("PLAYER SAVE PAYLOAD", payload);
 
   if (id) {
     return await supabase
