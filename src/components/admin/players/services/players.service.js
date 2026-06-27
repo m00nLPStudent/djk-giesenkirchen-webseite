@@ -52,3 +52,15 @@ export async function savePlayer(player, id = null) {
 
   return await supabase.from("players").insert(payload).select("*");
 }
+
+export async function deletePlayerCompletely(player) {
+  const imageUrl = player?.photo_url || player?.image_url;
+
+  const imageResult = await deletePlayerImage(imageUrl);
+
+  if (imageResult?.error) {
+    return imageResult;
+  }
+
+  return await supabase.from("players").delete().eq("id", player.id);
+}
