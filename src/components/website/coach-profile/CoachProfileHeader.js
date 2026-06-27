@@ -1,32 +1,16 @@
 import CoachProfileContactActions from "./CoachProfileContactActions";
 
-export default function CoachProfileHeader({ coach, fullName, team, contact }) {
+export default function CoachProfileHeader({ coach, fullName, contact }) {
   return (
     <div>
       <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
         Trainerprofil
       </p>
 
-      <h1 className="mt-5 text-5xl font-black md:text-7xl">
-        {fullName}
-      </h1>
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-red-600/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-red-400">
-            {coach.role || "Trainer"}
-          </span>
-
-          {coach.license && (
-            <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-              {coach.license}
-            </span>
-          )}
-
-          <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-            {team?.name_de || coach.team_name || "Keine Mannschaft"}
-          </span>
-        </div>
+      <div className="mt-5 flex flex-wrap items-start justify-between gap-6">
+        <h1 className="text-5xl font-black md:text-7xl">
+          {fullName}
+        </h1>
 
         <CoachProfileContactActions contact={contact} email={coach.email} />
       </div>
