@@ -36,7 +36,9 @@ export default function PlayerCard({ player }) {
     "Unbekannter Spieler";
 
   const teamName = player.teams?.name_de || "Keine Mannschaft";
+  const teamSlug = player.teams?.slug;
   const nationality = getNationality(player.nationality);
+  const profileUrl = teamSlug ? `/fussball/${teamSlug}/spieler/${player.id}` : null;
 
   return (
     <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[120px_1fr]">
@@ -109,13 +111,23 @@ export default function PlayerCard({ player }) {
           </p>
         )}
 
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href={`/admin/players/edit/${player.id}`}
             className="rounded-full border border-white/10 px-5 py-2 text-sm font-bold text-white transition hover:border-red-500"
           >
             Bearbeiten
           </Link>
+
+          {profileUrl && (
+            <Link
+              href={profileUrl}
+              target="_blank"
+              className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white transition hover:bg-red-700"
+            >
+              Profil anzeigen
+            </Link>
+          )}
         </div>
       </div>
     </div>
