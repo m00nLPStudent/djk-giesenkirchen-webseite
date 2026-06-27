@@ -2,47 +2,64 @@
 
 Diese Datei sammelt offene Aufgaben und technische Baustellen.
 
-## Aktuell offen
+## Erledigt
 
 ### Spielermodul
 
-- Datenbankfelder final mit Code abgleichen
-- Service auf bestehende Spalten anpassen
-- Formular auf bestehende Spalten anpassen
-- Spielerkarte auf bestehende Spalten anpassen
-- Übersicht auf Mannschaftszuordnung erweitern
-- Bild-Upload auf `photo_url` vereinheitlichen
-- Speichern testen
-- Bearbeiten testen
-- Aktiv/Inaktiv testen
+- [x] Datenbankfelder final mit Code abgeglichen
+- [x] Service auf bestehende Spalten angepasst
+- [x] Formular auf bestehende Spalten angepasst
+- [x] Spielerkarte auf bestehende Spalten angepasst
+- [x] Übersicht auf Mannschaftszuordnung erweitert
+- [x] Bild-Upload auf `photo_url` vereinheitlicht
+- [x] Platzhalterbild für Spieler eingebaut
+- [x] Alte Spielerbilder werden beim Wechseln/Entfernen gelöscht
+- [x] Speichern getestet
+- [x] Bearbeiten getestet
+- [x] Aktiv/Inaktiv getestet
+- [x] Spielerprofilseite erstellt
+- [x] Mannschafts-Kaderansicht mit Spielerprofilen erstellt
+- [x] Dashboard-Statistiken für Spieler erstellt
+- [x] Nationalitätenübersicht erstellt
+- [x] Filter- und Sortierlogik ausgelagert
+- [x] Spielerformular modularisiert
+- [x] Spielerprofil modularisiert
+
+## Aktuell offen
 
 ### Datenbank
 
-- `players` prüfen und final dokumentieren
 - `teams` prüfen und final dokumentieren
 - später Migrationen unter `supabase/migrations` anlegen
+- Rollen-/Rechtesystem später ergänzen
+- Beitragsstatus später ergänzen
 
 ### Adminbereich
 
 - QuickActions prüfen
 - Sidebar prüfen
 - fehlende Adminseiten als Platzhalter anlegen
-- einheitliche EmptyStates erstellen
+- einheitliche EmptyStates weiter ausbauen
 
 ### Website
 
 - fehlende Hauptseiten wurden als Platzhalter angelegt
-- Fußball-Unterseiten fehlen noch
+- Fußball-Unterseiten weiter ausbauen
 - Newsdetailseite prüfen
-- Mannschaftsdetailseite prüfen
+- Mannschaftsdetailseite weiter ausbauen
 
 ## Nächster konkreter Arbeitsschritt
 
-Spielermodul vollständig auf vorhandene Datenbankspalten umstellen:
+Trainerverwaltung als nächstes Modul umsetzen.
 
-- `shirt_number` statt `jersey_number`
-- `position_de` statt `position`
-- `position_en` ergänzen
-- `photo_url` statt `image_url`
+Ziel: Aufbau nach dem gleichen Muster wie das Spielermodul:
 
-Danach lokal testen.
+- Datenbankstruktur prüfen
+- Admin-Übersicht erstellen
+- Trainer anlegen
+- Trainer bearbeiten
+- Trainer aktiv/inaktiv setzen
+- Bildverwaltung mit Platzhalter und Storage-Cleanup
+- Mannschaftszuordnung vorbereiten
+- öffentliche Traineranzeige vorbereiten
+- modulare Komponentenstruktur einhalten
