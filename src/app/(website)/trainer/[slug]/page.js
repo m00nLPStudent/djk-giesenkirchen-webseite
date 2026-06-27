@@ -33,9 +33,9 @@ export default async function CoachProfilePage({ params }) {
     { label: "Funktion", value: coach.role },
     { label: "Mannschaft", value: team?.name_de || coach.team_name || "Keine Mannschaft" },
     { label: "Lizenz", value: coach.license },
-    { label: "E-Mail", value: coach.email, href: coach.email ? `mailto:${coach.email}` : null },
-    { label: "Telefon", value: contact.phoneDisplay, href: contact.phoneHref },
-    { label: "WhatsApp", value: contact.whatsappDisplay, href: contact.whatsappHref },
+    { label: "E-Mail", value: coach.email },
+    { label: "Telefon", value: contact.phoneDisplay },
+    { label: "Status", value: coach.is_active ? "Aktiv" : "Inaktiv" },
   ];
 
   return (
@@ -61,6 +61,7 @@ export default async function CoachProfilePage({ params }) {
                 coach={coach}
                 fullName={fullName}
                 team={team}
+                contact={contact}
               />
 
               <div className="mt-10 flex flex-1">
