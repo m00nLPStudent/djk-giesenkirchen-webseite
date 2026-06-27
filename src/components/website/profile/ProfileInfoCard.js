@@ -1,9 +1,21 @@
+function getValueClass(type) {
+  const classes = {
+    email: "text-lg md:text-xl whitespace-nowrap",
+    phone: "text-xl md:text-2xl whitespace-nowrap",
+    license: "text-xl md:text-2xl break-normal",
+    country: "text-xl md:text-2xl break-normal",
+    text: "text-2xl break-normal",
+  };
+
+  return classes[type] || classes.text;
+}
+
 export default function ProfileInfoCard({
   label,
   value,
   href,
   title,
-  truncate = false,
+  type = "text",
   children,
 }) {
   const content = (
@@ -13,9 +25,7 @@ export default function ProfileInfoCard({
       </p>
 
       <div
-        className={`mt-3 min-w-0 text-2xl font-black leading-tight text-white ${
-          truncate ? "truncate whitespace-nowrap" : "break-normal"
-        }`}
+        className={`mt-3 min-w-0 font-black leading-tight text-white ${getValueClass(type)}`}
         title={title || (typeof value === "string" ? value : undefined)}
       >
         {children || value || "-"}
