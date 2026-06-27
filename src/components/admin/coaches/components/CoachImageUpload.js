@@ -53,10 +53,6 @@ export default function CoachImageUpload({
           )}
         </div>
       </div>
-
-      {previewUrl && (
-        <p className="mt-4 break-all text-xs text-white/40">{previewUrl}</p>
-      )}
     </div>
   );
 }
