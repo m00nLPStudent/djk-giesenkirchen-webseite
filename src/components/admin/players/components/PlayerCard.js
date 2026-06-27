@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { COUNTRIES, getGenderLabel } from "@/constants";
+import { getGenderLabel } from "@/constants";
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
@@ -12,36 +12,9 @@ import {
   EntityCardBadges,
   EntityDeleteButton,
 } from "@/components/admin/ui/EntityCard";
+import { CountryFlag, getCountryByValue } from "@/components/admin/utils/countries";
 import { deletePlayerCompletely } from "../services/players.service";
 import PlayerStatusBadge from "./PlayerStatusBadge";
-
-function getNationality(value) {
-  if (!value) return null;
-
-  const normalizedValue = String(value).trim().toLowerCase();
-
-  return (
-    COUNTRIES.find((item) => {
-      return (
-        item.iso.toLowerCase() === normalizedValue ||
-        item.de.toLowerCase() === normalizedValue ||
-        item.en.toLowerCase() === normalizedValue
-      );
-    }) || null
-  );
-}
-
-function FlagIcon({ country }) {
-  if (!country || country.iso === "OTHER") return null;
-
-  return (
-    <img
-      src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
-      alt={country.de}
-      className="h-4 w-6 rounded-sm object-cover ring-1 ring-white/20"
-    />
-  );
-}
 
 export default function PlayerCard({ player }) {
   const router = useRouter();
@@ -52,7 +25,7 @@ export default function PlayerCard({ player }) {
 
   const teamName = player.teams?.name_de || "Keine Mannschaft";
   const teamSlug = player.teams?.slug;
-  const nationality = getNationality(player.nationality);
+  const nationality = getCountryByValue(player.nationality);
   const genderLabel = getGenderLabel(player.gender);
   const profileUrl = teamSlug ? `/fussball/${teamSlug}/spieler/${player.id}` : null;
   const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
@@ -86,7 +59,7 @@ export default function PlayerCard({ player }) {
         {player.is_captain && <EntityBadge variant="yellow">Spielführer</EntityBadge>}
         {nationality && (
           <EntityBadge>
-            <FlagIcon country={nationality} />
+            <CountryFlag country={nationality} />
             {nationality.de}
           </EntityBadge>
         )}
