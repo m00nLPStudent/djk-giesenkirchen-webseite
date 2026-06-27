@@ -32,18 +32,18 @@ export default async function CoachProfilePage({ params }) {
   const stats = [
     { label: "Funktion", value: coach.role },
     { label: "Mannschaft", value: team?.name_de || coach.team_name || "Keine Mannschaft" },
-    { label: "Lizenz", value: coach.license, truncate: true },
+    { label: "Lizenz", value: coach.license, type: "license" },
     {
       label: "E-Mail",
       value: coach.email,
       href: coach.email ? `mailto:${coach.email}` : null,
-      truncate: true,
+      type: "email",
     },
     {
       label: "Telefon",
       value: contact.phoneDisplay,
       href: contact.phoneHref,
-      truncate: true,
+      type: "phone",
     },
     { label: "Status", value: coach.is_active ? "Aktiv" : "Inaktiv" },
   ];
