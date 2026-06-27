@@ -44,13 +44,14 @@ function sortPlayers(players, sortBy) {
   });
 }
 
-export default function AdminPlayersList({ players = [] }) {
+export default function AdminPlayersList({ players = [], initialFilters = {} }) {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(initialFilters.statusFilter || "all");
   const [teamFilter, setTeamFilter] = useState("all");
   const [genderFilter, setGenderFilter] = useState("all");
   const [positionFilter, setPositionFilter] = useState("all");
   const [captainFilter, setCaptainFilter] = useState("all");
+  const [nationalityFilter, setNationalityFilter] = useState(initialFilters.nationalityFilter || "all");
   const [sortBy, setSortBy] = useState("name_asc");
 
   const teams = useMemo(() => {
@@ -94,6 +95,7 @@ export default function AdminPlayersList({ players = [] }) {
       if (statusFilter === "inactive" && player.is_active) return false;
       if (teamFilter !== "all" && player.team_id !== teamFilter) return false;
       if (genderFilter !== "all" && player.gender !== genderFilter) return false;
+      if (nationalityFilter !== "all" && player.nationality !== nationalityFilter) return false;
       if (positionFilter !== "all" && player.position_de !== positionFilter) return false;
       if (captainFilter === "captain" && !player.is_captain) return false;
       if (captainFilter === "not_captain" && player.is_captain) return false;
@@ -102,7 +104,7 @@ export default function AdminPlayersList({ players = [] }) {
     });
 
     return sortPlayers(result, sortBy);
-  }, [players, search, statusFilter, teamFilter, genderFilter, positionFilter, captainFilter, sortBy]);
+  }, [players, search, statusFilter, teamFilter, genderFilter, nationalityFilter, positionFilter, captainFilter, sortBy]);
 
   return (
     <>
@@ -119,6 +121,8 @@ export default function AdminPlayersList({ players = [] }) {
         setPositionFilter={setPositionFilter}
         captainFilter={captainFilter}
         setCaptainFilter={setCaptainFilter}
+        nationalityFilter={nationalityFilter}
+        setNationalityFilter={setNationalityFilter}
         sortBy={sortBy}
         setSortBy={setSortBy}
         teams={teams}
