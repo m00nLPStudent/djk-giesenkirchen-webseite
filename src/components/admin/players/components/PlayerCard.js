@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { COUNTRIES, getGenderLabel } from "@/constants";
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { deletePlayerCompletely } from "../services/players.service";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
 function getNationality(value) {
@@ -32,6 +37,8 @@ function FlagIcon({ country }) {
 }
 
 export default function PlayerCard({ player }) {
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
   const fullName =
     `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() ||
     "Unbekannter Spieler";
@@ -42,6 +49,25 @@ export default function PlayerCard({ player }) {
   const genderLabel = getGenderLabel(player.gender);
   const profileUrl = teamSlug ? `/fussball/${teamSlug}/spieler/${player.id}` : null;
   const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      `Spieler „${fullName}“ wirklich komplett löschen?\n\nDas Profil und ein eigenes Spielerbild werden dauerhaft entfernt.`,
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(true);
+    const { error } = await deletePlayerCompletely(player);
+    setDeleting(false);
+
+    if (error) {
+      alert("Fehler beim Löschen: " + error.message);
+      return;
+    }
+
+    router.refresh();
+  }
 
   return (
     <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[120px_1fr]">
@@ -133,6 +159,15 @@ export default function PlayerCard({ player }) {
               Profil anzeigen
             </Link>
           )}
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="rounded-full border border-red-500/30 px-5 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
+          >
+            {deleting ? "Löscht..." : "Löschen"}
+          </button>
         </div>
       </div>
     </div>
