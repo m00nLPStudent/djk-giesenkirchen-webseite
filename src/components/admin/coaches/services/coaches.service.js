@@ -38,6 +38,16 @@ export async function saveCoach(coach, id = null) {
   return await supabase.from("coaches").insert(payload);
 }
 
+export async function deleteCoachCompletely(coach) {
+  const imageResult = await deleteCoachImage(coach?.image_url);
+
+  if (imageResult?.error) {
+    return imageResult;
+  }
+
+  return await supabase.from("coaches").delete().eq("id", coach.id);
+}
+
 export async function deleteCoach(id) {
   return await supabase.from("coaches").delete().eq("id", id);
 }
