@@ -1,4 +1,6 @@
-export default function CoachProfileHeader({ coach, fullName, team }) {
+import CoachProfileContactActions from "./CoachProfileContactActions";
+
+export default function CoachProfileHeader({ coach, fullName, team, contact }) {
   return (
     <div>
       <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
@@ -23,6 +25,8 @@ export default function CoachProfileHeader({ coach, fullName, team }) {
         <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
           {team?.name_de || coach.team_name || "Keine Mannschaft"}
         </span>
+
+        <CoachProfileContactActions contact={contact} email={coach.email} />
       </div>
 
       {!coach.is_active && (
