@@ -7,6 +7,7 @@ import { savePlayer, uploadPlayerImage } from "../services/players.service";
 import {
   ADVANCED_POSITIONS,
   COUNTRIES,
+  GENDER_OPTIONS,
   SIMPLE_POSITIONS,
   STRONG_FOOT,
 } from "@/constants";
@@ -79,6 +80,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     birthdate: player?.birthdate || "",
     strong_foot: player?.strong_foot || "",
     nationality: player?.nationality || "",
+    gender: player?.gender || "male",
     sort_order: player?.sort_order || 0,
     is_active: player?.is_active ?? true,
     is_captain: player?.is_captain ?? false,
@@ -300,7 +302,19 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           ))}
         </select>
 
-        <div className="md:col-span-2">
+        <select
+          value={form.gender}
+          onChange={(e) => updateField("gender", e.target.value)}
+          className="w-full rounded-2xl border border-white/10 bg-[#17171d] p-4 outline-none focus:border-red-500"
+        >
+          {GENDER_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <div>
           <select
             value={form.nationality}
             onChange={(e) => updateField("nationality", e.target.value)}
