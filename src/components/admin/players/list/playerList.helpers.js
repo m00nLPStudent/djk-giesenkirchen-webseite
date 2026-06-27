@@ -1,3 +1,10 @@
+import {
+  matchesActiveStatus,
+  matchesSearch,
+  uniqueOptions,
+  uniqueValues,
+} from "@/components/admin/utils/list";
+
 export function calculateAge(birthdate) {
   if (!birthdate) return null;
 
@@ -38,23 +45,15 @@ export function sortPlayers(players, sortBy) {
 }
 
 export function getPlayerTeams(players = []) {
-  const map = new Map();
-
-  players.forEach((player) => {
-    if (player.team_id && player.teams?.name_de) {
-      map.set(player.team_id, player.teams.name_de);
-    }
-  });
-
-  return [...map.entries()]
-    .map(([id, name]) => ({ id, name }))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  return uniqueOptions(
+    players,
+    (player) => player.team_id,
+    (player) => player.teams?.name_de,
+  );
 }
 
 export function getPlayerPositions(players = []) {
-  return [...new Set(players.map((player) => player.position_de).filter(Boolean))].sort((a, b) =>
-    a.localeCompare(b),
-  );
+  return uniqueValues(players, (player) => player.position_de);
 }
 
 export function filterPlayers(players = [], filters = {}) {
@@ -69,24 +68,24 @@ export function filterPlayers(players = [], filters = {}) {
     sortBy = "name_asc",
   } = filters;
 
-  const searchTerm = search.toLowerCase().trim();
-
   const result = players.filter((player) => {
-    const text = [
-      player.first_name,
-      player.last_name,
-      player.shirt_number,
-      player.position_de,
-      player.year_group,
-      player.teams?.name_de,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
+    if (
+      !matchesSearch(
+        [
+          player.first_name,
+          player.last_name,
+          player.shirt_number,
+          player.position_de,
+          player.year_group,
+          player.teams?.name_de,
+        ],
+        search,
+      )
+    ) {
+      return false;
+    }
 
-    if (searchTerm && !text.includes(searchTerm)) return false;
-    if (statusFilter === "active" && !player.is_active) return false;
-    if (statusFilter === "inactive" && player.is_active) return false;
+    if (!matchesActiveStatus(player, statusFilter)) return false;
     if (teamFilter !== "all" && player.team_id !== teamFilter) return false;
     if (genderFilter !== "all" && player.gender !== genderFilter) return false;
     if (nationalityFilter !== "all" && player.nationality !== nationalityFilter) return false;
