@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import CoachImageUpload from "../components/CoachImageUpload";
+import CoachImageUpload from "@/components/admin/coaches/components/CoachImageUpload";
 import { createSlug } from "../utils/slug";
 import { uploadCoachImage, saveCoach } from "../services/coaches.service";
 

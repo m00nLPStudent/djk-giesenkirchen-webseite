@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import CoachFilters from "./components/CoachFilters";
-import CoachCard from "./components/CoachCard";
-import CoachEmptyState from "./components/CoachEmptyState";
+import CoachFilters from "@/components/admin/coaches/components/CoachFilters";
+import CoachCard from "@/components/admin/coaches/components/CoachCard";
+import CoachEmptyState from "@/components/admin/coaches/components/CoachEmptyState";
 
 export default function AdminCoachesList({ coaches = [] }) {
   const [filter, setFilter] = useState("alle");
