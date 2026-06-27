@@ -1,3 +1,4 @@
+export { default as AdminCoachesOverview } from "./AdminCoachesOverview";
 export { default as AdminCoachesList } from "./AdminCoachesList";
 export { default as AdminCoachesForm } from "./forms/AdminCoachesForm";
 
