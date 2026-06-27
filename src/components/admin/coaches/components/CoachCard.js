@@ -1,19 +1,48 @@
 import Link from "next/link";
+import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { COUNTRIES } from "@/constants";
 import CoachStatusBadge from "./CoachStatusBadge";
 
-export default function CoachCard({ coach }) {
+function getCountry(value) {
+  if (!value) return null;
+
+  const normalizedValue = String(value).trim().toLowerCase();
+
   return (
-    <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[180px_1fr]">
-      <div className="flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-white/5 p-4">
-        {coach.image_url ? (
-          <img
-            src={coach.image_url}
-            alt={coach.name}
-            className="h-full w-full rounded-xl object-cover"
-          />
-        ) : (
-          <span className="text-sm text-white/40">Kein Bild</span>
-        )}
+    COUNTRIES.find((country) => {
+      return (
+        country.iso.toLowerCase() === normalizedValue ||
+        country.de.toLowerCase() === normalizedValue ||
+        country.en.toLowerCase() === normalizedValue
+      );
+    }) || null
+  );
+}
+
+function FlagIcon({ country }) {
+  if (!country || country.iso === "OTHER") return null;
+
+  return (
+    <img
+      src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
+      alt={country.de}
+      className="h-4 w-6 rounded-sm object-cover ring-1 ring-white/20"
+    />
+  );
+}
+
+export default function CoachCard({ coach }) {
+  const country = getCountry(coach.nationality);
+  const imageUrl = coach.image_url || COACH_PLACEHOLDER_IMAGE;
+
+  return (
+    <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[140px_1fr]">
+      <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
+        <img
+          src={imageUrl}
+          alt={coach.name || "Trainerbild"}
+          className="h-full w-full object-cover"
+        />
       </div>
 
       <div>
@@ -27,6 +56,13 @@ export default function CoachCard({ coach }) {
           <span className="text-sm text-white/40">
             {coach.team_name || "Keine Mannschaft"}
           </span>
+
+          {country && (
+            <span className="inline-flex items-center gap-2 text-sm text-white/50">
+              <FlagIcon country={country} />
+              {country.de}
+            </span>
+          )}
         </div>
 
         <h2 className="mt-4 text-2xl font-black">{coach.name}</h2>
