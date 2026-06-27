@@ -24,6 +24,7 @@ export async function saveCoach(coach, id = null) {
     last_name: coach.last_name || null,
     name: coach.name || `${coach.first_name || ""} ${coach.last_name || ""}`.trim(),
     team_id: coach.team_id || null,
+    team_name: coach.team_id ? coach.team_name || null : null,
     image_url: coach.image_url || COACH_PLACEHOLDER_IMAGE,
     nationality: coach.nationality || null,
     sort_order: Number(coach.sort_order || 0),
