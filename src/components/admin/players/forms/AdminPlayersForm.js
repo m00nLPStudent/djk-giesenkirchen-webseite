@@ -42,6 +42,11 @@ function usesSimplePositions(teamName = "") {
   );
 }
 
+const germany = COUNTRIES.find((country) => country.iso === "DE");
+const countryOptions = germany
+  ? [germany, ...COUNTRIES.filter((country) => country.iso !== "DE")]
+  : COUNTRIES;
+
 export default function AdminPlayersForm({ player, teams = [] }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -216,7 +221,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           className="w-full rounded-2xl border border-white/10 bg-[#17171d] p-4"
         >
           <option value="">Nationalität auswählen</option>
-          {COUNTRIES.map((country) => (
+          {countryOptions.map((country) => (
             <option key={country.iso} value={country.iso}>
               {country.flag} {country.de}
             </option>
