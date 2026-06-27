@@ -4,6 +4,7 @@ import {
   TeamTrainingInfo,
   TeamContact,
   TeamCoachSection,
+  TeamPlayerSection,
 } from "@/components/website/team";
 
 export default async function TeamPage({ params }) {
@@ -21,6 +22,14 @@ export default async function TeamPage({ params }) {
     .eq("team_id", team?.id)
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
+
+  const { data: players } = await supabase
+    .from("players")
+    .select("*")
+    .eq("team_id", team?.id)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("last_name", { ascending: true });
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
@@ -43,6 +52,8 @@ export default async function TeamPage({ params }) {
           <TeamContact team={team} />
 
           <TeamCoachSection coaches={coaches || []} />
+
+          <TeamPlayerSection players={players || []} teamSlug={slug} />
         </div>
       </section>
     </main>
