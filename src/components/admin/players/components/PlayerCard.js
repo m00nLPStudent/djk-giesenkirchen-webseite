@@ -1,9 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { getGenderLabel } from "@/constants";
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
+import useDeleteEntity from "@/components/admin/hooks/useDeleteEntity";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
   EntityActionLink,
@@ -17,8 +16,6 @@ import { deletePlayerCompletely } from "../services/players.service";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
 export default function PlayerCard({ player }) {
-  const router = useRouter();
-  const [deleting, setDeleting] = useState(false);
   const fullName =
     `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() ||
     "Unbekannter Spieler";
@@ -29,25 +26,11 @@ export default function PlayerCard({ player }) {
   const genderLabel = getGenderLabel(player.gender);
   const profileUrl = teamSlug ? `/fussball/${teamSlug}/spieler/${player.id}` : null;
   const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
-
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      `Spieler „${fullName}“ wirklich komplett löschen?\n\nDas Profil und ein eigenes Spielerbild werden dauerhaft entfernt.`,
-    );
-
-    if (!confirmed) return;
-
-    setDeleting(true);
-    const { error } = await deletePlayerCompletely(player);
-    setDeleting(false);
-
-    if (error) {
-      alert("Fehler beim Löschen: " + error.message);
-      return;
-    }
-
-    router.refresh();
-  }
+  const { deleting, handleDelete } = useDeleteEntity({
+    entityLabel: "Spieler",
+    entityName: fullName,
+    deleteAction: () => deletePlayerCompletely(player),
+  });
 
   return (
     <EntityCard image={imageUrl} imageAlt={fullName} imageSize="sm">
