@@ -1,11 +1,17 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { COUNTRIES, getGenderLabel } from "@/constants";
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
+import {
+  EntityActionLink,
+  EntityCard,
+  EntityCardActions,
+  EntityCardBadges,
+  EntityDeleteButton,
+} from "@/components/admin/ui/EntityCard";
 import { deletePlayerCompletely } from "../services/players.service";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
@@ -71,91 +77,56 @@ export default function PlayerCard({ player }) {
   }
 
   return (
-    <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[120px_1fr]">
-      <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
-        <img
-          src={imageUrl}
-          alt={fullName}
-          className="h-full w-full object-cover"
-        />
-      </div>
+    <EntityCard image={imageUrl} imageAlt={fullName} imageSize="sm">
+      <EntityCardBadges>
+        <EntityBadge>{teamName}</EntityBadge>
+        {player.position_de && <EntityBadge variant="red">{player.position_de}</EntityBadge>}
+        {genderLabel && <EntityBadge>{genderLabel}</EntityBadge>}
+        <PlayerStatusBadge active={player.is_active} />
+        {player.is_captain && <EntityBadge variant="yellow">Spielführer</EntityBadge>}
+        {nationality && (
+          <EntityBadge>
+            <FlagIcon country={nationality} />
+            {nationality.de}
+          </EntityBadge>
+        )}
+      </EntityCardBadges>
 
-      <div>
-        <div className="flex flex-wrap items-center gap-3">
-          <EntityBadge>{teamName}</EntityBadge>
-
-          {player.position_de && <EntityBadge variant="red">{player.position_de}</EntityBadge>}
-
-          {genderLabel && <EntityBadge>{genderLabel}</EntityBadge>}
-
-          <PlayerStatusBadge active={player.is_active} />
-
-          {player.is_captain && <EntityBadge variant="yellow">Spielführer</EntityBadge>}
-
-          {nationality && (
-            <EntityBadge>
-              <FlagIcon country={nationality} />
-              {nationality.de}
-            </EntityBadge>
-          )}
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-end gap-4">
-          {player.shirt_number && (
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl font-black text-white">
-              {player.shirt_number}
-            </div>
-          )}
-
-          <div>
-            <h2 className="text-2xl font-black">{fullName}</h2>
-
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-white/45">
-              <span>
-                {player.year_group
-                  ? `Jahrgang ${player.year_group}`
-                  : "Jahrgang nicht hinterlegt"}
-              </span>
-
-              {player.strong_foot && <span>• {player.strong_foot}</span>}
-            </div>
+      <div className="mt-4 flex flex-wrap items-end gap-4">
+        {player.shirt_number && (
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl font-black text-white">
+            {player.shirt_number}
           </div>
-        </div>
-
-        {player.description_de && (
-          <p className="mt-4 max-w-3xl text-white/60">
-            {player.description_de}
-          </p>
         )}
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href={`/admin/players/edit/${player.id}`}
-            className="rounded-full border border-white/10 px-5 py-2 text-sm font-bold text-white transition hover:border-red-500"
-          >
-            Bearbeiten
-          </Link>
-
-          {profileUrl && (
-            <Link
-              href={profileUrl}
-              target="_blank"
-              className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white transition hover:bg-red-700"
-            >
-              Profil anzeigen
-            </Link>
-          )}
-
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="rounded-full border border-red-500/30 px-5 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
-          >
-            {deleting ? "Löscht..." : "Löschen"}
-          </button>
+        <div>
+          <h2 className="text-2xl font-black">{fullName}</h2>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-white/45">
+            <span>
+              {player.year_group
+                ? `Jahrgang ${player.year_group}`
+                : "Jahrgang nicht hinterlegt"}
+            </span>
+            {player.strong_foot && <span>• {player.strong_foot}</span>}
+          </div>
         </div>
       </div>
-    </div>
+
+      {player.description_de && (
+        <p className="mt-4 max-w-3xl text-white/60">
+          {player.description_de}
+        </p>
+      )}
+
+      <EntityCardActions>
+        <EntityActionLink href={`/admin/players/edit/${player.id}`}>
+          Bearbeiten
+        </EntityActionLink>
+        <EntityActionLink href={profileUrl} target="_blank" variant="primary">
+          Profil anzeigen
+        </EntityActionLink>
+        <EntityDeleteButton onClick={handleDelete} deleting={deleting} />
+      </EntityCardActions>
+    </EntityCard>
   );
 }
