@@ -68,7 +68,7 @@ function getFullName(player) {
 
 function ProfileStat({ label, value, children }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+    <div className="min-h-32 rounded-3xl border border-white/10 bg-white/5 p-6">
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
         {label}
       </p>
@@ -79,16 +79,23 @@ function ProfileStat({ label, value, children }) {
   );
 }
 
-function NationalityValue({ country, fallback }) {
-  if (!country) return fallback || "-";
-
+function NationalityBox({ country, fallback }) {
   return (
-    <span className="flex min-w-0 items-center gap-3">
-      <FlagIcon country={country} />
-      <span className="min-w-0 text-xl leading-tight md:text-2xl">
-        {country.de}
-      </span>
-    </span>
+    <div className="border-t border-white/10 p-6">
+      <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
+        Nationalität
+      </p>
+      <div className="mt-3 flex min-w-0 items-center gap-3 text-2xl font-black leading-tight text-white">
+        {country ? (
+          <>
+            <FlagIcon country={country} />
+            <span className="min-w-0 break-words">{country.de}</span>
+          </>
+        ) : (
+          fallback || "-"
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -144,6 +151,8 @@ export default async function PlayerProfilePage({ params }) {
                   </div>
                 )}
               </div>
+
+              <NationalityBox country={country} fallback={player.nationality} />
             </div>
 
             <div>
@@ -191,7 +200,7 @@ export default async function PlayerProfilePage({ params }) {
                 </p>
               )}
 
-              <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="mt-10 grid auto-rows-fr gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 <ProfileStat label="Rückennummer" value={player.shirt_number} />
                 <ProfileStat label="Position" value={player.position_de} />
                 <ProfileStat label="Mannschaft" value={team?.name_de} />
@@ -200,9 +209,7 @@ export default async function PlayerProfilePage({ params }) {
                 <ProfileStat label="Alter" value={age !== null ? `${age} Jahre` : "-"} />
                 <ProfileStat label="Jahrgang" value={player.year_group || "-"} />
                 <ProfileStat label="Starker Fuß" value={player.strong_foot} />
-                <ProfileStat label="Nationalität">
-                  <NationalityValue country={country} fallback={player.nationality} />
-                </ProfileStat>
+                <ProfileStat label="Im Verein seit" value={formatDate(player.joined_at)} />
               </div>
 
               {player.description_en && (
