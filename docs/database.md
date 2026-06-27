@@ -50,7 +50,7 @@ Wichtige Felder:
 
 Spieler des Vereins.
 
-Aktueller Zielstandard für das Spielermodul:
+Aktueller Zielstandard für das abgeschlossene Spielermodul:
 
 - id
 - team_id
@@ -61,19 +61,29 @@ Aktueller Zielstandard für das Spielermodul:
 - shirt_number
 - position_de
 - position_en
+- image_url
 - photo_url
 - description_de
 - description_en
 - birthdate
+- joined_at
 - year_group
 - strong_foot
 - nationality
+- gender
 - sort_order
 - is_active
 - is_captain
 - created_at
 
-Hinweis: Bestehende Spalten wie `shirt_number`, `position_de`, `position_en` und `photo_url` werden aktuell bevorzugt, damit vorhandene Abfragen nicht brechen.
+Hinweise:
+
+- `photo_url` ist das Hauptfeld für Spielerbilder.
+- `image_url` wird weiterhin mitgeführt, damit bestehende alte Abfragen nicht brechen.
+- `year_group` wird aus `birthdate` berechnet und gespeichert.
+- `gender`, `nationality`, `birthdate`, `first_name`, `last_name`, `team_id` und `position_de` sind im Formular Pflichtfelder.
+- `joined_at` wird für die Profil-Kachel „Im Verein seit“ verwendet.
+- Spieler ohne eigenes Bild nutzen das Platzhalterbild `players/Blanko.png` im Storage-Bucket `media`.
 
 ## Beziehungen
 
@@ -85,6 +95,40 @@ Ziel:
 
 ```sql
 team_id uuid references public.teams(id) on delete set null
+```
+
+## Storage
+
+### Bucket `media`
+
+Aktuell genutzt für:
+
+- Spielerbilder unter `players/`
+- Platzhalterbild `players/Blanko.png`
+
+Regeln:
+
+- Platzhalterbilder dürfen nicht automatisch gelöscht werden.
+- Eigene Spielerbilder werden beim Wechseln oder Entfernen aus Storage gelöscht.
+- Für Löschen aus dem Browser-Client wird eine passende Storage-Policy benötigt.
+
+## Zuletzt benötigte SQL-Ergänzungen für Spieler
+
+```sql
+ALTER TABLE public.players
+ADD COLUMN IF NOT EXISTS gender text,
+ADD COLUMN IF NOT EXISTS joined_at date;
+
+NOTIFY pgrst, 'reload schema';
+```
+
+Falls `gender` bereits vorhanden ist, reicht:
+
+```sql
+ALTER TABLE public.players
+ADD COLUMN IF NOT EXISTS joined_at date;
+
+NOTIFY pgrst, 'reload schema';
 ```
 
 ## Vorgehen bei Änderungen
