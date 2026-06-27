@@ -1,3 +1,4 @@
+import { validateRequiredFields } from "@/components/admin/utils/validation";
 import { PLAYER_PLACEHOLDER_IMAGE } from "../services/players.service";
 import { REQUIRED_PLAYER_FIELDS } from "./playerForm.config";
 
@@ -29,15 +30,7 @@ export function getYearGroupFromBirthdate(birthdate) {
 }
 
 export function validatePlayerForm(form) {
-  const errors = {};
-
-  Object.entries(REQUIRED_PLAYER_FIELDS).forEach(([field, label]) => {
-    if (!String(form[field] || "").trim()) {
-      errors[field] = `${label} ist ein Pflichtfeld.`;
-    }
-  });
-
-  return errors;
+  return validateRequiredFields(form, REQUIRED_PLAYER_FIELDS);
 }
 
 export function createPlayerPayload(form, yearGroup) {
