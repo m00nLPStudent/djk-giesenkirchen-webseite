@@ -1,4 +1,5 @@
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { validateRequiredFields } from "@/components/admin/utils/validation";
 import { normalizeGermanPhoneNumber } from "@/lib/phone";
 import { createSlug } from "../utils/slug";
 import { REQUIRED_COACH_FIELDS } from "./coachForm.config";
@@ -34,15 +35,7 @@ export function createInitialCoachForm(coach) {
 }
 
 export function validateCoachForm(form) {
-  const errors = {};
-
-  Object.entries(REQUIRED_COACH_FIELDS).forEach(([field, label]) => {
-    if (!String(form[field] || "").trim()) {
-      errors[field] = `${label} ist ein Pflichtfeld.`;
-    }
-  });
-
-  return errors;
+  return validateRequiredFields(form, REQUIRED_COACH_FIELDS);
 }
 
 export function createCoachPayload(form) {
