@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FormActions, FormSection } from "@/components/admin/forms";
 import PlayerImageUpload from "../components/PlayerImageUpload";
 import {
   deletePlayerImage,
@@ -116,54 +117,86 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     router.refresh();
   }
 
+  const hasErrors = Object.keys(errors).some((key) => errors[key]);
+
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
-      {Object.keys(errors).filter((key) => errors[key]).length > 0 && (
+      {hasErrors && (
         <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-5 text-red-200">
           <p className="font-bold">Bitte fülle alle Pflichtfelder aus.</p>
         </div>
       )}
 
-      <PlayerBasicFields
-        form={form}
-        errors={errors}
-        teams={teams}
-        updateField={updateField}
-      />
-
-      <PlayerSportFields
-        form={form}
-        errors={errors}
-        positionOptions={positionOptions}
-        updateField={updateField}
-        updatePosition={updatePosition}
-      />
-
-      <PlayerProfileFields
-        form={form}
-        errors={errors}
-        calculatedYearGroup={calculatedYearGroup}
-        updateField={updateField}
-      />
-
-      <PlayerDescriptionFields form={form} updateField={updateField} />
-
-      <PlayerImageUpload
-        imageUrl={form.photo_url || PLAYER_PLACEHOLDER_IMAGE}
-        placeholderUrl={PLAYER_PLACEHOLDER_IMAGE}
-        onUpload={uploadImage}
-        onRemove={removeImage}
-      />
-
-      <PlayerSettingsFields form={form} updateField={updateField} />
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-full bg-red-600 px-8 py-4 font-bold disabled:opacity-50"
+      <FormSection
+        eyebrow="Spieler"
+        title="Persönliche Daten"
+        description="Grunddaten, Mannschaftszuordnung und Rückennummer des Spielers."
       >
-        {loading ? "Speichert..." : "Spieler speichern"}
-      </button>
+        <PlayerBasicFields
+          form={form}
+          errors={errors}
+          teams={teams}
+          updateField={updateField}
+        />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Sport"
+        title="Sportliche Angaben"
+        description="Position, englische Positionsbezeichnung und sportliche Zusatzinformationen."
+      >
+        <PlayerSportFields
+          form={form}
+          errors={errors}
+          positionOptions={positionOptions}
+          updateField={updateField}
+          updatePosition={updatePosition}
+        />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Profil"
+        title="Profilangaben"
+        description="Geburtsdatum, Jahrgang, Geschlecht, Nationalität und Vereinszugehörigkeit."
+      >
+        <PlayerProfileFields
+          form={form}
+          errors={errors}
+          calculatedYearGroup={calculatedYearGroup}
+          updateField={updateField}
+        />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Beschreibung"
+        title="Spielerbeschreibung"
+        description="Optionale Texte für interne oder öffentliche Darstellungen."
+      >
+        <PlayerDescriptionFields form={form} updateField={updateField} />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Medien"
+        title="Spielerbild"
+        description="Das Bild wird in der Verwaltung, Mannschaftsübersicht und Spielerprofilseite verwendet."
+      >
+        <PlayerImageUpload
+          imageUrl={form.photo_url || PLAYER_PLACEHOLDER_IMAGE}
+          placeholderUrl={PLAYER_PLACEHOLDER_IMAGE}
+          onUpload={uploadImage}
+          onRemove={removeImage}
+        />
+      </FormSection>
+
+      <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
+        <PlayerSettingsFields form={form} updateField={updateField} />
+      </FormSection>
+
+      <FormActions
+        loading={loading}
+        submitLabel="Spieler speichern"
+        cancelHref="/admin/players"
+      />
     </form>
   );
 }
