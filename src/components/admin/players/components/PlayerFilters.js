@@ -7,6 +7,7 @@ const defaultFilters = {
   sortBy: "name_asc",
   teamFilter: "all",
   genderFilter: "all",
+  nationalityFilter: "all",
   positionFilter: "all",
   statusFilter: "all",
   captainFilter: "all",
@@ -21,6 +22,8 @@ export default function PlayerFilters({
   setTeamFilter,
   genderFilter,
   setGenderFilter,
+  nationalityFilter,
+  setNationalityFilter,
   positionFilter,
   setPositionFilter,
   captainFilter,
@@ -36,6 +39,7 @@ export default function PlayerFilters({
     sortBy,
     teamFilter,
     genderFilter,
+    nationalityFilter,
     positionFilter,
     statusFilter,
     captainFilter,
@@ -45,15 +49,16 @@ export default function PlayerFilters({
     return [
       teamFilter !== "all",
       genderFilter !== "all",
+      nationalityFilter !== "all",
       positionFilter !== "all",
       statusFilter !== "all",
       captainFilter !== "all",
       sortBy !== "name_asc",
     ].filter(Boolean).length;
-  }, [teamFilter, genderFilter, positionFilter, statusFilter, captainFilter, sortBy]);
+  }, [teamFilter, genderFilter, nationalityFilter, positionFilter, statusFilter, captainFilter, sortBy]);
 
   function openPanel() {
-    setDraft({ sortBy, teamFilter, genderFilter, positionFilter, statusFilter, captainFilter });
+    setDraft({ sortBy, teamFilter, genderFilter, nationalityFilter, positionFilter, statusFilter, captainFilter });
     setOpen(true);
   }
 
@@ -61,6 +66,7 @@ export default function PlayerFilters({
     setSortBy(draft.sortBy);
     setTeamFilter(draft.teamFilter);
     setGenderFilter(draft.genderFilter);
+    setNationalityFilter(draft.nationalityFilter);
     setPositionFilter(draft.positionFilter);
     setStatusFilter(draft.statusFilter);
     setCaptainFilter(draft.captainFilter);
@@ -72,6 +78,7 @@ export default function PlayerFilters({
     setSortBy(defaultFilters.sortBy);
     setTeamFilter(defaultFilters.teamFilter);
     setGenderFilter(defaultFilters.genderFilter);
+    setNationalityFilter(defaultFilters.nationalityFilter);
     setPositionFilter(defaultFilters.positionFilter);
     setStatusFilter(defaultFilters.statusFilter);
     setCaptainFilter(defaultFilters.captainFilter);
@@ -171,6 +178,12 @@ export default function PlayerFilters({
                 </div>
               </div>
 
+              {draft.nationalityFilter !== "all" && (
+                <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-100">
+                  Nationalität-Filter ist aktiv.
+                </div>
+              )}
+
               <FilterSelect label="Position" value={draft.positionFilter} onChange={(value) => updateDraft("positionFilter", value)}>
                 <option value="all">Alle Positionen</option>
                 {positions.map((position) => (
@@ -198,19 +211,11 @@ export default function PlayerFilters({
             </div>
 
             <div className="grid grid-cols-2 gap-3 border-t border-white/10 p-5">
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="h-12 rounded-full border border-white/10 px-5 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-              >
+              <button type="button" onClick={resetFilters} className="h-12 rounded-full border border-white/10 px-5 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white">
                 Zurücksetzen
               </button>
 
-              <button
-                type="button"
-                onClick={applyFilters}
-                className="h-12 rounded-full bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
-              >
+              <button type="button" onClick={applyFilters} className="h-12 rounded-full bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700">
                 Anwenden
               </button>
             </div>
@@ -229,11 +234,7 @@ function FilterSelect({ label, value, onChange, children }) {
   return (
     <div>
       <FilterLabel>{label}</FilterLabel>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-12 w-full rounded-2xl border border-white/10 bg-[#17171d] px-4 text-sm text-white outline-none transition focus:border-red-500"
-      >
+      <select value={value} onChange={(event) => onChange(event.target.value)} className="h-12 w-full rounded-2xl border border-white/10 bg-[#17171d] px-4 text-sm text-white outline-none transition focus:border-red-500">
         {children}
       </select>
     </div>
@@ -242,15 +243,7 @@ function FilterSelect({ label, value, onChange, children }) {
 
 function FilterChoice({ active, label, onClick }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`h-11 rounded-2xl border px-3 text-sm font-bold transition ${
-        active
-          ? "border-red-500 bg-red-600 text-white"
-          : "border-white/10 bg-white/5 text-white/60 hover:border-red-500 hover:text-white"
-      }`}
-    >
+    <button type="button" onClick={onClick} className={`h-11 rounded-2xl border px-3 text-sm font-bold transition ${active ? "border-red-500 bg-red-600 text-white" : "border-white/10 bg-white/5 text-white/60 hover:border-red-500 hover:text-white"}`}>
       {label}
     </button>
   );
