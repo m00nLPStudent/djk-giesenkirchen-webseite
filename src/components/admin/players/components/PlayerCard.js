@@ -2,21 +2,32 @@ import Link from "next/link";
 import { COUNTRIES } from "@/constants";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
-function getNationalityLabel(value) {
-  if (!value) return "";
+function getNationality(value) {
+  if (!value) return null;
 
   const normalizedValue = String(value).trim().toLowerCase();
-  const country = COUNTRIES.find((item) => {
-    return (
-      item.iso.toLowerCase() === normalizedValue ||
-      item.de.toLowerCase() === normalizedValue ||
-      item.en.toLowerCase() === normalizedValue
-    );
-  });
 
-  if (!country) return value;
+  return (
+    COUNTRIES.find((item) => {
+      return (
+        item.iso.toLowerCase() === normalizedValue ||
+        item.de.toLowerCase() === normalizedValue ||
+        item.en.toLowerCase() === normalizedValue
+      );
+    }) || null
+  );
+}
 
-  return `${country.flag} ${country.de}`;
+function FlagIcon({ country }) {
+  if (!country || country.iso === "OTHER") return null;
+
+  return (
+    <img
+      src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
+      alt={country.de}
+      className="h-4 w-6 rounded-sm object-cover ring-1 ring-white/20"
+    />
+  );
 }
 
 export default function PlayerCard({ player }) {
@@ -25,7 +36,7 @@ export default function PlayerCard({ player }) {
     "Unbekannter Spieler";
 
   const teamName = player.teams?.name_de || "Keine Mannschaft";
-  const nationalityLabel = getNationalityLabel(player.nationality);
+  const nationality = getNationality(player.nationality);
 
   return (
     <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[120px_1fr]">
@@ -72,13 +83,23 @@ export default function PlayerCard({ player }) {
           <div>
             <h2 className="text-2xl font-black">{fullName}</h2>
 
-            <p className="mt-1 text-sm text-white/45">
-              {player.year_group
-                ? `Jahrgang ${player.year_group}`
-                : "Jahrgang nicht hinterlegt"}
-              {player.strong_foot ? ` • ${player.strong_foot}` : ""}
-              {nationalityLabel ? ` • ${nationalityLabel}` : ""}
-            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-white/45">
+              <span>
+                {player.year_group
+                  ? `Jahrgang ${player.year_group}`
+                  : "Jahrgang nicht hinterlegt"}
+              </span>
+
+              {player.strong_foot && <span>• {player.strong_foot}</span>}
+
+              {nationality && (
+                <span className="inline-flex items-center gap-2">
+                  <span>•</span>
+                  <FlagIcon country={nationality} />
+                  <span>{nationality.de}</span>
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
