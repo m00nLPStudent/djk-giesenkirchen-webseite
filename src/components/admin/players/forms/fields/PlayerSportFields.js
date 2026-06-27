@@ -1,3 +1,4 @@
+import { FormGrid } from "@/components/admin/forms";
 import { InputField, SelectField } from "./FormField";
 
 export default function PlayerSportFields({
@@ -8,13 +9,15 @@ export default function PlayerSportFields({
   updatePosition,
 }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <FormGrid>
       <SelectField
+        label="Position"
+        required
         value={form.position_de}
         onChange={(event) => updatePosition(event.target.value)}
         error={errors.position_de}
       >
-        <option value="">Position auswählen *</option>
+        <option value="">Position auswählen</option>
         {positionOptions.map((position) => (
           <option key={position} value={position}>
             {position}
@@ -23,10 +26,11 @@ export default function PlayerSportFields({
       </SelectField>
 
       <InputField
-        placeholder="Position Englisch"
+        label="Position Englisch"
+        placeholder="z. B. Attack"
         value={form.position_en}
         onChange={(event) => updateField("position_en", event.target.value)}
       />
-    </div>
+    </FormGrid>
   );
 }
