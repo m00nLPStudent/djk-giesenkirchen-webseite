@@ -54,10 +54,6 @@ export default function PlayerImageUpload({
           )}
         </div>
       </div>
-
-      {imageUrl && (
-        <p className="mt-4 break-all text-xs text-white/40">{imageUrl}</p>
-      )}
     </div>
   );
 }
