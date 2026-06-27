@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
-import { COUNTRIES } from "@/constants";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
   EntityActionLink,
@@ -14,36 +13,9 @@ import {
   EntityCardTitle,
   EntityDeleteButton,
 } from "@/components/admin/ui/EntityCard";
+import { CountryFlag, getCountryByValue } from "@/components/admin/utils/countries";
 import { deleteCoachCompletely } from "../services/coaches.service";
 import CoachStatusBadge from "./CoachStatusBadge";
-
-function getCountry(value) {
-  if (!value) return null;
-
-  const normalizedValue = String(value).trim().toLowerCase();
-
-  return (
-    COUNTRIES.find((country) => {
-      return (
-        country.iso.toLowerCase() === normalizedValue ||
-        country.de.toLowerCase() === normalizedValue ||
-        country.en.toLowerCase() === normalizedValue
-      );
-    }) || null
-  );
-}
-
-function FlagIcon({ country }) {
-  if (!country || country.iso === "OTHER") return null;
-
-  return (
-    <img
-      src={`https://flagcdn.com/w40/${country.iso.toLowerCase()}.png`}
-      alt={country.de}
-      className="h-4 w-6 rounded-sm object-cover ring-1 ring-white/20"
-    />
-  );
-}
 
 function getTeamName(coach) {
   if (coach.teams?.name_de) return coach.teams.name_de;
@@ -54,7 +26,7 @@ function getTeamName(coach) {
 export default function CoachCard({ coach }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
-  const country = getCountry(coach.nationality);
+  const country = getCountryByValue(coach.nationality);
   const imageUrl = coach.image_url || COACH_PLACEHOLDER_IMAGE;
   const fullName = coach.name || `${coach.first_name || ""} ${coach.last_name || ""}`.trim() || "Trainer";
   const teamName = getTeamName(coach);
@@ -86,7 +58,7 @@ export default function CoachCard({ coach }) {
         <EntityBadge>{teamName}</EntityBadge>
         {country && (
           <EntityBadge>
-            <FlagIcon country={country} />
+            <CountryFlag country={country} />
             {country.de}
           </EntityBadge>
         )}
