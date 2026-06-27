@@ -1,37 +1,28 @@
-import { FormGrid } from "@/components/admin/forms";
-import { normalizeGermanPhoneNumber } from "@/lib/phone";
-import { TextInput } from "./CoachFormField";
+import { EmailField, FormGrid, PhoneField } from "@/components/admin/forms";
 
 export default function CoachContactFields({ form, errors, updateField }) {
   return (
     <FormGrid>
-      <TextInput
-        label="E-Mail"
+      <EmailField
         required
-        placeholder="name@example.de"
-        type="email"
         value={form.email}
-        onChange={(event) => updateField("email", event.target.value)}
+        onChange={(value) => updateField("email", value)}
         error={errors.email}
       />
 
-      <TextInput
-        label="Telefonnummer"
+      <PhoneField
         required
-        placeholder="01590..."
         value={form.phone}
-        onChange={(event) => updateField("phone", event.target.value)}
-        onBlur={(event) => updateField("phone", normalizeGermanPhoneNumber(event.target.value))}
+        onChange={(value) => updateField("phone", value)}
         error={errors.phone}
       />
 
-      <TextInput
+      <PhoneField
         label="WhatsApp-Nummer"
         required
-        placeholder="491590..."
+        placeholder="Internationale Schreibweise"
         value={form.whatsapp}
-        onChange={(event) => updateField("whatsapp", event.target.value)}
-        onBlur={(event) => updateField("whatsapp", normalizeGermanPhoneNumber(event.target.value))}
+        onChange={(value) => updateField("whatsapp", value)}
         error={errors.whatsapp}
       />
     </FormGrid>
