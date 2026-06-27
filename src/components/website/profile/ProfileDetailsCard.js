@@ -19,7 +19,26 @@ function getGridClass(columns) {
   return classes[columns] || classes[2];
 }
 
-function DetailContent({ label, value, type = "text" }) {
+function getCompletedItems(items, columns) {
+  const missingItems = items.length % columns;
+
+  if (!missingItems) return items;
+
+  return [
+    ...items,
+    ...Array.from({ length: columns - missingItems }, (_, index) => ({
+      label: `empty-${index}`,
+      value: "",
+      isEmpty: true,
+    })),
+  ];
+}
+
+function DetailContent({ label, value, type = "text", isEmpty = false }) {
+  if (isEmpty) {
+    return <span aria-hidden="true" />;
+  }
+
   return (
     <>
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
@@ -36,9 +55,9 @@ function DetailContent({ label, value, type = "text" }) {
 }
 
 function DetailItem({ item }) {
-  const cellClass = "min-w-0 p-5 md:p-6";
+  const cellClass = "min-h-28 min-w-0 p-5 md:p-6";
 
-  if (!item.href) {
+  if (item.isEmpty || !item.href) {
     return (
       <div className={cellClass}>
         <DetailContent {...item} />
@@ -58,6 +77,8 @@ export default function ProfileDetailsCard({
   items = [],
   columns = 2,
 }) {
+  const completedItems = getCompletedItems(items, columns);
+
   return (
     <section className="w-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
       <div className="p-6 pb-0 md:p-8 md:pb-0">
@@ -69,9 +90,9 @@ export default function ProfileDetailsCard({
       <div
         className={`mt-5 grid divide-y divide-white/10 md:divide-y-0 md:divide-x ${getGridClass(columns)}`}
       >
-        {items.map((item, index) => (
+        {completedItems.map((item, index) => (
           <div
-            key={item.label}
+            key={`${item.label}-${index}`}
             className={`min-w-0 ${index >= columns ? "md:border-t md:border-white/10" : ""}`}
           >
             <DetailItem item={item} />
