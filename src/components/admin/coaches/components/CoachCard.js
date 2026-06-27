@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { COUNTRIES } from "@/constants";
+import { deleteCoachCompletely } from "../services/coaches.service";
 import CoachStatusBadge from "./CoachStatusBadge";
 
 function getCountry(value) {
@@ -32,15 +37,37 @@ function FlagIcon({ country }) {
 }
 
 export default function CoachCard({ coach }) {
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
   const country = getCountry(coach.nationality);
   const imageUrl = coach.image_url || COACH_PLACEHOLDER_IMAGE;
+  const fullName = coach.name || `${coach.first_name || ""} ${coach.last_name || ""}`.trim() || "Trainer";
+
+  async function handleDelete() {
+    const confirmed = window.confirm(
+      `Trainer „${fullName}“ wirklich komplett löschen?\n\nDas Profil und ein eigenes Trainerbild werden dauerhaft entfernt.`,
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(true);
+    const { error } = await deleteCoachCompletely(coach);
+    setDeleting(false);
+
+    if (error) {
+      alert("Fehler beim Löschen: " + error.message);
+      return;
+    }
+
+    router.refresh();
+  }
 
   return (
     <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[140px_1fr]">
       <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
         <img
           src={imageUrl}
-          alt={coach.name || "Trainerbild"}
+          alt={fullName}
           className="h-full w-full object-cover"
         />
       </div>
@@ -65,7 +92,7 @@ export default function CoachCard({ coach }) {
           )}
         </div>
 
-        <h2 className="mt-4 text-2xl font-black">{coach.name}</h2>
+        <h2 className="mt-4 text-2xl font-black">{fullName}</h2>
 
         <p className="mt-3 max-w-3xl text-white/60">
           {coach.email || "Keine E-Mail hinterlegt"}
@@ -86,6 +113,15 @@ export default function CoachCard({ coach }) {
           >
             Profil ansehen
           </Link>
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
+          >
+            {deleting ? "Löscht..." : "Löschen"}
+          </button>
         </div>
       </div>
     </div>
