@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { FormActions, FormSection } from "@/components/admin/forms";
 import CoachImageUpload from "../components/CoachImageUpload";
 import {
   deleteCoachImage,
@@ -100,27 +101,60 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         </div>
       )}
 
-      <CoachBasicFields form={form} errors={errors} updateField={updateField} />
-      <CoachRoleFields form={form} errors={errors} teams={teams} updateField={updateField} />
-      <CoachContactFields form={form} errors={errors} updateField={updateField} />
-      <CoachProfileFields form={form} errors={errors} updateField={updateField} />
-
-      <CoachImageUpload
-        imageUrl={form.image_url || COACH_PLACEHOLDER_IMAGE}
-        placeholderUrl={COACH_PLACEHOLDER_IMAGE}
-        onUpload={uploadImage}
-        onRemove={removeImage}
-      />
-
-      <CoachSettingsFields form={form} updateField={updateField} />
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-full bg-red-600 px-8 py-4 font-bold disabled:opacity-50"
+      <FormSection
+        eyebrow="Trainer"
+        title="Persönliche Daten"
+        description="Grunddaten für die interne Verwaltung und die öffentliche Trainerseite."
       >
-        {loading ? "Speichert..." : "Trainer speichern"}
-      </button>
+        <CoachBasicFields form={form} errors={errors} updateField={updateField} />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Verein"
+        title="Vereinsdaten"
+        description="Funktion, Mannschaftszuordnung, Lizenz und Anzeige-Reihenfolge."
+      >
+        <CoachRoleFields form={form} errors={errors} teams={teams} updateField={updateField} />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Kontakt"
+        title="Kontaktdaten"
+        description="Telefon und WhatsApp werden automatisch ins internationale Format für Links umgewandelt."
+      >
+        <CoachContactFields form={form} errors={errors} updateField={updateField} />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Profil"
+        title="Profilangaben"
+        description="Weitere Angaben für die öffentliche Darstellung."
+      >
+        <CoachProfileFields form={form} errors={errors} updateField={updateField} />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Medien"
+        title="Trainerbild"
+        description="Das Bild wird im Adminbereich und auf der öffentlichen Trainerprofilseite verwendet."
+      >
+        <CoachImageUpload
+          imageUrl={form.image_url || COACH_PLACEHOLDER_IMAGE}
+          placeholderUrl={COACH_PLACEHOLDER_IMAGE}
+          onUpload={uploadImage}
+          onRemove={removeImage}
+        />
+      </FormSection>
+
+      <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
+        <CoachSettingsFields form={form} updateField={updateField} />
+      </FormSection>
+
+      <FormActions
+        loading={loading}
+        submitLabel="Trainer speichern"
+        cancelHref="/admin/coaches"
+      />
     </form>
   );
 }
