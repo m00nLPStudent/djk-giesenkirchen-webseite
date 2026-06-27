@@ -6,7 +6,11 @@ export default function PlayerImageUpload({ imageUrl, onUpload, onRemove }) {
       <div className="mt-6 flex flex-wrap items-center gap-6">
         <div className="flex h-36 w-36 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
           {imageUrl ? (
-            <img src={imageUrl} alt="Spielerbild" className="h-full w-full object-cover" />
+            <img
+              src={imageUrl}
+              alt="Spielerbild"
+              className="h-full w-full object-cover"
+            />
           ) : (
             <span className="text-sm text-white/40">Kein Bild</span>
           )}
@@ -18,7 +22,12 @@ export default function PlayerImageUpload({ imageUrl, onUpload, onRemove }) {
             <input
               type="file"
               accept="image/*"
-              onChange={(event) => onUpload(event.target.files?.[0])}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) {
+                  onUpload(file);
+                }
+              }}
               className="hidden"
             />
           </label>
@@ -34,6 +43,10 @@ export default function PlayerImageUpload({ imageUrl, onUpload, onRemove }) {
           )}
         </div>
       </div>
+
+      {imageUrl && (
+        <p className="mt-4 break-all text-xs text-white/40">{imageUrl}</p>
+      )}
     </div>
   );
 }
