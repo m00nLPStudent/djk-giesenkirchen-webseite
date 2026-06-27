@@ -34,6 +34,7 @@ export async function savePlayer(player, id = null) {
     description_de: player.description_de || null,
     description_en: player.description_en || null,
     birthdate: player.birthdate || null,
+    joined_at: player.joined_at || null,
     year_group: player.year_group || null,
     strong_foot: player.strong_foot || null,
     nationality: player.nationality || null,
