@@ -11,20 +11,22 @@ export default function CoachProfileHeader({ coach, fullName, team, contact }) {
         {fullName}
       </h1>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <span className="rounded-full bg-red-600/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-red-400">
-          {coach.role || "Trainer"}
-        </span>
-
-        {coach.license && (
-          <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-            {coach.license}
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="rounded-full bg-red-600/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-red-400">
+            {coach.role || "Trainer"}
           </span>
-        )}
 
-        <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-          {team?.name_de || coach.team_name || "Keine Mannschaft"}
-        </span>
+          {coach.license && (
+            <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
+              {coach.license}
+            </span>
+          )}
+
+          <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
+            {team?.name_de || coach.team_name || "Keine Mannschaft"}
+          </span>
+        </div>
 
         <CoachProfileContactActions contact={contact} email={coach.email} />
       </div>
