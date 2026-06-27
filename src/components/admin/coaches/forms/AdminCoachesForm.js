@@ -2,10 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { COUNTRIES } from "@/constants";
 import CoachImageUpload from "../components/CoachImageUpload";
 import { createSlug } from "../utils/slug";
-import { uploadCoachImage, saveCoach } from "../services/coaches.service";
+import {
+  deleteCoachImage,
+  uploadCoachImage,
+  saveCoach,
+} from "../services/coaches.service";
 import { coachRoles, coachLicenses } from "../constants/CoachOptions";
+
+const germany = COUNTRIES.find((country) => country.iso === "DE");
+const countryOptions = germany
+  ? [germany, ...COUNTRIES.filter((country) => country.iso !== "DE")]
+  : COUNTRIES;
 
 export default function AdminCoachesForm({ coach, teams = [] }) {
   const router = useRouter();
@@ -19,7 +30,8 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     whatsapp: coach?.whatsapp || "",
     license: coach?.license || "Keine Lizenz",
     team_id: coach?.team_id || "",
-    image_url: coach?.image_url || "",
+    nationality: coach?.nationality || "",
+    image_url: coach?.image_url || COACH_PLACEHOLDER_IMAGE,
     sort_order: coach?.sort_order || 0,
     is_active: coach?.is_active ?? true,
   });
@@ -34,7 +46,11 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
   }
 
   async function uploadImage(file) {
-    const { data, error } = await uploadCoachImage(file);
+    const { data, error } = await uploadCoachImage(file, {
+      id: coach?.id,
+      name: form.name,
+      image_url: form.image_url,
+    });
 
     if (error) {
       alert(error.message);
@@ -42,6 +58,17 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     }
 
     updateField("image_url", data);
+  }
+
+  async function removeImage() {
+    const { error } = await deleteCoachImage(form.image_url);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    updateField("image_url", COACH_PLACEHOLDER_IMAGE);
   }
 
   async function handleSubmit(event) {
@@ -53,6 +80,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     const payload = {
       ...form,
       slug,
+      image_url: form.image_url || COACH_PLACEHOLDER_IMAGE,
       team_id: form.team_id || null,
       sort_order: Number(form.sort_order),
       is_active: form.is_active,
@@ -77,7 +105,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         placeholder="Name"
         value={form.name}
         onChange={(e) => updateField("name", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
+        className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500"
         required
       />
 
@@ -85,73 +113,93 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         placeholder="Slug, z. B. swen-verbocket"
         value={form.slug}
         onChange={(e) => updateField("slug", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
+        className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500"
       />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <select
+          value={form.role}
+          onChange={(e) => updateField("role", e.target.value)}
+          className="h-14 w-full rounded-2xl border border-white/10 bg-[#18181d] px-4 text-white outline-none focus:border-red-500"
+        >
+          {coachRoles.map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={form.team_id}
+          onChange={(e) => updateField("team_id", e.target.value)}
+          className="h-14 w-full rounded-2xl border border-white/10 bg-[#18181d] px-4 text-white outline-none focus:border-red-500"
+        >
+          <option value="">Keine Mannschaft zugeordnet</option>
+
+          {teams.map((team) => (
+            <option key={team.id} value={team.id}>
+              {team.name_de}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <input
+          placeholder="E-Mail"
+          type="email"
+          value={form.email}
+          onChange={(e) => updateField("email", e.target.value)}
+          className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500"
+        />
+
+        <input
+          placeholder="Telefon"
+          value={form.phone}
+          onChange={(e) => updateField("phone", e.target.value)}
+          className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500"
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <input
+          placeholder="WhatsApp, z. B. 491701234567"
+          value={form.whatsapp}
+          onChange={(e) => updateField("whatsapp", e.target.value)}
+          className="h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500"
+        />
+
+        <select
+          value={form.license}
+          onChange={(e) => updateField("license", e.target.value)}
+          className="h-14 w-full rounded-2xl border border-white/10 bg-[#18181d] px-4 text-white outline-none focus:border-red-500"
+        >
+          {coachLicenses.map((license) => (
+            <option key={license} value={license}>
+              {license}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <select
-        value={form.role}
-        onChange={(e) => updateField("role", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-[#18181d] p-4 text-white"
+        value={form.nationality}
+        onChange={(e) => updateField("nationality", e.target.value)}
+        className="h-14 w-full rounded-2xl border border-white/10 bg-[#18181d] px-4 text-white outline-none focus:border-red-500"
       >
-        {coachRoles.map((role) => (
-          <option key={role} value={role}>
-            {role}
-          </option>
-        ))}
-      </select>
-
-      <select
-        value={form.team_id}
-        onChange={(e) => updateField("team_id", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-[#18181d] p-4 text-white"
-      >
-        <option value="">Keine Mannschaft zugeordnet</option>
-
-        {teams.map((team) => (
-          <option key={team.id} value={team.id}>
-            {team.name_de}
-          </option>
-        ))}
-      </select>
-
-      <input
-        placeholder="E-Mail"
-        type="email"
-        value={form.email}
-        onChange={(e) => updateField("email", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <input
-        placeholder="Telefon"
-        value={form.phone}
-        onChange={(e) => updateField("phone", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <input
-        placeholder="WhatsApp, z. B. 491701234567"
-        value={form.whatsapp}
-        onChange={(e) => updateField("whatsapp", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <select
-        value={form.license}
-        onChange={(e) => updateField("license", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-[#18181d] p-4 text-white"
-      >
-        {coachLicenses.map((license) => (
-          <option key={license} value={license}>
-            {license}
+        <option value="">Nationalität auswählen</option>
+        {countryOptions.map((country) => (
+          <option key={country.iso} value={country.iso}>
+            {country.flag} {country.de}
           </option>
         ))}
       </select>
 
       <CoachImageUpload
-        imageUrl={form.image_url}
+        imageUrl={form.image_url || COACH_PLACEHOLDER_IMAGE}
+        placeholderUrl={COACH_PLACEHOLDER_IMAGE}
         onUpload={uploadImage}
-        onRemove={() => updateField("image_url", "")}
+        onRemove={removeImage}
       />
 
       <div>
@@ -163,7 +211,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
           type="number"
           value={form.sort_order}
           onChange={(e) => updateField("sort_order", e.target.value)}
-          className="w-32 rounded-2xl border border-white/10 bg-white/5 p-4"
+          className="h-14 w-32 rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500"
         />
       </div>
 
