@@ -1,5 +1,5 @@
-import ProfileInfoGrid from "@/components/website/profile/ProfileInfoGrid";
+import ProfileDetailsCard from "@/components/website/profile/ProfileDetailsCard";
 
 export default function PlayerProfileStatsGrid({ stats = [] }) {
-  return <ProfileInfoGrid stats={stats} />;
+  return <ProfileDetailsCard title="Spielerdaten" items={stats} />;
 }
