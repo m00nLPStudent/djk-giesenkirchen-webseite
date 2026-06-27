@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { COUNTRIES } from "@/constants";
+import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
 
 function getCountry(value) {
   if (!value) return null;
@@ -35,6 +36,7 @@ export default function TeamPlayerCard({ player, teamSlug }) {
     "Unbekannter Spieler";
 
   const country = getCountry(player.nationality);
+  const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
 
   return (
     <Link
@@ -42,15 +44,11 @@ export default function TeamPlayerCard({ player, teamSlug }) {
       className="group block overflow-hidden rounded-3xl border border-white/10 bg-white/5 transition hover:-translate-y-1 hover:border-red-500/50 hover:bg-white/10"
     >
       <div className="relative flex h-72 items-center justify-center bg-black/20">
-        {player.photo_url ? (
-          <img
-            src={player.photo_url}
-            alt={fullName}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <span className="text-sm text-white/40">Kein Bild</span>
-        )}
+        <img
+          src={imageUrl}
+          alt={fullName}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
 
         {player.shirt_number && (
           <div className="absolute left-4 top-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl font-black text-white shadow-xl">
