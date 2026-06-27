@@ -4,29 +4,29 @@ export default function PlayerImageUpload({
   onUpload,
   onRemove,
 }) {
-  const isPlaceholder = imageUrl === placeholderUrl;
+  const previewUrl = imageUrl || placeholderUrl;
+  const isPlaceholder = previewUrl === placeholderUrl;
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="text-2xl font-black">Spielerbild</h2>
-      <p className="mt-2 text-sm text-white/50">
-        Ohne eigenes Bild wird automatisch das Platzhalterbild verwendet.
-      </p>
+    <div className="grid gap-6 md:grid-cols-[180px_1fr] md:items-center">
+      <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl bg-black/20 ring-1 ring-white/10">
+        {previewUrl ? (
+          <img
+            src={previewUrl}
+            alt="Spielerbild"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <span className="text-sm text-white/40">Kein Bild</span>
+        )}
+      </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-6">
-        <div className="flex h-36 w-36 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt="Spielerbild"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="text-sm text-white/40">Kein Bild</span>
-          )}
-        </div>
+      <div>
+        <p className="text-sm leading-6 text-white/50">
+          Ohne eigenes Bild wird automatisch das Platzhalterbild verwendet. Beim Hochladen eines neuen Bildes wird das vorherige eigene Bild aus dem Storage entfernt.
+        </p>
 
-        <div className="space-y-3">
+        <div className="mt-5 flex flex-wrap gap-3">
           <label className="inline-flex cursor-pointer rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-red-700">
             Bild auswählen
             <input
@@ -43,11 +43,11 @@ export default function PlayerImageUpload({
             />
           </label>
 
-          {!isPlaceholder && imageUrl && (
+          {!isPlaceholder && previewUrl && (
             <button
               type="button"
               onClick={onRemove}
-              className="block rounded-full border border-red-500/30 px-5 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10"
+              className="rounded-full border border-red-500/30 px-5 py-3 text-sm font-bold text-red-400 transition hover:bg-red-500/10"
             >
               Eigenes Bild entfernen
             </button>
