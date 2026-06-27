@@ -30,12 +30,6 @@ export default function PlayerProfileImageCard({ player, fullName, country }) {
             Noch kein Spielerfoto vorhanden
           </div>
         )}
-
-        {player.shirt_number && (
-          <div className="absolute left-6 top-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-red-600 text-4xl font-black shadow-2xl">
-            {player.shirt_number}
-          </div>
-        )}
       </div>
 
       <div className="border-t border-white/10 p-6">
