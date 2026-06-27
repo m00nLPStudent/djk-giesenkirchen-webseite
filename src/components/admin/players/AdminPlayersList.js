@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PlayerFilters from "./components/PlayerFilters";
 import PlayerCard from "./components/PlayerCard";
 import PlayerEmptyState from "./components/PlayerEmptyState";
@@ -53,6 +53,11 @@ export default function AdminPlayersList({ players = [], initialFilters = {} }) 
   const [captainFilter, setCaptainFilter] = useState("all");
   const [nationalityFilter, setNationalityFilter] = useState(initialFilters.nationalityFilter || "all");
   const [sortBy, setSortBy] = useState("name_asc");
+
+  useEffect(() => {
+    setStatusFilter(initialFilters.statusFilter || "all");
+    setNationalityFilter(initialFilters.nationalityFilter || "all");
+  }, [initialFilters.statusFilter, initialFilters.nationalityFilter]);
 
   const teams = useMemo(() => {
     const map = new Map();
