@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
+import { deleteEntityWithImage } from "@/components/admin/services/deleteEntity.service";
 
 export const PLAYER_PLACEHOLDER_IMAGE =
   "https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/players/Blanko.png";
@@ -54,13 +55,10 @@ export async function savePlayer(player, id = null) {
 }
 
 export async function deletePlayerCompletely(player) {
-  const imageUrl = player?.photo_url || player?.image_url;
-
-  const imageResult = await deletePlayerImage(imageUrl);
-
-  if (imageResult?.error) {
-    return imageResult;
-  }
-
-  return await supabase.from("players").delete().eq("id", player.id);
+  return await deleteEntityWithImage({
+    table: "players",
+    id: player?.id,
+    imageUrl: player?.photo_url || player?.image_url,
+    ignoredUrls: [PLAYER_PLACEHOLDER_IMAGE],
+  });
 }
