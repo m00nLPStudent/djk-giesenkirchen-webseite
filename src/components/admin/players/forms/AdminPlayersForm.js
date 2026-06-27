@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormActions, FormSection } from "@/components/admin/forms";
+import { REQUIRED_FIELDS_MESSAGE, hasValidationErrors } from "@/components/admin/utils/validation";
 import PlayerImageUpload from "../components/PlayerImageUpload";
 import {
   deletePlayerImage,
@@ -117,13 +118,13 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     router.refresh();
   }
 
-  const hasErrors = Object.keys(errors).some((key) => errors[key]);
+  const hasErrors = hasValidationErrors(errors);
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
       {hasErrors && (
         <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-5 text-red-200">
-          <p className="font-bold">Bitte fülle alle Pflichtfelder aus.</p>
+          <p className="font-bold">{REQUIRED_FIELDS_MESSAGE}</p>
         </div>
       )}
 
