@@ -18,8 +18,11 @@ export default function ProfileInfoCard({
   type = "text",
   children,
 }) {
+  const cardClass =
+    "flex h-full min-h-32 flex-col justify-center rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50";
+
   const content = (
-    <div className="flex min-h-32 flex-col justify-center rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50">
+    <div className={cardClass}>
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
         {label}
       </p>
@@ -36,7 +39,7 @@ export default function ProfileInfoCard({
   if (!href) return content;
 
   return (
-    <a href={href} className="block min-w-0">
+    <a href={href} className="block h-full min-w-0">
       {content}
     </a>
   );
