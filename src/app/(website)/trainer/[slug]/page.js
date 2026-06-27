@@ -28,11 +28,16 @@ export default async function CoachProfilePage({ params }) {
   const country = getCountry(coach.nationality);
   const team = getTeam(coach);
   const contact = getCoachContact(coach);
+  const teamName = team?.name_de || coach.team_name || "Keine Mannschaft";
 
   const details = [
     { label: "Funktion", value: coach.role },
-    { label: "Mannschaft", value: team?.name_de || coach.team_name || "Keine Mannschaft" },
-    { label: "Lizenz", value: coach.license },
+    {
+      label: "Mannschaft",
+      value: teamName,
+      href: team?.slug ? `/fussball/${team.slug}` : null,
+    },
+    { label: "Lizenz", value: coach.license, type: "license" },
     {
       label: "E-Mail",
       value: coach.email,
