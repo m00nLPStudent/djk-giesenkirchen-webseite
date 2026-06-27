@@ -60,6 +60,7 @@ const requiredFields = {
   birthdate: "Geburtsdatum",
   position_de: "Position",
   nationality: "Nationalität",
+  gender: "Geschlecht",
 };
 
 export default function AdminPlayersForm({ player, teams = [] }) {
@@ -80,7 +81,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     birthdate: player?.birthdate || "",
     strong_foot: player?.strong_foot || "",
     nationality: player?.nationality || "",
-    gender: player?.gender || "male",
+    gender: player?.gender || "",
     sort_order: player?.sort_order || 0,
     is_active: player?.is_active ?? true,
     is_captain: player?.is_captain ?? false,
@@ -172,7 +173,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
   }
 
   function fieldClass(field) {
-    return `w-full rounded-2xl border bg-white/5 p-4 ${
+    return `h-14 w-full rounded-2xl border bg-white/5 px-4 ${
       errors[field]
         ? "border-red-500 outline-none"
         : "border-white/10 outline-none focus:border-red-500"
@@ -180,11 +181,19 @@ export default function AdminPlayersForm({ player, teams = [] }) {
   }
 
   function selectClass(field) {
-    return `w-full rounded-2xl border bg-[#17171d] p-4 ${
+    return `h-14 w-full rounded-2xl border bg-[#17171d] px-4 ${
       errors[field]
         ? "border-red-500 outline-none"
         : "border-white/10 outline-none focus:border-red-500"
     }`;
+  }
+
+  function defaultFieldClass() {
+    return "h-14 w-full rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500";
+  }
+
+  function defaultSelectClass() {
+    return "h-14 w-full rounded-2xl border border-white/10 bg-[#17171d] px-4 outline-none focus:border-red-500";
   }
 
   function ErrorText({ field }) {
@@ -244,7 +253,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           placeholder="Rückennummer"
           value={form.shirt_number}
           onChange={(e) => updateField("shirt_number", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 outline-none focus:border-red-500"
+          className={defaultFieldClass()}
         />
       </div>
 
@@ -269,7 +278,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           placeholder="Position Englisch"
           value={form.position_en}
           onChange={(e) => updateField("position_en", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 p-4 outline-none focus:border-red-500"
+          className={defaultFieldClass()}
         />
       </div>
 
@@ -292,7 +301,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
         <select
           value={form.strong_foot}
           onChange={(e) => updateField("strong_foot", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-[#17171d] p-4 outline-none focus:border-red-500"
+          className={defaultSelectClass()}
         >
           <option value="">Starker Fuß auswählen</option>
           {STRONG_FOOT.map((foot) => (
@@ -302,17 +311,21 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           ))}
         </select>
 
-        <select
-          value={form.gender}
-          onChange={(e) => updateField("gender", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-[#17171d] p-4 outline-none focus:border-red-500"
-        >
-          {GENDER_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <div>
+          <select
+            value={form.gender}
+            onChange={(e) => updateField("gender", e.target.value)}
+            className={selectClass("gender")}
+          >
+            <option value="">Geschlecht auswählen *</option>
+            {GENDER_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <ErrorText field="gender" />
+        </div>
 
         <div>
           <select
@@ -362,7 +375,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           type="number"
           value={form.sort_order}
           onChange={(e) => updateField("sort_order", e.target.value)}
-          className="w-32 rounded-2xl border border-white/10 bg-white/5 p-4 outline-none focus:border-red-500"
+          className="h-14 w-32 rounded-2xl border border-white/10 bg-white/5 px-4 outline-none focus:border-red-500"
         />
       </div>
 
