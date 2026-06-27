@@ -13,6 +13,7 @@ export function createInitialPlayerForm(player) {
     description_de: player?.description_de || "",
     description_en: player?.description_en || "",
     birthdate: player?.birthdate || "",
+    joined_at: player?.joined_at || "",
     strong_foot: player?.strong_foot || "",
     nationality: player?.nationality || "",
     gender: player?.gender || "",
