@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCountryLabel } from "@/constants";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
 export default function PlayerCard({ player }) {
@@ -7,6 +8,9 @@ export default function PlayerCard({ player }) {
     "Unbekannter Spieler";
 
   const teamName = player.teams?.name_de || "Keine Mannschaft";
+  const nationalityLabel = player.nationality
+    ? getCountryLabel(player.nationality)
+    : "";
 
   return (
     <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[120px_1fr]">
@@ -58,7 +62,7 @@ export default function PlayerCard({ player }) {
                 ? `Jahrgang ${player.year_group}`
                 : "Jahrgang nicht hinterlegt"}
               {player.strong_foot ? ` • ${player.strong_foot}` : ""}
-              {player.nationality ? ` • ${player.nationality}` : ""}
+              {nationalityLabel ? ` • ${nationalityLabel}` : ""}
             </p>
           </div>
         </div>
