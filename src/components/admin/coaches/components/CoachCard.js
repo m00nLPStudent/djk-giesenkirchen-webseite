@@ -1,11 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { COUNTRIES } from "@/constants";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
+import {
+  EntityActionLink,
+  EntityCard,
+  EntityCardActions,
+  EntityCardBadges,
+  EntityCardMeta,
+  EntityCardTitle,
+  EntityDeleteButton,
+} from "@/components/admin/ui/EntityCard";
 import { deleteCoachCompletely } from "../services/coaches.service";
 import CoachStatusBadge from "./CoachStatusBadge";
 
@@ -71,61 +79,31 @@ export default function CoachCard({ coach }) {
   }
 
   return (
-    <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[140px_1fr]">
-      <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
-        <img
-          src={imageUrl}
-          alt={fullName}
-          className="h-full w-full object-cover"
-        />
-      </div>
+    <EntityCard image={imageUrl} imageAlt={fullName}>
+      <EntityCardBadges>
+        <EntityBadge variant="red">{coach.role || "Trainer"}</EntityBadge>
+        <CoachStatusBadge active={coach.is_active} />
+        <EntityBadge>{teamName}</EntityBadge>
+        {country && (
+          <EntityBadge>
+            <FlagIcon country={country} />
+            {country.de}
+          </EntityBadge>
+        )}
+      </EntityCardBadges>
 
-      <div>
-        <div className="flex flex-wrap items-center gap-3">
-          <EntityBadge variant="red">{coach.role || "Trainer"}</EntityBadge>
-          <CoachStatusBadge active={coach.is_active} />
-          <EntityBadge>{teamName}</EntityBadge>
+      <EntityCardTitle>{fullName}</EntityCardTitle>
+      <EntityCardMeta>{coach.email || "Keine E-Mail hinterlegt"}</EntityCardMeta>
 
-          {country && (
-            <EntityBadge>
-              <FlagIcon country={country} />
-              {country.de}
-            </EntityBadge>
-          )}
-        </div>
-
-        <h2 className="mt-4 text-2xl font-black">{fullName}</h2>
-
-        <p className="mt-3 max-w-3xl text-white/60">
-          {coach.email || "Keine E-Mail hinterlegt"}
-        </p>
-
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link
-            href={`/admin/coaches/edit/${coach.id}`}
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-          >
-            Bearbeiten
-          </Link>
-
-          <Link
-            href={`/trainer/${coach.slug}`}
-            target="_blank"
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-          >
-            Profil ansehen
-          </Link>
-
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
-          >
-            {deleting ? "Löscht..." : "Löschen"}
-          </button>
-        </div>
-      </div>
-    </div>
+      <EntityCardActions>
+        <EntityActionLink href={`/admin/coaches/edit/${coach.id}`}>
+          Bearbeiten
+        </EntityActionLink>
+        <EntityActionLink href={`/trainer/${coach.slug}`} target="_blank">
+          Profil ansehen
+        </EntityActionLink>
+        <EntityDeleteButton onClick={handleDelete} deleting={deleting} />
+      </EntityCardActions>
+    </EntityCard>
   );
 }
