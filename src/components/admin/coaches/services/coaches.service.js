@@ -1,6 +1,7 @@
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { supabase } from "@/lib/supabase";
 import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
+import { deleteEntityWithImage } from "@/components/admin/services/deleteEntity.service";
 
 export async function deleteCoachImage(imageUrl) {
   return await deleteMediaFile(imageUrl, {
@@ -39,13 +40,12 @@ export async function saveCoach(coach, id = null) {
 }
 
 export async function deleteCoachCompletely(coach) {
-  const imageResult = await deleteCoachImage(coach?.image_url);
-
-  if (imageResult?.error) {
-    return imageResult;
-  }
-
-  return await supabase.from("coaches").delete().eq("id", coach.id);
+  return await deleteEntityWithImage({
+    table: "coaches",
+    id: coach?.id,
+    imageUrl: coach?.image_url,
+    ignoredUrls: [COACH_PLACEHOLDER_IMAGE],
+  });
 }
 
 export async function deleteCoach(id) {
