@@ -27,7 +27,7 @@ function ActionIcon({ href, label, children, className = "" }) {
 
 export default function CoachProfileContactActions({ contact, email }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex shrink-0 items-center gap-2">
       <ActionIcon href={contact?.phoneHref} label="Trainer anrufen">
         <Phone size={18} />
       </ActionIcon>
@@ -39,7 +39,7 @@ export default function CoachProfileContactActions({ contact, email }) {
       <ActionIcon
         href={contact?.whatsappHref}
         label="WhatsApp öffnen"
-        className="text-[#25D366] hover:text-white"
+        className="border-[#25D366]/30 bg-[#25D366]/15 text-[#25D366] hover:border-[#25D366] hover:bg-[#25D366]/25 hover:text-[#25D366]"
       >
         <WhatsAppIcon className="h-5 w-5" />
       </ActionIcon>
