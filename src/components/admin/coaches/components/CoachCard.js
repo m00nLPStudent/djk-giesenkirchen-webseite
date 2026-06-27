@@ -1,8 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+import useDeleteEntity from "@/components/admin/hooks/useDeleteEntity";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
   EntityActionLink,
@@ -24,31 +23,15 @@ function getTeamName(coach) {
 }
 
 export default function CoachCard({ coach }) {
-  const router = useRouter();
-  const [deleting, setDeleting] = useState(false);
   const country = getCountryByValue(coach.nationality);
   const imageUrl = coach.image_url || COACH_PLACEHOLDER_IMAGE;
   const fullName = coach.name || `${coach.first_name || ""} ${coach.last_name || ""}`.trim() || "Trainer";
   const teamName = getTeamName(coach);
-
-  async function handleDelete() {
-    const confirmed = window.confirm(
-      `Trainer „${fullName}“ wirklich komplett löschen?\n\nDas Profil und ein eigenes Trainerbild werden dauerhaft entfernt.`,
-    );
-
-    if (!confirmed) return;
-
-    setDeleting(true);
-    const { error } = await deleteCoachCompletely(coach);
-    setDeleting(false);
-
-    if (error) {
-      alert("Fehler beim Löschen: " + error.message);
-      return;
-    }
-
-    router.refresh();
-  }
+  const { deleting, handleDelete } = useDeleteEntity({
+    entityLabel: "Trainer",
+    entityName: fullName,
+    deleteAction: () => deleteCoachCompletely(coach),
+  });
 
   return (
     <EntityCard image={imageUrl} imageAlt={fullName}>
