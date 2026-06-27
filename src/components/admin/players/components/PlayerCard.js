@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { COUNTRIES, getGenderLabel } from "@/constants";
+import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
 function getNationality(value) {
@@ -40,19 +41,16 @@ export default function PlayerCard({ player }) {
   const nationality = getNationality(player.nationality);
   const genderLabel = getGenderLabel(player.gender);
   const profileUrl = teamSlug ? `/fussball/${teamSlug}/spieler/${player.id}` : null;
+  const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
 
   return (
     <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/50 hover:bg-white/10 md:grid-cols-[120px_1fr]">
       <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
-        {player.photo_url ? (
-          <img
-            src={player.photo_url}
-            alt={fullName}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <span className="text-sm text-white/40">Kein Bild</span>
-        )}
+        <img
+          src={imageUrl}
+          alt={fullName}
+          className="h-full w-full object-cover"
+        />
       </div>
 
       <div>
