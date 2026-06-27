@@ -12,20 +12,17 @@ import {
   EntityDeleteButton,
 } from "@/components/admin/ui/EntityCard";
 import { CountryFlag, getCountryByValue } from "@/components/admin/utils/countries";
+import { getEntityImage, getEntityTeam, getFullName } from "@/components/admin/utils/entity";
 import { deletePlayerCompletely } from "../services/players.service";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
 export default function PlayerCard({ player }) {
-  const fullName =
-    `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() ||
-    "Unbekannter Spieler";
-
-  const teamName = player.teams?.name_de || "Keine Mannschaft";
-  const teamSlug = player.teams?.slug;
+  const fullName = getFullName(player, "Unbekannter Spieler");
+  const team = getEntityTeam(player);
   const nationality = getCountryByValue(player.nationality);
   const genderLabel = getGenderLabel(player.gender);
-  const profileUrl = teamSlug ? `/fussball/${teamSlug}/spieler/${player.id}` : null;
-  const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
+  const profileUrl = team.slug ? `/fussball/${team.slug}/spieler/${player.id}` : null;
+  const imageUrl = getEntityImage(player, PLAYER_PLACEHOLDER_IMAGE, ["photo_url", "image_url"]);
   const { deleting, handleDelete } = useDeleteEntity({
     entityLabel: "Spieler",
     entityName: fullName,
@@ -35,7 +32,7 @@ export default function PlayerCard({ player }) {
   return (
     <EntityCard image={imageUrl} imageAlt={fullName} imageSize="sm">
       <EntityCardBadges>
-        <EntityBadge>{teamName}</EntityBadge>
+        <EntityBadge>{team.name}</EntityBadge>
         {player.position_de && <EntityBadge variant="red">{player.position_de}</EntityBadge>}
         {genderLabel && <EntityBadge>{genderLabel}</EntityBadge>}
         <PlayerStatusBadge active={player.is_active} />
