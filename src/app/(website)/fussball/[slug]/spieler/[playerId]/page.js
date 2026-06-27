@@ -32,7 +32,7 @@ function FlagIcon({ country }) {
     <img
       src={`https://flagcdn.com/w80/${country.iso.toLowerCase()}.png`}
       alt={country.de}
-      className="h-8 w-12 rounded-md object-cover ring-1 ring-white/20"
+      className="h-7 w-11 shrink-0 rounded-md object-cover ring-1 ring-white/20"
     />
   );
 }
@@ -72,10 +72,23 @@ function ProfileStat({ label, value, children }) {
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
         {label}
       </p>
-      <div className="mt-3 text-2xl font-black text-white">
+      <div className="mt-3 break-words text-2xl font-black leading-tight text-white">
         {children || value || "-"}
       </div>
     </div>
+  );
+}
+
+function NationalityValue({ country, fallback }) {
+  if (!country) return fallback || "-";
+
+  return (
+    <span className="flex min-w-0 items-center gap-3">
+      <FlagIcon country={country} />
+      <span className="min-w-0 text-xl leading-tight md:text-2xl">
+        {country.de}
+      </span>
+    </span>
   );
 }
 
@@ -188,14 +201,7 @@ export default async function PlayerProfilePage({ params }) {
                 <ProfileStat label="Jahrgang" value={player.year_group || "-"} />
                 <ProfileStat label="Starker Fuß" value={player.strong_foot} />
                 <ProfileStat label="Nationalität">
-                  {country ? (
-                    <span className="inline-flex items-center gap-3">
-                      <FlagIcon country={country} />
-                      {country.de}
-                    </span>
-                  ) : (
-                    player.nationality || "-"
-                  )}
+                  <NationalityValue country={country} fallback={player.nationality} />
                 </ProfileStat>
               </div>
 
