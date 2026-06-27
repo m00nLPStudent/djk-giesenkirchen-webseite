@@ -1,9 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import PlayerImageUpload from "../components/PlayerImageUpload";
 import { savePlayer, uploadPlayerImage } from "../services/players.service";
+import {
+  ADVANCED_POSITIONS,
+  COUNTRIES,
+  SIMPLE_POSITIONS,
+  STRONG_FOOT,
+} from "@/constants";
+
+const POSITION_EN = {
+  Torwart: "Goalkeeper",
+  Abwehr: "Defence",
+  Mittelfeld: "Midfield",
+  Angriff: "Attack",
+  Innenverteidiger: "Centre-back",
+  Außenverteidiger: "Full-back",
+  "Defensives Mittelfeld": "Defensive midfield",
+  "Zentrales Mittelfeld": "Central midfield",
+  "Offensives Mittelfeld": "Attacking midfield",
+  "Linkes Mittelfeld": "Left midfield",
+  "Rechtes Mittelfeld": "Right midfield",
+  Linksaußen: "Left winger",
+  Rechtsaußen: "Right winger",
+  Mittelstürmer: "Centre forward",
+};
+
+function usesSimplePositions(teamName = "") {
+  const name = teamName.toLowerCase();
+
+  return (
+    name.includes("bambini") ||
+    name.includes("f-jugend") ||
+    name.includes("f1") ||
+    name.includes("f2") ||
+    name.includes("e-jugend") ||
+    name.includes("e1") ||
+    name.includes("e2")
+  );
+}
 
 export default function AdminPlayersForm({ player, teams = [] }) {
   const router = useRouter();
@@ -28,10 +65,27 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     is_captain: player?.is_captain ?? false,
   });
 
+  const selectedTeam = useMemo(
+    () => teams.find((team) => team.id === form.team_id),
+    [form.team_id, teams],
+  );
+
+  const positionOptions = usesSimplePositions(selectedTeam?.name_de)
+    ? SIMPLE_POSITIONS
+    : ADVANCED_POSITIONS;
+
   function updateField(field, value) {
     setForm((current) => ({
       ...current,
       [field]: value,
+    }));
+  }
+
+  function updatePosition(value) {
+    setForm((current) => ({
+      ...current,
+      position_de: value,
+      position_en: POSITION_EN[value] || value,
     }));
   }
 
@@ -50,13 +104,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     event.preventDefault();
     setLoading(true);
 
-    console.log("FORM VOR SPEICHERN:", form);
-    console.log("PLAYER ID:", player?.id);
-
-    const { data, error } = await savePlayer(form, player?.id ?? null);
-
-    console.log("SUPABASE RESPONSE DATA:", data);
-    console.log("SUPABASE RESPONSE ERROR:", error);
+    const { error } = await savePlayer(form, player?.id ?? null);
 
     setLoading(false);
 
@@ -113,12 +161,18 @@ export default function AdminPlayersForm({ player, teams = [] }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <input
-          placeholder="Position Deutsch"
+        <select
           value={form.position_de}
-          onChange={(e) => updateField("position_de", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-        />
+          onChange={(e) => updatePosition(e.target.value)}
+          className="w-full rounded-2xl border border-white/10 bg-[#17171d] p-4"
+        >
+          <option value="">Position auswählen</option>
+          {positionOptions.map((position) => (
+            <option key={position} value={position}>
+              {position}
+            </option>
+          ))}
+        </select>
 
         <input
           placeholder="Position Englisch"
@@ -143,19 +197,31 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
         />
 
-        <input
-          placeholder="Starker Fuß"
+        <select
           value={form.strong_foot}
           onChange={(e) => updateField("strong_foot", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-        />
+          className="w-full rounded-2xl border border-white/10 bg-[#17171d] p-4"
+        >
+          <option value="">Starker Fuß auswählen</option>
+          {STRONG_FOOT.map((foot) => (
+            <option key={foot} value={foot}>
+              {foot}
+            </option>
+          ))}
+        </select>
 
-        <input
-          placeholder="Nationalität"
+        <select
           value={form.nationality}
           onChange={(e) => updateField("nationality", e.target.value)}
-          className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-        />
+          className="w-full rounded-2xl border border-white/10 bg-[#17171d] p-4"
+        >
+          <option value="">Nationalität auswählen</option>
+          {COUNTRIES.map((country) => (
+            <option key={country.iso} value={country.iso}>
+              {country.flag} {country.de}
+            </option>
+          ))}
+        </select>
       </div>
 
       <textarea
