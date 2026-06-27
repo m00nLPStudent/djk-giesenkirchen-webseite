@@ -20,6 +20,9 @@ export async function uploadCoachImage(file, coach = {}) {
 export async function saveCoach(coach, id = null) {
   const payload = {
     ...coach,
+    first_name: coach.first_name || null,
+    last_name: coach.last_name || null,
+    name: coach.name || `${coach.first_name || ""} ${coach.last_name || ""}`.trim(),
     team_id: coach.team_id || null,
     image_url: coach.image_url || COACH_PLACEHOLDER_IMAGE,
     nationality: coach.nationality || null,
