@@ -8,6 +8,7 @@ Dieses Dokument beschreibt die gewünschte Projektstruktur.
 src/
 ├── app/
 ├── components/
+├── constants/
 ├── lib/
 └── styles/
 ```
@@ -64,7 +65,21 @@ src/components/
 ```txt
 src/components/website/
 ├── navigation/
-└── football/
+├── football/
+├── team/
+└── player-profile/
+```
+
+### Öffentliche Spielerprofil-Komponenten
+
+```txt
+src/components/website/player-profile/
+├── PlayerProfileImageCard.js
+├── PlayerProfileHeader.js
+├── PlayerProfileStatsGrid.js
+├── PlayerProfileDescription.js
+├── playerProfile.helpers.js
+└── index.js
 ```
 
 ## Admin-Komponenten
@@ -73,9 +88,18 @@ src/components/website/
 src/components/admin/
 ├── layout/
 ├── dashboard/
+├── forms/
 ├── ui/
 ├── teams/
 └── players/
+```
+
+### Gemeinsame Admin-Formularfelder
+
+```txt
+src/components/admin/forms/
+├── FormField.js
+└── index.js
 ```
 
 ## Beispiel: Players-Modul
@@ -92,10 +116,35 @@ src/components/admin/players/
 │   ├── PlayerStats.js
 │   └── PlayerStatusBadge.js
 ├── forms/
-│   └── AdminPlayersForm.js
-└── services/
-    └── players.service.js
+│   ├── AdminPlayersForm.js
+│   ├── playerForm.config.js
+│   ├── playerForm.helpers.js
+│   └── fields/
+│       ├── FormField.js
+│       ├── PlayerBasicFields.js
+│       ├── PlayerSportFields.js
+│       ├── PlayerProfileFields.js
+│       ├── PlayerDescriptionFields.js
+│       └── PlayerSettingsFields.js
+├── list/
+│   └── playerList.helpers.js
+├── services/
+│   └── players.service.js
+└── stats/
+    ├── PlayerStatsCard.js
+    ├── PlayerNationalityList.js
+    └── playerStats.helpers.js
 ```
+
+## Gemeinsame Bibliotheken
+
+```txt
+src/lib/
+├── supabase.js
+└── storage.js
+```
+
+`storage.js` enthält wiederverwendbare Storage-Helfer für Upload, Löschen, Dateinamen und Public-URL-Pfade.
 
 ## Regel
 
