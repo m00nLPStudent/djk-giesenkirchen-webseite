@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useState } from "react";
 import { GENDER_OPTIONS } from "@/constants";
 
