@@ -1,4 +1,4 @@
-import { FormGrid } from "@/components/admin/forms";
+import { CountrySelectField, FormGrid } from "@/components/admin/forms";
 import { GENDER_OPTIONS, STRONG_FOOT } from "@/constants";
 import { COUNTRY_OPTIONS } from "../playerForm.config";
 import { InputField, SelectField } from "./FormField";
@@ -67,20 +67,13 @@ export default function PlayerProfileFields({
         </SelectField>
       </FormGrid>
 
-      <SelectField
-        label="Nationalität"
+      <CountrySelectField
         required
+        options={COUNTRY_OPTIONS}
         value={form.nationality}
-        onChange={(event) => updateField("nationality", event.target.value)}
+        onChange={(value) => updateField("nationality", value)}
         error={errors.nationality}
-      >
-        <option value="">Nationalität auswählen</option>
-        {COUNTRY_OPTIONS.map((country) => (
-          <option key={country.iso} value={country.iso}>
-            {country.flag} {country.de}
-          </option>
-        ))}
-      </SelectField>
+      />
     </div>
   );
 }
