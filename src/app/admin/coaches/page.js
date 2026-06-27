@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import { AdminCoachesList, CoachStats } from "@/components/admin/coaches";
+import { AdminCoachesOverview } from "@/components/admin/coaches";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
@@ -10,10 +10,6 @@ export default async function AdminCoachesPage() {
     .order("sort_order", { ascending: true });
 
   const coachList = coaches || [];
-
-  const active = coachList.filter((coach) => coach.is_active).length;
-  const inactive = coachList.filter((coach) => !coach.is_active).length;
-  const assignedTeams = coachList.filter((coach) => coach.team_id).length;
 
   return (
     <AdminLayout title="Trainer verwalten" subtitle="Adminbereich">
@@ -26,14 +22,7 @@ export default async function AdminCoachesPage() {
         </Link>
       </div>
 
-      <CoachStats
-        total={coachList.length}
-        active={active}
-        inactive={inactive}
-        assignedTeams={assignedTeams}
-      />
-
-      <AdminCoachesList coaches={coachList} />
+      <AdminCoachesOverview coaches={coachList} />
     </AdminLayout>
   );
 }
