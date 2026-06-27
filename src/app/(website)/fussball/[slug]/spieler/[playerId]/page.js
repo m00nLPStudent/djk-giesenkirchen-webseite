@@ -19,6 +19,11 @@ function getCountry(value) {
   );
 }
 
+function getTeam(player) {
+  if (Array.isArray(player?.teams)) return player.teams[0] || null;
+  return player?.teams || null;
+}
+
 function FlagIcon({ country }) {
   if (!country || country.iso === "OTHER") return null;
 
@@ -80,23 +85,29 @@ export default async function PlayerProfilePage({ params }) {
     .from("players")
     .select("*, teams(id, name_de, slug, age_group, training_times_de)")
     .eq("id", playerId)
-    .eq("is_active", true)
     .single();
 
-  if (!player || player.teams?.slug !== slug) {
+  if (!player) {
+    notFound();
+  }
+
+  const team = getTeam(player);
+
+  if (team?.slug && team.slug !== slug) {
     notFound();
   }
 
   const fullName = getFullName(player);
   const country = getCountry(player.nationality);
   const age = calculateAge(player.birthdate);
+  const teamSlug = team?.slug || slug;
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
       <section className="px-6 pt-32 pb-24">
         <div className="mx-auto max-w-7xl">
           <Link
-            href={`/fussball/${slug}`}
+            href={`/fussball/${teamSlug}`}
             className="inline-flex rounded-full border border-white/10 px-5 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
           >
             Zurück zur Mannschaft
@@ -146,9 +157,15 @@ export default async function PlayerProfilePage({ params }) {
                 )}
 
                 <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-                  {player.teams?.name_de}
+                  {team?.name_de || "Keine Mannschaft"}
                 </span>
               </div>
+
+              {!player.is_active && (
+                <div className="mt-6 rounded-3xl border border-yellow-500/30 bg-yellow-500/10 p-5 text-yellow-200">
+                  Dieser Spieler ist aktuell im Adminbereich deaktiviert und wird öffentlich normalerweise nicht im Kader angezeigt.
+                </div>
+              )}
 
               {player.description_de && (
                 <p className="mt-8 max-w-3xl text-lg leading-8 text-white/70">
@@ -159,7 +176,7 @@ export default async function PlayerProfilePage({ params }) {
               <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 <ProfileStat label="Rückennummer" value={player.shirt_number} />
                 <ProfileStat label="Position" value={player.position_de} />
-                <ProfileStat label="Mannschaft" value={player.teams?.name_de} />
+                <ProfileStat label="Mannschaft" value={team?.name_de} />
                 <ProfileStat label="Geburtsdatum" value={formatDate(player.birthdate)} />
                 <ProfileStat label="Alter" value={age !== null ? `${age} Jahre` : "-"} />
                 <ProfileStat label="Jahrgang" value={player.year_group || "-"} />
