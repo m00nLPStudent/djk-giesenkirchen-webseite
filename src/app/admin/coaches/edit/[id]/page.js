@@ -12,10 +12,15 @@ export default async function EditCoachPage({ params }) {
     .eq("id", id)
     .single();
 
+  const { data: teams } = await supabase
+    .from("teams")
+    .select("id, name_de")
+    .order("sort_order", { ascending: true });
+
   return (
     <AdminLayout title="Trainer bearbeiten" subtitle="Trainer">
       <BackButton />
-      <AdminCoachesForm coach={coach} />
+      <AdminCoachesForm coach={coach} teams={teams || []} />
     </AdminLayout>
   );
 }

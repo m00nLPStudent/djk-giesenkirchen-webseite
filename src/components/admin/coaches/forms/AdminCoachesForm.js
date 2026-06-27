@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import CoachImageUpload from "@/components/admin/coaches/components/CoachImageUpload";
+import CoachImageUpload from "../components/CoachImageUpload";
 import { createSlug } from "../utils/slug";
 import { uploadCoachImage, saveCoach } from "../services/coaches.service";
+import { coachRoles, coachLicenses } from "../constants/CoachOptions";
 
-export default function AdminCoachesForm({ coach }) {
+export default function AdminCoachesForm({ coach, teams = [] }) {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -16,8 +17,8 @@ export default function AdminCoachesForm({ coach }) {
     email: coach?.email || "",
     phone: coach?.phone || "",
     whatsapp: coach?.whatsapp || "",
-    license: coach?.license || "",
-    team_name: coach?.team_name || "",
+    license: coach?.license || "Keine Lizenz",
+    team_id: coach?.team_id || "",
     image_url: coach?.image_url || "",
     sort_order: coach?.sort_order || 0,
     is_active: coach?.is_active ?? true,
@@ -52,6 +53,7 @@ export default function AdminCoachesForm({ coach }) {
     const payload = {
       ...form,
       slug,
+      team_id: form.team_id || null,
       sort_order: Number(form.sort_order),
       is_active: form.is_active,
     };
@@ -86,19 +88,31 @@ export default function AdminCoachesForm({ coach }) {
         className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
       />
 
-      <input
-        placeholder="Funktion, z. B. Trainer oder Co-Trainer"
+      <select
         value={form.role}
         onChange={(e) => updateField("role", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
+        className="w-full rounded-2xl border border-white/10 bg-[#18181d] p-4 text-white"
+      >
+        {coachRoles.map((role) => (
+          <option key={role} value={role}>
+            {role}
+          </option>
+        ))}
+      </select>
 
-      <input
-        placeholder="Mannschaft, z. B. E1 Jugend"
-        value={form.team_name}
-        onChange={(e) => updateField("team_name", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
+      <select
+        value={form.team_id}
+        onChange={(e) => updateField("team_id", e.target.value)}
+        className="w-full rounded-2xl border border-white/10 bg-[#18181d] p-4 text-white"
+      >
+        <option value="">Keine Mannschaft zugeordnet</option>
+
+        {teams.map((team) => (
+          <option key={team.id} value={team.id}>
+            {team.name_de}
+          </option>
+        ))}
+      </select>
 
       <input
         placeholder="E-Mail"
@@ -122,12 +136,17 @@ export default function AdminCoachesForm({ coach }) {
         className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
       />
 
-      <input
-        placeholder="Lizenz, z. B. C-Lizenz"
+      <select
         value={form.license}
         onChange={(e) => updateField("license", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
+        className="w-full rounded-2xl border border-white/10 bg-[#18181d] p-4 text-white"
+      >
+        {coachLicenses.map((license) => (
+          <option key={license} value={license}>
+            {license}
+          </option>
+        ))}
+      </select>
 
       <CoachImageUpload
         imageUrl={form.image_url}
@@ -146,10 +165,6 @@ export default function AdminCoachesForm({ coach }) {
           onChange={(e) => updateField("sort_order", e.target.value)}
           className="w-32 rounded-2xl border border-white/10 bg-white/5 p-4"
         />
-
-        <p className="mt-2 text-sm text-white/40">
-          Kleinere Zahl = weiter oben anzeigen
-        </p>
       </div>
 
       <div className="rounded-2xl border border-white/10 bg-white/5 p-4">

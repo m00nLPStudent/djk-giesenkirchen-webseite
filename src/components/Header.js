@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Navigation } from "@/components/website/navigation";
 
 export default function Header() {
   return (
@@ -21,14 +22,7 @@ export default function Header() {
           </div>
         </Link>
 
-        <nav className="hidden gap-8 text-sm font-bold uppercase text-white/80 lg:flex">
-          <Link href="/news">News</Link>
-          <Link href="/#mannschaften">Fußball</Link>
-          <Link href="#">Tischtennis</Link>
-          <Link href="#">Damen-Gymnastik</Link>
-          <Link href="#">Termine</Link>
-          <Link href="#">Kontakt</Link>
-        </nav>
+        <Navigation />
       </div>
     </header>
   );
