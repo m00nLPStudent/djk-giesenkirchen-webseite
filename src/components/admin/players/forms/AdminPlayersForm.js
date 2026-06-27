@@ -3,7 +3,12 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import PlayerImageUpload from "../components/PlayerImageUpload";
-import { savePlayer, uploadPlayerImage } from "../services/players.service";
+import {
+  deletePlayerImage,
+  PLAYER_PLACEHOLDER_IMAGE,
+  savePlayer,
+  uploadPlayerImage,
+} from "../services/players.service";
 import {
   ADVANCED_POSITIONS,
   COUNTRIES,
@@ -75,7 +80,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     shirt_number: player?.shirt_number || "",
     position_de: player?.position_de || "",
     position_en: player?.position_en || "",
-    photo_url: player?.photo_url || "",
+    photo_url: player?.photo_url || PLAYER_PLACEHOLDER_IMAGE,
     description_de: player?.description_de || "",
     description_en: player?.description_en || "",
     birthdate: player?.birthdate || "",
@@ -135,7 +140,12 @@ export default function AdminPlayersForm({ player, teams = [] }) {
   }
 
   async function uploadImage(file) {
-    const { data, error } = await uploadPlayerImage(file, "players");
+    const { data, error } = await uploadPlayerImage(file, {
+      id: player?.id,
+      first_name: form.first_name,
+      last_name: form.last_name,
+      photo_url: form.photo_url,
+    });
 
     if (error) {
       alert(error.message);
@@ -143,6 +153,17 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     }
 
     updateField("photo_url", data);
+  }
+
+  async function removeImage() {
+    const { error } = await deletePlayerImage(form.photo_url);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    updateField("photo_url", PLAYER_PLACEHOLDER_IMAGE);
   }
 
   async function handleSubmit(event) {
@@ -156,6 +177,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
 
     const payload = {
       ...form,
+      photo_url: form.photo_url || PLAYER_PLACEHOLDER_IMAGE,
       year_group: calculatedYearGroup,
     };
 
@@ -361,9 +383,10 @@ export default function AdminPlayersForm({ player, teams = [] }) {
       />
 
       <PlayerImageUpload
-        imageUrl={form.photo_url}
+        imageUrl={form.photo_url || PLAYER_PLACEHOLDER_IMAGE}
+        placeholderUrl={PLAYER_PLACEHOLDER_IMAGE}
         onUpload={uploadImage}
-        onRemove={() => updateField("photo_url", "")}
+        onRemove={removeImage}
       />
 
       <div>
