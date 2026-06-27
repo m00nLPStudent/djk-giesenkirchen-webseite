@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { COUNTRIES } from "@/constants";
+import { COUNTRIES, getGenderLabel } from "@/constants";
 import { supabase } from "@/lib/supabase";
 
 function getCountry(value) {
@@ -101,6 +101,7 @@ export default async function PlayerProfilePage({ params }) {
   const country = getCountry(player.nationality);
   const age = calculateAge(player.birthdate);
   const teamSlug = team?.slug || slug;
+  const genderLabel = getGenderLabel(player.gender);
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
@@ -150,6 +151,12 @@ export default async function PlayerProfilePage({ params }) {
                   </span>
                 )}
 
+                {genderLabel && (
+                  <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-white/60">
+                    {genderLabel}
+                  </span>
+                )}
+
                 {player.is_captain && (
                   <span className="rounded-full bg-yellow-500/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.25em] text-yellow-400">
                     Spielführer
@@ -177,6 +184,7 @@ export default async function PlayerProfilePage({ params }) {
                 <ProfileStat label="Rückennummer" value={player.shirt_number} />
                 <ProfileStat label="Position" value={player.position_de} />
                 <ProfileStat label="Mannschaft" value={team?.name_de} />
+                <ProfileStat label="Geschlecht" value={genderLabel} />
                 <ProfileStat label="Geburtsdatum" value={formatDate(player.birthdate)} />
                 <ProfileStat label="Alter" value={age !== null ? `${age} Jahre` : "-"} />
                 <ProfileStat label="Jahrgang" value={player.year_group || "-"} />
