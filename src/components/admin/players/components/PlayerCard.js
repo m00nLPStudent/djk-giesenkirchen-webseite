@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { COUNTRIES, getGenderLabel } from "@/constants";
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
+import EntityBadge from "@/components/admin/ui/EntityBadge";
 import { deletePlayerCompletely } from "../services/players.service";
 import PlayerStatusBadge from "./PlayerStatusBadge";
 
@@ -81,28 +82,21 @@ export default function PlayerCard({ player }) {
 
       <div>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white/60">
-            {teamName}
-          </span>
+          <EntityBadge>{teamName}</EntityBadge>
 
-          {player.position_de && (
-            <span className="rounded-full bg-red-600/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-              {player.position_de}
-            </span>
-          )}
+          {player.position_de && <EntityBadge variant="red">{player.position_de}</EntityBadge>}
 
-          {genderLabel && (
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-white/60">
-              {genderLabel}
-            </span>
-          )}
+          {genderLabel && <EntityBadge>{genderLabel}</EntityBadge>}
 
           <PlayerStatusBadge active={player.is_active} />
 
-          {player.is_captain && (
-            <span className="rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-yellow-400">
-              Spielführer
-            </span>
+          {player.is_captain && <EntityBadge variant="yellow">Spielführer</EntityBadge>}
+
+          {nationality && (
+            <EntityBadge>
+              <FlagIcon country={nationality} />
+              {nationality.de}
+            </EntityBadge>
           )}
         </div>
 
@@ -124,14 +118,6 @@ export default function PlayerCard({ player }) {
               </span>
 
               {player.strong_foot && <span>• {player.strong_foot}</span>}
-
-              {nationality && (
-                <span className="inline-flex items-center gap-2">
-                  <span>•</span>
-                  <FlagIcon country={nationality} />
-                  <span>{nationality.de}</span>
-                </span>
-              )}
             </div>
           </div>
         </div>
