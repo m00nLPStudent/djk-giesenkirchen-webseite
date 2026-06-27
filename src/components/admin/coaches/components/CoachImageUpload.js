@@ -1,46 +1,61 @@
-export default function CoachImageUpload({ imageUrl, onUpload, onRemove }) {
+import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+
+export default function CoachImageUpload({
+  imageUrl,
+  placeholderUrl = COACH_PLACEHOLDER_IMAGE,
+  onUpload,
+  onRemove,
+}) {
+  const previewUrl = imageUrl || placeholderUrl;
+  const isPlaceholder = previewUrl === placeholderUrl;
+
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <label className="mb-2 block text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-        Trainerbild
-      </label>
-
-      <label className="inline-flex cursor-pointer items-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-red-700">
-        Bild auswählen
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => onUpload(e.target.files?.[0])}
-          className="hidden"
-        />
-      </label>
-
-      <p className="mt-3 text-sm text-white/40">
-        Das Bild wird automatisch hochgeladen.
+      <h2 className="text-2xl font-black">Trainerbild</h2>
+      <p className="mt-2 text-sm text-white/50">
+        Ohne eigenes Bild wird automatisch das Platzhalterbild verwendet.
       </p>
 
-      {imageUrl && (
-        <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-bold uppercase tracking-[0.25em] text-white/50">
-              Vorschau
-            </p>
+      <div className="mt-6 flex flex-wrap items-center gap-6">
+        <div className="flex h-36 w-36 items-center justify-center overflow-hidden rounded-3xl bg-black/20">
+          <img
+            src={previewUrl}
+            alt="Trainerbild"
+            className="h-full w-full object-cover"
+          />
+        </div>
 
+        <div className="space-y-3">
+          <label className="inline-flex cursor-pointer rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-red-700">
+            Bild auswählen
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) {
+                  onUpload(file);
+                }
+                event.target.value = "";
+              }}
+              className="hidden"
+            />
+          </label>
+
+          {!isPlaceholder && previewUrl && (
             <button
               type="button"
               onClick={onRemove}
-              className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10"
+              className="block rounded-full border border-red-500/30 px-5 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10"
             >
-              Bild entfernen
+              Eigenes Bild entfernen
             </button>
-          </div>
-
-          <img
-            src={imageUrl}
-            alt="Trainerbild"
-            className="max-h-72 w-full rounded-xl object-contain"
-          />
+          )}
         </div>
+      </div>
+
+      {previewUrl && (
+        <p className="mt-4 break-all text-xs text-white/40">{previewUrl}</p>
       )}
     </div>
   );
