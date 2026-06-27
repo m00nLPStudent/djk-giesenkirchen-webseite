@@ -1,75 +1,22 @@
 import { supabase } from "@/lib/supabase";
+import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
 
 export const PLAYER_PLACEHOLDER_IMAGE =
   "https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/players/Blanko.png";
 
-function getStoragePathFromPublicUrl(url) {
-  if (!url) return null;
-  if (url === PLAYER_PLACEHOLDER_IMAGE) return null;
-
-  const marker = "/storage/v1/object/public/media/";
-  const index = url.indexOf(marker);
-
-  if (index === -1) return null;
-
-  return decodeURIComponent(url.slice(index + marker.length));
-}
-
-function getFileExtension(fileName = "") {
-  const extension = fileName.split(".").pop()?.toLowerCase();
-  return extension || "png";
-}
-
-function slugify(value = "spieler") {
-  return String(value)
-    .toLowerCase()
-    .trim()
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "spieler";
-}
-
 export async function deletePlayerImage(imageUrl) {
-  const path = getStoragePathFromPublicUrl(imageUrl);
-
-  if (!path) {
-    return { error: null };
-  }
-
-  return await supabase.storage.from("media").remove([path]);
+  return await deleteMediaFile(imageUrl, {
+    ignoredUrls: [PLAYER_PLACEHOLDER_IMAGE],
+  });
 }
 
 export async function uploadPlayerImage(file, player = {}) {
-  if (!file) return { data: null, error: null };
-
-  const previousPath = getStoragePathFromPublicUrl(player.photo_url);
-  const extension = getFileExtension(file.name);
-  const name = slugify(
-    `${player.first_name || ""}-${player.last_name || ""}-${player.id || Date.now()}`,
-  );
-  const fileName = `players/${name}.${extension}`;
-
-  if (previousPath && previousPath !== fileName) {
-    await supabase.storage.from("media").remove([previousPath]);
-  }
-
-  const { error } = await supabase.storage
-    .from("media")
-    .upload(fileName, file, { upsert: true });
-
-  if (error) {
-    return { data: null, error };
-  }
-
-  const { data } = supabase.storage.from("media").getPublicUrl(fileName);
-
-  return {
-    data: `${data.publicUrl}?v=${Date.now()}`,
-    error: null,
-  };
+  return await uploadMediaFile(file, {
+    folder: "players",
+    name: `${player.first_name || ""}-${player.last_name || ""}-${player.id || Date.now()}`,
+    previousUrl: player.photo_url,
+    ignoredUrls: [PLAYER_PLACEHOLDER_IMAGE],
+  });
 }
 
 export async function savePlayer(player, id = null) {
