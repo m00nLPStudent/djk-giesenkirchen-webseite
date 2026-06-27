@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { COUNTRIES, getGenderLabel } from "@/constants";
+import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { supabase } from "@/lib/supabase";
 
 function getCountry(value) {
@@ -102,6 +103,7 @@ export default async function PlayerProfilePage({ params }) {
   const age = calculateAge(player.birthdate);
   const teamSlug = team?.slug || slug;
   const genderLabel = getGenderLabel(player.gender);
+  const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
@@ -117,15 +119,11 @@ export default async function PlayerProfilePage({ params }) {
           <div className="mt-10 grid gap-10 lg:grid-cols-[420px_1fr] lg:items-start">
             <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/5">
               <div className="relative flex h-[520px] items-center justify-center bg-black/20">
-                {player.photo_url ? (
-                  <img
-                    src={player.photo_url}
-                    alt={fullName}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span className="text-white/40">Kein Spielerbild vorhanden</span>
-                )}
+                <img
+                  src={imageUrl}
+                  alt={fullName}
+                  className="h-full w-full object-cover"
+                />
 
                 {player.shirt_number && (
                   <div className="absolute left-6 top-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-red-600 text-4xl font-black shadow-2xl">
