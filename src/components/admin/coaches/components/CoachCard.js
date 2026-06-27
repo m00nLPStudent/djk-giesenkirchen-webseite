@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { COUNTRIES } from "@/constants";
+import EntityBadge from "@/components/admin/ui/EntityBadge";
 import { deleteCoachCompletely } from "../services/coaches.service";
 import CoachStatusBadge from "./CoachStatusBadge";
 
@@ -36,12 +37,19 @@ function FlagIcon({ country }) {
   );
 }
 
+function getTeamName(coach) {
+  if (coach.teams?.name_de) return coach.teams.name_de;
+  if (coach.team_name) return coach.team_name;
+  return "Keine Mannschaft";
+}
+
 export default function CoachCard({ coach }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const country = getCountry(coach.nationality);
   const imageUrl = coach.image_url || COACH_PLACEHOLDER_IMAGE;
   const fullName = coach.name || `${coach.first_name || ""} ${coach.last_name || ""}`.trim() || "Trainer";
+  const teamName = getTeamName(coach);
 
   async function handleDelete() {
     const confirmed = window.confirm(
@@ -74,21 +82,15 @@ export default function CoachCard({ coach }) {
 
       <div>
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-red-600/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-            {coach.role || "Trainer"}
-          </span>
-
+          <EntityBadge variant="red">{coach.role || "Trainer"}</EntityBadge>
           <CoachStatusBadge active={coach.is_active} />
-
-          <span className="text-sm text-white/40">
-            {coach.team_name || "Keine Mannschaft"}
-          </span>
+          <EntityBadge>{teamName}</EntityBadge>
 
           {country && (
-            <span className="inline-flex items-center gap-2 text-sm text-white/50">
+            <EntityBadge>
               <FlagIcon country={country} />
               {country.de}
-            </span>
+            </EntityBadge>
           )}
         </div>
 
