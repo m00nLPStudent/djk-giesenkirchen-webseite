@@ -59,7 +59,6 @@ export async function saveTeam(team, id = null) {
     fupa_matches_widget_id: team.fupa_matches_widget_id || null,
     fupa_table_widget_id: team.fupa_table_widget_id || null,
     fupa_club_url: team.fupa_club_url || null,
-    fupa_custom_css: team.fupa_custom_css || null,
     sort_order: Number(team.sort_order || 0),
     is_active: team.is_active ?? true,
   };
