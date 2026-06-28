@@ -1,33 +1,5 @@
 import { Shield, UsersRound, UserRound, Handshake } from "lucide-react";
-
-function StatCard({ item, active, onClick }) {
-  const Icon = item.icon;
-
-  return (
-    <button
-      type="button"
-      onClick={() => onClick(item.filter)}
-      className={`rounded-3xl border p-6 text-left transition ${
-        active
-          ? "border-red-500 bg-red-500/10"
-          : "border-white/10 bg-white/5 hover:border-red-500/50 hover:bg-white/10"
-      }`}
-    >
-      <div className="flex items-center justify-between">
-        <div
-          className={`flex h-14 w-14 items-center justify-center rounded-2xl ${item.bg}`}
-        >
-          <Icon className={item.color} size={28} />
-        </div>
-
-        <p className="text-4xl font-black">{item.value}</p>
-      </div>
-
-      <h2 className="mt-6 text-xl font-black">{item.title}</h2>
-      <p className="mt-2 text-sm text-white/45">{item.description}</p>
-    </button>
-  );
-}
+import StatisticGrid from "@/components/admin/ui/StatisticGrid";
 
 export default function CoachStats({
   trainer = 0,
@@ -77,15 +49,10 @@ export default function CoachStats({
   ];
 
   return (
-    <div className="mb-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-      {stats.map((item) => (
-        <StatCard
-          key={item.title}
-          item={item}
-          active={activeFilter === item.filter}
-          onClick={onFilterChange}
-        />
-      ))}
-    </div>
+    <StatisticGrid
+      items={stats}
+      activeFilter={activeFilter}
+      onFilterChange={onFilterChange}
+    />
   );
 }
