@@ -1,6 +1,6 @@
 import FupaScript from "./FupaScript";
 
-export default function FupaWidget({ widgetId, title, description, clubUrl, customCss }) {
+export default function FupaWidget({ widgetId, title, description, clubUrl }) {
   if (!widgetId) {
     return (
       <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8">
@@ -16,10 +16,8 @@ export default function FupaWidget({ widgetId, title, description, clubUrl, cust
   }
 
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8">
+    <section className="fupa-widget-shell rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8">
       <FupaScript />
-
-      {customCss && <style>{customCss}</style>}
 
       <p className="text-xs font-bold uppercase tracking-[0.35em] text-red-400">
         FuPa
