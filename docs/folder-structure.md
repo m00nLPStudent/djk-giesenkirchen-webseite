@@ -29,6 +29,7 @@ src/app/(website)/
 ├── page.js
 ├── news/
 ├── fussball/
+├── trainer/
 ├── tischtennis/
 ├── damen-gymnastik/
 ├── termine/
@@ -67,7 +68,17 @@ src/components/website/
 ├── navigation/
 ├── football/
 ├── team/
-└── player-profile/
+├── profile/
+├── player-profile/
+└── coach-profile/
+```
+
+### Gemeinsame öffentliche Profil-Komponenten
+
+```txt
+src/components/website/profile/
+├── ProfileDetailsCard.js
+└── index.js
 ```
 
 ### Öffentliche Spielerprofil-Komponenten
@@ -82,6 +93,17 @@ src/components/website/player-profile/
 └── index.js
 ```
 
+### Öffentliche Trainerprofil-Komponenten
+
+```txt
+src/components/website/coach-profile/
+├── CoachProfileImageCard.js
+├── CoachProfileHeader.js
+├── CoachProfileStatsGrid.js
+├── coachProfile.helpers.js
+└── index.js
+```
+
 ## Admin-Komponenten
 
 ```txt
@@ -89,9 +111,14 @@ src/components/admin/
 ├── layout/
 ├── dashboard/
 ├── forms/
+├── hooks/
+├── media/
+├── services/
 ├── ui/
+├── utils/
 ├── teams/
-└── players/
+├── players/
+└── coaches/
 ```
 
 ### Gemeinsame Admin-Formularfelder
@@ -99,7 +126,47 @@ src/components/admin/
 ```txt
 src/components/admin/forms/
 ├── FormField.js
+├── FormSection.js
+├── SettingsFields.js
+├── SpecialFields.js
+├── StatusSwitch.js
 └── index.js
+```
+
+### Gemeinsame Admin-Hooks
+
+```txt
+src/components/admin/hooks/
+├── useDeleteEntity.js
+├── useEntityForm.js
+└── useImageUpload.js
+```
+
+### Gemeinsame Admin-Services
+
+```txt
+src/components/admin/services/
+├── deleteEntity.service.js
+└── entity.repository.js
+```
+
+### Gemeinsame Admin-UI
+
+```txt
+src/components/admin/ui/
+├── EntityBadge.js
+├── EntityCard.js
+└── StatisticGrid.js
+```
+
+### Gemeinsame Admin-Utils
+
+```txt
+src/components/admin/utils/
+├── countries.js
+├── entity.js
+├── list.js
+└── validation.js
 ```
 
 ## Beispiel: Players-Modul
@@ -113,7 +180,6 @@ src/components/admin/players/
 │   ├── PlayerEmptyState.js
 │   ├── PlayerFilters.js
 │   ├── PlayerImageUpload.js
-│   ├── PlayerStats.js
 │   └── PlayerStatusBadge.js
 ├── forms/
 │   ├── AdminPlayersForm.js
@@ -131,15 +197,48 @@ src/components/admin/players/
 ├── services/
 │   └── players.service.js
 └── stats/
-    ├── PlayerStatsCard.js
     ├── PlayerNationalityList.js
     └── playerStats.helpers.js
+```
+
+## Beispiel: Coaches-Modul
+
+```txt
+src/components/admin/coaches/
+├── AdminCoachesList.js
+├── AdminCoachesOverview.js
+├── index.js
+├── components/
+│   ├── CoachCard.js
+│   ├── CoachEmptyState.js
+│   ├── CoachFilters.js
+│   ├── CoachImageUpload.js
+│   ├── CoachStats.js
+│   ├── CoachStatusBadge.js
+│   └── CoachTeamsOverview.js
+├── forms/
+│   ├── AdminCoachesForm.js
+│   ├── coachForm.config.js
+│   ├── coachForm.helpers.js
+│   └── fields/
+│       ├── CoachBasicFields.js
+│       ├── CoachContactFields.js
+│       ├── CoachFormField.js
+│       ├── CoachProfileFields.js
+│       ├── CoachRoleFields.js
+│       └── CoachSettingsFields.js
+├── services/
+│   └── coaches.service.js
+└── utils/
+    ├── coachStats.js
+    └── slug.js
 ```
 
 ## Gemeinsame Bibliotheken
 
 ```txt
 src/lib/
+├── phone.js
 ├── supabase.js
 └── storage.js
 ```
@@ -148,4 +247,4 @@ src/lib/
 
 ## Regel
 
-Neue Module werden nach demselben Muster aufgebaut, damit das CMS langfristig wartbar bleibt.
+Neue Module werden nach demselben Muster aufgebaut, damit das CMS langfristig wartbar bleibt. Gemeinsame UI-, Formular-, Upload-, Lösch-, Statistik- und Repository-Bausteine werden bevorzugt wiederverwendet.
