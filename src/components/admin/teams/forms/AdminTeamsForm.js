@@ -16,7 +16,7 @@ import {
 import TeamLogoUpload from "../components/TeamLogoUpload";
 import { createSlug } from "../utils/slug";
 import { uploadTeamImage, saveTeam } from "../services/teams.service";
-import TeamCompetitionFields from "./fields/TeamCompetitionFields";
+import TeamFupaFields from "./fields/TeamFupaFields";
 
 function createInitialForm(team) {
   return {
@@ -36,16 +36,12 @@ function createInitialForm(team) {
     contact_email: team?.contact_email || "",
     contact_phone: team?.contact_phone || "",
     contact_image_url: team?.contact_image_url || "",
-    fussball_de_team_url: team?.fussball_de_team_url || "",
-    fussball_de_team_id: team?.fussball_de_team_id || "",
-    fussball_de_competition_id: team?.fussball_de_competition_id || "",
-    fussball_de_club_id: team?.fussball_de_club_id || "",
-    fussball_de_matches_widget_url: team?.fussball_de_matches_widget_url || "",
-    fussball_de_matches_url: team?.fussball_de_matches_url || "",
-    dfb_matches_widget_url: team?.dfb_matches_widget_url || "",
-    fussball_de_table_widget_url: team?.fussball_de_table_widget_url || "",
-    fussball_de_table_url: team?.fussball_de_table_url || "",
-    dfb_table_widget_url: team?.dfb_table_widget_url || "",
+    fupa_matches_widget_code: "",
+    fupa_table_widget_code: "",
+    fupa_matches_widget_id: team?.fupa_matches_widget_id || "",
+    fupa_table_widget_id: team?.fupa_table_widget_id || "",
+    fupa_club_url: team?.fupa_club_url || "",
+    fupa_custom_css: team?.fupa_custom_css || "",
   };
 }
 
@@ -133,8 +129,8 @@ export default function AdminTeamsForm({ team }) {
         </div>
       </FormSection>
 
-      <FormSection eyebrow="Spielbetrieb" title="fussball.de / DFB" description="Ein Mannschaftslink reicht aus. Das System übernimmt daraus die Grundlage für Spielplan und Tabelle.">
-        <TeamCompetitionFields form={form} updateField={updateField} />
+      <FormSection eyebrow="Spielbetrieb" title="FuPa Integration" description="Widget-Code aus dem FuPa Widget-Builder einfügen. Gespeichert werden automatisch nur die sicheren Widget-IDs.">
+        <TeamFupaFields form={form} updateField={updateField} />
       </FormSection>
 
       <FormSection eyebrow="Kontakt" title="Ansprechpartner">
