@@ -1,38 +1,160 @@
 .fupa-widget-shell {
-  --fupa-red: #dc2626;
+  --fupa-red: #ef111d;
+  --fupa-red-dark: #991b1b;
   --fupa-dark: #101014;
-  --fupa-card: #17171d;
+  --fupa-card: #18181f;
+  --fupa-card-soft: #202027;
   --fupa-border: rgba(255, 255, 255, 0.1);
-  --fupa-muted: rgba(255, 255, 255, 0.55);
+  --fupa-border-strong: rgba(255, 255, 255, 0.18);
+  --fupa-text: #ffffff;
+  --fupa-muted: rgba(255, 255, 255, 0.6);
+  --fupa-muted-strong: rgba(255, 255, 255, 0.78);
+}
+
+.fupa-widget-shell > div:last-child {
+  background: linear-gradient(180deg, rgba(24, 24, 31, 0.98), rgba(16, 16, 20, 0.98));
+  border-color: var(--fupa-border);
+  color: var(--fupa-text);
 }
 
 .fupa-widget-shell [id^="fp-widget_root-"] {
   width: 100%;
   min-height: 120px;
-  color: #111;
+  color: var(--fupa-text);
+  font-family: inherit;
+}
+
+.fupa-widget-shell [id^="fp-widget_root-"] * {
+  box-sizing: border-box;
+  font-family: inherit !important;
 }
 
 .fupa-widget-shell a {
-  color: var(--fupa-red);
-  font-weight: 800;
-  text-decoration: none;
+  color: var(--fupa-red) !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
 }
 
 .fupa-widget-shell a:hover {
-  text-decoration: underline;
+  color: #ffffff !important;
+  text-decoration: none !important;
 }
 
 .fupa-widget-shell table {
-  width: 100%;
-  border-collapse: collapse;
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  color: var(--fupa-text) !important;
+}
+
+.fupa-widget-shell thead,
+.fupa-widget-shell .fp-table-header,
+.fupa-widget-shell .fp-team-matches-view-header,
+.fupa-widget-shell .fp-subheading-text {
+  background: rgba(239, 17, 29, 0.14) !important;
+  color: var(--fupa-red) !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
 }
 
 .fupa-widget-shell th,
 .fupa-widget-shell td {
-  padding: 0.75rem;
+  border-color: var(--fupa-border) !important;
+  color: var(--fupa-text) !important;
+  padding: 0.85rem 0.9rem !important;
+}
+
+.fupa-widget-shell tr,
+.fupa-widget-shell .fp-table-row,
+.fupa-widget-shell .fp-team-matches-view-match-row {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border-color: var(--fupa-border) !important;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.fupa-widget-shell tr:hover,
+.fupa-widget-shell .fp-table-row:hover,
+.fupa-widget-shell .fp-team-matches-view-match-row:hover {
+  background: rgba(239, 17, 29, 0.09) !important;
+  border-color: rgba(239, 17, 29, 0.35) !important;
+}
+
+.fupa-widget-shell .fp-team-matches-view-match-row,
+.fupa-widget-shell .fp-team-matches-view-match-row-match,
+.fupa-widget-shell .fp-border-color {
+  border: 1px solid var(--fupa-border) !important;
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+  margin-bottom: 0.65rem !important;
+}
+
+.fupa-widget-shell .fp-team-matches-view-match-row-team-container,
+.fupa-widget-shell .fp-team-matches-view-match-row-team-container.align-right,
+.fupa-widget-shell .fp-team-matches-view-match-row-team-container.align-left {
+  color: var(--fupa-text) !important;
+  font-weight: 900 !important;
+}
+
+.fupa-widget-shell .fp-team-matches-view-match-row-result,
+.fupa-widget-shell .fp-team-matches-view-match-row-score,
+.fupa-widget-shell .fp-score,
+.fupa-widget-shell .fp-match-score {
+  background: rgba(239, 17, 29, 0.16) !important;
+  border-radius: 0.65rem !important;
+  color: #ffffff !important;
+  font-weight: 1000 !important;
+  padding: 0.25rem 0.55rem !important;
+}
+
+.fupa-widget-shell .fp-team-logo,
+.fupa-widget-shell img {
+  max-width: 32px !important;
+  max-height: 32px !important;
+  object-fit: contain !important;
+}
+
+.fupa-widget-shell .fp-ellipsis,
+.fupa-widget-shell .fp-team-name,
+.fupa-widget-shell .fp-table-team-name {
+  color: var(--fupa-text) !important;
+  font-weight: 900 !important;
+}
+
+.fupa-widget-shell .fp-muted,
+.fupa-widget-shell .fp-table-small,
+.fupa-widget-shell .fp-team-matches-view-match-row-date,
+.fupa-widget-shell .fp-team-matches-view-match-row-league {
+  color: var(--fupa-muted) !important;
+}
+
+.fupa-widget-shell .fp-widget-footer,
+.fupa-widget-shell .fp-footer,
+.fupa-widget-shell [class*="footer"] {
+  border-top: 1px solid var(--fupa-border) !important;
+  color: var(--fupa-muted) !important;
+  margin-top: 0.75rem !important;
+  padding-top: 0.75rem !important;
 }
 
 .fupa-widget-shell iframe {
-  width: 100%;
-  border: 0;
+  width: 100% !important;
+  border: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .fupa-widget-shell > div:last-child {
+    padding: 0.85rem !important;
+  }
+
+  .fupa-widget-shell th,
+  .fupa-widget-shell td {
+    padding: 0.65rem 0.5rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .fupa-widget-shell .fp-team-matches-view-match-row {
+    font-size: 0.85rem !important;
+  }
 }
