@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import {
   TeamHero,
-  TeamTrainingInfo,
-  TeamContact,
+  TeamIntroCard,
+  TeamInfoGrid,
   TeamCoachSection,
   TeamPlayerSection,
 } from "@/components/website/team";
@@ -33,26 +33,12 @@ export default async function TeamPage({ params }) {
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
-      <section className="px-6 pt-32 pb-20">
-        <div className="mx-auto max-w-7xl">
+      <section className="px-6 pt-32 pb-24">
+        <div className="mx-auto max-w-7xl space-y-8">
           <TeamHero team={team} />
-
-          <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-            Fußballabteilung
-          </p>
-
-          <h1 className="mt-6 text-6xl font-black">{team?.name_de}</h1>
-
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70">
-            {team?.description_de || "Mannschaftsbeschreibung folgt."}
-          </p>
-
-          <TeamTrainingInfo team={team} />
-
-          <TeamContact team={team} />
-
+          <TeamIntroCard team={team} />
+          <TeamInfoGrid team={team} />
           <TeamCoachSection coaches={coaches || []} />
-
           <TeamPlayerSection players={players || []} teamSlug={slug} />
         </div>
       </section>
