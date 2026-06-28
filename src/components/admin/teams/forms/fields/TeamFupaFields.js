@@ -45,7 +45,7 @@ export default function TeamFupaFields({ form, updateField }) {
         </p>
         <p className="mt-3 text-sm leading-6 text-white/55">
           Kopiere hier den kompletten Widget-Code aus dem FuPa Widget-Builder hinein.
-          Gespeichert wird automatisch nur die sichere Widget-ID.
+          Das Design wird zentral für alle Mannschaften über die Webseite gesteuert.
         </p>
       </div>
 
@@ -63,14 +63,6 @@ export default function TeamFupaFields({ form, updateField }) {
         placeholder="Optional ab D-Jugend, Damen und Senioren"
         value={form.fupa_table_widget_code}
         onChange={(event) => updateTableWidget(event.target.value)}
-      />
-
-      <TextareaField
-        label="Eigenes FuPa CSS"
-        rows={8}
-        placeholder="Optionaler CSS-Code aus dem FuPa Widget-Builder"
-        value={form.fupa_custom_css}
-        onChange={(event) => updateField("fupa_custom_css", event.target.value)}
       />
 
       <div className="grid gap-4 md:grid-cols-3">
