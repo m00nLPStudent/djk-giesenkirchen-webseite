@@ -1,7 +1,12 @@
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
-import { supabase } from "@/lib/supabase";
 import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
-import { deleteEntityWithImage } from "@/components/admin/services/deleteEntity.service";
+import { createEntityRepository } from "@/components/admin/services/entity.repository";
+
+const coachRepository = createEntityRepository({
+  table: "coaches",
+  placeholderImage: COACH_PLACEHOLDER_IMAGE,
+  imageFields: ["image_url"],
+});
 
 export async function deleteCoachImage(imageUrl) {
   return await deleteMediaFile(imageUrl, {
@@ -32,22 +37,13 @@ export async function saveCoach(coach, id = null) {
     is_active: coach.is_active ?? true,
   };
 
-  if (id) {
-    return await supabase.from("coaches").update(payload).eq("id", id);
-  }
-
-  return await supabase.from("coaches").insert(payload);
+  return await coachRepository.upsert(payload, id);
 }
 
 export async function deleteCoachCompletely(coach) {
-  return await deleteEntityWithImage({
-    table: "coaches",
-    id: coach?.id,
-    imageUrl: coach?.image_url,
-    ignoredUrls: [COACH_PLACEHOLDER_IMAGE],
-  });
+  return await coachRepository.removeWithImage(coach);
 }
 
 export async function deleteCoach(id) {
-  return await supabase.from("coaches").delete().eq("id", id);
+  return await coachRepository.remove(id);
 }
