@@ -1,3 +1,4 @@
+.fupa-card,
 .fupa-widget-shell {
   --fupa-red: #ef111d;
   --fupa-red-soft: rgba(239, 17, 29, 0.14);
@@ -11,6 +12,11 @@
   --fupa-highlight: rgba(239, 17, 29, 0.14);
 }
 
+.fupa-card {
+  min-height: 100%;
+}
+
+.fupa-widget-frame,
 .fupa-widget-shell > div:last-child,
 .fupa-widget-shell [id^="fp-widget_root-"] {
   background: var(--fupa-card) !important;
@@ -44,7 +50,6 @@
 .fupa-widget-shell table {
   width: 100% !important;
   border-collapse: collapse !important;
-  color: var(--fupa-text) !important;
 }
 
 .fupa-widget-shell thead,
@@ -55,7 +60,6 @@
 .fupa-widget-shell .fp-team-matches-view-header,
 .fupa-widget-shell .fp-subheading-text {
   background: var(--fupa-card-head) !important;
-  background-color: var(--fupa-card-head) !important;
   color: var(--fupa-red) !important;
   font-weight: 900 !important;
   text-transform: uppercase !important;
@@ -93,27 +97,23 @@
 .fupa-widget-shell tr,
 .fupa-widget-shell .fp-table-row {
   background: rgba(255, 255, 255, 0.03) !important;
-  background-color: rgba(255, 255, 255, 0.03) !important;
-  transition: background-color 180ms ease, border-color 180ms ease;
+  transition: background-color 180ms ease;
 }
 
 .fupa-widget-shell tr:nth-child(even),
 .fupa-widget-shell .fp-table-row:nth-child(even) {
   background: rgba(255, 255, 255, 0.055) !important;
-  background-color: rgba(255, 255, 255, 0.055) !important;
 }
 
 .fupa-widget-shell tr:hover,
 .fupa-widget-shell .fp-table-row:hover {
   background: var(--fupa-red-hover) !important;
-  background-color: var(--fupa-red-hover) !important;
 }
 
 .fupa-widget-shell .fp-team-matches-view-match-row,
 .fupa-widget-shell .fp-team-matches-view-match-row-match,
 .fupa-widget-shell .fp-border-color {
   background: rgba(255, 255, 255, 0.045) !important;
-  background-color: rgba(255, 255, 255, 0.045) !important;
   border: 1px solid var(--fupa-border) !important;
   border-radius: 1rem !important;
   color: var(--fupa-text) !important;
@@ -124,7 +124,6 @@
 .fupa-widget-shell .fp-team-matches-view-match-row:hover,
 .fupa-widget-shell .fp-team-matches-view-match-row-match:hover {
   background: var(--fupa-red-hover) !important;
-  background-color: var(--fupa-red-hover) !important;
   border-color: rgba(239, 17, 29, 0.45) !important;
 }
 
@@ -144,7 +143,6 @@
 .fupa-widget-shell .fp-score,
 .fupa-widget-shell .fp-match-score {
   background: var(--fupa-red-soft) !important;
-  background-color: var(--fupa-red-soft) !important;
   border-radius: 0.7rem !important;
   color: #ffffff !important;
   font-weight: 1000 !important;
@@ -169,21 +167,6 @@
   color: #ffffff !important;
 }
 
-.fupa-widget-shell tr:has(a[href*="giesenkirchen"]),
-.fupa-widget-shell tr:has([title*="Giesenkirchen"]),
-.fupa-widget-shell tr:has([class*="Giesenkirchen"]) {
-  background: var(--fupa-highlight) !important;
-  background-color: var(--fupa-highlight) !important;
-  box-shadow: inset 4px 0 0 var(--fupa-red) !important;
-}
-
-.fupa-widget-shell a[href*="giesenkirchen"],
-.fupa-widget-shell [title*="Giesenkirchen"],
-.fupa-widget-shell [class*="Giesenkirchen"] {
-  color: #ffffff !important;
-  font-weight: 1000 !important;
-}
-
 .fupa-widget-shell .fp-muted,
 .fupa-widget-shell .fp-table-small,
 .fupa-widget-shell .fp-team-matches-view-match-row-date,
@@ -199,7 +182,6 @@
 .fupa-widget-shell [class*="footer"],
 .fupa-widget-shell [class*="Footer"] {
   background: rgba(255, 255, 255, 0.035) !important;
-  background-color: rgba(255, 255, 255, 0.035) !important;
   border-top: 1px solid var(--fupa-border) !important;
   color: var(--fupa-muted) !important;
   font-size: 0.7rem !important;
@@ -212,7 +194,6 @@
   width: 100% !important;
   border: 0 !important;
   background: var(--fupa-card) !important;
-  background-color: var(--fupa-card) !important;
 }
 
 @media (max-width: 768px) {
