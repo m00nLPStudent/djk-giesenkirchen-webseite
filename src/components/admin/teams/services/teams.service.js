@@ -57,6 +57,7 @@ export async function saveTeam(team, id = null) {
     contact_email: team.contact_email || null,
     contact_phone: team.contact_phone || null,
     contact_image_url: team.contact_image_url || null,
+    fussball_de_team_url: team.fussball_de_team_url || null,
     fussball_de_team_id: team.fussball_de_team_id || null,
     fussball_de_competition_id: team.fussball_de_competition_id || null,
     fussball_de_club_id: team.fussball_de_club_id || null,
