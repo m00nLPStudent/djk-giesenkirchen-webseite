@@ -3,6 +3,8 @@ export { default as TeamIntroCard } from "./TeamIntroCard";
 export { default as TeamInfoGrid } from "./TeamInfoGrid";
 export { default as TeamTrainingInfo } from "./TeamTrainingInfo";
 export { default as TeamContact } from "./TeamContact";
+export { default as TeamCompetitionSection } from "./TeamCompetitionSection";
+export { default as TeamExternalEmbed } from "./TeamExternalEmbed";
 export { default as TeamCoachSection } from "./TeamCoachSection";
 export { default as TeamCoachCard } from "./TeamCoachCard";
 export { default as TeamPlayerSection } from "./TeamPlayerSection";
