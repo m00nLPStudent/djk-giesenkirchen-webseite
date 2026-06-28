@@ -20,20 +20,26 @@ export function isTableRelevantTeam(team = {}) {
   return true;
 }
 
-export function getMatchWidgetUrl(team = {}) {
+export function isWidgetUrl(url = "") {
+  const value = String(url).toLowerCase();
+
   return (
-    team.fussball_de_matches_widget_url ||
-    team.fussball_de_matches_url ||
-    team.dfb_matches_widget_url ||
-    ""
+    value.includes("widget") ||
+    value.includes("iframe") ||
+    value.includes("embed")
   );
 }
 
+export function getTeamSourceUrl(team = {}) {
+  return team.fussball_de_team_url || team.fussball_de_matches_url || "";
+}
+
+export function getMatchWidgetUrl(team = {}) {
+  const url = team.fussball_de_matches_widget_url || team.dfb_matches_widget_url || "";
+  return isWidgetUrl(url) ? url : "";
+}
+
 export function getTableWidgetUrl(team = {}) {
-  return (
-    team.fussball_de_table_widget_url ||
-    team.fussball_de_table_url ||
-    team.dfb_table_widget_url ||
-    ""
-  );
+  const url = team.fussball_de_table_widget_url || team.dfb_table_widget_url || "";
+  return isWidgetUrl(url) ? url : "";
 }
