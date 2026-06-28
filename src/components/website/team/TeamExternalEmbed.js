@@ -1,4 +1,10 @@
-export default function TeamExternalEmbed({ title, description, url, emptyText }) {
+export default function TeamExternalEmbed({
+  title,
+  description,
+  url,
+  sourceUrl,
+  emptyText,
+}) {
   return (
     <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8">
       <div className="mb-6">
@@ -22,7 +28,17 @@ export default function TeamExternalEmbed({ title, description, url, emptyText }
         </div>
       ) : (
         <div className="rounded-3xl border border-white/10 bg-black/20 p-6 text-white/55">
-          {emptyText}
+          <p>{emptyText}</p>
+
+          {sourceUrl && (
+            <a
+              href={sourceUrl}
+              target="_blank"
+              className="mt-5 inline-flex rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
+            >
+              Offizielle fussball.de-Seite öffnen
+            </a>
+          )}
         </div>
       )}
     </section>
