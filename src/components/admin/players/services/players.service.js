@@ -1,9 +1,14 @@
-import { supabase } from "@/lib/supabase";
 import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
-import { deleteEntityWithImage } from "@/components/admin/services/deleteEntity.service";
+import { createEntityRepository } from "@/components/admin/services/entity.repository";
 
 export const PLAYER_PLACEHOLDER_IMAGE =
   "https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/players/Blanko.png";
+
+const playerRepository = createEntityRepository({
+  table: "players",
+  placeholderImage: PLAYER_PLACEHOLDER_IMAGE,
+  imageFields: ["photo_url", "image_url"],
+});
 
 export async function deletePlayerImage(imageUrl) {
   return await deleteMediaFile(imageUrl, {
@@ -43,22 +48,9 @@ export async function savePlayer(player, id = null) {
     is_captain: player.is_captain ?? false,
   };
 
-  if (id) {
-    return await supabase
-      .from("players")
-      .update(payload)
-      .eq("id", id)
-      .select("*");
-  }
-
-  return await supabase.from("players").insert(payload).select("*");
+  return await playerRepository.upsert(payload, id);
 }
 
 export async function deletePlayerCompletely(player) {
-  return await deleteEntityWithImage({
-    table: "players",
-    id: player?.id,
-    imageUrl: player?.photo_url || player?.image_url,
-    ignoredUrls: [PLAYER_PLACEHOLDER_IMAGE],
-  });
+  return await playerRepository.removeWithImage(player);
 }
