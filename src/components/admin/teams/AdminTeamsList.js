@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { matchesActiveStatus, matchesSearch } from "@/components/admin/utils/list";
 import TeamFilters from "./components/TeamFilters";
 import TeamCard from "./components/TeamCard";
 import TeamEmptyState from "./components/TeamEmptyState";
@@ -21,19 +22,22 @@ export default function AdminTeamsList({ teams = [] }) {
 
   const filteredTeams = teams.filter((team) => {
     const group = getTeamGroup(team);
+    const matchesGroup = filter === "alle" || filter === group;
+    const matchesStatus = matchesActiveStatus(team, filter);
 
-    const matchesFilter =
-      filter === "alle" ||
-      (filter === "aktiv" && team.is_active) ||
-      (filter === "inaktiv" && !team.is_active) ||
-      filter === group;
-
-    const searchText =
-      `${team.name_de} ${team.age_group} ${team.season} ${team.training_times_de}`.toLowerCase();
-
-    const matchesSearch = searchText.includes(search.toLowerCase());
-
-    return matchesFilter && matchesSearch;
+    return (
+      (matchesGroup || matchesStatus) &&
+      matchesSearch(
+        [
+          team.name_de,
+          team.name_en,
+          team.age_group,
+          team.season,
+          team.training_times_de,
+        ],
+        search,
+      )
+    );
   });
 
   return (
