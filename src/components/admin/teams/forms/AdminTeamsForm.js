@@ -36,6 +36,7 @@ function createInitialForm(team) {
     contact_email: team?.contact_email || "",
     contact_phone: team?.contact_phone || "",
     contact_image_url: team?.contact_image_url || "",
+    fussball_de_team_url: team?.fussball_de_team_url || "",
     fussball_de_team_id: team?.fussball_de_team_id || "",
     fussball_de_competition_id: team?.fussball_de_competition_id || "",
     fussball_de_club_id: team?.fussball_de_club_id || "",
@@ -132,7 +133,7 @@ export default function AdminTeamsForm({ team }) {
         </div>
       </FormSection>
 
-      <FormSection eyebrow="Spielbetrieb" title="fussball.de / DFB" description="Offizielle IDs und Widget-URLs für Spielplan und Tabelle.">
+      <FormSection eyebrow="Spielbetrieb" title="fussball.de / DFB" description="Ein Mannschaftslink reicht aus. Das System übernimmt daraus die Grundlage für Spielplan und Tabelle.">
         <TeamCompetitionFields form={form} updateField={updateField} />
       </FormSection>
 
