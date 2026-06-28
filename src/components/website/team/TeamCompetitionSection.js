@@ -1,14 +1,8 @@
-import { fetchFussballDeCompetitionData } from "@/lib/fussball-de/fussballDe.server";
-import TeamMatchList from "./TeamMatchList";
-import TeamTable from "./TeamTable";
-import { getTeamSourceUrl, isTableRelevantTeam } from "./teamCompetition.helpers";
+import { FupaWidget } from "@/components/website/fupa";
+import { isTableRelevantTeam } from "./teamCompetition.helpers";
 
-export default async function TeamCompetitionSection({ team }) {
+export default function TeamCompetitionSection({ team }) {
   const showTable = isTableRelevantTeam(team);
-  const sourceUrl = getTeamSourceUrl(team);
-  const data = await fetchFussballDeCompetitionData(sourceUrl, {
-    includeTable: showTable,
-  });
 
   return (
     <section className="mt-8 space-y-6">
@@ -18,23 +12,27 @@ export default async function TeamCompetitionSection({ team }) {
         </p>
         <h2 className="mt-3 text-4xl font-black">Spiele & Tabelle</h2>
         <p className="mt-3 max-w-3xl text-white/55">
-          Hier werden das letzte Spiel und die nächsten drei Spiele angezeigt.
-          Ab der D-Jugend wird zusätzlich die aktuelle Tabelle eingebunden.
+          Die offiziellen Spiele und Tabellen werden über FuPa eingebunden.
+          Von Bambini bis E-Jugend wird nur der Spielplan angezeigt.
         </p>
       </div>
 
       <div className={`grid gap-6 ${showTable ? "xl:grid-cols-2" : ""}`}>
-        <TeamMatchList
-          matches={data.matches}
-          sourceUrl={data.sourceUrl}
-          error={data.error}
+        <FupaWidget
+          title="Spielplan"
+          description="Letzte und kommende Spiele dieser Mannschaft."
+          widgetId={team?.fupa_matches_widget_id}
+          clubUrl={team?.fupa_club_url}
+          customCss={team?.fupa_custom_css}
         />
 
         {showTable && (
-          <TeamTable
-            rows={data.table}
-            sourceUrl={data.sourceUrl}
-            error={data.error}
+          <FupaWidget
+            title="Tabelle"
+            description="Aktuelle Tabelle der jeweiligen Staffel."
+            widgetId={team?.fupa_table_widget_id}
+            clubUrl={team?.fupa_club_url}
+            customCss={team?.fupa_custom_css}
           />
         )}
       </div>
