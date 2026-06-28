@@ -1,0 +1,38 @@
+.fupa-widget-shell {
+  --fupa-red: #dc2626;
+  --fupa-dark: #101014;
+  --fupa-card: #17171d;
+  --fupa-border: rgba(255, 255, 255, 0.1);
+  --fupa-muted: rgba(255, 255, 255, 0.55);
+}
+
+.fupa-widget-shell [id^="fp-widget_root-"] {
+  width: 100%;
+  min-height: 120px;
+  color: #111;
+}
+
+.fupa-widget-shell a {
+  color: var(--fupa-red);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.fupa-widget-shell a:hover {
+  text-decoration: underline;
+}
+
+.fupa-widget-shell table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fupa-widget-shell th,
+.fupa-widget-shell td {
+  padding: 0.75rem;
+}
+
+.fupa-widget-shell iframe {
+  width: 100%;
+  border: 0;
+}
