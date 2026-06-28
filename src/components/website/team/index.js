@@ -1,4 +1,6 @@
 export { default as TeamHero } from "./TeamHero";
+export { default as TeamIntroCard } from "./TeamIntroCard";
+export { default as TeamInfoGrid } from "./TeamInfoGrid";
 export { default as TeamTrainingInfo } from "./TeamTrainingInfo";
 export { default as TeamContact } from "./TeamContact";
 export { default as TeamCoachSection } from "./TeamCoachSection";
