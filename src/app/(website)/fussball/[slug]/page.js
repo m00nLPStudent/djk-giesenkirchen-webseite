@@ -3,6 +3,7 @@ import {
   TeamHero,
   TeamIntroCard,
   TeamInfoGrid,
+  TeamCompetitionSection,
   TeamCoachSection,
   TeamPlayerSection,
 } from "@/components/website/team";
@@ -38,6 +39,7 @@ export default async function TeamPage({ params }) {
           <TeamHero team={team} />
           <TeamIntroCard team={team} />
           <TeamInfoGrid team={team} />
+          <TeamCompetitionSection team={team} />
           <TeamCoachSection coaches={coaches || []} />
           <TeamPlayerSection players={players || []} teamSlug={slug} />
         </div>
