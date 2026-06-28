@@ -1,16 +1,14 @@
-import TeamExternalEmbed from "./TeamExternalEmbed";
-import {
-  getMatchWidgetUrl,
-  getTableWidgetUrl,
-  getTeamSourceUrl,
-  isTableRelevantTeam,
-} from "./teamCompetition.helpers";
+import { fetchFussballDeCompetitionData } from "@/lib/fussball-de/fussballDe.server";
+import TeamMatchList from "./TeamMatchList";
+import TeamTable from "./TeamTable";
+import { getTeamSourceUrl, isTableRelevantTeam } from "./teamCompetition.helpers";
 
-export default function TeamCompetitionSection({ team }) {
+export default async function TeamCompetitionSection({ team }) {
   const showTable = isTableRelevantTeam(team);
   const sourceUrl = getTeamSourceUrl(team);
-  const matchUrl = getMatchWidgetUrl(team);
-  const tableUrl = getTableWidgetUrl(team);
+  const data = await fetchFussballDeCompetitionData(sourceUrl, {
+    includeTable: showTable,
+  });
 
   return (
     <section className="mt-8 space-y-6">
@@ -26,21 +24,17 @@ export default function TeamCompetitionSection({ team }) {
       </div>
 
       <div className={`grid gap-6 ${showTable ? "xl:grid-cols-2" : ""}`}>
-        <TeamExternalEmbed
-          title="Spielplan"
-          description="Letztes Spiel und die nächsten drei Spiele dieser Mannschaft."
-          url={matchUrl}
-          sourceUrl={sourceUrl}
-          emptyText="Es ist ein normaler fussball.de-Link hinterlegt, aber noch keine echte Spielplan-Widget-URL. Deshalb wird die komplette Webseite nicht mehr eingebettet."
+        <TeamMatchList
+          matches={data.matches}
+          sourceUrl={data.sourceUrl}
+          error={data.error}
         />
 
         {showTable && (
-          <TeamExternalEmbed
-            title="Tabelle"
-            description="Aktuelle Tabelle der jeweiligen Staffel."
-            url={tableUrl}
-            sourceUrl={sourceUrl}
-            emptyText="Es ist ein normaler fussball.de-Link hinterlegt, aber noch keine echte Tabellen-Widget-URL. Deshalb wird die komplette Webseite nicht mehr eingebettet."
+          <TeamTable
+            rows={data.table}
+            sourceUrl={data.sourceUrl}
+            error={data.error}
           />
         )}
       </div>
