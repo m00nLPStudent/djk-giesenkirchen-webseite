@@ -23,7 +23,6 @@ export default function TeamCompetitionSection({ team }) {
           description="Letzte und kommende Spiele dieser Mannschaft."
           widgetId={team?.fupa_matches_widget_id}
           clubUrl={team?.fupa_club_url}
-          customCss={team?.fupa_custom_css}
         />
 
         {showTable && (
@@ -32,7 +31,6 @@ export default function TeamCompetitionSection({ team }) {
             description="Aktuelle Tabelle der jeweiligen Staffel."
             widgetId={team?.fupa_table_widget_id}
             clubUrl={team?.fupa_club_url}
-            customCss={team?.fupa_custom_css}
           />
         )}
       </div>
