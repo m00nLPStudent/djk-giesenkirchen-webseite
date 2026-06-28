@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { FormActions, FormSection } from "@/components/admin/forms";
-import { REQUIRED_FIELDS_MESSAGE, hasValidationErrors } from "@/components/admin/utils/validation";
+import useEntityForm from "@/components/admin/hooks/useEntityForm";
+import useImageUpload from "@/components/admin/hooks/useImageUpload";
+import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
 import CoachImageUpload from "../components/CoachImageUpload";
 import {
   deleteCoachImage,
@@ -24,54 +25,35 @@ import CoachSettingsFields from "./fields/CoachSettingsFields";
 
 export default function AdminCoachesForm({ coach, teams = [] }) {
   const router = useRouter();
-  const [form, setForm] = useState(() => createInitialCoachForm(coach));
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
+  const {
+    form,
+    errors,
+    loading,
+    setLoading,
+    updateField,
+    validateForm,
+    hasErrors,
+  } = useEntityForm({
+    initialForm: createInitialCoachForm(coach),
+    validate: validateCoachForm,
+  });
 
-  function updateField(field, value) {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
-
-    if (errors[field]) {
-      setErrors((current) => ({ ...current, [field]: null }));
-    }
-  }
-
-  async function uploadImage(file) {
-    const fullName = `${form.first_name} ${form.last_name}`.trim();
-
-    const { data, error } = await uploadCoachImage(file, {
+  const { uploadImage, removeImage } = useImageUpload({
+    currentUrl: form.image_url,
+    placeholderUrl: COACH_PLACEHOLDER_IMAGE,
+    uploadAction: uploadCoachImage,
+    deleteAction: deleteCoachImage,
+    onChange: (url) => updateField("image_url", url),
+    getUploadContext: () => ({
       id: coach?.id,
-      name: fullName,
-      image_url: form.image_url,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("image_url", data);
-  }
-
-  async function removeImage() {
-    const { error } = await deleteCoachImage(form.image_url);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("image_url", COACH_PLACEHOLDER_IMAGE);
-  }
+      name: `${form.first_name} ${form.last_name}`.trim(),
+    }),
+  });
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const nextErrors = validateCoachForm(form);
-    setErrors(nextErrors);
+    const nextErrors = validateForm();
 
     if (Object.keys(nextErrors).length > 0) {
       return;
@@ -91,8 +73,6 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     router.push("/admin/coaches");
     router.refresh();
   }
-
-  const hasErrors = hasValidationErrors(errors);
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
