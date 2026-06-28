@@ -42,7 +42,6 @@ export async function deleteTeamContactImage(imageUrl) {
 
 export async function saveTeam(team, id = null) {
   const payload = {
-    ...team,
     name_de: team.name_de || null,
     name_en: team.name_en || null,
     slug: team.slug || null,
@@ -57,16 +56,10 @@ export async function saveTeam(team, id = null) {
     contact_email: team.contact_email || null,
     contact_phone: team.contact_phone || null,
     contact_image_url: team.contact_image_url || null,
-    fussball_de_team_url: team.fussball_de_team_url || null,
-    fussball_de_team_id: team.fussball_de_team_id || null,
-    fussball_de_competition_id: team.fussball_de_competition_id || null,
-    fussball_de_club_id: team.fussball_de_club_id || null,
-    fussball_de_matches_widget_url: team.fussball_de_matches_widget_url || null,
-    fussball_de_matches_url: team.fussball_de_matches_url || null,
-    dfb_matches_widget_url: team.dfb_matches_widget_url || null,
-    fussball_de_table_widget_url: team.fussball_de_table_widget_url || null,
-    fussball_de_table_url: team.fussball_de_table_url || null,
-    dfb_table_widget_url: team.dfb_table_widget_url || null,
+    fupa_matches_widget_id: team.fupa_matches_widget_id || null,
+    fupa_table_widget_id: team.fupa_table_widget_id || null,
+    fupa_club_url: team.fupa_club_url || null,
+    fupa_custom_css: team.fupa_custom_css || null,
     sort_order: Number(team.sort_order || 0),
     is_active: team.is_active ?? true,
   };
