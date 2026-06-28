@@ -1,32 +1,58 @@
 .fupa-widget-shell {
   --fupa-red: #ef111d;
-  --fupa-red-dark: #991b1b;
+  --fupa-red-soft: rgba(239, 17, 29, 0.16);
+  --fupa-red-hover: rgba(239, 17, 29, 0.24);
   --fupa-dark: #101014;
-  --fupa-card: #18181f;
+  --fupa-card: #1b1b21;
   --fupa-card-soft: #202027;
   --fupa-border: rgba(255, 255, 255, 0.1);
   --fupa-border-strong: rgba(255, 255, 255, 0.18);
   --fupa-text: #ffffff;
-  --fupa-muted: rgba(255, 255, 255, 0.6);
-  --fupa-muted-strong: rgba(255, 255, 255, 0.78);
+  --fupa-muted: rgba(255, 255, 255, 0.64);
+  --fupa-highlight: rgba(239, 17, 29, 0.2);
 }
 
 .fupa-widget-shell > div:last-child {
-  background: linear-gradient(180deg, rgba(24, 24, 31, 0.98), rgba(16, 16, 20, 0.98));
-  border-color: var(--fupa-border);
-  color: var(--fupa-text);
+  background: var(--fupa-card) !important;
+  border-color: var(--fupa-border) !important;
+  color: var(--fupa-text) !important;
 }
 
 .fupa-widget-shell [id^="fp-widget_root-"] {
   width: 100%;
   min-height: 120px;
-  color: var(--fupa-text);
-  font-family: inherit;
+  background: var(--fupa-card) !important;
+  color: var(--fupa-text) !important;
+  font-family: inherit !important;
 }
 
-.fupa-widget-shell [id^="fp-widget_root-"] * {
-  box-sizing: border-box;
+.fupa-widget-shell [id^="fp-widget_root-"] *,
+.fupa-widget-shell [id^="fp-widget_root-"] *::before,
+.fupa-widget-shell [id^="fp-widget_root-"] *::after {
+  box-sizing: border-box !important;
   font-family: inherit !important;
+}
+
+.fupa-widget-shell div,
+.fupa-widget-shell section,
+.fupa-widget-shell article,
+.fupa-widget-shell main,
+.fupa-widget-shell nav,
+.fupa-widget-shell header,
+.fupa-widget-shell footer,
+.fupa-widget-shell ul,
+.fupa-widget-shell li,
+.fupa-widget-shell table,
+.fupa-widget-shell thead,
+.fupa-widget-shell tbody,
+.fupa-widget-shell tr,
+.fupa-widget-shell th,
+.fupa-widget-shell td,
+.fupa-widget-shell [class^="fp-"],
+.fupa-widget-shell [class*=" fp-"] {
+  background-color: transparent !important;
+  color: var(--fupa-text) !important;
+  border-color: var(--fupa-border) !important;
 }
 
 .fupa-widget-shell a {
@@ -37,7 +63,6 @@
 
 .fupa-widget-shell a:hover {
   color: #ffffff !important;
-  text-decoration: none !important;
 }
 
 .fupa-widget-shell table {
@@ -48,13 +73,15 @@
 }
 
 .fupa-widget-shell thead,
+.fupa-widget-shell thead tr,
 .fupa-widget-shell .fp-table-header,
 .fupa-widget-shell .fp-team-matches-view-header,
-.fupa-widget-shell .fp-subheading-text {
-  background: rgba(239, 17, 29, 0.14) !important;
+.fupa-widget-shell .fp-subheading-text,
+.fupa-widget-shell [class*="heading"],
+.fupa-widget-shell [class*="header"] {
+  background: var(--fupa-red-soft) !important;
   color: var(--fupa-red) !important;
-  font-size: 0.72rem !important;
-  font-weight: 900 !important;
+  font-weight: 1000 !important;
   letter-spacing: 0.18em !important;
   text-transform: uppercase !important;
 }
@@ -66,33 +93,59 @@
   padding: 0.85rem 0.9rem !important;
 }
 
+.fupa-widget-shell th,
+.fupa-widget-shell th * {
+  color: var(--fupa-red) !important;
+  font-size: 0.72rem !important;
+  font-weight: 1000 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+}
+
+.fupa-widget-shell td,
+.fupa-widget-shell td *,
+.fupa-widget-shell span,
+.fupa-widget-shell p,
+.fupa-widget-shell strong,
+.fupa-widget-shell b {
+  color: var(--fupa-text) !important;
+}
+
 .fupa-widget-shell tr,
 .fupa-widget-shell .fp-table-row,
-.fupa-widget-shell .fp-team-matches-view-match-row {
+.fupa-widget-shell .fp-team-matches-view-match-row,
+.fupa-widget-shell .fp-team-matches-view-match-row-match,
+.fupa-widget-shell [class*="match-row"],
+.fupa-widget-shell [class*="table-row"] {
   background: rgba(255, 255, 255, 0.035) !important;
   border-color: var(--fupa-border) !important;
-  transition: background-color 180ms ease, border-color 180ms ease;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
 }
 
 .fupa-widget-shell tr:hover,
 .fupa-widget-shell .fp-table-row:hover,
-.fupa-widget-shell .fp-team-matches-view-match-row:hover {
-  background: rgba(239, 17, 29, 0.09) !important;
-  border-color: rgba(239, 17, 29, 0.35) !important;
+.fupa-widget-shell .fp-team-matches-view-match-row:hover,
+.fupa-widget-shell [class*="match-row"]:hover,
+.fupa-widget-shell [class*="table-row"]:hover {
+  background: var(--fupa-red-hover) !important;
+  border-color: rgba(239, 17, 29, 0.45) !important;
 }
 
 .fupa-widget-shell .fp-team-matches-view-match-row,
 .fupa-widget-shell .fp-team-matches-view-match-row-match,
-.fupa-widget-shell .fp-border-color {
+.fupa-widget-shell .fp-border-color,
+.fupa-widget-shell [class*="match-row"] {
   border: 1px solid var(--fupa-border) !important;
   border-radius: 1rem !important;
   overflow: hidden !important;
-  margin-bottom: 0.65rem !important;
+  margin-bottom: 0.7rem !important;
 }
 
-.fupa-widget-shell .fp-team-matches-view-match-row-team-container,
-.fupa-widget-shell .fp-team-matches-view-match-row-team-container.align-right,
-.fupa-widget-shell .fp-team-matches-view-match-row-team-container.align-left {
+.fupa-widget-shell [class*="team"],
+.fupa-widget-shell [class*="Team"],
+.fupa-widget-shell .fp-ellipsis,
+.fupa-widget-shell .fp-team-name,
+.fupa-widget-shell .fp-table-team-name {
   color: var(--fupa-text) !important;
   font-weight: 900 !important;
 }
@@ -100,12 +153,29 @@
 .fupa-widget-shell .fp-team-matches-view-match-row-result,
 .fupa-widget-shell .fp-team-matches-view-match-row-score,
 .fupa-widget-shell .fp-score,
-.fupa-widget-shell .fp-match-score {
-  background: rgba(239, 17, 29, 0.16) !important;
-  border-radius: 0.65rem !important;
+.fupa-widget-shell .fp-match-score,
+.fupa-widget-shell [class*="score"],
+.fupa-widget-shell [class*="result"] {
+  background: var(--fupa-red-soft) !important;
+  border-radius: 0.7rem !important;
   color: #ffffff !important;
   font-weight: 1000 !important;
-  padding: 0.25rem 0.55rem !important;
+  padding: 0.2rem 0.55rem !important;
+}
+
+.fupa-widget-shell [class*="Giesenkirchen"],
+.fupa-widget-shell [title*="Giesenkirchen"],
+.fupa-widget-shell a[href*="giesenkirchen"] {
+  color: #ffffff !important;
+  font-weight: 1000 !important;
+  text-shadow: 0 0 18px rgba(239, 17, 29, 0.35) !important;
+}
+
+.fupa-widget-shell tr:has([class*="Giesenkirchen"]),
+.fupa-widget-shell tr:has([title*="Giesenkirchen"]),
+.fupa-widget-shell tr:has(a[href*="giesenkirchen"]) {
+  background: var(--fupa-highlight) !important;
+  box-shadow: inset 4px 0 0 var(--fupa-red) !important;
 }
 
 .fupa-widget-shell .fp-team-logo,
@@ -115,32 +185,30 @@
   object-fit: contain !important;
 }
 
-.fupa-widget-shell .fp-ellipsis,
-.fupa-widget-shell .fp-team-name,
-.fupa-widget-shell .fp-table-team-name {
-  color: var(--fupa-text) !important;
-  font-weight: 900 !important;
-}
-
 .fupa-widget-shell .fp-muted,
 .fupa-widget-shell .fp-table-small,
 .fupa-widget-shell .fp-team-matches-view-match-row-date,
-.fupa-widget-shell .fp-team-matches-view-match-row-league {
+.fupa-widget-shell .fp-team-matches-view-match-row-league,
+.fupa-widget-shell [class*="muted"],
+.fupa-widget-shell [class*="date"],
+.fupa-widget-shell [class*="league"] {
   color: var(--fupa-muted) !important;
 }
 
 .fupa-widget-shell .fp-widget-footer,
 .fupa-widget-shell .fp-footer,
 .fupa-widget-shell [class*="footer"] {
+  background: rgba(255, 255, 255, 0.035) !important;
   border-top: 1px solid var(--fupa-border) !important;
   color: var(--fupa-muted) !important;
   margin-top: 0.75rem !important;
-  padding-top: 0.75rem !important;
+  padding: 0.9rem !important;
 }
 
 .fupa-widget-shell iframe {
   width: 100% !important;
   border: 0 !important;
+  background: var(--fupa-card) !important;
 }
 
 @media (max-width: 768px) {
@@ -154,7 +222,8 @@
     font-size: 0.82rem !important;
   }
 
-  .fupa-widget-shell .fp-team-matches-view-match-row {
+  .fupa-widget-shell .fp-team-matches-view-match-row,
+  .fupa-widget-shell [class*="match-row"] {
     font-size: 0.85rem !important;
   }
 }
