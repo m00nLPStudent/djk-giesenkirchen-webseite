@@ -41,7 +41,6 @@ function createInitialForm(team) {
     fupa_matches_widget_id: team?.fupa_matches_widget_id || "",
     fupa_table_widget_id: team?.fupa_table_widget_id || "",
     fupa_club_url: team?.fupa_club_url || "",
-    fupa_custom_css: team?.fupa_custom_css || "",
   };
 }
 
