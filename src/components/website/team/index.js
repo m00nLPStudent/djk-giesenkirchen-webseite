@@ -5,6 +5,8 @@ export { default as TeamTrainingInfo } from "./TeamTrainingInfo";
 export { default as TeamContact } from "./TeamContact";
 export { default as TeamCompetitionSection } from "./TeamCompetitionSection";
 export { default as TeamExternalEmbed } from "./TeamExternalEmbed";
+export { default as TeamMatchList } from "./TeamMatchList";
+export { default as TeamTable } from "./TeamTable";
 export { default as TeamCoachSection } from "./TeamCoachSection";
 export { default as TeamCoachCard } from "./TeamCoachCard";
 export { default as TeamPlayerSection } from "./TeamPlayerSection";
