@@ -187,11 +187,14 @@
 .fupa-widget-shell .fp-widget-footer,
 .fupa-widget-shell .fp-footer,
 .fupa-widget-shell [class*="footer"],
-.fupa-widget-shell [class*="Footer"],
-.fupa-widget-shell a[href*="fupa.net/club/djkvfl-giesenkirchen"],
-.fupa-widget-shell a[href*="FuPa Widget"],
-.fupa-widget-shell a[href*="widget"] {
-  display: none !important;
+.fupa-widget-shell [class*="Footer"] {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border-top: 1px solid var(--fupa-border) !important;
+  color: var(--fupa-muted) !important;
+  font-size: 0.7rem !important;
+  margin-top: 0.75rem !important;
+  opacity: 0.45 !important;
+  padding: 0.45rem 0.6rem !important;
 }
 
 .fupa-widget-shell iframe {
