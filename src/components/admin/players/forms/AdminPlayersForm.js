@@ -1,9 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { FormActions, FormSection } from "@/components/admin/forms";
-import { REQUIRED_FIELDS_MESSAGE, hasValidationErrors } from "@/components/admin/utils/validation";
+import useEntityForm from "@/components/admin/hooks/useEntityForm";
+import useImageUpload from "@/components/admin/hooks/useImageUpload";
+import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
 import PlayerImageUpload from "../components/PlayerImageUpload";
 import {
   deletePlayerImage,
@@ -26,9 +28,20 @@ import PlayerSettingsFields from "./fields/PlayerSettingsFields";
 
 export default function AdminPlayersForm({ player, teams = [] }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [form, setForm] = useState(() => createInitialPlayerForm(player));
+  const {
+    form,
+    setForm,
+    errors,
+    setErrors,
+    loading,
+    setLoading,
+    updateField,
+    validateForm,
+    hasErrors,
+  } = useEntityForm({
+    initialForm: createInitialPlayerForm(player),
+    validate: validatePlayerForm,
+  });
 
   const selectedTeam = useMemo(
     () => teams.find((team) => team.id === form.team_id),
@@ -42,17 +55,6 @@ export default function AdminPlayersForm({ player, teams = [] }) {
 
   const calculatedYearGroup = getYearGroupFromBirthdate(form.birthdate);
 
-  function updateField(field, value) {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
-
-    if (errors[field]) {
-      setErrors((current) => ({ ...current, [field]: null }));
-    }
-  }
-
   function updatePosition(value) {
     setForm((current) => ({
       ...current,
@@ -65,38 +67,23 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     }
   }
 
-  async function uploadImage(file) {
-    const { data, error } = await uploadPlayerImage(file, {
+  const { uploadImage, removeImage } = useImageUpload({
+    currentUrl: form.photo_url,
+    placeholderUrl: PLAYER_PLACEHOLDER_IMAGE,
+    uploadAction: uploadPlayerImage,
+    deleteAction: deletePlayerImage,
+    onChange: (url) => updateField("photo_url", url),
+    getUploadContext: () => ({
       id: player?.id,
       first_name: form.first_name,
       last_name: form.last_name,
-      photo_url: form.photo_url,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("photo_url", data);
-  }
-
-  async function removeImage() {
-    const { error } = await deletePlayerImage(form.photo_url);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("photo_url", PLAYER_PLACEHOLDER_IMAGE);
-  }
+    }),
+  });
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const nextErrors = validatePlayerForm(form);
-    setErrors(nextErrors);
+    const nextErrors = validateForm();
 
     if (Object.keys(nextErrors).length > 0) {
       return;
@@ -117,8 +104,6 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     router.push("/admin/players");
     router.refresh();
   }
-
-  const hasErrors = hasValidationErrors(errors);
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
