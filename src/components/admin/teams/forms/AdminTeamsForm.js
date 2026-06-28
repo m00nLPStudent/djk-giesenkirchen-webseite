@@ -2,14 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  ActiveStatusField,
+  EmailField,
+  FormActions,
+  FormGrid,
+  FormSection,
+  InputField,
+  PhoneField,
+  SortOrderField,
+  TextareaField,
+} from "@/components/admin/forms";
 import TeamLogoUpload from "../components/TeamLogoUpload";
 import { createSlug } from "../utils/slug";
 import { uploadTeamImage, saveTeam } from "../services/teams.service";
+import TeamCompetitionFields from "./fields/TeamCompetitionFields";
 
-export default function AdminTeamsForm({ team }) {
-  const router = useRouter();
-
-  const [form, setForm] = useState({
+function createInitialForm(team) {
+  return {
     name_de: team?.name_de || "",
     name_en: team?.name_en || "",
     slug: team?.slug || "",
@@ -26,19 +36,33 @@ export default function AdminTeamsForm({ team }) {
     contact_email: team?.contact_email || "",
     contact_phone: team?.contact_phone || "",
     contact_image_url: team?.contact_image_url || "",
-  });
+    fussball_de_team_id: team?.fussball_de_team_id || "",
+    fussball_de_competition_id: team?.fussball_de_competition_id || "",
+    fussball_de_club_id: team?.fussball_de_club_id || "",
+    fussball_de_matches_widget_url: team?.fussball_de_matches_widget_url || "",
+    fussball_de_matches_url: team?.fussball_de_matches_url || "",
+    dfb_matches_widget_url: team?.dfb_matches_widget_url || "",
+    fussball_de_table_widget_url: team?.fussball_de_table_widget_url || "",
+    fussball_de_table_url: team?.fussball_de_table_url || "",
+    dfb_table_widget_url: team?.dfb_table_widget_url || "",
+  };
+}
 
+export default function AdminTeamsForm({ team }) {
+  const router = useRouter();
+  const [form, setForm] = useState(() => createInitialForm(team));
   const [loading, setLoading] = useState(false);
 
   function updateField(field, value) {
-    setForm((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setForm((current) => ({ ...current, [field]: value }));
   }
 
   async function uploadImage(file) {
-    const { data, error } = await uploadTeamImage(file, "teams");
+    const { data, error } = await uploadTeamImage(file, {
+      id: team?.id,
+      name_de: form.name_de,
+      team_image_url: form.team_image_url,
+    });
 
     if (error) {
       alert(error.message);
@@ -49,7 +73,11 @@ export default function AdminTeamsForm({ team }) {
   }
 
   async function uploadContactImage(file) {
-    const { data, error } = await uploadTeamImage(file, "contacts");
+    const { data, error } = await uploadTeamImage(file, {
+      id: team?.id,
+      name_de: form.contact_name || form.name_de,
+      team_image_url: form.contact_image_url,
+    });
 
     if (error) {
       alert(error.message);
@@ -63,22 +91,15 @@ export default function AdminTeamsForm({ team }) {
     event.preventDefault();
     setLoading(true);
 
-    const cleanPhone = form.contact_phone
-      ?.replace(/\s/g, "")
-      .replace(/\+/g, "");
-
-    const slug = form.slug || createSlug(form.name_de);
-
     const payload = {
       ...form,
-      contact_phone: cleanPhone,
-      slug,
+      contact_phone: form.contact_phone?.replace(/\s/g, "").replace(/\+/g, ""),
+      slug: form.slug || createSlug(form.name_de),
       sort_order: Number(form.sort_order),
       is_active: form.is_active,
     };
 
     const { error } = await saveTeam(payload, team?.id ?? null);
-
     setLoading(false);
 
     if (error) {
@@ -92,189 +113,50 @@ export default function AdminTeamsForm({ team }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-      <input
-        placeholder="Name Deutsch"
-        value={form.name_de}
-        onChange={(e) => updateField("name_de", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-        required
-      />
+      <FormSection eyebrow="Mannschaft" title="Grunddaten">
+        <FormGrid>
+          <InputField label="Name Deutsch" required value={form.name_de} onChange={(event) => updateField("name_de", event.target.value)} />
+          <InputField label="Name Englisch" value={form.name_en} onChange={(event) => updateField("name_en", event.target.value)} />
+          <InputField label="Slug" placeholder="e1" value={form.slug} onChange={(event) => updateField("slug", event.target.value)} />
+          <InputField label="Altersgruppe" value={form.age_group} onChange={(event) => updateField("age_group", event.target.value)} />
+          <InputField label="Saison" value={form.season} onChange={(event) => updateField("season", event.target.value)} />
+        </FormGrid>
+      </FormSection>
 
-      <input
-        placeholder="Name Englisch"
-        value={form.name_en}
-        onChange={(e) => updateField("name_en", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <input
-        placeholder="Slug, z. B. e1"
-        value={form.slug}
-        onChange={(e) => updateField("slug", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <input
-        placeholder="Altersgruppe, z. B. Jugend oder Senioren"
-        value={form.age_group}
-        onChange={(e) => updateField("age_group", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <input
-        placeholder="Saison"
-        value={form.season}
-        onChange={(e) => updateField("season", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <textarea
-        placeholder="Beschreibung Deutsch"
-        rows={5}
-        value={form.description_de}
-        onChange={(e) => updateField("description_de", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <textarea
-        placeholder="Beschreibung Englisch"
-        rows={5}
-        value={form.description_en}
-        onChange={(e) => updateField("description_en", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <textarea
-        placeholder="Trainingszeiten Deutsch"
-        rows={3}
-        value={form.training_times_de}
-        onChange={(e) => updateField("training_times_de", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <textarea
-        placeholder="Trainingszeiten Englisch"
-        rows={3}
-        value={form.training_times_en}
-        onChange={(e) => updateField("training_times_en", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
-
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-        <h2 className="text-2xl font-black">Kontakt</h2>
-
-        <div className="mt-6 space-y-4">
-          <input
-            placeholder="Ansprechpartner"
-            value={form.contact_name}
-            onChange={(e) => updateField("contact_name", e.target.value)}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-          />
-
-          <input
-            placeholder="E-Mail"
-            type="email"
-            value={form.contact_email}
-            onChange={(e) => updateField("contact_email", e.target.value)}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-          />
-
-          <input
-            placeholder="Handynummer, z. B. 491701234567"
-            value={form.contact_phone}
-            onChange={(e) => updateField("contact_phone", e.target.value)}
-            className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-          />
+      <FormSection eyebrow="Beschreibung" title="Texte & Trainingszeiten">
+        <div className="space-y-4">
+          <TextareaField label="Beschreibung Deutsch" rows={5} value={form.description_de} onChange={(event) => updateField("description_de", event.target.value)} />
+          <TextareaField label="Beschreibung Englisch" rows={5} value={form.description_en} onChange={(event) => updateField("description_en", event.target.value)} />
+          <TextareaField label="Trainingszeiten Deutsch" rows={3} value={form.training_times_de} onChange={(event) => updateField("training_times_de", event.target.value)} />
+          <TextareaField label="Trainingszeiten Englisch" rows={3} value={form.training_times_en} onChange={(event) => updateField("training_times_en", event.target.value)} />
         </div>
+      </FormSection>
 
-        <div className="mt-6">
-          <label className="mb-2 block text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-            Ansprechpartner Bild
-          </label>
+      <FormSection eyebrow="Spielbetrieb" title="fussball.de / DFB" description="Offizielle IDs und Widget-URLs für Spielplan und Tabelle.">
+        <TeamCompetitionFields form={form} updateField={updateField} />
+      </FormSection>
 
-          <label className="inline-flex cursor-pointer items-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-700">
-            Bild auswählen
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => uploadContactImage(e.target.files?.[0])}
-              className="hidden"
-            />
-          </label>
+      <FormSection eyebrow="Kontakt" title="Ansprechpartner">
+        <div className="space-y-4">
+          <InputField label="Ansprechpartner" value={form.contact_name} onChange={(event) => updateField("contact_name", event.target.value)} />
+          <EmailField value={form.contact_email} onChange={(value) => updateField("contact_email", value)} />
+          <PhoneField value={form.contact_phone} onChange={(value) => updateField("contact_phone", value)} />
+          <TeamLogoUpload imageUrl={form.contact_image_url} onUpload={uploadContactImage} onRemove={() => updateField("contact_image_url", "")} />
         </div>
+      </FormSection>
 
-        {form.contact_image_url && (
-          <div className="mt-4">
-            <div className="mb-3 flex items-center gap-4">
-              <img
-                src={form.contact_image_url}
-                alt="Ansprechpartner"
-                className="h-24 w-24 rounded-full border border-white/10 object-cover"
-              />
+      <FormSection eyebrow="Medien" title="Mannschaftsbild">
+        <TeamLogoUpload imageUrl={form.team_image_url} onUpload={uploadImage} onRemove={() => updateField("team_image_url", "")} />
+      </FormSection>
 
-              <button
-                type="button"
-                onClick={() => updateField("contact_image_url", "")}
-                className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10"
-              >
-                Bild entfernen
-              </button>
-            </div>
-          </div>
-        )}
+      <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
+        <div className="space-y-6">
+          <SortOrderField value={form.sort_order} onChange={(value) => updateField("sort_order", value)} />
+          <ActiveStatusField checked={form.is_active} onChange={(value) => updateField("is_active", value)} entityLabel="Mannschaft" />
+        </div>
+      </FormSection>
 
-        <p className="mt-3 text-sm text-white/40">
-          Für WhatsApp bitte die Nummer im internationalen Format ohne +
-          eintragen, z. B. 491701234567.
-        </p>
-      </div>
-
-      <TeamLogoUpload
-        imageUrl={form.team_image_url}
-        onUpload={uploadImage}
-        onRemove={() => updateField("team_image_url", "")}
-      />
-
-      <div>
-        <label className="mb-2 block text-sm font-bold uppercase tracking-[0.25em] text-white/60">
-          Reihenfolge
-        </label>
-
-        <input
-          type="number"
-          value={form.sort_order}
-          onChange={(e) => updateField("sort_order", e.target.value)}
-          className="w-32 rounded-2xl border border-white/10 bg-white/5 p-4"
-        />
-
-        <p className="mt-2 text-sm text-white/40">
-          Kleinere Zahl = weiter oben anzeigen
-        </p>
-      </div>
-
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-        <label className="flex items-center gap-3 text-white">
-          <input
-            type="checkbox"
-            checked={form.is_active}
-            onChange={(e) => updateField("is_active", e.target.checked)}
-          />
-
-          <span className="font-medium">Mannschaft aktiv anzeigen</span>
-        </label>
-
-        <p className="mt-2 text-sm text-white/40">
-          Deaktivierte Mannschaften erscheinen nicht auf der Webseite.
-        </p>
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-full bg-red-600 px-8 py-4 font-bold disabled:opacity-50"
-      >
-        {loading ? "Speichert..." : "Mannschaft speichern"}
-      </button>
+      <FormActions loading={loading} submitLabel="Mannschaft speichern" cancelHref="/admin/teams" />
     </form>
   );
 }
