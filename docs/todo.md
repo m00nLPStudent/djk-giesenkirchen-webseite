@@ -14,6 +14,7 @@ Diese Datei sammelt offene Aufgaben und technische Baustellen.
 - [x] Bild-Upload auf `photo_url` vereinheitlicht
 - [x] Platzhalterbild für Spieler eingebaut
 - [x] Alte Spielerbilder werden beim Wechseln/Entfernen gelöscht
+- [x] Spieler vollständig inklusive eigenem Bild löschbar
 - [x] Speichern getestet
 - [x] Bearbeiten getestet
 - [x] Aktiv/Inaktiv getestet
@@ -24,6 +25,43 @@ Diese Datei sammelt offene Aufgaben und technische Baustellen.
 - [x] Filter- und Sortierlogik ausgelagert
 - [x] Spielerformular modularisiert
 - [x] Spielerprofil modularisiert
+- [x] Gemeinsame Admin-Komponenten angebunden
+
+### Trainermodul
+
+- [x] Datenbankfelder mit Code abgeglichen
+- [x] Service auf bestehende Spalten angepasst
+- [x] Formular auf bestehende Spalten angepasst
+- [x] Trainerkarte auf bestehende Spalten angepasst
+- [x] Übersicht auf Mannschaftszuordnung erweitert
+- [x] Bild-Upload mit Platzhalterbild eingebaut
+- [x] Alte Trainerbilder werden beim Wechseln/Entfernen gelöscht
+- [x] Trainer vollständig inklusive eigenem Bild löschbar
+- [x] Speichern getestet
+- [x] Bearbeiten getestet
+- [x] Aktiv/Inaktiv getestet
+- [x] öffentliche Trainerprofilseite erstellt
+- [x] Trainerstatistiken erstellt
+- [x] Filterung nach Trainer, Co-Trainer, Betreuer und Mannschaften erstellt
+- [x] Trainerformular modularisiert
+- [x] Trainerprofil modularisiert
+- [x] Gemeinsame Admin-Komponenten angebunden
+
+### Gemeinsame Admin-Grundlage
+
+- [x] `AdminImageUpload`
+- [x] `useImageUpload`
+- [x] `useEntityForm`
+- [x] `useDeleteEntity`
+- [x] `EntityBadge` / `EntityStatusBadge`
+- [x] `EntityCard`
+- [x] `StatisticGrid`
+- [x] `ProfileDetailsCard`
+- [x] `entity.repository`
+- [x] gemeinsame Listen- und Suchhelfer
+- [x] gemeinsame Validierungshelfer
+- [x] gemeinsame Länder-/Flaggenhelfer
+- [x] gemeinsame Settings-Felder
 
 ## Aktuell offen
 
@@ -47,19 +85,10 @@ Diese Datei sammelt offene Aufgaben und technische Baustellen.
 - Fußball-Unterseiten weiter ausbauen
 - Newsdetailseite prüfen
 - Mannschaftsdetailseite weiter ausbauen
+- Trainer-/Betreuerbereich auf Mannschaftsseiten integrieren
 
 ## Nächster konkreter Arbeitsschritt
 
-Trainerverwaltung als nächstes Modul umsetzen.
+Mannschaftsseiten weiter ausbauen.
 
-Ziel: Aufbau nach dem gleichen Muster wie das Spielermodul:
-
-- Datenbankstruktur prüfen
-- Admin-Übersicht erstellen
-- Trainer anlegen
-- Trainer bearbeiten
-- Trainer aktiv/inaktiv setzen
-- Bildverwaltung mit Platzhalter und Storage-Cleanup
-- Mannschaftszuordnung vorbereiten
-- öffentliche Traineranzeige vorbereiten
-- modulare Komponentenstruktur einhalten
+Ziel: Spieler, Trainer und Betreuer auf den öffentlichen Mannschaftsseiten sauber zusammenführen und die Mannschaftsverwaltung als nächstes Admin-Modul nach dem neuen gemeinsamen Muster aufbauen.
