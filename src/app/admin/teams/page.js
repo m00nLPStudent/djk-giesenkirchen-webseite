@@ -9,24 +9,33 @@ export default async function AdminTeamsPage() {
     .select("*")
     .order("sort_order", { ascending: true });
 
-  const { data: players } = await supabase.from("players").select("is_active");
-
-  const { count: playersCount } = await supabase
+  const { data: players } = await supabase
     .from("players")
-    .select("*", { count: "exact", head: true });
+    .select("id, team_id, is_active");
+
+  const { data: coaches } = await supabase
+    .from("coaches")
+    .select("id, team_id, is_active");
 
   const teamList = teams || [];
-
   const playerList = players || [];
+  const coachList = coaches || [];
 
-  const activePlayers = playerList.filter((player) => player.is_active).length;
-
-  const inactivePlayers = playerList.filter(
-    (player) => !player.is_active,
-  ).length;
+  const teamsWithCounts = teamList.map((team) => ({
+    ...team,
+    players_count: playerList.filter(
+      (player) => player.team_id === team.id && player.is_active,
+    ).length,
+    coaches_count: coachList.filter(
+      (coach) => coach.team_id === team.id && coach.is_active,
+    ).length,
+  }));
 
   const active = teamList.filter((team) => team.is_active).length;
   const inactive = teamList.filter((team) => !team.is_active).length;
+  const fupaReady = teamList.filter(
+    (team) => team.fupa_matches_widget_id || team.fupa_table_widget_id,
+  ).length;
 
   return (
     <AdminLayout title="Mannschaften verwalten" subtitle="Adminbereich">
@@ -41,12 +50,12 @@ export default async function AdminTeamsPage() {
 
       <TeamStats
         total={teamList.length}
-        activePlayers={activePlayers}
-        inactivePlayers={inactivePlayers}
-        openPayments={0}
+        active={active}
+        inactive={inactive}
+        fupaReady={fupaReady}
       />
 
-      <AdminTeamsList teams={teamList} />
+      <AdminTeamsList teams={teamsWithCounts} />
     </AdminLayout>
   );
 }
