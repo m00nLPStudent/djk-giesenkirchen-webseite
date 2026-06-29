@@ -1,0 +1,65 @@
+.football-de-card,
+.football-de-widget-shell {
+  --football-de-red: #ef111d;
+  --football-de-red-soft: rgba(239, 17, 29, 0.14);
+  --football-de-red-hover: rgba(239, 17, 29, 0.16);
+  --football-de-card: #1b1b21;
+  --football-de-card-head: #24242b;
+  --football-de-border: rgba(255, 255, 255, 0.1);
+  --football-de-text: #ffffff;
+  --football-de-muted: rgba(255, 255, 255, 0.62);
+}
+
+.football-de-card {
+  min-height: 100%;
+}
+
+.football-de-widget-frame,
+.football-de-widget-shell .fussballde_widget {
+  background: var(--football-de-card) !important;
+  color: var(--football-de-text) !important;
+  font-family: inherit !important;
+  min-height: 180px;
+}
+
+.football-de-widget-shell .fussballde_widget *,
+.football-de-widget-shell .fussballde_widget iframe {
+  box-sizing: border-box !important;
+  font-family: inherit !important;
+}
+
+.football-de-widget-shell .fussballde_widget iframe {
+  width: 100% !important;
+  border: 0 !important;
+  background: var(--football-de-card) !important;
+}
+
+.football-de-widget-shell .fussballde_widget table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+.football-de-widget-shell .fussballde_widget th,
+.football-de-widget-shell .fussballde_widget td {
+  border-color: var(--football-de-border) !important;
+  color: var(--football-de-text) !important;
+}
+
+.football-de-widget-shell .fussballde_widget th {
+  background: var(--football-de-card-head) !important;
+  color: var(--football-de-red) !important;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+}
+
+.football-de-widget-shell .fussballde_widget a {
+  color: var(--football-de-red) !important;
+  font-weight: 900 !important;
+  text-decoration: none !important;
+}
+
+.football-de-widget-shell .fussballde_widget a:hover {
+  color: #ffffff !important;
+}
