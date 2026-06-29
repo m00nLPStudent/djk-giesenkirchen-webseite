@@ -17,7 +17,9 @@ function getTeamGroup(team) {
 
 function matchesFilter(team, filter) {
   if (filter === "alle") return true;
-  if (filter === "fupa") return Boolean(team.fupa_matches_widget_id || team.fupa_table_widget_id);
+  if (filter === "fussball-de") {
+    return Boolean(team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id);
+  }
   if (filter === "jugend" || filter === "senioren" || filter === "damen") {
     return getTeamGroup(team) === filter;
   }
