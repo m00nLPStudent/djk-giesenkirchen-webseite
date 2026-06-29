@@ -7,13 +7,22 @@ import TeamCard from "./components/TeamCard";
 import TeamEmptyState from "./components/TeamEmptyState";
 
 function getTeamGroup(team) {
-  const group = (team.age_group || "").toLowerCase();
+  const value = `${team.age_group || ""} ${team.name_de || ""}`.toLowerCase();
 
-  if (group.includes("senioren")) {
-    return "senioren";
-  }
+  if (value.includes("damen")) return "damen";
+  if (value.includes("senioren") || value.includes("herren")) return "senioren";
 
   return "jugend";
+}
+
+function matchesFilter(team, filter) {
+  if (filter === "alle") return true;
+  if (filter === "fupa") return Boolean(team.fupa_matches_widget_id || team.fupa_table_widget_id);
+  if (filter === "jugend" || filter === "senioren" || filter === "damen") {
+    return getTeamGroup(team) === filter;
+  }
+
+  return matchesActiveStatus(team, filter);
 }
 
 export default function AdminTeamsList({ teams = [] }) {
@@ -21,12 +30,8 @@ export default function AdminTeamsList({ teams = [] }) {
   const [search, setSearch] = useState("");
 
   const filteredTeams = teams.filter((team) => {
-    const group = getTeamGroup(team);
-    const matchesGroup = filter === "alle" || filter === group;
-    const matchesStatus = matchesActiveStatus(team, filter);
-
     return (
-      (matchesGroup || matchesStatus) &&
+      matchesFilter(team, filter) &&
       matchesSearch(
         [
           team.name_de,
@@ -34,6 +39,7 @@ export default function AdminTeamsList({ teams = [] }) {
           team.age_group,
           team.season,
           team.training_times_de,
+          team.contact_name,
         ],
         search,
       )
