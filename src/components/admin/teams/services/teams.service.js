@@ -56,9 +56,8 @@ export async function saveTeam(team, id = null) {
     contact_email: team.contact_email || null,
     contact_phone: team.contact_phone || null,
     contact_image_url: team.contact_image_url || null,
-    fupa_matches_widget_id: team.fupa_matches_widget_id || null,
-    fupa_table_widget_id: team.fupa_table_widget_id || null,
-    fupa_club_url: team.fupa_club_url || null,
+    fussball_de_matches_widget_id: team.fussball_de_matches_widget_id || null,
+    fussball_de_table_widget_id: team.fussball_de_table_widget_id || null,
     sort_order: Number(team.sort_order || 0),
     is_active: team.is_active ?? true,
   };
