@@ -16,7 +16,7 @@ import {
 import TeamLogoUpload from "../components/TeamLogoUpload";
 import { createSlug } from "../utils/slug";
 import { uploadTeamImage, saveTeam } from "../services/teams.service";
-import TeamFupaFields from "./fields/TeamFupaFields";
+import TeamFootballDeFields from "./fields/TeamFootballDeFields";
 
 function createInitialForm(team) {
   return {
@@ -36,11 +36,10 @@ function createInitialForm(team) {
     contact_email: team?.contact_email || "",
     contact_phone: team?.contact_phone || "",
     contact_image_url: team?.contact_image_url || "",
-    fupa_matches_widget_code: "",
-    fupa_table_widget_code: "",
-    fupa_matches_widget_id: team?.fupa_matches_widget_id || "",
-    fupa_table_widget_id: team?.fupa_table_widget_id || "",
-    fupa_club_url: team?.fupa_club_url || "",
+    fussball_de_matches_widget_code: "",
+    fussball_de_table_widget_code: "",
+    fussball_de_matches_widget_id: team?.fussball_de_matches_widget_id || "",
+    fussball_de_table_widget_id: team?.fussball_de_table_widget_id || "",
   };
 }
 
@@ -128,8 +127,8 @@ export default function AdminTeamsForm({ team }) {
         </div>
       </FormSection>
 
-      <FormSection eyebrow="Spielbetrieb" title="FuPa Integration" description="Widget-Code aus dem FuPa Widget-Builder einfügen. Gespeichert werden automatisch nur die sicheren Widget-IDs.">
-        <TeamFupaFields form={form} updateField={updateField} />
+      <FormSection eyebrow="Spielbetrieb" title="fussball.de Integration" description="Widget-Code aus fussball.de einfügen. Gespeichert werden automatisch nur die Widget-IDs.">
+        <TeamFootballDeFields form={form} updateField={updateField} />
       </FormSection>
 
       <FormSection eyebrow="Kontakt" title="Ansprechpartner">
