@@ -1,6 +1,6 @@
-import { FupaSection } from "@/components/website/fupa";
+import { FootballDeSection } from "@/components/website/football-de";
 import { isTableRelevantTeam } from "./teamCompetition.helpers";
 
 export default function TeamCompetitionSection({ team }) {
-  return <FupaSection team={team} showTable={isTableRelevantTeam(team)} />;
+  return <FootballDeSection team={team} showTable={isTableRelevantTeam(team)} />;
 }
