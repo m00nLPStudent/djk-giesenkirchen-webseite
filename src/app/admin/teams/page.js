@@ -33,8 +33,8 @@ export default async function AdminTeamsPage() {
 
   const active = teamList.filter((team) => team.is_active).length;
   const inactive = teamList.filter((team) => !team.is_active).length;
-  const fupaReady = teamList.filter(
-    (team) => team.fupa_matches_widget_id || team.fupa_table_widget_id,
+  const footballDeReady = teamList.filter(
+    (team) => team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
   ).length;
 
   return (
@@ -52,7 +52,7 @@ export default async function AdminTeamsPage() {
         total={teamList.length}
         active={active}
         inactive={inactive}
-        fupaReady={fupaReady}
+        footballDeReady={footballDeReady}
       />
 
       <AdminTeamsList teams={teamsWithCounts} />
