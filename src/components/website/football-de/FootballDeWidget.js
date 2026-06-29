@@ -7,13 +7,9 @@ import FootballDeError from "./FootballDeError";
 const FOOTBALL_DE_SCRIPT_SRC = "https://www.fussball.de/widgets.js";
 
 function loadFootballDeScript() {
-  const existingScript = document.querySelector(
-    `script[src="${FOOTBALL_DE_SCRIPT_SRC}"]`,
-  );
-
-  if (existingScript) {
-    existingScript.remove();
-  }
+  document
+    .querySelectorAll('script[src^="https://www.fussball.de/widgets.js"]')
+    .forEach((script) => script.remove());
 
   const script = document.createElement("script");
   script.type = "text/javascript";
@@ -41,7 +37,7 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
       if (!widget) return;
 
       setIsEmpty(widget.children.length === 0 && widget.innerHTML.trim() === "");
-    }, 2500);
+    }, 3000);
 
     return () => {
       window.clearTimeout(loadTimeout);
@@ -59,18 +55,18 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
 
   return (
     <FootballDeCard title={title} description={description} className="football-de-widget-shell">
-      <div className="football-de-widget-frame flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#1b1b21] p-4 text-white">
+      <div className="football-de-widget-frame rounded-3xl border border-white/10 bg-white p-4 text-black">
         <div
           ref={widgetRef}
           key={`${widgetId}-${widgetType}-${reactId}`}
           className="fussballde_widget"
           data-id={widgetId}
           data-type={widgetType}
-          style={{ width: "100%" }}
+          style={{ width: "100%", minHeight: "260px" }}
         />
 
         {isEmpty && (
-          <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-sm leading-6 text-yellow-100">
+          <div className="mt-4 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-sm leading-6 text-yellow-100">
             Das fussball.de-Widget wurde geladen, aber nicht automatisch befüllt.
             Bitte prüfe, ob die Widget-Domain exakt zur aktuell geöffneten URL passt
             und ob der Widget-Code nach dem Speichern neu kopiert wurde.
