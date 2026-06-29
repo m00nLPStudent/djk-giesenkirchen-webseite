@@ -18,15 +18,56 @@ function loadFootballDeScript() {
   document.head.appendChild(script);
 }
 
+function getWidgetDiagnostics(widget) {
+  const scripts = document.querySelectorAll(
+    'script[src^="https://www.fussball.de/widgets.js"]',
+  );
+
+  return {
+    found: Boolean(widget),
+    dataId: widget?.getAttribute("data-id") || "",
+    dataType: widget?.getAttribute("data-type") || "",
+    children: widget?.children.length ?? 0,
+    htmlLength: widget?.innerHTML.trim().length ?? 0,
+    iframeCount: widget?.querySelectorAll("iframe").length ?? 0,
+    scriptCount: scripts.length,
+    currentHost: window.location.host,
+  };
+}
+
+function FootballDeDebug({ debug }) {
+  if (!debug) return null;
+
+  return (
+    <div className="mt-4 rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4 text-xs leading-6 text-blue-50">
+      <p className="mb-2 font-black uppercase tracking-[0.2em] text-blue-200">
+        Widget Debug
+      </p>
+      <div className="grid gap-1 md:grid-cols-2">
+        <span>Gefunden: {debug.found ? "Ja" : "Nein"}</span>
+        <span>Host: {debug.currentHost}</span>
+        <span>Data-ID: {debug.dataId || "—"}</span>
+        <span>Data-Type: {debug.dataType || "—"}</span>
+        <span>Kinder: {debug.children}</span>
+        <span>HTML-Länge: {debug.htmlLength}</span>
+        <span>iframes: {debug.iframeCount}</span>
+        <span>widgets.js: {debug.scriptCount}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function FootballDeWidget({ widgetId, widgetType, title, description }) {
   const reactId = useId();
   const widgetRef = useRef(null);
   const [isEmpty, setIsEmpty] = useState(false);
+  const [debug, setDebug] = useState(null);
 
   useEffect(() => {
     if (!widgetId) return;
 
     setIsEmpty(false);
+    setDebug(null);
 
     const loadTimeout = window.setTimeout(() => {
       loadFootballDeScript();
@@ -36,7 +77,9 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
       const widget = widgetRef.current;
       if (!widget) return;
 
-      setIsEmpty(widget.children.length === 0 && widget.innerHTML.trim() === "");
+      const diagnostics = getWidgetDiagnostics(widget);
+      setDebug(diagnostics);
+      setIsEmpty(diagnostics.children === 0 && diagnostics.htmlLength === 0);
     }, 3000);
 
     return () => {
@@ -72,6 +115,8 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
             und ob der Widget-Code nach dem Speichern neu kopiert wurde.
           </div>
         )}
+
+        <FootballDeDebug debug={debug} />
       </div>
     </FootballDeCard>
   );
