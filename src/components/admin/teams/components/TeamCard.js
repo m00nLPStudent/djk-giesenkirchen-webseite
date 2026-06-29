@@ -43,7 +43,9 @@ export default function TeamCard({ team }) {
     deleteAction: () => removeTeam(team),
   });
 
-  const hasFupa = Boolean(team.fupa_matches_widget_id || team.fupa_table_widget_id);
+  const hasFootballDe = Boolean(
+    team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
+  );
 
   return (
     <EntityCard image={team.team_image_url} imageAlt={team.name_de} imageSize="md">
@@ -51,7 +53,7 @@ export default function TeamCard({ team }) {
         <EntityBadge variant="red">{team.age_group || "Mannschaft"}</EntityBadge>
         <TeamStatusBadge active={team.is_active} />
         <EntityBadge>Saison {team.season || "—"}</EntityBadge>
-        <EntityBadge>{hasFupa ? "FuPa aktiv" : "FuPa fehlt"}</EntityBadge>
+        <EntityBadge>{hasFootballDe ? "fussball.de aktiv" : "fussball.de fehlt"}</EntityBadge>
         <EntityBadge>Reihenfolge {team.sort_order ?? 0}</EntityBadge>
       </EntityCardBadges>
 
