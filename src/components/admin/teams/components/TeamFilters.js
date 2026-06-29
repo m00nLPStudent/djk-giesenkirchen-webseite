@@ -1,6 +1,10 @@
 export default function TeamFilters({ filter, setFilter, search, setSearch }) {
   const filters = [
     ["alle", "Alle"],
+    ["jugend", "Jugend"],
+    ["senioren", "Senioren"],
+    ["damen", "Damen"],
+    ["fupa", "FuPa"],
     ["aktiv", "Aktiv"],
     ["inaktiv", "Inaktiv"],
   ];
@@ -16,7 +20,7 @@ export default function TeamFilters({ filter, setFilter, search, setSearch }) {
             className={`rounded-full px-4 py-2 text-sm font-bold transition ${
               filter === value
                 ? "bg-red-600 text-white"
-                : "border border-white/10 text-white/60 hover:text-white"
+                : "border border-white/10 text-white/60 hover:border-red-500/40 hover:text-white"
             }`}
           >
             {label}
@@ -29,7 +33,7 @@ export default function TeamFilters({ filter, setFilter, search, setSearch }) {
         placeholder="Mannschaft suchen..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-white lg:w-80"
+        className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-red-500/60 lg:w-80"
       />
     </div>
   );
