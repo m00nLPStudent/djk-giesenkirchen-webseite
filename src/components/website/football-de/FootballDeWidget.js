@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import FootballDeCard from "./FootballDeCard";
 import FootballDeError from "./FootballDeError";
 
 const FOOTBALL_DE_SCRIPT_SRC = "https://www.fussball.de/widgets.js";
 
-function reloadFootballDeScript() {
+function loadFootballDeScript() {
   const existingScript = document.querySelector(
     `script[src="${FOOTBALL_DE_SCRIPT_SRC}"]`,
   );
@@ -17,22 +17,36 @@ function reloadFootballDeScript() {
 
   const script = document.createElement("script");
   script.type = "text/javascript";
-  script.src = FOOTBALL_DE_SCRIPT_SRC;
-  script.async = true;
-  document.body.appendChild(script);
+  script.src = `${FOOTBALL_DE_SCRIPT_SRC}?t=${Date.now()}`;
+  script.async = false;
+  document.head.appendChild(script);
 }
 
 export default function FootballDeWidget({ widgetId, widgetType, title, description }) {
   const reactId = useId();
+  const widgetRef = useRef(null);
+  const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
     if (!widgetId) return;
 
-    const timeout = window.setTimeout(() => {
-      reloadFootballDeScript();
-    }, 150);
+    setIsEmpty(false);
 
-    return () => window.clearTimeout(timeout);
+    const loadTimeout = window.setTimeout(() => {
+      loadFootballDeScript();
+    }, 250);
+
+    const checkTimeout = window.setTimeout(() => {
+      const widget = widgetRef.current;
+      if (!widget) return;
+
+      setIsEmpty(widget.children.length === 0 && widget.innerHTML.trim() === "");
+    }, 2500);
+
+    return () => {
+      window.clearTimeout(loadTimeout);
+      window.clearTimeout(checkTimeout);
+    };
   }, [widgetId, widgetType, reactId]);
 
   if (!widgetId) {
@@ -47,12 +61,21 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
     <FootballDeCard title={title} description={description} className="football-de-widget-shell">
       <div className="football-de-widget-frame flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#1b1b21] p-4 text-white">
         <div
+          ref={widgetRef}
           key={`${widgetId}-${widgetType}-${reactId}`}
           className="fussballde_widget"
           data-id={widgetId}
           data-type={widgetType}
           style={{ width: "100%" }}
         />
+
+        {isEmpty && (
+          <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-sm leading-6 text-yellow-100">
+            Das fussball.de-Widget wurde geladen, aber nicht automatisch befüllt.
+            Bitte prüfe, ob die Widget-Domain exakt zur aktuell geöffneten URL passt
+            und ob der Widget-Code nach dem Speichern neu kopiert wurde.
+          </div>
+        )}
       </div>
     </FootballDeCard>
   );
