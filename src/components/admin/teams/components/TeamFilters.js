@@ -4,7 +4,7 @@ export default function TeamFilters({ filter, setFilter, search, setSearch }) {
     ["jugend", "Jugend"],
     ["senioren", "Senioren"],
     ["damen", "Damen"],
-    ["fupa", "FuPa"],
+    ["fussball-de", "fussball.de"],
     ["aktiv", "Aktiv"],
     ["inaktiv", "Inaktiv"],
   ];
