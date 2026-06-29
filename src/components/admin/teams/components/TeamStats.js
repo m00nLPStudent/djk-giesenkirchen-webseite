@@ -1,10 +1,10 @@
-import { Shield, AlertCircle, PauseCircle, Users } from "lucide-react";
+import { CheckCircle2, Link2, PauseCircle, Shield } from "lucide-react";
 
 export default function TeamStats({
   total = 0,
-  activePlayers = 0,
-  inactivePlayers = 0,
-  openPayments = 0,
+  active = 0,
+  inactive = 0,
+  fupaReady = 0,
 }) {
   const stats = [
     {
@@ -15,27 +15,28 @@ export default function TeamStats({
       bg: "bg-red-500/20",
     },
     {
-      title: "Aktive Spieler",
-      value: activePlayers,
-      icon: Users,
+      title: "Aktiv",
+      value: active,
+      icon: CheckCircle2,
       color: "text-green-400",
       bg: "bg-green-500/20",
     },
     {
-      title: "Inaktive Spieler",
-      value: inactivePlayers,
+      title: "Inaktiv",
+      value: inactive,
       icon: PauseCircle,
       color: "text-yellow-400",
       bg: "bg-yellow-500/20",
     },
     {
-      title: "Offene Beiträge",
-      value: openPayments,
-      icon: AlertCircle,
+      title: "FuPa verknüpft",
+      value: fupaReady,
+      icon: Link2,
       color: "text-blue-400",
       bg: "bg-blue-500/20",
     },
   ];
+
   return (
     <div className="mb-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       {stats.map((item) => {
@@ -44,7 +45,7 @@ export default function TeamStats({
         return (
           <div
             key={item.title}
-            className="rounded-3xl border border-white/10 bg-white/5 p-6"
+            className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/40 hover:bg-white/10"
           >
             <div className="flex items-center justify-between">
               <div
