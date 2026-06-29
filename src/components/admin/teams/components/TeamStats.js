@@ -4,7 +4,7 @@ export default function TeamStats({
   total = 0,
   active = 0,
   inactive = 0,
-  fupaReady = 0,
+  footballDeReady = 0,
 }) {
   const stats = [
     {
@@ -29,8 +29,8 @@ export default function TeamStats({
       bg: "bg-yellow-500/20",
     },
     {
-      title: "FuPa verknüpft",
-      value: fupaReady,
+      title: "fussball.de verknüpft",
+      value: footballDeReady,
       icon: Link2,
       color: "text-blue-400",
       bg: "bg-blue-500/20",
