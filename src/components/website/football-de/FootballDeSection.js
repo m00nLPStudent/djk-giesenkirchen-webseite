@@ -18,7 +18,7 @@ export default function FootballDeSection({ team, showTable }) {
           title="Spielplan"
           description="Letzte und kommende Spiele dieser Mannschaft."
           widgetId={team?.fussball_de_matches_widget_id}
-          widgetType="matches"
+          widgetType="team-matches"
         />
 
         {showTable && (
