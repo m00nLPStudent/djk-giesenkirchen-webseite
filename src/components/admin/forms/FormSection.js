@@ -30,6 +30,47 @@ export function FormGrid({ children, columns = 2, className = "" }) {
   return <div className={`grid gap-4 ${columnClass} ${className}`}>{children}</div>;
 }
 
+export function FormAlert({ children, tone = "error", className = "" }) {
+  const toneClass =
+    tone === "warning"
+      ? "border-yellow-500/30 bg-yellow-500/10 text-yellow-100"
+      : "border-red-500/30 bg-red-500/10 text-red-200";
+
+  if (!children) return null;
+
+  return (
+    <div className={`rounded-3xl border p-5 ${toneClass} ${className}`}>
+      <p className="font-bold">{children}</p>
+    </div>
+  );
+}
+
+export function FormHintBox({ eyebrow, children, className = "" }) {
+  return (
+    <div className={`rounded-3xl border border-white/10 bg-black/20 p-5 ${className}`}>
+      {eyebrow && (
+        <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
+          {eyebrow}
+        </p>
+      )}
+      <div className="mt-3 text-sm leading-6 text-white/55">{children}</div>
+    </div>
+  );
+}
+
+export function FormValuePreview({ label, value }) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-black/20 p-5">
+      <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
+        {label}
+      </p>
+      <p className="mt-2 break-all text-sm text-white/70">
+        {value || "Noch nicht erkannt."}
+      </p>
+    </div>
+  );
+}
+
 export function FormActions({ loading, submitLabel, loadingLabel = "Speichert...", cancelHref }) {
   return (
     <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
