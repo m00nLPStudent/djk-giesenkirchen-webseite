@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { FormActions, FormSection } from "@/components/admin/forms";
+import { FormActions, FormAlert, FormSection } from "@/components/admin/forms";
 import useEntityForm from "@/components/admin/hooks/useEntityForm";
 import useImageUpload from "@/components/admin/hooks/useImageUpload";
 import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
@@ -107,11 +107,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
-      {hasErrors && (
-        <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-5 text-red-200">
-          <p className="font-bold">{REQUIRED_FIELDS_MESSAGE}</p>
-        </div>
-      )}
+      {hasErrors && <FormAlert>{REQUIRED_FIELDS_MESSAGE}</FormAlert>}
 
       <FormSection
         eyebrow="Spieler"
