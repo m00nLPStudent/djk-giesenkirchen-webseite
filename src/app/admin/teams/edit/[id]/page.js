@@ -12,10 +12,21 @@ export default async function EditTeamPage({ params }) {
     .eq("id", id)
     .single();
 
+  const { data: seasons } = await supabase
+    .from("seasons")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
+  const { data: teamSeasons } = await supabase
+    .from("team_seasons")
+    .select("*")
+    .eq("team_id", id);
+
   return (
     <AdminLayout title="Mannschaft bearbeiten" subtitle="Mannschaften">
       <BackButton />
-      <AdminTeamsForm team={team} />
+      <AdminTeamsForm team={team} seasons={seasons || []} teamSeasons={teamSeasons || []} />
     </AdminLayout>
   );
 }
