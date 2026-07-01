@@ -8,6 +8,7 @@ import {
   FormActions,
   FormGrid,
   FormSection,
+  FormHintBox,
   InputField,
   PhoneField,
   SelectField,
@@ -144,13 +145,15 @@ function createInitialForm({
   coachAssignments = [],
   seasonId = null,
 }) {
-  const selectedSeason = seasons.find((season) => season.id === seasonId) || getCurrentSeason(seasons);
+  const publicSeason = getCurrentSeason(seasons);
+  const selectedSeason = seasons.find((season) => season.id === seasonId) || publicSeason;
   const selectedTeamSeason = findTeamSeason(teamSeasons, selectedSeason?.id);
   const source = selectedTeamSeason || team || {};
 
   return {
     season_id: selectedSeason?.id || "",
     season: selectedSeason?.name || team?.season || "2026/2027",
+    public_season_id: publicSeason?.id || selectedSeason?.id || "",
     team_season_id: selectedTeamSeason?.id || "",
     selected_player_ids: getAssignedIds(playerAssignments, selectedTeamSeason?.id, "player_id"),
     selected_coach_ids: getAssignedIds(coachAssignments, selectedTeamSeason?.id, "coach_id"),
@@ -209,16 +212,19 @@ export default function AdminTeamsForm({
 
   function updateSeason(seasonId) {
     const season = seasons.find((item) => item.id === seasonId);
-    setForm(
-      createInitialForm({
-        team,
-        seasons,
-        teamSeasons,
-        playerAssignments,
-        coachAssignments,
-        seasonId: season?.id,
-      }),
-    );
+    const nextForm = createInitialForm({
+      team,
+      seasons,
+      teamSeasons,
+      playerAssignments,
+      coachAssignments,
+      seasonId: season?.id,
+    });
+
+    setForm((current) => ({
+      ...nextForm,
+      public_season_id: current.public_season_id,
+    }));
   }
 
   async function uploadImage(file) {
@@ -288,12 +294,12 @@ export default function AdminTeamsForm({
 
       {activeTab === "season" && (
         <FormSection
-          eyebrow="Saison"
-          title="Saison auswählen"
-          description="Wähle zuerst aus, für welche Saison diese Mannschaft bearbeitet werden soll. Saisonbezogene Daten werden getrennt gespeichert."
+          eyebrow="Saison bearbeiten"
+          title="Bearbeitungs-Saison auswählen"
+          description="Wähle hier nur aus, welche Saison dieser Mannschaft du gerade bearbeiten möchtest. Welche Saison öffentlich angezeigt wird, stellst du unter Einstellungen ein."
         >
           <SelectField
-            label="Saison"
+            label="Diese Saison bearbeiten"
             required
             value={form.season_id}
             onChange={(event) => updateSeason(event.target.value)}
@@ -301,7 +307,7 @@ export default function AdminTeamsForm({
             <option value="">Saison auswählen</option>
             {seasons.map((season) => (
               <option key={season.id} value={season.id}>
-                {season.name}{season.is_current ? " · aktuell" : ""}
+                {season.name}{season.is_current ? " · aktuell öffentlich" : ""}
               </option>
             ))}
           </SelectField>
@@ -315,7 +321,7 @@ export default function AdminTeamsForm({
             <InputField label="Name Englisch" value={form.name_en} onChange={(event) => updateField("name_en", event.target.value)} />
             <InputField label="Slug" placeholder="e1" value={form.slug} onChange={(event) => updateField("slug", event.target.value)} />
             <InputField label="Altersgruppe" value={form.age_group} onChange={(event) => updateField("age_group", event.target.value)} />
-            <InputField label="Saison" value={form.season} disabled />
+            <InputField label="Bearbeitete Saison" value={form.season} disabled />
           </FormGrid>
         </FormSection>
       )}
@@ -396,8 +402,24 @@ export default function AdminTeamsForm({
       )}
 
       {activeTab === "settings" && (
-        <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
+        <FormSection eyebrow="Einstellungen" title="Status, Sortierung & öffentliche Saison">
           <div className="space-y-6">
+            <FormHintBox eyebrow="Öffentliche Anzeige">
+              Diese Auswahl gilt für die komplette Website. Die hier gewählte Saison wird auf den öffentlichen Mannschaftsseiten angezeigt.
+            </FormHintBox>
+
+            <SelectField
+              label="Öffentlich angezeigte Saison"
+              value={form.public_season_id}
+              onChange={(event) => updateField("public_season_id", event.target.value)}
+            >
+              {seasons.map((season) => (
+                <option key={season.id} value={season.id}>
+                  {season.name}{season.id === form.public_season_id ? " · wird angezeigt" : ""}
+                </option>
+              ))}
+            </SelectField>
+
             <SortOrderField value={form.sort_order} onChange={(value) => updateField("sort_order", value)} />
             <ActiveStatusField checked={form.is_active} onChange={(value) => updateField("is_active", value)} entityLabel="Mannschaft" />
           </div>
