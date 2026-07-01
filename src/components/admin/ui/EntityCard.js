@@ -52,16 +52,3 @@ export function EntityActionLink({ href, children, variant = "default", target }
     </Link>
   );
 }
-
-export function EntityDeleteButton({ onClick, deleting = false }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={deleting}
-      className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
-    >
-      {deleting ? "Löscht..." : "Löschen"}
-    </button>
-  );
-}
