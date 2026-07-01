@@ -10,10 +10,22 @@ export default async function NewTeamPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
+  const { data: players } = await supabase
+    .from("players")
+    .select("*")
+    .eq("is_active", true)
+    .order("last_name", { ascending: true });
+
+  const { data: coaches } = await supabase
+    .from("coaches")
+    .select("*")
+    .eq("is_active", true)
+    .order("last_name", { ascending: true });
+
   return (
     <AdminLayout title="Neue Mannschaft" subtitle="Mannschaften">
       <BackButton />
-      <AdminTeamsForm seasons={seasons || []} />
+      <AdminTeamsForm seasons={seasons || []} players={players || []} coaches={coaches || []} />
     </AdminLayout>
   );
 }
