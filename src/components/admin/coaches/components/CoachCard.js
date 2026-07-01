@@ -1,7 +1,8 @@
 "use client";
 
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
-import useDeleteEntity from "@/components/admin/hooks/useDeleteEntity";
+import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
+import { removeCoachRecord } from "@/components/admin/delete/removeActions";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
   EntityActionLink,
@@ -10,11 +11,9 @@ import {
   EntityCardBadges,
   EntityCardMeta,
   EntityCardTitle,
-  EntityDeleteButton,
 } from "@/components/admin/ui/EntityCard";
 import { CountryFlag, getCountryByValue } from "@/components/admin/utils/countries";
 import { getEntityImage, getEntityTeam, getFullName } from "@/components/admin/utils/entity";
-import { deleteCoachCompletely } from "../services/coaches.service";
 import CoachStatusBadge from "./CoachStatusBadge";
 
 export default function CoachCard({ coach }) {
@@ -22,11 +21,6 @@ export default function CoachCard({ coach }) {
   const imageUrl = getEntityImage(coach, COACH_PLACEHOLDER_IMAGE);
   const fullName = getFullName(coach, "Trainer");
   const team = getEntityTeam(coach);
-  const { deleting, handleDelete } = useDeleteEntity({
-    entityLabel: "Trainer",
-    entityName: fullName,
-    deleteAction: () => deleteCoachCompletely(coach),
-  });
 
   return (
     <EntityCard image={imageUrl} imageAlt={fullName}>
@@ -46,13 +40,15 @@ export default function CoachCard({ coach }) {
       <EntityCardMeta>{coach.email || "Keine E-Mail hinterlegt"}</EntityCardMeta>
 
       <EntityCardActions>
-        <EntityActionLink href={`/admin/coaches/edit/${coach.id}`}>
-          Bearbeiten
-        </EntityActionLink>
-        <EntityActionLink href={`/trainer/${coach.slug}`} target="_blank">
-          Profil ansehen
-        </EntityActionLink>
-        <EntityDeleteButton onClick={handleDelete} deleting={deleting} />
+        <EntityActionLink href={`/admin/coaches/edit/${coach.id}`}>Bearbeiten</EntityActionLink>
+        <EntityActionLink href={`/trainer/${coach.slug}`} target="_blank">Profil ansehen</EntityActionLink>
+        <AdminRemoveButton
+          label="Trainer"
+          name={fullName}
+          action={() => removeCoachRecord(coach)}
+          affected={["Profil", "Saison-Zuordnungen"]}
+          preserved={["Mannschaften", "Spieler", "News"]}
+        />
       </EntityCardActions>
     </EntityCard>
   );
