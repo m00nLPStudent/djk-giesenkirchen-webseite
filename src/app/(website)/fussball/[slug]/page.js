@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import {
   TeamHero,
-  TeamSeasonSelector,
+  TeamIntroCard,
   TeamDetailTabs,
 } from "@/components/website/team";
 
@@ -51,10 +51,8 @@ function mapSeasonCoaches(assignments = []) {
     .filter((coach) => coach?.id && coach.is_active !== false);
 }
 
-export default async function TeamPage({ params, searchParams }) {
+export default async function TeamPage({ params }) {
   const { slug } = await params;
-  const query = await searchParams;
-  const selectedSeasonSlug = query?.saison;
 
   const { data: seasons } = await supabase
     .from("seasons")
@@ -63,9 +61,7 @@ export default async function TeamPage({ params, searchParams }) {
     .order("sort_order", { ascending: true });
 
   const seasonList = seasons || [];
-  const currentSeason = seasonList.find((season) => season.is_current) || seasonList[0] || null;
-  const selectedSeason =
-    seasonList.find((season) => season.slug === selectedSeasonSlug) || currentSeason;
+  const selectedSeason = seasonList.find((season) => season.is_current) || seasonList[0] || null;
 
   const { data: team } = await supabase
     .from("teams")
@@ -133,13 +129,8 @@ export default async function TeamPage({ params, searchParams }) {
     <main className="min-h-screen bg-[#101014] text-white">
       <section className="px-6 pt-32 pb-24">
         <div className="mx-auto max-w-7xl space-y-8">
-          <TeamSeasonSelector
-            baseSlug={team?.slug || slug}
-            seasons={seasonList}
-            selectedSeason={selectedSeason}
-          />
-
           <TeamHero team={displayTeam} />
+          <TeamIntroCard team={displayTeam} />
 
           <TeamDetailTabs
             team={displayTeam}
