@@ -27,3 +27,28 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.football-de-widget-frame,
+.football-de-widget-frame .fussballde_widget,
+.football-de-widget-frame .fussballde_widget > div {
+  background: #101014 !important;
+  color: #ffffff !important;
+}
+
+.football-de-widget-frame .fussballde_widget * {
+  color: #ffffff !important;
+}
+
+.football-de-widget-frame .fussballde_widget [style*="background: rgb(255, 255, 255)"],
+.football-de-widget-frame .fussballde_widget [style*="background-color: rgb(255, 255, 255)"],
+.football-de-widget-frame .fussballde_widget [style*="background:#fff"],
+.football-de-widget-frame .fussballde_widget [style*="background: #fff"],
+.football-de-widget-frame .fussballde_widget [style*="background-color:#fff"],
+.football-de-widget-frame .fussballde_widget [style*="background-color: #fff"] {
+  background: #101014 !important;
+}
+
+.football-de-widget-frame .fussballde_widget iframe {
+  background: #101014 !important;
+  border-radius: 1.5rem;
+}
