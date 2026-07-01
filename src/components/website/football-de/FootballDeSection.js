@@ -14,7 +14,7 @@ export default function FootballDeSection({ team, showTable }) {
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div className={`grid items-start gap-6 ${showTable ? "lg:grid-cols-2" : ""}`}>
         <FootballDeAccordion
           title="Spielplan"
           description="Letzte und kommende Spiele dieser Mannschaft anzeigen."
