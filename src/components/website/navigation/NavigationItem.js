@@ -15,7 +15,7 @@ export default function NavigationItem({ item, openMenu, setOpenMenu }) {
     >
       <Link
         href={item.href}
-        className={`group relative flex items-center gap-2 rounded-full px-4 py-3 transition duration-300 ${
+        className={`group relative flex items-center gap-2 rounded-full px-4 py-2.5 transition duration-300 ${
           isOpen
             ? "bg-[#c4001a] text-white shadow-lg shadow-red-950/40"
             : "hover:bg-[#c4001a]/15 hover:text-white"
@@ -34,7 +34,7 @@ export default function NavigationItem({ item, openMenu, setOpenMenu }) {
       </Link>
 
       {hasChildren && isOpen && (
-        <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-4">
+        <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-3">
           {item.dropdown}
         </div>
       )}
