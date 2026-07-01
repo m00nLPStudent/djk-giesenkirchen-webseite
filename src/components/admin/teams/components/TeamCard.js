@@ -1,6 +1,7 @@
 "use client";
 
-import useDeleteEntity from "@/components/admin/hooks/useDeleteEntity";
+import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
+import { removeTeamRecord } from "@/components/admin/delete/removeActions";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
   EntityActionLink,
@@ -9,9 +10,7 @@ import {
   EntityCardBadges,
   EntityCardMeta,
   EntityCardTitle,
-  EntityDeleteButton,
 } from "@/components/admin/ui/EntityCard";
-import { removeTeam } from "../services/teams.service";
 import TeamStatusBadge from "./TeamStatusBadge";
 
 function TeamInfoGrid({ team }) {
@@ -37,12 +36,6 @@ function TeamInfoGrid({ team }) {
 }
 
 export default function TeamCard({ team }) {
-  const { deleting, handleDelete } = useDeleteEntity({
-    entityLabel: "Mannschaft",
-    entityName: team.name_de || "Unbekannte Mannschaft",
-    deleteAction: () => removeTeam(team),
-  });
-
   const hasFootballDe = Boolean(
     team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
   );
@@ -58,20 +51,34 @@ export default function TeamCard({ team }) {
       </EntityCardBadges>
 
       <EntityCardTitle>{team.name_de}</EntityCardTitle>
-      <EntityCardMeta>
-        {team.description_de || "Keine Beschreibung vorhanden."}
-      </EntityCardMeta>
+      <EntityCardMeta>{team.description_de || "Keine Beschreibung vorhanden."}</EntityCardMeta>
 
       <TeamInfoGrid team={team} />
 
       <EntityCardActions>
-        <EntityActionLink href={`/admin/teams/edit/${team.id}`}>
-          Bearbeiten
-        </EntityActionLink>
+        <EntityActionLink href={`/admin/teams/edit/${team.id}`}>Bearbeiten</EntityActionLink>
         <EntityActionLink href={`/fussball/${team.slug}`} target="_blank" variant="primary">
           Ansehen
         </EntityActionLink>
-        <EntityDeleteButton onClick={handleDelete} deleting={deleting} />
+        <AdminRemoveButton
+          label="Mannschaft"
+          name={team.name_de || "Unbekannte Mannschaft"}
+          action={() => removeTeamRecord(team)}
+          affected={[
+            "Mannschaft",
+            "alle Saisondaten dieser Mannschaft",
+            "Kader-Zuordnungen dieser Mannschaft",
+            "Trainer-Zuordnungen dieser Mannschaft",
+            "Mannschaftsbilder, sofern vorhanden",
+          ]}
+          preserved={[
+            "Spielerprofile",
+            "Trainerprofile",
+            "News-Beiträge",
+            "Saisons",
+            "Abteilungen",
+          ]}
+        />
       </EntityCardActions>
     </EntityCard>
   );
