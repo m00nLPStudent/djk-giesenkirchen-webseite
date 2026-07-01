@@ -20,7 +20,7 @@ function getNewsStatus(item) {
 export default async function AdminNewsPage() {
   const { data: news } = await supabase
     .from("news")
-    .select("*")
+    .select("*, football_team:football_team_id(name_de)")
     .order("created_at", { ascending: false });
 
   const newsList = news || [];
