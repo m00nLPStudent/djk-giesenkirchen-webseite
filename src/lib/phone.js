@@ -30,6 +30,22 @@ export function formatGermanPhoneNumber(value = "") {
   return normalized;
 }
 
+export function formatGermanPhoneNumberReadable(value = "") {
+  const normalized = normalizeGermanPhoneNumber(value);
+
+  if (!normalized) return "";
+  if (!normalized.startsWith("49")) return normalized;
+
+  const nationalNumber = normalized.slice(2);
+  const providerPrefix = nationalNumber.slice(0, 4);
+  const subscriberNumber = nationalNumber.slice(4);
+
+  if (!providerPrefix) return "+49";
+  if (!subscriberNumber) return `+49 ${providerPrefix}`;
+
+  return `+49 ${providerPrefix} ${subscriberNumber}`;
+}
+
 export function getWhatsAppUrl(value = "") {
   const normalized = normalizeGermanPhoneNumber(value);
   if (!normalized) return null;
