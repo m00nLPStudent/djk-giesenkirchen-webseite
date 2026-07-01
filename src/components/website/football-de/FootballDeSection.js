@@ -1,3 +1,4 @@
+import FootballDeAccordion from "./FootballDeAccordion";
 import FootballDeWidget from "./FootballDeWidget";
 
 export default function FootballDeSection({ team, showTable }) {
@@ -13,21 +14,31 @@ export default function FootballDeSection({ team, showTable }) {
         </p>
       </div>
 
-      <div className={`grid items-stretch gap-6 ${showTable ? "xl:grid-cols-2" : ""}`}>
-        <FootballDeWidget
+      <div className="space-y-4">
+        <FootballDeAccordion
           title="Spielplan"
-          description="Letzte und kommende Spiele dieser Mannschaft."
-          widgetId={team?.fussball_de_matches_widget_id}
-          widgetType="team-matches"
-        />
+          description="Letzte und kommende Spiele dieser Mannschaft anzeigen."
+        >
+          <FootballDeWidget
+            title="Spielplan"
+            description="Letzte und kommende Spiele dieser Mannschaft."
+            widgetId={team?.fussball_de_matches_widget_id}
+            widgetType="team-matches"
+          />
+        </FootballDeAccordion>
 
         {showTable && (
-          <FootballDeWidget
+          <FootballDeAccordion
             title="Tabelle"
-            description="Aktuelle Tabelle der jeweiligen Staffel."
-            widgetId={team?.fussball_de_table_widget_id}
-            widgetType="table"
-          />
+            description="Aktuelle Tabelle der jeweiligen Staffel anzeigen."
+          >
+            <FootballDeWidget
+              title="Tabelle"
+              description="Aktuelle Tabelle der jeweiligen Staffel."
+              widgetId={team?.fussball_de_table_widget_id}
+              widgetType="table"
+            />
+          </FootballDeAccordion>
         )}
       </div>
     </section>
