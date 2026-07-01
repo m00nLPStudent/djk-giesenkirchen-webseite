@@ -1,11 +1,12 @@
 import { supabase } from "@/lib/supabase";
+import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
 
 export default async function NewsDetailPage({ params }) {
   const { slug } = await params;
 
   const { data: article } = await supabase
     .from("news")
-    .select("*")
+    .select("*, football_team:football_team_id(name_de)")
     .eq("slug", slug)
     .eq("is_published", true)
     .lte("published_at", new Date().toISOString())
@@ -29,12 +30,12 @@ export default async function NewsDetailPage({ params }) {
             <img
               src={article.image_url}
               alt={article.title_de}
-              className="mb-10 max-h-[420px] w-full rounded-3xl object-contain bg-white/5 p-8"
+              className="mb-10 max-h-[420px] w-full rounded-3xl bg-white/5 object-contain p-8"
             />
           )}
 
           <p className="text-sm uppercase tracking-[0.35em] text-red-400">
-            {article.category}
+            {getNewsCategoryDisplay(article)}
           </p>
 
           <h1 className="mt-4 text-6xl font-black">{article.title_de}</h1>
