@@ -1,5 +1,5 @@
 import { COUNTRIES } from "@/constants";
-import { formatGermanPhoneNumber, getPhoneHref, getWhatsAppUrl } from "@/lib/phone";
+import { formatGermanPhoneNumberReadable, getPhoneHref, getWhatsAppUrl } from "@/lib/phone";
 
 export function getCountry(value) {
   if (!value) return null;
@@ -29,8 +29,8 @@ export function getTeam(coach) {
 
 export function getCoachContact(coach) {
   return {
-    phoneDisplay: formatGermanPhoneNumber(coach?.phone),
-    whatsappDisplay: formatGermanPhoneNumber(coach?.whatsapp),
+    phoneDisplay: formatGermanPhoneNumberReadable(coach?.phone),
+    whatsappDisplay: formatGermanPhoneNumberReadable(coach?.whatsapp),
     phoneHref: getPhoneHref(coach?.phone),
     whatsappHref: getWhatsAppUrl(coach?.whatsapp),
   };
