@@ -1,62 +1,6 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-
-function formatDate(value) {
-  if (!value) return "Aktuell";
-
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
-function NewsCard({ item, featured = false }) {
-  return (
-    <Link href={`/news/${item.slug}`} className="group block h-full">
-      <article
-        className={`h-full overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 transition group-hover:-translate-y-1 group-hover:border-red-500/50 group-hover:bg-white/10 ${
-          featured ? "lg:grid lg:grid-cols-[1.05fr_0.95fr]" : ""
-        }`}
-      >
-        {item.image_url && (
-          <div className={`${featured ? "h-72 lg:h-full" : "h-56"} bg-white/5 p-5`}>
-            <img
-              src={item.image_url}
-              alt={item.title_de}
-              className="h-full w-full rounded-[1.5rem] object-cover"
-            />
-          </div>
-        )}
-
-        <div className={`${featured ? "p-8 md:p-10" : "p-6"}`}>
-          <div className="flex flex-wrap gap-3">
-            <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
-              {item.category || "Verein"}
-            </span>
-            <span className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-white/50">
-              {formatDate(item.published_at)}
-            </span>
-          </div>
-
-          <h2 className={`${featured ? "mt-7 text-4xl md:text-5xl" : "mt-5 text-2xl"} font-black leading-tight text-white`}>
-            {item.title_de}
-          </h2>
-
-          {item.teaser_de && (
-            <p className={`${featured ? "mt-6 text-lg leading-8" : "mt-4 text-sm leading-6"} text-white/65`}>
-              {item.teaser_de}
-            </p>
-          )}
-
-          <p className="mt-6 text-sm font-black uppercase tracking-[0.22em] text-red-400">
-            Weiterlesen
-          </p>
-        </div>
-      </article>
-    </Link>
-  );
-}
+import NewsCard from "@/components/website/news/NewsCard";
 
 export default async function Home() {
   const { data: latestNews } = await supabase
@@ -68,7 +12,7 @@ export default async function Home() {
     .limit(4);
 
   const featuredNews = latestNews?.[0];
-  const secondaryNews = latestNews?.slice(1) || [];
+  const secondaryNews = latestNews?.slice(1, 4) || [];
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
@@ -87,10 +31,10 @@ export default async function Home() {
             </div>
 
             <Link
-              href="/news"
+              href="/news/uebersicht"
               className="w-fit rounded-full border border-white/20 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white/80 transition hover:border-red-500 hover:text-white"
             >
-              Alle News
+              News Übersicht
             </Link>
           </div>
 
@@ -101,7 +45,7 @@ export default async function Home() {
               {secondaryNews.length > 0 && (
                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                   {secondaryNews.map((item) => (
-                    <NewsCard item={item} key={item.id} />
+                    <NewsCard item={item} key={item.id} compactMeta />
                   ))}
                 </div>
               )}
