@@ -1,5 +1,5 @@
 import { COUNTRIES } from "@/constants";
-import { normalizeGermanPhoneNumber } from "@/lib/phone";
+import { formatGermanPhoneNumberReadable, normalizeGermanPhoneNumber } from "@/lib/phone";
 import { InputField, SelectField } from "./FormField";
 
 export function EmailField({ value, onChange, error, required = false }) {
@@ -29,7 +29,7 @@ export function PhoneField({
       label={label}
       required={required}
       placeholder={placeholder}
-      value={value}
+      value={formatGermanPhoneNumberReadable(value)}
       onChange={(event) => onChange(event.target.value)}
       onBlur={(event) => onChange(normalizeGermanPhoneNumber(event.target.value))}
       error={error}
