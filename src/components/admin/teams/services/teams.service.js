@@ -89,6 +89,46 @@ function createTeamSeasonPayload(team, teamId, seasonId) {
   };
 }
 
+async function replacePlayerAssignments(teamSeasonId, playerIds = []) {
+  const deleteResult = await supabase
+    .from("player_team_seasons")
+    .delete()
+    .eq("team_season_id", teamSeasonId);
+
+  if (deleteResult.error) return deleteResult;
+
+  if (!playerIds.length) return { error: null };
+
+  return await supabase.from("player_team_seasons").insert(
+    playerIds.map((playerId, index) => ({
+      player_id: playerId,
+      team_season_id: teamSeasonId,
+      sort_order: index,
+      is_active: true,
+    })),
+  );
+}
+
+async function replaceCoachAssignments(teamSeasonId, coachIds = []) {
+  const deleteResult = await supabase
+    .from("coach_team_seasons")
+    .delete()
+    .eq("team_season_id", teamSeasonId);
+
+  if (deleteResult.error) return deleteResult;
+
+  if (!coachIds.length) return { error: null };
+
+  return await supabase.from("coach_team_seasons").insert(
+    coachIds.map((coachId, index) => ({
+      coach_id: coachId,
+      team_season_id: teamSeasonId,
+      sort_order: index,
+      is_active: true,
+    })),
+  );
+}
+
 export async function saveTeam(team, id = null) {
   return await teamRepository.upsert(createTeamPayload(team), id);
 }
@@ -113,6 +153,26 @@ export async function saveTeamWithSeason(team, id = null) {
     .select("*");
 
   if (seasonResult.error) return seasonResult;
+
+  const savedTeamSeason = Array.isArray(seasonResult.data)
+    ? seasonResult.data[0]
+    : seasonResult.data;
+
+  if (savedTeamSeason?.id) {
+    const playerResult = await replacePlayerAssignments(
+      savedTeamSeason.id,
+      team.selected_player_ids || [],
+    );
+
+    if (playerResult.error) return playerResult;
+
+    const coachResult = await replaceCoachAssignments(
+      savedTeamSeason.id,
+      team.selected_coach_ids || [],
+    );
+
+    if (coachResult.error) return coachResult;
+  }
 
   return teamResult;
 }
