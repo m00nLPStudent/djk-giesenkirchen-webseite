@@ -129,11 +129,31 @@ async function replaceCoachAssignments(teamSeasonId, coachIds = []) {
   );
 }
 
+async function setCurrentPublicSeason(seasonId) {
+  if (!seasonId) return { error: null };
+
+  const resetResult = await supabase
+    .from("seasons")
+    .update({ is_current: false })
+    .neq("id", seasonId);
+
+  if (resetResult.error) return resetResult;
+
+  return await supabase
+    .from("seasons")
+    .update({ is_current: true })
+    .eq("id", seasonId);
+}
+
 export async function saveTeam(team, id = null) {
   return await teamRepository.upsert(createTeamPayload(team), id);
 }
 
 export async function saveTeamWithSeason(team, id = null) {
+  const currentSeasonResult = await setCurrentPublicSeason(team.public_season_id);
+
+  if (currentSeasonResult.error) return currentSeasonResult;
+
   const teamResult = await saveTeam(team, id);
 
   if (teamResult.error) return teamResult;
