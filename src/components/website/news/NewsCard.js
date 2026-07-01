@@ -10,6 +10,24 @@ export function formatNewsDate(value) {
   }).format(new Date(value));
 }
 
+function getFootballTeamName(item = {}) {
+  if (item.football_team?.name_de) return item.football_team.name_de;
+  if (item.teams?.name_de) return item.teams.name_de;
+  if (Array.isArray(item.teams) && item.teams[0]?.name_de) return item.teams[0].name_de;
+  return "";
+}
+
+export function getNewsCategoryDisplay(item = {}) {
+  const category = item.category || "Allgemein";
+  const teamName = getFootballTeamName(item);
+
+  if (item.category_key === "fussball" && teamName) {
+    return `Fußball · ${teamName}`;
+  }
+
+  return category;
+}
+
 export default function NewsCard({ item, featured = false, compactMeta = false }) {
   return (
     <Link href={`/news/${item.slug}`} className="group block h-full">
@@ -31,7 +49,7 @@ export default function NewsCard({ item, featured = false, compactMeta = false }
         <div className={`${featured ? "flex h-full flex-col p-8 md:p-10" : "p-6"}`}>
           <div className="flex flex-wrap justify-end gap-3">
             <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
-              {item.category || "Verein"}
+              {getNewsCategoryDisplay(item)}
             </span>
           </div>
 
