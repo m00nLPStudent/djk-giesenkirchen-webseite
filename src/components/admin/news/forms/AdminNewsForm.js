@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import NewsImageUpload from "../components/NewsImageUpload";
 import { createSlug } from "../utils/slug";
 import { uploadNewsImage, createNews } from "../services/news.service";
+import NewsCategoryFields from "./NewsCategoryFields";
 
-export default function AdminNewsForm() {
+export default function AdminNewsForm({ teams = [] }) {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -17,6 +18,8 @@ export default function AdminNewsForm() {
     content_de: "",
     content_en: "",
     category: "Verein",
+    category_key: "verein",
+    football_team_id: "",
     image_url: "",
     is_published: true,
     published_at: "",
@@ -58,6 +61,7 @@ export default function AdminNewsForm() {
       ...form,
       slug,
       author: "DJK/VfL Giesenkirchen",
+      football_team_id: form.category_key === "fussball" ? form.football_team_id || null : null,
       is_published: form.is_published,
       published_at: publishedAt,
     });
@@ -90,12 +94,7 @@ export default function AdminNewsForm() {
         className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
       />
 
-      <input
-        placeholder="Kategorie"
-        value={form.category}
-        onChange={(e) => updateField("category", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
+      <NewsCategoryFields form={form} teams={teams} updateField={updateField} />
 
       <textarea
         placeholder="Teaser Deutsch"
@@ -157,8 +156,7 @@ export default function AdminNewsForm() {
         />
 
         <p className="mt-2 text-sm text-white/40">
-          Leer lassen = direkte Veröffentlichung. Datum in der Zukunft =
-          geplante Veröffentlichung.
+          Leer lassen = direkte Veröffentlichung. Datum in der Zukunft = geplante Veröffentlichung.
         </p>
       </div>
 
