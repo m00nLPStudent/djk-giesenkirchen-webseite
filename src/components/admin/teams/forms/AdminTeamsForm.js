@@ -27,7 +27,83 @@ function findTeamSeason(teamSeasons = [], seasonId) {
   return teamSeasons.find((teamSeason) => teamSeason.season_id === seasonId) || null;
 }
 
-function createInitialForm(team, seasons = [], teamSeasons = [], seasonId = null) {
+function getAssignedIds(assignments = [], teamSeasonId, fieldName) {
+  if (!teamSeasonId) return [];
+
+  return assignments
+    .filter((assignment) => assignment.team_season_id === teamSeasonId)
+    .map((assignment) => assignment[fieldName])
+    .filter(Boolean);
+}
+
+function getPersonName(person = {}) {
+  const fullName = `${person.first_name || ""} ${person.last_name || ""}`.trim();
+  return fullName || person.name || person.name_de || "Ohne Namen";
+}
+
+function SelectionList({ items = [], selectedIds = [], onChange, getLabel, getMeta, emptyText }) {
+  function toggleItem(id) {
+    const nextValue = selectedIds.includes(id)
+      ? selectedIds.filter((selectedId) => selectedId !== id)
+      : [...selectedIds, id];
+
+    onChange(nextValue);
+  }
+
+  if (!items.length) {
+    return (
+      <div className="rounded-3xl border border-white/10 bg-black/20 p-5 text-sm text-white/55">
+        {emptyText}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {items.map((item) => {
+        const isSelected = selectedIds.includes(item.id);
+
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => toggleItem(item.id)}
+            className={`rounded-2xl border p-4 text-left transition ${
+              isSelected
+                ? "border-red-500 bg-red-500/10 text-white"
+                : "border-white/10 bg-black/20 text-white/70 hover:border-red-500 hover:text-white"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <span
+                className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-xs font-black ${
+                  isSelected ? "border-red-500 bg-red-600 text-white" : "border-white/20"
+                }`}
+              >
+                {isSelected ? "✓" : ""}
+              </span>
+              <span>
+                <span className="block font-bold">{getLabel(item)}</span>
+                {getMeta?.(item) && (
+                  <span className="mt-1 block text-xs text-white/45">{getMeta(item)}</span>
+                )}
+              </span>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function createInitialForm({
+  team,
+  seasons = [],
+  teamSeasons = [],
+  playerAssignments = [],
+  coachAssignments = [],
+  seasonId = null,
+}) {
   const selectedSeason = seasons.find((season) => season.id === seasonId) || getCurrentSeason(seasons);
   const selectedTeamSeason = findTeamSeason(teamSeasons, selectedSeason?.id);
   const source = selectedTeamSeason || team || {};
@@ -35,6 +111,9 @@ function createInitialForm(team, seasons = [], teamSeasons = [], seasonId = null
   return {
     season_id: selectedSeason?.id || "",
     season: selectedSeason?.name || team?.season || "2026/2027",
+    team_season_id: selectedTeamSeason?.id || "",
+    selected_player_ids: getAssignedIds(playerAssignments, selectedTeamSeason?.id, "player_id"),
+    selected_coach_ids: getAssignedIds(coachAssignments, selectedTeamSeason?.id, "coach_id"),
     name_de: source.name_de || team?.name_de || "",
     name_en: source.name_en || team?.name_en || "",
     slug: source.slug || team?.slug || "",
@@ -60,11 +139,26 @@ function createInitialForm(team, seasons = [], teamSeasons = [], seasonId = null
   };
 }
 
-export default function AdminTeamsForm({ team, seasons = [], teamSeasons = [] }) {
+export default function AdminTeamsForm({
+  team,
+  seasons = [],
+  teamSeasons = [],
+  players = [],
+  coaches = [],
+  playerAssignments = [],
+  coachAssignments = [],
+}) {
   const router = useRouter();
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
   const [form, setForm] = useState(() =>
-    createInitialForm(team, seasons, teamSeasons, initialSeason?.id),
+    createInitialForm({
+      team,
+      seasons,
+      teamSeasons,
+      playerAssignments,
+      coachAssignments,
+      seasonId: initialSeason?.id,
+    }),
   );
   const [loading, setLoading] = useState(false);
 
@@ -74,7 +168,16 @@ export default function AdminTeamsForm({ team, seasons = [], teamSeasons = [] })
 
   function updateSeason(seasonId) {
     const season = seasons.find((item) => item.id === seasonId);
-    setForm(createInitialForm(team, seasons, teamSeasons, season?.id));
+    setForm(
+      createInitialForm({
+        team,
+        seasons,
+        teamSeasons,
+        playerAssignments,
+        coachAssignments,
+        seasonId: season?.id,
+      }),
+    );
   }
 
   async function uploadImage(file) {
@@ -176,6 +279,36 @@ export default function AdminTeamsForm({ team, seasons = [], teamSeasons = [] })
           <TextareaField label="Trainingszeiten Deutsch" rows={3} value={form.training_times_de} onChange={(event) => updateField("training_times_de", event.target.value)} />
           <TextareaField label="Trainingszeiten Englisch" rows={3} value={form.training_times_en} onChange={(event) => updateField("training_times_en", event.target.value)} />
         </div>
+      </FormSection>
+
+      <FormSection
+        eyebrow="Kader"
+        title="Spieler dieser Saison"
+        description="Wähle aus, welche zentral angelegten Spieler in dieser Saison zu dieser Mannschaft gehören."
+      >
+        <SelectionList
+          items={players}
+          selectedIds={form.selected_player_ids}
+          onChange={(value) => updateField("selected_player_ids", value)}
+          getLabel={getPersonName}
+          getMeta={(player) => [player.position_de, player.year_group].filter(Boolean).join(" · ")}
+          emptyText="Es sind noch keine Spieler angelegt."
+        />
+      </FormSection>
+
+      <FormSection
+        eyebrow="Team"
+        title="Trainer & Betreuer dieser Saison"
+        description="Wähle aus, welche zentral angelegten Trainer oder Betreuer in dieser Saison zu dieser Mannschaft gehören."
+      >
+        <SelectionList
+          items={coaches}
+          selectedIds={form.selected_coach_ids}
+          onChange={(value) => updateField("selected_coach_ids", value)}
+          getLabel={getPersonName}
+          getMeta={(coach) => [coach.role_de, coach.license].filter(Boolean).join(" · ")}
+          emptyText="Es sind noch keine Trainer oder Betreuer angelegt."
+        />
       </FormSection>
 
       <FormSection eyebrow="Spielbetrieb" title="fussball.de Integration" description="Widget-Code aus fussball.de einfügen. Gespeichert werden automatisch nur die Widget-IDs.">
