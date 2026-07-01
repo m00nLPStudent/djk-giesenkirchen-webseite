@@ -55,7 +55,7 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
 
   return (
     <FootballDeCard title={title} description={description} className="football-de-widget-shell">
-      <div className="football-de-widget-frame rounded-3xl border border-white/10 bg-white p-4 text-black">
+      <div className="football-de-widget-frame overflow-hidden rounded-3xl border border-white/10 bg-[#101014] p-4 text-white">
         <div
           ref={widgetRef}
           key={`${widgetId}-${widgetType}-${reactId}`}
