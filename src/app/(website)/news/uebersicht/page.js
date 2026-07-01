@@ -27,7 +27,7 @@ export default async function NewsOverviewPage({ searchParams }) {
 
   let newsQuery = supabase
     .from("news")
-    .select("*", { count: "exact" })
+    .select("*, football_team:football_team_id(name_de)", { count: "exact" })
     .eq("is_published", true)
     .lte("published_at", new Date().toISOString())
     .order("published_at", { ascending: false })
