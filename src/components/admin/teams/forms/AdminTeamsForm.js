@@ -55,6 +55,11 @@ function getPersonName(person = {}) {
   return fullName || person.name || person.name_de || "Ohne Namen";
 }
 
+function belongsToTeam(item = {}, teamId) {
+  if (!teamId) return true;
+  return !item.team_id || item.team_id === teamId;
+}
+
 function SelectionList({ items = [], selectedIds = [], onChange, getLabel, getMeta, emptyText }) {
   function toggleItem(id) {
     const nextValue = selectedIds.includes(id)
@@ -205,6 +210,17 @@ export default function AdminTeamsForm({
     }),
   );
   const [loading, setLoading] = useState(false);
+  const isEditMode = Boolean(team?.id);
+
+  const filteredPlayers = useMemo(
+    () => players.filter((player) => belongsToTeam(player, team?.id)),
+    [players, team?.id],
+  );
+
+  const filteredCoaches = useMemo(
+    () => coaches.filter((coach) => belongsToTeam(coach, team?.id)),
+    [coaches, team?.id],
+  );
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -315,14 +331,30 @@ export default function AdminTeamsForm({
       )}
 
       {activeTab === "base" && (
-        <FormSection eyebrow="Mannschaft" title="Grunddaten">
-          <FormGrid>
-            <InputField label="Name Deutsch" required value={form.name_de} onChange={(event) => updateField("name_de", event.target.value)} />
-            <InputField label="Name Englisch" value={form.name_en} onChange={(event) => updateField("name_en", event.target.value)} />
-            <InputField label="Slug" placeholder="e1" value={form.slug} onChange={(event) => updateField("slug", event.target.value)} />
-            <InputField label="Altersgruppe" value={form.age_group} onChange={(event) => updateField("age_group", event.target.value)} />
-            <InputField label="Bearbeitete Saison" value={form.season} disabled />
-          </FormGrid>
+        <FormSection
+          eyebrow="Mannschaft"
+          title="Grunddaten"
+          description={
+            isEditMode
+              ? "Diese Grunddaten werden nur beim Erstellen einer Mannschaft festgelegt und sind danach gesperrt."
+              : "Diese Grunddaten werden beim Erstellen der Mannschaft festgelegt."
+          }
+        >
+          {isEditMode && (
+            <FormHintBox eyebrow="Gesperrte Grunddaten">
+              Name, Slug und Altersgruppe können nach dem Erstellen nicht mehr direkt geändert werden, damit Spieler-, Trainer- und Saisonzuordnungen stabil bleiben.
+            </FormHintBox>
+          )}
+
+          <div className={isEditMode ? "mt-6" : ""}>
+            <FormGrid>
+              <InputField label="Name Deutsch" required value={form.name_de} disabled={isEditMode} onChange={(event) => updateField("name_de", event.target.value)} />
+              <InputField label="Name Englisch" value={form.name_en} disabled={isEditMode} onChange={(event) => updateField("name_en", event.target.value)} />
+              <InputField label="Slug" placeholder="e1" value={form.slug} disabled={isEditMode} onChange={(event) => updateField("slug", event.target.value)} />
+              <InputField label="Altersgruppe" value={form.age_group} disabled={isEditMode} onChange={(event) => updateField("age_group", event.target.value)} />
+              <InputField label="Bearbeitete Saison" value={form.season} disabled />
+            </FormGrid>
+          </div>
         </FormSection>
       )}
 
@@ -348,15 +380,15 @@ export default function AdminTeamsForm({
         <FormSection
           eyebrow="Kader"
           title="Spieler dieser Saison"
-          description="Wähle aus, welche zentral angelegten Spieler in dieser Saison zu dieser Mannschaft gehören."
+          description="Angezeigt werden nur Spieler, die bei der Spielererstellung dieser Mannschaft zugeordnet wurden."
         >
           <SelectionList
-            items={players}
+            items={filteredPlayers}
             selectedIds={form.selected_player_ids}
             onChange={(value) => updateField("selected_player_ids", value)}
             getLabel={getPersonName}
             getMeta={(player) => [player.position_de, player.year_group].filter(Boolean).join(" · ")}
-            emptyText="Es sind noch keine Spieler angelegt."
+            emptyText="Für diese Mannschaft sind noch keine Spieler angelegt oder zugeordnet."
           />
         </FormSection>
       )}
@@ -365,15 +397,15 @@ export default function AdminTeamsForm({
         <FormSection
           eyebrow="Team"
           title="Trainer & Betreuer dieser Saison"
-          description="Wähle aus, welche zentral angelegten Trainer oder Betreuer in dieser Saison zu dieser Mannschaft gehören."
+          description="Angezeigt werden nur Trainer und Betreuer, die bei der Trainererstellung dieser Mannschaft zugeordnet wurden."
         >
           <SelectionList
-            items={coaches}
+            items={filteredCoaches}
             selectedIds={form.selected_coach_ids}
             onChange={(value) => updateField("selected_coach_ids", value)}
             getLabel={getPersonName}
             getMeta={(coach) => [coach.role_de, coach.license].filter(Boolean).join(" · ")}
-            emptyText="Es sind noch keine Trainer oder Betreuer angelegt."
+            emptyText="Für diese Mannschaft sind noch keine Trainer oder Betreuer angelegt oder zugeordnet."
           />
         </FormSection>
       )}
