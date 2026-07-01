@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ActiveStatusField,
@@ -10,46 +10,71 @@ import {
   FormSection,
   InputField,
   PhoneField,
+  SelectField,
   SortOrderField,
   TextareaField,
 } from "@/components/admin/forms";
 import TeamLogoUpload from "../components/TeamLogoUpload";
 import { createSlug } from "../utils/slug";
-import { uploadTeamImage, saveTeam } from "../services/teams.service";
+import { uploadTeamImage, saveTeamWithSeason } from "../services/teams.service";
 import TeamFootballDeFields from "./fields/TeamFootballDeFields";
 
-function createInitialForm(team) {
+function getCurrentSeason(seasons = []) {
+  return seasons.find((season) => season.is_current) || seasons[0] || null;
+}
+
+function findTeamSeason(teamSeasons = [], seasonId) {
+  return teamSeasons.find((teamSeason) => teamSeason.season_id === seasonId) || null;
+}
+
+function createInitialForm(team, seasons = [], teamSeasons = [], seasonId = null) {
+  const selectedSeason = seasons.find((season) => season.id === seasonId) || getCurrentSeason(seasons);
+  const selectedTeamSeason = findTeamSeason(teamSeasons, selectedSeason?.id);
+  const source = selectedTeamSeason || team || {};
+
   return {
-    name_de: team?.name_de || "",
-    name_en: team?.name_en || "",
-    slug: team?.slug || "",
-    age_group: team?.age_group || "Jugend",
-    season: team?.season || "2026/2027",
-    description_de: team?.description_de || "",
-    description_en: team?.description_en || "",
-    training_times_de: team?.training_times_de || "",
-    training_times_en: team?.training_times_en || "",
-    team_image_url: team?.team_image_url || "",
-    sort_order: team?.sort_order || 0,
-    is_active: team?.is_active ?? true,
-    contact_name: team?.contact_name || "",
-    contact_email: team?.contact_email || "",
-    contact_phone: team?.contact_phone || "",
-    contact_image_url: team?.contact_image_url || "",
+    season_id: selectedSeason?.id || "",
+    season: selectedSeason?.name || team?.season || "2026/2027",
+    name_de: source.name_de || team?.name_de || "",
+    name_en: source.name_en || team?.name_en || "",
+    slug: source.slug || team?.slug || "",
+    age_group: source.age_group || team?.age_group || "Jugend",
+    description_de: source.description_de || team?.description_de || "",
+    description_en: source.description_en || team?.description_en || "",
+    training_times_de: source.training_times_de || team?.training_times_de || "",
+    training_times_en: source.training_times_en || team?.training_times_en || "",
+    team_image_url: source.team_image_url || team?.team_image_url || "",
+    sort_order: source.sort_order ?? team?.sort_order ?? 0,
+    is_active: source.is_active ?? team?.is_active ?? true,
+    contact_name: source.contact_name || team?.contact_name || "",
+    contact_email: source.contact_email || team?.contact_email || "",
+    contact_phone: source.contact_phone || team?.contact_phone || "",
+    contact_image_url: source.contact_image_url || team?.contact_image_url || "",
     fussball_de_matches_widget_code: "",
     fussball_de_table_widget_code: "",
-    fussball_de_matches_widget_id: team?.fussball_de_matches_widget_id || "",
-    fussball_de_table_widget_id: team?.fussball_de_table_widget_id || "",
+    fussball_de_matches_widget_id:
+      source.fussball_de_matches_widget_id || team?.fussball_de_matches_widget_id || "",
+    fussball_de_table_widget_id:
+      source.fussball_de_table_widget_id || team?.fussball_de_table_widget_id || "",
+    fussball_de_team_url: source.fussball_de_team_url || team?.fussball_de_team_url || "",
   };
 }
 
-export default function AdminTeamsForm({ team }) {
+export default function AdminTeamsForm({ team, seasons = [], teamSeasons = [] }) {
   const router = useRouter();
-  const [form, setForm] = useState(() => createInitialForm(team));
+  const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
+  const [form, setForm] = useState(() =>
+    createInitialForm(team, seasons, teamSeasons, initialSeason?.id),
+  );
   const [loading, setLoading] = useState(false);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateSeason(seasonId) {
+    const season = seasons.find((item) => item.id === seasonId);
+    setForm(createInitialForm(team, seasons, teamSeasons, season?.id));
   }
 
   async function uploadImage(file) {
@@ -84,6 +109,12 @@ export default function AdminTeamsForm({ team }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (!form.season_id) {
+      alert("Bitte zuerst eine Saison auswählen.");
+      return;
+    }
+
     setLoading(true);
 
     const payload = {
@@ -94,7 +125,7 @@ export default function AdminTeamsForm({ team }) {
       is_active: form.is_active,
     };
 
-    const { error } = await saveTeam(payload, team?.id ?? null);
+    const { error } = await saveTeamWithSeason(payload, team?.id ?? null);
     setLoading(false);
 
     if (error) {
@@ -108,13 +139,33 @@ export default function AdminTeamsForm({ team }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+      <FormSection
+        eyebrow="Saison"
+        title="Saison auswählen"
+        description="Wähle zuerst aus, für welche Saison diese Mannschaft bearbeitet werden soll. Saisonbezogene Daten werden getrennt gespeichert."
+      >
+        <SelectField
+          label="Saison"
+          required
+          value={form.season_id}
+          onChange={(event) => updateSeason(event.target.value)}
+        >
+          <option value="">Saison auswählen</option>
+          {seasons.map((season) => (
+            <option key={season.id} value={season.id}>
+              {season.name}{season.is_current ? " · aktuell" : ""}
+            </option>
+          ))}
+        </SelectField>
+      </FormSection>
+
       <FormSection eyebrow="Mannschaft" title="Grunddaten">
         <FormGrid>
           <InputField label="Name Deutsch" required value={form.name_de} onChange={(event) => updateField("name_de", event.target.value)} />
           <InputField label="Name Englisch" value={form.name_en} onChange={(event) => updateField("name_en", event.target.value)} />
           <InputField label="Slug" placeholder="e1" value={form.slug} onChange={(event) => updateField("slug", event.target.value)} />
           <InputField label="Altersgruppe" value={form.age_group} onChange={(event) => updateField("age_group", event.target.value)} />
-          <InputField label="Saison" value={form.season} onChange={(event) => updateField("season", event.target.value)} />
+          <InputField label="Saison" value={form.season} disabled />
         </FormGrid>
       </FormSection>
 
