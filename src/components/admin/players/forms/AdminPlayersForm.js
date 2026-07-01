@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FormActions, FormAlert, FormSection } from "@/components/admin/forms";
 import useEntityForm from "@/components/admin/hooks/useEntityForm";
@@ -26,8 +26,45 @@ import PlayerProfileFields from "./fields/PlayerProfileFields";
 import PlayerDescriptionFields from "./fields/PlayerDescriptionFields";
 import PlayerSettingsFields from "./fields/PlayerSettingsFields";
 
+const PLAYER_FORM_TABS = [
+  { id: "basic", label: "Grunddaten" },
+  { id: "sport", label: "Sport" },
+  { id: "profile", label: "Profil" },
+  { id: "description", label: "Beschreibung" },
+  { id: "media", label: "Medien" },
+  { id: "settings", label: "Einstellungen" },
+];
+
+function PlayerFormTabs({ activeTab, onChange }) {
+  return (
+    <div className="sticky top-4 z-10 rounded-[2rem] border border-white/10 bg-[#17171d]/95 p-3 backdrop-blur">
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {PLAYER_FORM_TABS.map((tab) => {
+          const isActive = activeTab === tab.id;
+
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => onChange(tab.id)}
+              className={`shrink-0 rounded-full px-5 py-3 text-sm font-black transition ${
+                isActive
+                  ? "bg-red-600 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPlayersForm({ player, teams = [] }) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("basic");
   const {
     form,
     setForm,
@@ -86,6 +123,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     const nextErrors = validateForm();
 
     if (Object.keys(nextErrors).length > 0) {
+      setActiveTab("basic");
       return;
     }
 
@@ -107,72 +145,86 @@ export default function AdminPlayersForm({ player, teams = [] }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
+      <PlayerFormTabs activeTab={activeTab} onChange={setActiveTab} />
+
       {hasErrors && <FormAlert>{REQUIRED_FIELDS_MESSAGE}</FormAlert>}
 
-      <FormSection
-        eyebrow="Spieler"
-        title="Persönliche Daten"
-        description="Grunddaten, Mannschaftszuordnung und Rückennummer des Spielers."
-      >
-        <PlayerBasicFields
-          form={form}
-          errors={errors}
-          teams={teams}
-          updateField={updateField}
-        />
-      </FormSection>
+      {activeTab === "basic" && (
+        <FormSection
+          eyebrow="Spieler"
+          title="Persönliche Daten"
+          description="Grunddaten, Mannschaftszuordnung und Rückennummer des Spielers."
+        >
+          <PlayerBasicFields
+            form={form}
+            errors={errors}
+            teams={teams}
+            updateField={updateField}
+          />
+        </FormSection>
+      )}
 
-      <FormSection
-        eyebrow="Sport"
-        title="Sportliche Angaben"
-        description="Position, englische Positionsbezeichnung und sportliche Zusatzinformationen."
-      >
-        <PlayerSportFields
-          form={form}
-          errors={errors}
-          positionOptions={positionOptions}
-          updateField={updateField}
-          updatePosition={updatePosition}
-        />
-      </FormSection>
+      {activeTab === "sport" && (
+        <FormSection
+          eyebrow="Sport"
+          title="Sportliche Angaben"
+          description="Position, englische Positionsbezeichnung und sportliche Zusatzinformationen."
+        >
+          <PlayerSportFields
+            form={form}
+            errors={errors}
+            positionOptions={positionOptions}
+            updateField={updateField}
+            updatePosition={updatePosition}
+          />
+        </FormSection>
+      )}
 
-      <FormSection
-        eyebrow="Profil"
-        title="Profilangaben"
-        description="Geburtsdatum, Jahrgang, Geschlecht, Nationalität und Vereinszugehörigkeit."
-      >
-        <PlayerProfileFields
-          form={form}
-          errors={errors}
-          calculatedYearGroup={calculatedYearGroup}
-          updateField={updateField}
-        />
-      </FormSection>
+      {activeTab === "profile" && (
+        <FormSection
+          eyebrow="Profil"
+          title="Profilangaben"
+          description="Geburtsdatum, Jahrgang, Geschlecht, Nationalität und Vereinszugehörigkeit."
+        >
+          <PlayerProfileFields
+            form={form}
+            errors={errors}
+            calculatedYearGroup={calculatedYearGroup}
+            updateField={updateField}
+          />
+        </FormSection>
+      )}
 
-      <FormSection
-        eyebrow="Beschreibung"
-        title="Spielerbeschreibung"
-        description="Optionale Texte für interne oder öffentliche Darstellungen."
-      >
-        <PlayerDescriptionFields form={form} updateField={updateField} />
-      </FormSection>
+      {activeTab === "description" && (
+        <FormSection
+          eyebrow="Beschreibung"
+          title="Spielerbeschreibung"
+          description="Optionale Texte für interne oder öffentliche Darstellungen."
+        >
+          <PlayerDescriptionFields form={form} updateField={updateField} />
+        </FormSection>
+      )}
 
-      <FormSection
-        eyebrow="Medien"
-        title="Spielerbild"
-        description="Das Bild wird in der Verwaltung, Mannschaftsübersicht und Spielerprofilseite verwendet."
-      >
-        <PlayerImageUpload
-          imageUrl={form.photo_url || PLAYER_PLACEHOLDER_IMAGE}
-          placeholderUrl={PLAYER_PLACEHOLDER_IMAGE}
-          onUpload={uploadImage}
-          onRemove={removeImage}
-        />
-      </FormSection>
+      {activeTab === "media" && (
+        <FormSection
+          eyebrow="Medien"
+          title="Spielerbild"
+          description="Das Bild wird in der Verwaltung, Mannschaftsübersicht und Spielerprofilseite verwendet."
+        >
+          <PlayerImageUpload
+            imageUrl={form.photo_url || PLAYER_PLACEHOLDER_IMAGE}
+            placeholderUrl={PLAYER_PLACEHOLDER_IMAGE}
+            onUpload={uploadImage}
+            onRemove={removeImage}
+          />
+        </FormSection>
+      )}
 
-      <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
-        <PlayerSettingsFields form={form} updateField={updateField} />
-      </FormSection>
+      {activeTab === "settings" && (
+        <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
+          <PlayerSettingsFields form={form} updateField={updateField} />
+        </FormSection>
+      )}
 
       <FormActions
         loading={loading}
