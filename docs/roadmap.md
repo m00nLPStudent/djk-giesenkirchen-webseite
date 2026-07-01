@@ -22,11 +22,38 @@ Es wird immer erst geprüft, welche Datenbankstruktur vorhanden ist. Danach werd
 - News
 - Mannschaften
 - Spieler
-- Trainer
+- Trainer / Betreuer
 - Medien
 - Termine
 - Turniere
 - Einstellungen
+
+## Modulstatus
+
+### Abgeschlossen
+
+- Projektbasis
+- Gemeinsame Admin-Grundlage
+- Spielermodul
+- Trainermodul
+- Mannschaftsmodul inkl. Saisonlogik
+
+### Technisch vorbereitet, aber pausiert
+
+- fussball.de Widgets für Spielplan und Tabelle
+
+Grund: Die finale Darstellung und Domain-Freigabe können erst sauber getestet werden, wenn die Website auf dem Server beziehungsweise auf der finalen Domain läuft.
+
+### Offen
+
+- News-Modul finalisieren
+- Termine / Kalender
+- Sponsoren
+- Vorstand
+- Medienverwaltung
+- Rollen- und Rechtesystem
+- Responsive Feinschliff für die komplette Website
+- Deployment / Server / Domain
 
 ## Nächste Schritte
 
@@ -56,6 +83,8 @@ Es wird immer erst geprüft, welche Datenbankstruktur vorhanden ist. Danach werd
 - [x] Filter- und Sortiersystem erstellen
 - [x] Code modularisieren
 - [x] Gemeinsame Admin-Bausteine nutzen
+- [x] Spielerformular in Reiterstruktur überführen
+- [x] Gemeinsame Tab-Navigation nutzen
 
 ### Phase 3: Trainermodul fertigstellen
 
@@ -73,6 +102,9 @@ Es wird immer erst geprüft, welche Datenbankstruktur vorhanden ist. Danach werd
 - [x] Mannschaftsübersicht in Trainerverwaltung erstellen
 - [x] Code modularisieren
 - [x] Gemeinsame Admin-Bausteine nutzen
+- [x] Trainerformular in Reiterstruktur überführen
+- [x] Gemeinsame Tab-Navigation nutzen
+- [x] Telefonnummern zentral lesbar formatieren
 
 ### Phase 4: Gemeinsame Admin-Grundlage
 
@@ -88,15 +120,48 @@ Es wird immer erst geprüft, welche Datenbankstruktur vorhanden ist. Danach werd
 - [x] Gemeinsames Repository-Grundgerüst
 - [x] Gemeinsame Listen-, Such- und Filterhelfer
 - [x] Gemeinsame Profil-Detail-Komponente
+- [x] Gemeinsame Tab-Navigation für Adminformulare
+- [x] Gemeinsame Telefonnummer-Helfer
 
-### Phase 5: Mannschaftsseiten erweitern
+### Phase 5: Mannschaftsmodul fertigstellen
 
+- [x] Mannschaften anlegen und bearbeiten
+- [x] Mannschaftsübersicht im Adminbereich
+- [x] Öffentliche Mannschaftsdetailseite
+- [x] Mannschaftsbild / Hero-Bereich
+- [x] Beschreibung unter Mannschaftsbild anzeigen
+- [x] Trainingsinformationen als Standard-Reiter anzeigen
 - [x] Spieler pro Mannschaft anzeigen
-- [ ] Trainer pro Mannschaft anzeigen
-- [ ] öffentliche Mannschaftsdetailseiten weiter ausbauen
-- [ ] Trainer- und Betreuerbereich auf Mannschaftsseiten integrieren
+- [x] Trainer und Betreuer pro Mannschaft anzeigen
+- [x] Kontaktbereich pro Mannschaft anzeigen
+- [x] Spielbetrieb als eigener Reiter
+- [x] fussball.de Spielplan als aufklappbare Kachel
+- [x] fussball.de Tabelle als aufklappbare Kachel
+- [x] responsive Anordnung der Spielbetrieb-Kacheln
+- [x] Saison-Tabelle `seasons` eingeführt
+- [x] Saison-Versionen über `team_seasons` eingeführt
+- [x] Spieler saisonabhängig über `player_team_seasons` zuordnen
+- [x] Trainer saisonabhängig über `coach_team_seasons` zuordnen
+- [x] Adminformular mit Reitern aufbauen
+- [x] Im Admin auswählen, welche Saison bearbeitet wird
+- [x] Im Admin auswählen, welche Saison öffentlich angezeigt wird
+- [x] Öffentliche Mannschaftsseite zeigt nur aktuelle Admin-Saison
+- [x] Admin-Mannschaftsübersicht zeigt aktuelle öffentliche Saison
+- [x] Code modularisieren und gemeinsame Komponenten nutzen
 
-### Phase 6: Weitere Adminmodule
+### Phase 6: fussball.de Integration finalisieren
+
+- [x] Widget-IDs im Admin speichern
+- [x] Spielplan-Widget technisch einbinden
+- [x] Tabellen-Widget technisch einbinden
+- [x] Widgets in aufklappbaren Kacheln anzeigen
+- [ ] Website auf Server / finale Domain bringen
+- [ ] Domain in fussball.de Widget-Konfiguration prüfen
+- [ ] Widget-Farben im fussball.de Generator final einstellen
+- [ ] Darstellung auf echter Domain testen
+- [ ] Responsive Feinschliff der Widgets
+
+### Phase 7: Weitere Adminmodule
 
 - [ ] Vorstand
 - [ ] Sponsoren
@@ -106,18 +171,31 @@ Es wird immer erst geprüft, welche Datenbankstruktur vorhanden ist. Danach werd
 - [ ] Rollen- und Rechtesystem
 - [ ] Beitragsstatus
 
-### Phase 7: Öffentliche Webseite ausbauen
+### Phase 8: Öffentliche Webseite ausbauen
 
-- Fußballbereich
-- Tischtennis
-- Damen-Gymnastik
-- Kontakt
-- Termine
-- Newsdetailseiten
+- [x] Fußballbereich Grundstruktur
+- [x] Mannschaftsdetailseiten
+- [x] Trainerprofilseiten
+- [ ] Newsdetailseiten
+- [ ] Termine
+- [ ] Kontakt
+- [ ] Tischtennis
+- [ ] Damen-Gymnastik
+- [ ] Sponsorenbereich
+
+### Phase 9: Abschluss / Deployment
+
+- [ ] Responsive Design gesamter Website prüfen
+- [ ] SEO-Grundlagen prüfen
+- [ ] Performance prüfen
+- [ ] Deployment vorbereiten
+- [ ] Server / Domain einrichten
+- [ ] Live-Test mit Supabase und Storage
+- [ ] football.de Live-Test durchführen
 
 ## Aktueller nächster Fokus
 
-Mannschaftsseiten weiter ausbauen und dort Spieler, Trainer und Betreuer sauber zusammenführen.
+Das Mannschaftsmodul ist abgeschlossen. Als nächstes sollte mit einem neuen Hauptmodul weitergemacht werden, sinnvollerweise News, Termine oder Sponsoren.
 
 ## Regel
 
