@@ -208,5 +208,5 @@ export async function removeTeam(team) {
     if (contactImageResult?.error) return contactImageResult;
   }
 
-  return await teamRepository.remove(team?.id);
+  return await supabase.rpc("remove_team_cascade", { team_uuid: team?.id });
 }
