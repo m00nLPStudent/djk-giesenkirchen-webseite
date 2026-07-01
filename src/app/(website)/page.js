@@ -59,12 +59,6 @@ function NewsCard({ item, featured = false }) {
 }
 
 export default async function Home() {
-  const { data: teams, error } = await supabase
-    .from("teams")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order");
-
   const { data: latestNews } = await supabase
     .from("news")
     .select("*")
@@ -78,7 +72,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
-      <section className="relative overflow-hidden px-6 pt-32 pb-20">
+      <section className="relative overflow-hidden px-6 pt-48 pb-24 md:pt-56">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#c4001a55,transparent_35%),linear-gradient(120deg,#101014_20%,#1b1b22_60%,#c4001a_140%)]" />
 
         <div className="relative z-10 mx-auto max-w-7xl">
@@ -119,44 +113,6 @@ export default async function Home() {
               </p>
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="bg-[#101014] px-6 py-24">
-        <div className="mx-auto max-w-7xl">
-          <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-            Fußballabteilung
-          </p>
-
-          <h2 className="mt-4 text-4xl font-black md:text-5xl">
-            Unsere Mannschaften
-          </h2>
-
-          {error && (
-            <p className="mt-6 text-red-400">
-              Mannschaften konnten nicht geladen werden.
-            </p>
-          )}
-
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {teams?.map((team) => (
-              <Link
-                href={`/fussball/${team.slug}`}
-                key={team.slug}
-                className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:bg-white/10"
-              >
-                <p className="text-xs uppercase tracking-[0.25em] text-white/50">
-                  {team.age_group}
-                </p>
-
-                <h3 className="mt-4 min-h-[96px] text-2xl font-black leading-tight">
-                  {team.name_de}
-                </h3>
-
-                <p className="mt-4 text-sm text-white/60">Mannschaft ansehen</p>
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
     </main>
