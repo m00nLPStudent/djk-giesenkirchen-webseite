@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NewsStatusBadge from "./NewsStatusBadge";
 import DeleteNewsButton from "@/components/admin/ui/DeleteNewsButton";
+import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
 
 export default function NewsCard({ item }) {
   return (
@@ -20,7 +21,7 @@ export default function NewsCard({ item }) {
       <div>
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-red-600/20 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-            {item.category || "Allgemein"}
+            {getNewsCategoryDisplay(item)}
           </span>
 
           <NewsStatusBadge
