@@ -50,7 +50,3 @@ export async function savePlayer(player, id = null) {
 
   return await playerRepository.upsert(payload, id);
 }
-
-export async function deletePlayerCompletely(player) {
-  return await playerRepository.removeWithImage(player);
-}
