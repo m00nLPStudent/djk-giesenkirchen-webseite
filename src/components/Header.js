@@ -4,7 +4,7 @@ import { Navigation } from "@/components/website/navigation";
 export default function Header() {
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/75 backdrop-blur">
-      <div className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4 pl-44 md:pl-56 lg:pl-60">
+      <div className="relative mx-auto flex max-w-7xl items-center gap-8 px-6 py-4 pl-44 md:pl-56 lg:pl-60">
         <Link
           href="/"
           className="group absolute left-6 top-1/2 z-20 -translate-y-[38%]"
@@ -17,11 +17,11 @@ export default function Header() {
           />
         </Link>
 
-        <Link href="/" className="block min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.32em] text-red-400">
+        <Link href="/" className="block w-[340px] shrink-0 min-w-0 xl:w-[390px]">
+          <p className="text-[0.68rem] font-black uppercase tracking-[0.32em] text-red-400">
             Gemeinsam. Stark.
           </p>
-          <h1 className="mt-1 text-2xl font-black leading-tight text-white md:text-3xl">
+          <h1 className="mt-1 truncate text-2xl font-black leading-tight text-white">
             Giesenkirchen
           </h1>
           <p className="mt-1 text-xs font-bold uppercase tracking-[0.24em] text-white/45">
@@ -29,7 +29,7 @@ export default function Header() {
           </p>
         </Link>
 
-        <div className="ml-auto">
+        <div className="flex min-w-0 flex-1 justify-end">
           <Navigation />
         </div>
       </div>
