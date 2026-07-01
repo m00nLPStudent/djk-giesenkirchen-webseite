@@ -19,6 +19,19 @@ import { createSlug } from "../utils/slug";
 import { uploadTeamImage, saveTeamWithSeason } from "../services/teams.service";
 import TeamFootballDeFields from "./fields/TeamFootballDeFields";
 
+const TEAM_FORM_TABS = [
+  { id: "season", label: "Saison" },
+  { id: "base", label: "Mannschaft" },
+  { id: "description", label: "Beschreibung" },
+  { id: "training", label: "Training" },
+  { id: "players", label: "Kader" },
+  { id: "staff", label: "Trainer" },
+  { id: "competition", label: "Spielbetrieb" },
+  { id: "contact", label: "Kontakt" },
+  { id: "media", label: "Medien" },
+  { id: "settings", label: "Einstellungen" },
+];
+
 function getCurrentSeason(seasons = []) {
   return seasons.find((season) => season.is_current) || seasons[0] || null;
 }
@@ -96,6 +109,33 @@ function SelectionList({ items = [], selectedIds = [], onChange, getLabel, getMe
   );
 }
 
+function TeamFormTabs({ activeTab, onChange }) {
+  return (
+    <div className="sticky top-4 z-10 rounded-[2rem] border border-white/10 bg-[#17171d]/95 p-3 backdrop-blur">
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {TEAM_FORM_TABS.map((tab) => {
+          const isActive = activeTab === tab.id;
+
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => onChange(tab.id)}
+              className={`shrink-0 rounded-full px-5 py-3 text-sm font-black transition ${
+                isActive
+                  ? "bg-red-600 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function createInitialForm({
   team,
   seasons = [],
@@ -150,6 +190,7 @@ export default function AdminTeamsForm({
 }) {
   const router = useRouter();
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
+  const [activeTab, setActiveTab] = useState("season");
   const [form, setForm] = useState(() =>
     createInitialForm({
       team,
@@ -215,6 +256,7 @@ export default function AdminTeamsForm({
 
     if (!form.season_id) {
       alert("Bitte zuerst eine Saison auswählen.");
+      setActiveTab("season");
       return;
     }
 
@@ -242,98 +284,125 @@ export default function AdminTeamsForm({
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-      <FormSection
-        eyebrow="Saison"
-        title="Saison auswählen"
-        description="Wähle zuerst aus, für welche Saison diese Mannschaft bearbeitet werden soll. Saisonbezogene Daten werden getrennt gespeichert."
-      >
-        <SelectField
-          label="Saison"
-          required
-          value={form.season_id}
-          onChange={(event) => updateSeason(event.target.value)}
+      <TeamFormTabs activeTab={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "season" && (
+        <FormSection
+          eyebrow="Saison"
+          title="Saison auswählen"
+          description="Wähle zuerst aus, für welche Saison diese Mannschaft bearbeitet werden soll. Saisonbezogene Daten werden getrennt gespeichert."
         >
-          <option value="">Saison auswählen</option>
-          {seasons.map((season) => (
-            <option key={season.id} value={season.id}>
-              {season.name}{season.is_current ? " · aktuell" : ""}
-            </option>
-          ))}
-        </SelectField>
-      </FormSection>
+          <SelectField
+            label="Saison"
+            required
+            value={form.season_id}
+            onChange={(event) => updateSeason(event.target.value)}
+          >
+            <option value="">Saison auswählen</option>
+            {seasons.map((season) => (
+              <option key={season.id} value={season.id}>
+                {season.name}{season.is_current ? " · aktuell" : ""}
+              </option>
+            ))}
+          </SelectField>
+        </FormSection>
+      )}
 
-      <FormSection eyebrow="Mannschaft" title="Grunddaten">
-        <FormGrid>
-          <InputField label="Name Deutsch" required value={form.name_de} onChange={(event) => updateField("name_de", event.target.value)} />
-          <InputField label="Name Englisch" value={form.name_en} onChange={(event) => updateField("name_en", event.target.value)} />
-          <InputField label="Slug" placeholder="e1" value={form.slug} onChange={(event) => updateField("slug", event.target.value)} />
-          <InputField label="Altersgruppe" value={form.age_group} onChange={(event) => updateField("age_group", event.target.value)} />
-          <InputField label="Saison" value={form.season} disabled />
-        </FormGrid>
-      </FormSection>
+      {activeTab === "base" && (
+        <FormSection eyebrow="Mannschaft" title="Grunddaten">
+          <FormGrid>
+            <InputField label="Name Deutsch" required value={form.name_de} onChange={(event) => updateField("name_de", event.target.value)} />
+            <InputField label="Name Englisch" value={form.name_en} onChange={(event) => updateField("name_en", event.target.value)} />
+            <InputField label="Slug" placeholder="e1" value={form.slug} onChange={(event) => updateField("slug", event.target.value)} />
+            <InputField label="Altersgruppe" value={form.age_group} onChange={(event) => updateField("age_group", event.target.value)} />
+            <InputField label="Saison" value={form.season} disabled />
+          </FormGrid>
+        </FormSection>
+      )}
 
-      <FormSection eyebrow="Beschreibung" title="Texte & Trainingszeiten">
-        <div className="space-y-4">
-          <TextareaField label="Beschreibung Deutsch" rows={5} value={form.description_de} onChange={(event) => updateField("description_de", event.target.value)} />
-          <TextareaField label="Beschreibung Englisch" rows={5} value={form.description_en} onChange={(event) => updateField("description_en", event.target.value)} />
-          <TextareaField label="Trainingszeiten Deutsch" rows={3} value={form.training_times_de} onChange={(event) => updateField("training_times_de", event.target.value)} />
-          <TextareaField label="Trainingszeiten Englisch" rows={3} value={form.training_times_en} onChange={(event) => updateField("training_times_en", event.target.value)} />
-        </div>
-      </FormSection>
+      {activeTab === "description" && (
+        <FormSection eyebrow="Beschreibung" title="Mannschaftsbeschreibung">
+          <div className="space-y-4">
+            <TextareaField label="Beschreibung Deutsch" rows={8} value={form.description_de} onChange={(event) => updateField("description_de", event.target.value)} />
+            <TextareaField label="Beschreibung Englisch" rows={8} value={form.description_en} onChange={(event) => updateField("description_en", event.target.value)} />
+          </div>
+        </FormSection>
+      )}
 
-      <FormSection
-        eyebrow="Kader"
-        title="Spieler dieser Saison"
-        description="Wähle aus, welche zentral angelegten Spieler in dieser Saison zu dieser Mannschaft gehören."
-      >
-        <SelectionList
-          items={players}
-          selectedIds={form.selected_player_ids}
-          onChange={(value) => updateField("selected_player_ids", value)}
-          getLabel={getPersonName}
-          getMeta={(player) => [player.position_de, player.year_group].filter(Boolean).join(" · ")}
-          emptyText="Es sind noch keine Spieler angelegt."
-        />
-      </FormSection>
+      {activeTab === "training" && (
+        <FormSection eyebrow="Training" title="Trainingsinformationen">
+          <div className="space-y-4">
+            <TextareaField label="Trainingszeiten Deutsch" rows={5} value={form.training_times_de} onChange={(event) => updateField("training_times_de", event.target.value)} />
+            <TextareaField label="Trainingszeiten Englisch" rows={5} value={form.training_times_en} onChange={(event) => updateField("training_times_en", event.target.value)} />
+          </div>
+        </FormSection>
+      )}
 
-      <FormSection
-        eyebrow="Team"
-        title="Trainer & Betreuer dieser Saison"
-        description="Wähle aus, welche zentral angelegten Trainer oder Betreuer in dieser Saison zu dieser Mannschaft gehören."
-      >
-        <SelectionList
-          items={coaches}
-          selectedIds={form.selected_coach_ids}
-          onChange={(value) => updateField("selected_coach_ids", value)}
-          getLabel={getPersonName}
-          getMeta={(coach) => [coach.role_de, coach.license].filter(Boolean).join(" · ")}
-          emptyText="Es sind noch keine Trainer oder Betreuer angelegt."
-        />
-      </FormSection>
+      {activeTab === "players" && (
+        <FormSection
+          eyebrow="Kader"
+          title="Spieler dieser Saison"
+          description="Wähle aus, welche zentral angelegten Spieler in dieser Saison zu dieser Mannschaft gehören."
+        >
+          <SelectionList
+            items={players}
+            selectedIds={form.selected_player_ids}
+            onChange={(value) => updateField("selected_player_ids", value)}
+            getLabel={getPersonName}
+            getMeta={(player) => [player.position_de, player.year_group].filter(Boolean).join(" · ")}
+            emptyText="Es sind noch keine Spieler angelegt."
+          />
+        </FormSection>
+      )}
 
-      <FormSection eyebrow="Spielbetrieb" title="fussball.de Integration" description="Widget-Code aus fussball.de einfügen. Gespeichert werden automatisch nur die Widget-IDs.">
-        <TeamFootballDeFields form={form} updateField={updateField} />
-      </FormSection>
+      {activeTab === "staff" && (
+        <FormSection
+          eyebrow="Team"
+          title="Trainer & Betreuer dieser Saison"
+          description="Wähle aus, welche zentral angelegten Trainer oder Betreuer in dieser Saison zu dieser Mannschaft gehören."
+        >
+          <SelectionList
+            items={coaches}
+            selectedIds={form.selected_coach_ids}
+            onChange={(value) => updateField("selected_coach_ids", value)}
+            getLabel={getPersonName}
+            getMeta={(coach) => [coach.role_de, coach.license].filter(Boolean).join(" · ")}
+            emptyText="Es sind noch keine Trainer oder Betreuer angelegt."
+          />
+        </FormSection>
+      )}
 
-      <FormSection eyebrow="Kontakt" title="Ansprechpartner">
-        <div className="space-y-4">
-          <InputField label="Ansprechpartner" value={form.contact_name} onChange={(event) => updateField("contact_name", event.target.value)} />
-          <EmailField value={form.contact_email} onChange={(value) => updateField("contact_email", value)} />
-          <PhoneField value={form.contact_phone} onChange={(value) => updateField("contact_phone", value)} />
-          <TeamLogoUpload imageUrl={form.contact_image_url} onUpload={uploadContactImage} onRemove={() => updateField("contact_image_url", "")} />
-        </div>
-      </FormSection>
+      {activeTab === "competition" && (
+        <FormSection eyebrow="Spielbetrieb" title="fussball.de Integration" description="Widget-Code aus fussball.de einfügen. Gespeichert werden automatisch nur die Widget-IDs.">
+          <TeamFootballDeFields form={form} updateField={updateField} />
+        </FormSection>
+      )}
 
-      <FormSection eyebrow="Medien" title="Mannschaftsbild">
-        <TeamLogoUpload imageUrl={form.team_image_url} onUpload={uploadImage} onRemove={() => updateField("team_image_url", "")} />
-      </FormSection>
+      {activeTab === "contact" && (
+        <FormSection eyebrow="Kontakt" title="Ansprechpartner">
+          <div className="space-y-4">
+            <InputField label="Ansprechpartner" value={form.contact_name} onChange={(event) => updateField("contact_name", event.target.value)} />
+            <EmailField value={form.contact_email} onChange={(value) => updateField("contact_email", value)} />
+            <PhoneField value={form.contact_phone} onChange={(value) => updateField("contact_phone", value)} />
+            <TeamLogoUpload imageUrl={form.contact_image_url} onUpload={uploadContactImage} onRemove={() => updateField("contact_image_url", "")} />
+          </div>
+        </FormSection>
+      )}
 
-      <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
-        <div className="space-y-6">
-          <SortOrderField value={form.sort_order} onChange={(value) => updateField("sort_order", value)} />
-          <ActiveStatusField checked={form.is_active} onChange={(value) => updateField("is_active", value)} entityLabel="Mannschaft" />
-        </div>
-      </FormSection>
+      {activeTab === "media" && (
+        <FormSection eyebrow="Medien" title="Mannschaftsbild">
+          <TeamLogoUpload imageUrl={form.team_image_url} onUpload={uploadImage} onRemove={() => updateField("team_image_url", "")} />
+        </FormSection>
+      )}
+
+      {activeTab === "settings" && (
+        <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
+          <div className="space-y-6">
+            <SortOrderField value={form.sort_order} onChange={(value) => updateField("sort_order", value)} />
+            <ActiveStatusField checked={form.is_active} onChange={(value) => updateField("is_active", value)} entityLabel="Mannschaft" />
+          </div>
+        </FormSection>
+      )}
 
       <FormActions loading={loading} submitLabel="Mannschaft speichern" cancelHref="/admin/teams" />
     </form>
