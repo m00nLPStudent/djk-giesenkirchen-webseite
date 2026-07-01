@@ -13,10 +13,10 @@ export default function Header() {
           />
 
           <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-red-400">
-              DJK/VfL
+            <p className="text-[0.62rem] font-black uppercase tracking-[0.28em] text-red-400">
+              Gemeinsam. Stark.
             </p>
-            <h1 className="text-lg font-bold text-white">
+            <h1 className="text-lg font-bold leading-tight text-white">
               Giesenkirchen 05/09 e.V.
             </h1>
           </div>
