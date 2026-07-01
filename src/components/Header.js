@@ -4,7 +4,7 @@ import { Navigation } from "@/components/website/navigation";
 export default function Header() {
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/75 backdrop-blur">
-      <div className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-5 pl-36 md:pl-44 lg:pl-48">
+      <div className="relative mx-auto flex max-w-7xl items-center justify-between px-6 py-4 pl-44 md:pl-56 lg:pl-60">
         <Link
           href="/"
           className="group absolute left-6 top-1/2 z-20 -translate-y-[38%]"
