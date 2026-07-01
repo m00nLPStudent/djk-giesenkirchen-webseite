@@ -1,12 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import {
   TeamHero,
-  TeamIntroCard,
-  TeamInfoGrid,
-  TeamCompetitionSection,
-  TeamCoachSection,
-  TeamPlayerSection,
   TeamSeasonSelector,
+  TeamDetailTabs,
 } from "@/components/website/team";
 
 function mergeTeamSeason(team, teamSeason, season) {
@@ -142,12 +138,15 @@ export default async function TeamPage({ params, searchParams }) {
             seasons={seasonList}
             selectedSeason={selectedSeason}
           />
+
           <TeamHero team={displayTeam} />
-          <TeamIntroCard team={displayTeam} />
-          <TeamInfoGrid team={displayTeam} />
-          <TeamCompetitionSection team={displayTeam} />
-          <TeamCoachSection coaches={coaches || []} />
-          <TeamPlayerSection players={players || []} teamSlug={slug} />
+
+          <TeamDetailTabs
+            team={displayTeam}
+            coaches={coaches || []}
+            players={players || []}
+            teamSlug={slug}
+          />
         </div>
       </section>
     </main>
