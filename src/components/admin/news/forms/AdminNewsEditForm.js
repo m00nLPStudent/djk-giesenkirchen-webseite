@@ -4,8 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import NewsImageUpload from "../components/NewsImageUpload";
 import { uploadNewsImage, updateNews } from "../services/news.service";
+import NewsCategoryFields, { getCategoryKeyFromLabel } from "./NewsCategoryFields";
 
-export default function AdminNewsEditForm({ news }) {
+function formatDateTimeLocal(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 16);
+}
+
+export default function AdminNewsEditForm({ news, teams = [] }) {
   const router = useRouter();
 
   const [form, setForm] = useState({
@@ -16,9 +24,11 @@ export default function AdminNewsEditForm({ news }) {
     content_de: news?.content_de || "",
     content_en: news?.content_en || "",
     category: news?.category || "Verein",
+    category_key: news?.category_key || getCategoryKeyFromLabel(news?.category || "Verein"),
+    football_team_id: news?.football_team_id || "",
     image_url: news?.image_url || "",
     is_published: news?.is_published ?? true,
-    published_at: news?.published_at || "",
+    published_at: formatDateTimeLocal(news?.published_at),
   });
 
   const [loading, setLoading] = useState(false);
@@ -53,6 +63,7 @@ export default function AdminNewsEditForm({ news }) {
 
     const { error } = await updateNews(news.id, {
       ...form,
+      football_team_id: form.category_key === "fussball" ? form.football_team_id || null : null,
       is_published: form.is_published,
       published_at: publishedAt,
     });
@@ -85,12 +96,7 @@ export default function AdminNewsEditForm({ news }) {
         className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
       />
 
-      <input
-        placeholder="Kategorie"
-        value={form.category}
-        onChange={(e) => updateField("category", e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-white/5 p-4"
-      />
+      <NewsCategoryFields form={form} teams={teams} updateField={updateField} />
 
       <textarea
         placeholder="Teaser Deutsch"
@@ -152,8 +158,7 @@ export default function AdminNewsEditForm({ news }) {
         />
 
         <p className="mt-2 text-sm text-white/40">
-          Leer lassen = direkte Veröffentlichung. Datum in der Zukunft =
-          geplante Veröffentlichung.
+          Leer lassen = direkte Veröffentlichung. Datum in der Zukunft = geplante Veröffentlichung.
         </p>
       </div>
 
