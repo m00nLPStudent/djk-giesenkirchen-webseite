@@ -39,11 +39,3 @@ export async function saveCoach(coach, id = null) {
 
   return await coachRepository.upsert(payload, id);
 }
-
-export async function deleteCoachCompletely(coach) {
-  return await coachRepository.removeWithImage(coach);
-}
-
-export async function deleteCoach(id) {
-  return await coachRepository.remove(id);
-}
