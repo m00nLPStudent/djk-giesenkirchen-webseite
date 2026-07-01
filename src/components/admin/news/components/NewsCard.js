@@ -50,7 +50,7 @@ export default function NewsCard({ item }) {
             Bearbeiten
           </Link>
 
-          <DeleteNewsButton id={item.id} />
+          <DeleteNewsButton id={item.id} title={item.title_de} />
         </div>
       </div>
     </div>
