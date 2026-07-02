@@ -22,3 +22,7 @@ export async function removeTeamRecord(team) {
 export async function removeNewsRecord(news) {
   return await removeEntity("news", news?.id);
 }
+
+export async function removeBoardMemberRecord(member) {
+  return await removeEntity("board_member", member?.id);
+}
