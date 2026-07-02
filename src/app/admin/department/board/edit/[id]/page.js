@@ -11,9 +11,15 @@ export default async function EditBoardMemberPage({ params }) {
     .eq("id", id)
     .single();
 
+  const { data: roles } = await supabase
+    .from("board_roles")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+
   return (
     <AdminLayout title="Vorstandsmitglied bearbeiten" subtitle="Abteilung">
-      <AdminBoardMemberForm member={member} />
+      <AdminBoardMemberForm member={member} roles={roles || []} />
     </AdminLayout>
   );
 }
