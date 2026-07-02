@@ -19,6 +19,7 @@ export async function deleteBoardImage(imageUrl) {
 
 export async function saveBoardMember(member, id = null) {
   const payload = {
+    role_id: member.role_id || null,
     first_name: member.first_name || null,
     last_name: member.last_name || null,
     role_de: member.role_de || null,
