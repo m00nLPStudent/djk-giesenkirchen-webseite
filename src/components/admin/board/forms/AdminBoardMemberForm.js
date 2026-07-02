@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ActiveStatusField, EmailField, FormActions, FormGrid, FormSection, InputField, PhoneField, SortOrderField } from "@/components/admin/forms";
+import { ActiveStatusField, EmailField, FormActions, FormGrid, FormSection, InputField, PhoneField, SelectField, SortOrderField } from "@/components/admin/forms";
 import BoardMemberImageUpload from "../components/BoardMemberImageUpload";
 import { BOARD_PLACEHOLDER_IMAGE, saveBoardMember, uploadBoardImage } from "../services/board.service";
 
-export default function AdminBoardMemberForm({ member }) {
+export default function AdminBoardMemberForm({ member, roles = [] }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
+    role_id: member?.role_id || "",
     first_name: member?.first_name || "",
     last_name: member?.last_name || "",
     role_de: member?.role_de || "",
@@ -23,6 +24,16 @@ export default function AdminBoardMemberForm({ member }) {
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateRole(roleId) {
+    const role = roles.find((item) => item.id === roleId);
+    setForm((current) => ({
+      ...current,
+      role_id: roleId,
+      role_de: role?.name_de || "",
+      role_en: role?.name_en || "",
+    }));
   }
 
   async function uploadImage(file) {
@@ -55,7 +66,12 @@ export default function AdminBoardMemberForm({ member }) {
         <FormGrid>
           <InputField label="Vorname" required value={form.first_name} onChange={(event) => updateField("first_name", event.target.value)} />
           <InputField label="Nachname" required value={form.last_name} onChange={(event) => updateField("last_name", event.target.value)} />
-          <InputField label="Funktion" required value={form.role_de} onChange={(event) => updateField("role_de", event.target.value)} />
+          <SelectField label="Funktion" required value={form.role_id} onChange={(event) => updateRole(event.target.value)}>
+            <option value="">Funktion auswählen</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.id}>{role.name_de}</option>
+            ))}
+          </SelectField>
           <InputField label="Funktion Englisch" value={form.role_en} onChange={(event) => updateField("role_en", event.target.value)} />
         </FormGrid>
       </FormSection>
