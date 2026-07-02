@@ -47,7 +47,8 @@ export default async function FootballDepartmentPage() {
               <DepartmentPersonCard
                 key={coach.id}
                 person={coach}
-                meta={[getCoachTeam(coach), coach.license].filter(Boolean).join(" · ")}
+                imageBadge={getCoachTeam(coach)}
+                meta={coach.license}
               />
             ))}
           </div>
