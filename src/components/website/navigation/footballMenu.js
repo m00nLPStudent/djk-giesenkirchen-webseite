@@ -12,8 +12,8 @@ export const footballMenuItems = [
     label: "Abteilung",
     href: "/fussball/abteilung",
     children: [
-      { label: "Vorstand", href: "/fussball/abteilung#vorstand" },
-      { label: "Trainer", href: "/fussball/abteilung#trainer" },
+      { label: "Vorstand", href: "/fussball/abteilung/vorstand" },
+      { label: "Trainer", href: "/fussball/abteilung/trainer" },
     ],
   },
   {
