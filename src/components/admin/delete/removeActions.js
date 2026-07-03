@@ -26,3 +26,7 @@ export async function removeNewsRecord(news) {
 export async function removeBoardMemberRecord(member) {
   return await removeEntity("board_member", member?.id);
 }
+
+export async function removeSponsorRecord(sponsor) {
+  return await removeEntity("sponsor", sponsor?.id);
+}
