@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, Newspaper, Shield, UserRound, Users, Building2 } from "lucide-react";
+import { Plus, Newspaper, Shield, UserRound, Users, Building2, Handshake } from "lucide-react";
 
 export default function AdminCreateMenu() {
   const [open, setOpen] = useState(false);
@@ -23,6 +23,10 @@ export default function AdminCreateMenu() {
           <Link href="/admin/news/new" className="flex items-center gap-3 px-5 py-4 font-bold text-white/80 hover:bg-white/5 hover:text-white">
             <Newspaper size={18} />
             Neue News
+          </Link>
+          <Link href="/admin/sponsors/new" className="flex items-center gap-3 px-5 py-4 font-bold text-white/80 hover:bg-white/5 hover:text-white">
+            <Handshake size={18} />
+            Neuer Sponsor
           </Link>
           <Link href="/admin/department/board/new" className="flex items-center gap-3 px-5 py-4 font-bold text-white/80 hover:bg-white/5 hover:text-white">
             <Building2 size={18} />
