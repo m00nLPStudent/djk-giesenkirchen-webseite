@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Music2 } from "lucide-react";
+import { Instagram, Music2, Share2 } from "lucide-react";
 
 function SocialLink({ href, label, children }) {
   if (!href) return null;
@@ -30,7 +30,7 @@ export default function SponsorCard({ sponsor }) {
         <h3 className="text-2xl font-black">{sponsor.name}</h3>
         {sponsor.description_de && <p className="mt-3 text-sm leading-6 text-white/55">{sponsor.description_de}</p>}
         <div className="mt-6 flex gap-3">
-          <SocialLink href={sponsor.facebook_url} label={`${sponsor.name} auf Facebook`}><Facebook size={18} /></SocialLink>
+          <SocialLink href={sponsor.facebook_url} label={`${sponsor.name} auf Facebook`}><Share2 size={18} /></SocialLink>
           <SocialLink href={sponsor.instagram_url} label={`${sponsor.name} auf Instagram`}><Instagram size={18} /></SocialLink>
           <SocialLink href={sponsor.tiktok_url} label={`${sponsor.name} auf TikTok`}><Music2 size={18} /></SocialLink>
         </div>
