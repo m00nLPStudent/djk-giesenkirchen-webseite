@@ -16,6 +16,8 @@ Diese Datei sammelt größere Änderungen am Projekt.
 - zentrale Löschlogik eingeführt
 - Startseite und Navigation überarbeitet
 - Dokumentationsstruktur erweitert
+- Abteilungsmodul mit Vorstand, Vorstandsfunktionen und Trainerübersicht fertiggestellt
+- Öffentliche Abteilungsseiten modularisiert
 
 ## Regel
 
