@@ -18,6 +18,8 @@ Diese Datei sammelt größere Änderungen am Projekt.
 - Dokumentationsstruktur erweitert
 - Abteilungsmodul mit Vorstand, Vorstandsfunktionen und Trainerübersicht fertiggestellt
 - Öffentliche Abteilungsseiten modularisiert
+- Sponsorenmodul mit Kategorien, Banner-Upload, Social-Media-Links und öffentlicher Sponsorenübersicht fertiggestellt
+- Sponsoren-Komponenten modularisiert und SocialLinks als gemeinsames Modul eingeführt
 
 ## Regel
 
