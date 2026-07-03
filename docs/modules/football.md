@@ -2,9 +2,9 @@
 
 ## Status
 
-Mannschaftsmodul abgeschlossen, fussball.de Integration technisch vorbereitet.
+Mannschaftsmodul und Abteilungsmodul abgeschlossen. fussball.de Integration ist technisch vorbereitet und wird final auf der Live-Domain geprüft.
 
-## Funktionen
+## Öffentliche Funktionen
 
 - Fußballbereich auf der öffentlichen Website
 - Mannschaftsdetailseiten
@@ -15,6 +15,18 @@ Mannschaftsmodul abgeschlossen, fussball.de Integration technisch vorbereitet.
 - Kontaktbereich
 - Spielbetrieb-Reiter
 - fussball.de Spielplan und Tabelle als aufklappbare Kacheln
+- Abteilungsübersicht
+- separate Vorstandsseite
+- separate Trainer- und Betreuerseite
+
+## Admin-Funktionen
+
+- Mannschaften erstellen und bearbeiten
+- Spieler und Trainer saisonabhängig zuordnen
+- Vorstandsmitglieder erstellen, bearbeiten und löschen
+- Vorstandsfunktionen über Datenbank-Dropdown auswählen
+- englische Funktionsbezeichnung automatisch übernehmen
+- zentrales Löschmodul für Vorstandsmitglieder
 
 ## Datenbank
 
@@ -24,6 +36,15 @@ Mannschaftsmodul abgeschlossen, fussball.de Integration technisch vorbereitet.
 - `team_seasons`
 - `player_team_seasons`
 - `coach_team_seasons`
+- `board_members`
+- `board_roles`
+
+## Wiederverwendbare Komponenten
+
+- `DepartmentPageLayout`
+- `DepartmentPersonCard`
+- `DepartmentPersonGrid`
+- `department.helpers.js`
 
 ## Pausiert
 
