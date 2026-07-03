@@ -2,11 +2,11 @@
 
 ## Status
 
-In Arbeit.
+Abgeschlossen.
 
 ## Ziel
 
-Sponsoren der Fußballabteilung sollen öffentlich sichtbar und im Adminbereich pflegbar sein.
+Sponsoren der Fußballabteilung sind öffentlich sichtbar und im Adminbereich vollständig pflegbar.
 
 ## Öffentliche Seite
 
@@ -25,8 +25,10 @@ Jeder Sponsor wird als einheitliche Karte dargestellt:
 - Banner/Logo in einheitlicher Größe
 - Name
 - Beschreibung
-- Link zur Webseite über die Karte
+- Banner/Logo optional als Link zur Webseite
+- zusätzlicher Button „Webseite besuchen“
 - Social-Media-Icons für Facebook, Instagram und TikTok
+- keine verschachtelten Links, damit kein Hydration-Fehler entsteht
 
 ## Adminbereich
 
@@ -68,6 +70,40 @@ Wichtige Felder:
 - `tiktok_url`
 - `is_active`
 - `sort_order`
+
+## Wiederverwendbare Komponenten
+
+Öffentliche Website:
+
+- `SponsorCard`
+- `SponsorBanner`
+- `SponsorActions`
+- `SponsorGrid`
+- `SponsorSection`
+- `SponsorTabs`
+- `SocialLinks`
+
+Adminbereich:
+
+- `AdminSponsorForm`
+- `AdminSponsorList`
+- `SponsorCard`
+- `SponsorImageUpload`
+- `sponsors.service.js`
+
+## Social Media
+
+Social-Media-Ausgaben laufen über das gemeinsame Modul:
+
+```text
+src/components/common/SocialLinks
+```
+
+Aktuell unterstützt:
+
+- Facebook
+- Instagram
+- TikTok
 
 ## Löschlogik
 
