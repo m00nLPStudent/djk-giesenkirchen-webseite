@@ -25,6 +25,7 @@
 - Saisonverwaltung für Mannschaften
 - News-Grundstruktur
 - Abteilungsmodul mit Vorstand und Trainerteam
+- Sponsorenmodul mit Kategorien, Banner-Upload und Social-Media-Links
 
 ## Öffentliche Website
 
@@ -37,3 +38,4 @@
 - Abteilungsübersicht
 - Vorstandsseite
 - Trainer- und Betreuerseite
+- Sponsorenübersicht mit Mannschaftssponsoren, Bannersponsoren und allgemeinen Sponsoren
