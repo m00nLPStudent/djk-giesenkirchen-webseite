@@ -13,6 +13,7 @@ import {
   Trophy,
   Settings,
   Building2,
+  Handshake,
 } from "lucide-react";
 
 const logoUrl =
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/news", label: "News", icon: Newspaper },
   { href: "/admin/department", label: "Abteilung", icon: Building2 },
+  { href: "/admin/sponsors", label: "Sponsoren", icon: Handshake },
   { href: "/admin/teams", label: "Mannschaften", icon: Shield },
   { href: "/admin/coaches", label: "Trainer", icon: UserRound },
   { href: "/admin/players", label: "Spieler", icon: Users },
