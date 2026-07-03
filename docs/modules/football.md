@@ -2,7 +2,7 @@
 
 ## Status
 
-Mannschaftsmodul und Abteilungsmodul abgeschlossen. fussball.de Integration ist technisch vorbereitet und wird final auf der Live-Domain geprüft.
+Mannschaftsmodul, Abteilungsmodul und Sponsorenmodul abgeschlossen. fussball.de Integration ist technisch vorbereitet und wird final auf der Live-Domain geprüft.
 
 ## Öffentliche Funktionen
 
@@ -18,6 +18,7 @@ Mannschaftsmodul und Abteilungsmodul abgeschlossen. fussball.de Integration ist 
 - Abteilungsübersicht
 - separate Vorstandsseite
 - separate Trainer- und Betreuerseite
+- Sponsorenbereich mit Mannschaftssponsoren, Bannersponsoren und allgemeinen Sponsoren
 
 ## Admin-Funktionen
 
@@ -26,7 +27,11 @@ Mannschaftsmodul und Abteilungsmodul abgeschlossen. fussball.de Integration ist 
 - Vorstandsmitglieder erstellen, bearbeiten und löschen
 - Vorstandsfunktionen über Datenbank-Dropdown auswählen
 - englische Funktionsbezeichnung automatisch übernehmen
-- zentrales Löschmodul für Vorstandsmitglieder
+- Sponsoren erstellen, bearbeiten und löschen
+- Sponsor-Kategorie auswählen
+- Sponsor-Banner hochladen
+- Sponsor-Webseite und Social-Media-Links pflegen
+- zentrales Löschmodul für Vorstandsmitglieder und Sponsoren
 
 ## Datenbank
 
@@ -38,13 +43,27 @@ Mannschaftsmodul und Abteilungsmodul abgeschlossen. fussball.de Integration ist 
 - `coach_team_seasons`
 - `board_members`
 - `board_roles`
+- `sponsor_categories`
+- `sponsors`
 
 ## Wiederverwendbare Komponenten
+
+Abteilung:
 
 - `DepartmentPageLayout`
 - `DepartmentPersonCard`
 - `DepartmentPersonGrid`
 - `department.helpers.js`
+
+Sponsoren:
+
+- `SponsorCard`
+- `SponsorBanner`
+- `SponsorActions`
+- `SponsorGrid`
+- `SponsorSection`
+- `SponsorTabs`
+- `SocialLinks`
 
 ## Pausiert
 
