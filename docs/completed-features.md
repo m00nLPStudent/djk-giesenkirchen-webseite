@@ -24,6 +24,7 @@
 - Mannschaftsmodul
 - Saisonverwaltung für Mannschaften
 - News-Grundstruktur
+- Abteilungsmodul mit Vorstand und Trainerteam
 
 ## Öffentliche Website
 
@@ -33,3 +34,6 @@
 - Trainerprofile
 - News-Übersicht
 - News-Detailseite
+- Abteilungsübersicht
+- Vorstandsseite
+- Trainer- und Betreuerseite
