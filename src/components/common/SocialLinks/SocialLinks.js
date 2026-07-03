@@ -1,55 +1,20 @@
-import {
-  SiFacebook,
-  SiInstagram,
-  SiTiktok,
-  SiYoutube,
-  SiWhatsapp,
-  SiLinkedin,
-  SiX,
-} from "react-icons/si";
+import { SiFacebook, SiInstagram, SiTiktok } from "react-icons/si";
 
-const SOCIAL_CONFIG = {
-  facebook: {
-    label: "Facebook",
-    Icon: SiFacebook,
-  },
-  instagram: {
-    label: "Instagram",
-    Icon: SiInstagram,
-  },
-  tiktok: {
-    label: "TikTok",
-    Icon: SiTiktok,
-  },
-  youtube: {
-    label: "YouTube",
-    Icon: SiYoutube,
-  },
-  whatsapp: {
-    label: "WhatsApp",
-    Icon: SiWhatsapp,
-  },
-  linkedin: {
-    label: "LinkedIn",
-    Icon: SiLinkedin,
-  },
-  x: {
-    label: "X",
-    Icon: SiX,
-  },
+const socialConfig = {
+  facebook: { label: "Facebook", Icon: SiFacebook },
+  instagram: { label: "Instagram", Icon: SiInstagram },
+  tiktok: { label: "TikTok", Icon: SiTiktok },
 };
 
 export default function SocialLinks({ links = {}, name = "Profil", className = "" }) {
   const entries = Object.entries(links).filter(([, href]) => Boolean(href));
-
   if (!entries.length) return null;
 
   return (
     <div className={`flex flex-wrap gap-3 ${className}`}>
       {entries.map(([key, href]) => {
-        const config = SOCIAL_CONFIG[key];
+        const config = socialConfig[key];
         if (!config) return null;
-
         const Icon = config.Icon;
 
         return (
