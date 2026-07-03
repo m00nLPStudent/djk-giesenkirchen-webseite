@@ -1,17 +1,4 @@
-function SocialLink({ href, label, children }) {
-  if (!href) return null;
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs font-black text-white/70 transition hover:border-red-500 hover:bg-red-600 hover:text-white"
-    >
-      {children}
-    </a>
-  );
-}
+import SocialLinks from "@/components/common/SocialLinks";
 
 export default function SponsorCard({ sponsor }) {
   const image = sponsor.image_url;
@@ -27,11 +14,15 @@ export default function SponsorCard({ sponsor }) {
       <div className="p-6">
         <h3 className="text-2xl font-black">{sponsor.name}</h3>
         {sponsor.description_de && <p className="mt-3 text-sm leading-6 text-white/55">{sponsor.description_de}</p>}
-        <div className="mt-6 flex gap-3">
-          <SocialLink href={sponsor.facebook_url} label={`${sponsor.name} auf Facebook`}>FB</SocialLink>
-          <SocialLink href={sponsor.instagram_url} label={`${sponsor.name} auf Instagram`}>IG</SocialLink>
-          <SocialLink href={sponsor.tiktok_url} label={`${sponsor.name} auf TikTok`}>TT</SocialLink>
-        </div>
+        <SocialLinks
+          className="mt-6"
+          name={sponsor.name}
+          links={{
+            facebook: sponsor.facebook_url,
+            instagram: sponsor.instagram_url,
+            tiktok: sponsor.tiktok_url,
+          }}
+        />
       </div>
     </div>
   );
