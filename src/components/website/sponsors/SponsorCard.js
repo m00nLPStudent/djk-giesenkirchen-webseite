@@ -1,5 +1,3 @@
-import { Instagram, Music2, Share2 } from "lucide-react";
-
 function SocialLink({ href, label, children }) {
   if (!href) return null;
   return (
@@ -8,7 +6,7 @@ function SocialLink({ href, label, children }) {
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:border-red-500 hover:bg-red-600 hover:text-white"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xs font-black text-white/70 transition hover:border-red-500 hover:bg-red-600 hover:text-white"
     >
       {children}
     </a>
@@ -30,9 +28,9 @@ export default function SponsorCard({ sponsor }) {
         <h3 className="text-2xl font-black">{sponsor.name}</h3>
         {sponsor.description_de && <p className="mt-3 text-sm leading-6 text-white/55">{sponsor.description_de}</p>}
         <div className="mt-6 flex gap-3">
-          <SocialLink href={sponsor.facebook_url} label={`${sponsor.name} auf Facebook`}><Share2 size={18} /></SocialLink>
-          <SocialLink href={sponsor.instagram_url} label={`${sponsor.name} auf Instagram`}><Instagram size={18} /></SocialLink>
-          <SocialLink href={sponsor.tiktok_url} label={`${sponsor.name} auf TikTok`}><Music2 size={18} /></SocialLink>
+          <SocialLink href={sponsor.facebook_url} label={`${sponsor.name} auf Facebook`}>FB</SocialLink>
+          <SocialLink href={sponsor.instagram_url} label={`${sponsor.name} auf Instagram`}>IG</SocialLink>
+          <SocialLink href={sponsor.tiktok_url} label={`${sponsor.name} auf TikTok`}>TT</SocialLink>
         </div>
       </div>
     </div>
