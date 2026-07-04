@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FormActions,
@@ -12,9 +12,14 @@ import {
 } from "@/components/admin/forms";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import AdminImageUpload from "@/components/admin/media/AdminImageUpload";
+import EventDocumentsManager from "../components/EventDocumentsManager";
+import { createSlug } from "@/lib/slug";
 import {
   createEvent,
+  deleteEventDocument,
+  getEventDocuments,
   updateEvent,
+  uploadEventDocument,
   uploadEventImage,
 } from "../services/events.service";
 
@@ -23,6 +28,7 @@ const EVENT_FORM_TABS = [
   { id: "time", label: "Datum & Zeit" },
   { id: "location", label: "Ort" },
   { id: "media", label: "Medien" },
+  { id: "documents", label: "Dokumente" },
   { id: "settings", label: "Einstellungen" },
 ];
 
@@ -42,6 +48,8 @@ function formatDateTimeLocal(value) {
 }
 
 function createInitialEventForm(event) {
+  const initialSlug = event?.slug || createSlug(event?.title_de || "");
+
   return {
     title_de: event?.title_de || "",
     title_en: event?.title_en || "",
@@ -59,6 +67,7 @@ function createInitialEventForm(event) {
     team_id: event?.team_id || "",
     external_url: event?.external_url || "",
     image_url: event?.image_url || "",
+    slug: initialSlug,
     is_published: event?.is_published ?? false,
     is_featured: event?.is_featured ?? false,
     sort_order: event?.sort_order ?? 0,
@@ -72,12 +81,49 @@ function toIsoOrNull(value) {
   return date.toISOString();
 }
 
+function sortDocuments(items = []) {
+  return [...items].sort((a, b) => {
+    const sortA = a.sort_order || 0;
+    const sortB = b.sort_order || 0;
+    if (sortA !== sortB) return sortA - sortB;
+    return (
+      new Date(a.created_at || 0).getTime() -
+      new Date(b.created_at || 0).getTime()
+    );
+  });
+}
+
 export default function EventEditorForm({ event = null, teams = [] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
   const [form, setForm] = useState(() => createInitialEventForm(event));
   const [loading, setLoading] = useState(false);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [documents, setDocuments] = useState(() =>
+    sortDocuments(event?.event_documents || []),
+  );
   const isEdit = Boolean(event?.id);
+  const publicSlug = form.slug || createSlug(form.title_de);
+  const publicUrl = publicSlug ? `/termine/${publicSlug}` : "";
+
+  useEffect(() => {
+    async function loadDocuments() {
+      if (!isEdit || !event?.id) return;
+
+      setDocumentsLoading(true);
+      const { data, error } = await getEventDocuments(event.id);
+      setDocumentsLoading(false);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      setDocuments(sortDocuments(data || []));
+    }
+
+    void loadDocuments();
+  }, [event?.id, isEdit]);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -95,6 +141,32 @@ export default function EventEditorForm({ event = null, teams = [] }) {
     }
 
     updateField("image_url", data);
+  }
+
+  async function handleDocumentUpload(file) {
+    if (!event?.id) return;
+
+    const { data, error } = await uploadEventDocument(file, event.id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    if (data) {
+      setDocuments((current) => sortDocuments([...current, data]));
+    }
+  }
+
+  async function handleDocumentDelete(documentItem) {
+    const { error } = await deleteEventDocument(documentItem);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setDocuments((current) =>
+      current.filter((item) => item.id !== documentItem.id),
+    );
   }
 
   async function handleSubmit(submitEvent) {
@@ -131,6 +203,7 @@ export default function EventEditorForm({ event = null, teams = [] }) {
       team_id: form.team_id || null,
       external_url: form.external_url.trim() || null,
       image_url: form.image_url || null,
+      slug: publicSlug || null,
       is_published: Boolean(form.is_published),
       is_featured: Boolean(form.is_featured),
       sort_order: Number(form.sort_order || 0),
@@ -170,9 +243,13 @@ export default function EventEditorForm({ event = null, teams = [] }) {
               label="Titel Deutsch"
               required
               value={form.title_de}
-              onChange={(eventValue) =>
-                updateField("title_de", eventValue.target.value)
-              }
+              onChange={(eventValue) => {
+                const nextTitle = eventValue.target.value;
+                updateField("title_de", nextTitle);
+                if (!isEdit || !event?.slug || event.slug === form.slug) {
+                  updateField("slug", createSlug(nextTitle));
+                }
+              }}
             />
             <InputField
               label="Titel Englisch"
@@ -354,6 +431,29 @@ export default function EventEditorForm({ event = null, teams = [] }) {
         </FormSection>
       )}
 
+      {activeTab === "documents" && (
+        <FormSection
+          eyebrow="Dokumente"
+          title="Dateien zum Termin"
+          description="Anhänge für die öffentliche Termin-Detailseite verwalten."
+        >
+          {!isEdit ? (
+            <div className="rounded-[1.75rem] border border-dashed border-white/10 bg-black/10 p-8 text-center text-sm text-white/55">
+              Speichere den Termin zuerst, danach können Dokumente hochgeladen
+              werden.
+            </div>
+          ) : (
+            <EventDocumentsManager
+              documents={documents}
+              setDocuments={setDocuments}
+              onUploadDocument={handleDocumentUpload}
+              onDeleteDocument={handleDocumentDelete}
+              loading={documentsLoading}
+            />
+          )}
+        </FormSection>
+      )}
+
       {activeTab === "settings" && (
         <FormSection
           eyebrow="Einstellungen"
@@ -394,6 +494,15 @@ export default function EventEditorForm({ event = null, teams = [] }) {
                 updateField("sort_order", Number(eventValue.target.value || 0))
               }
             />
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+              Öffentlicher Link
+            </p>
+            <p className="mt-2 break-all text-sm text-white/70">
+              {publicUrl || "Slug wird automatisch aus dem Titel erzeugt."}
+            </p>
           </div>
         </FormSection>
       )}

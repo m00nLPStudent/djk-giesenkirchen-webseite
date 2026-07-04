@@ -90,6 +90,17 @@ export default function EventCard({ item }) {
           >
             Bearbeiten
           </Link>
+
+          {item.slug && (
+            <Link
+              href={`/termine/${item.slug}`}
+              className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-300 transition hover:border-red-400 hover:text-red-200"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Öffentliche Seite
+            </Link>
+          )}
         </div>
       </div>
     </div>

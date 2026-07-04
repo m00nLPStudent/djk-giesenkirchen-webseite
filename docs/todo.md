@@ -4,6 +4,17 @@ Diese Datei sammelt offene Aufgaben und technische Baustellen.
 
 ## Erledigt
 
+### Struktur-Review und Event-Phase 1
+
+- [x] To-do 1: Projektstruktur analysiert
+- [x] To-do 2: Duplikate identifiziert
+- [x] To-do 3: Datei-Helfer zentralisiert (`src/lib/files.js`)
+- [x] To-do 4: Storage-Helfer modularisiert (`src/lib/storage.js`)
+- [x] To-do 5: Docs-Struktur neu aufgebaut
+- [x] To-do 6: Abschlussdokumentation erstellt (`docs/development/project-health.md`)
+- [x] Termine SQL-Entwurf erstellt (`public.events`)
+- [x] Admin Events Phase 1 abgeschlossen (Liste, Neu, Bearbeiten, Service, Bild-Upload)
+
 ### Spielermodul
 
 - [x] Datenbankfelder final mit Code abgeglichen

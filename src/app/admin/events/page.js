@@ -1,14 +1,10 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminEventsList } from "@/components/admin/events";
-import { supabase } from "@/lib/supabase";
+import { getAdminEvents } from "@/components/admin/events/services/events.service";
 import Link from "next/link";
 
 export default async function AdminEventsPage() {
-  const { data: events } = await supabase
-    .from("events")
-    .select("*")
-    .order("starts_at", { ascending: true })
-    .order("created_at", { ascending: false });
+  const { data: events } = await getAdminEvents();
 
   return (
     <AdminLayout title="Termine verwalten" subtitle="Adminbereich">

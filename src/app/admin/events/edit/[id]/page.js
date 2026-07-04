@@ -8,7 +8,7 @@ export default async function EditEventPage({ params }) {
 
   const { data: event } = await supabase
     .from("events")
-    .select("*")
+    .select("*, event_documents(*)")
     .eq("id", id)
     .single();
 

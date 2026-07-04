@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
+import { HomeEventsSection } from "@/components/website/events";
+import { getUpcomingPublishedEvents } from "@/components/admin/events/services/events.service";
 
 export default async function Home() {
   const { data: latestNews } = await supabase
@@ -12,6 +14,7 @@ export default async function Home() {
 
   const featuredNews = latestNews?.[0];
   const secondaryNews = latestNews?.slice(1, 4) || [];
+  const { data: upcomingEvents } = await getUpcomingPublishedEvents(4);
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
@@ -41,11 +44,15 @@ export default async function Home() {
             </div>
           ) : (
             <div className="mt-12 rounded-[2rem] border border-white/10 bg-white/5 p-8">
-              <p className="text-lg text-white/65">Aktuell sind noch keine News veröffentlicht.</p>
+              <p className="text-lg text-white/65">
+                Aktuell sind noch keine News veröffentlicht.
+              </p>
             </div>
           )}
         </div>
       </section>
+
+      <HomeEventsSection events={upcomingEvents || []} />
     </main>
   );
 }
