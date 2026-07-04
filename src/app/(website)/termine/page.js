@@ -1,10 +1,16 @@
 import { EventsSection } from "@/components/website/events";
 import { getPublishedEvents } from "@/components/admin/events/services/events.service";
-import { splitEventsByTimeline } from "@/lib/events";
+import { expandRecurringEvents, splitEventsByTimeline } from "@/lib/events";
 
 export default async function EventsPage() {
   const { data: events } = await getPublishedEvents();
-  const { upcoming, past } = splitEventsByTimeline(events || []);
+  const now = new Date();
+  const expandedEvents = expandRecurringEvents(events || [], {
+    from: new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000),
+    to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+    maxOccurrencesPerEvent: 180,
+  });
+  const { upcoming, past } = splitEventsByTimeline(expandedEvents, now);
 
   return (
     <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-24 text-white">

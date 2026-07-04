@@ -19,7 +19,10 @@ export default function EventsSection({ title, eyebrow, events }) {
       ) : (
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           {events.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard
+              key={event.occurrence_id || `${event.id}-${event.starts_at}`}
+              event={event}
+            />
           ))}
         </div>
       )}

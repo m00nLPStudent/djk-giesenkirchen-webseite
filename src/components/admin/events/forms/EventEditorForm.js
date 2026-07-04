@@ -40,11 +40,26 @@ const EVENT_TYPES = [
   ["sonstiges", "Sonstiges"],
 ];
 
+const RECURRENCE_TYPES = [
+  ["none", "Keine Wiederholung"],
+  ["daily", "Täglich"],
+  ["weekly", "Wöchentlich"],
+  ["monthly", "Monatlich"],
+  ["yearly", "Jährlich"],
+];
+
 function formatDateTimeLocal(value) {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toISOString().slice(0, 16);
+}
+
+function formatDateLocal(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
 }
 
 function createInitialEventForm(event) {
@@ -68,6 +83,10 @@ function createInitialEventForm(event) {
     external_url: event?.external_url || "",
     image_url: event?.image_url || "",
     slug: initialSlug,
+    recurrence_type: event?.recurrence_type || "none",
+    recurrence_interval: event?.recurrence_interval ?? 1,
+    recurrence_until: formatDateLocal(event?.recurrence_until),
+    recurrence_count: event?.recurrence_count ?? "",
     is_published: event?.is_published ?? false,
     is_featured: event?.is_featured ?? false,
     sort_order: event?.sort_order ?? 0,
@@ -103,6 +122,7 @@ export default function EventEditorForm({ event = null, teams = [] }) {
     sortDocuments(event?.event_documents || []),
   );
   const isEdit = Boolean(event?.id);
+  const hasRecurrence = form.recurrence_type !== "none";
   const publicSlug = form.slug || createSlug(form.title_de);
   const publicUrl = publicSlug ? `/termine/${publicSlug}` : "";
 
@@ -204,6 +224,18 @@ export default function EventEditorForm({ event = null, teams = [] }) {
       external_url: form.external_url.trim() || null,
       image_url: form.image_url || null,
       slug: publicSlug || null,
+      recurrence_type: hasRecurrence ? form.recurrence_type : "none",
+      recurrence_interval: hasRecurrence
+        ? Math.max(1, Number(form.recurrence_interval || 1))
+        : null,
+      recurrence_until:
+        hasRecurrence && form.recurrence_until
+          ? toIsoOrNull(`${form.recurrence_until}T23:59`)
+          : null,
+      recurrence_count:
+        hasRecurrence && form.recurrence_count !== ""
+          ? Math.max(1, Number(form.recurrence_count || 1))
+          : null,
       is_published: Boolean(form.is_published),
       is_featured: Boolean(form.is_featured),
       sort_order: Number(form.sort_order || 0),
@@ -367,6 +399,72 @@ export default function EventEditorForm({ event = null, teams = [] }) {
             />
             Ganztägiger Termin
           </label>
+
+          <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-400">
+              Wiederholung
+            </p>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {RECURRENCE_TYPES.map(([value, label]) => (
+                <label
+                  key={value}
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-sm text-white/75"
+                >
+                  <input
+                    type="radio"
+                    name="recurrence_type"
+                    value={value}
+                    checked={form.recurrence_type === value}
+                    onChange={(eventValue) =>
+                      updateField("recurrence_type", eventValue.target.value)
+                    }
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+
+            {hasRecurrence && (
+              <div className="mt-5 grid gap-5 md:grid-cols-3">
+                <InputField
+                  label="Intervall"
+                  type="number"
+                  min="1"
+                  value={form.recurrence_interval}
+                  onChange={(eventValue) =>
+                    updateField(
+                      "recurrence_interval",
+                      Math.max(1, Number(eventValue.target.value || 1)),
+                    )
+                  }
+                />
+
+                <InputField
+                  label="Enddatum der Serie"
+                  type="date"
+                  value={form.recurrence_until}
+                  onChange={(eventValue) =>
+                    updateField("recurrence_until", eventValue.target.value)
+                  }
+                />
+
+                <InputField
+                  label="Maximale Wiederholungen"
+                  type="number"
+                  min="1"
+                  value={form.recurrence_count}
+                  onChange={(eventValue) => {
+                    const next = eventValue.target.value;
+                    updateField(
+                      "recurrence_count",
+                      next === "" ? "" : Math.max(1, Number(next)),
+                    );
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </FormSection>
       )}
 

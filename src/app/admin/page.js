@@ -6,6 +6,7 @@ import DashboardPlannedNews from "@/components/admin/dashboard/DashboardPlannedN
 import DashboardQuickActions from "@/components/admin/dashboard/DashboardQuickActions";
 import DashboardSystemStatus from "@/components/admin/dashboard/DashboardSystemStatus";
 import DashboardToday from "@/components/admin/dashboard/DashboardToday";
+import { expandRecurringEvents } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 
 async function getCount(table) {
@@ -40,6 +41,22 @@ export default async function AdminPage() {
     .order("published_at", { ascending: true })
     .limit(5);
 
+  const { data: dashboardEvents } = await supabase
+    .from("events")
+    .select(
+      "id, title_de, event_type, starts_at, ends_at, is_all_day, location_name, location_city, recurrence_type, recurrence_interval, recurrence_until, recurrence_count",
+    )
+    .eq("is_published", true)
+    .order("starts_at", { ascending: true })
+    .limit(100);
+
+  const now = new Date();
+  const upcomingEvents = expandRecurringEvents(dashboardEvents || [], {
+    from: now,
+    to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+    maxOccurrencesPerEvent: 120,
+  }).slice(0, 5);
+
   const counts = {
     news: newsCount,
     teams: teamsCount,
@@ -61,7 +78,7 @@ export default async function AdminPage() {
       <DashboardQuickActions />
 
       <div className="mt-10 grid gap-6 xl:grid-cols-2">
-        <DashboardToday />
+        <DashboardToday events={upcomingEvents} />
         <DashboardSystemStatus />
       </div>
     </AdminLayout>

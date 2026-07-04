@@ -1,8 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CalendarClock, CalendarDays, Download } from "lucide-react";
+import {
+  buildGoogleCalendarUrl,
+  buildOutlookCalendarUrl,
+} from "@/lib/calendar";
 import { formatFileSize } from "@/lib/files";
+import { buildGoogleMapsSearchUrl } from "@/lib/maps";
 import {
   formatEventDate,
+  formatRecurrenceText,
   formatEventTime,
   getEventTypeLabel,
 } from "@/lib/events";
@@ -36,6 +43,15 @@ export default async function EventDetailPage({ params }) {
   ]
     .filter(Boolean)
     .join(" · ");
+  const mapsUrl = buildGoogleMapsSearchUrl({
+    locationName: event.location_name,
+    locationAddress: event.location_address,
+    locationCity: event.location_city,
+  });
+  const googleCalendarUrl = buildGoogleCalendarUrl(event);
+  const outlookCalendarUrl = buildOutlookCalendarUrl(event);
+  const icsUrl = event.slug ? `/termine/${event.slug}/ics` : null;
+  const recurrenceText = formatRecurrenceText(event);
   const documents = (event.event_documents || [])
     .filter((document) => document.is_public)
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
@@ -60,23 +76,99 @@ export default async function EventDetailPage({ params }) {
             {event.title_de}
           </h1>
 
-          <div className="mt-6 flex flex-wrap gap-6 text-white/60">
-            <span>{formatEventDate(event.starts_at)}</span>
-            <span>
-              {formatEventTime(event.starts_at, { isAllDay: event.is_all_day })}
-            </span>
-            {event.ends_at && (
+          <div className="mt-6 flex flex-wrap items-center gap-4 text-white/60">
+            <div className="flex flex-wrap items-center gap-6">
+              <span>{formatEventDate(event.starts_at)}</span>
               <span>
-                bis {formatEventDate(event.ends_at)} ·{" "}
-                {formatEventTime(event.ends_at)}
+                {formatEventTime(event.starts_at, {
+                  isAllDay: event.is_all_day,
+                })}
               </span>
+              {event.ends_at && (
+                <span>
+                  bis {formatEventDate(event.ends_at)} ·{" "}
+                  {formatEventTime(event.ends_at)}
+                </span>
+              )}
+            </div>
+
+            {(icsUrl || googleCalendarUrl || outlookCalendarUrl) && (
+              <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:ml-auto sm:w-auto">
+                {icsUrl && (
+                  <a
+                    href={icsUrl}
+                    title="ICS herunterladen"
+                    aria-label="ICS herunterladen"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/20 text-white/60 transition hover:border-red-500/50 hover:bg-red-600/15 hover:text-red-300"
+                  >
+                    <Download className="h-4 w-4" aria-hidden="true" />
+                  </a>
+                )}
+
+                {googleCalendarUrl && (
+                  <a
+                    href={googleCalendarUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="In Google Kalender öffnen"
+                    aria-label="In Google Kalender öffnen"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/20 text-white/60 transition hover:border-red-500/50 hover:bg-red-600/15 hover:text-red-300"
+                  >
+                    <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                  </a>
+                )}
+
+                {outlookCalendarUrl && (
+                  <a
+                    href={outlookCalendarUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="In Outlook Kalender öffnen"
+                    aria-label="In Outlook Kalender öffnen"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/20 text-white/60 transition hover:border-red-500/50 hover:bg-red-600/15 hover:text-red-300"
+                  >
+                    <CalendarClock className="h-4 w-4" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
             )}
           </div>
 
-          {location && (
-            <p className="mt-6 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-bold uppercase tracking-[0.15em] text-white/70">
-              {location}
+          {recurrenceText && (
+            <p className="mt-4 text-sm font-bold uppercase tracking-[0.14em] text-white/55">
+              {recurrenceText}
             </p>
+          )}
+
+          {location && (
+            <div className="mt-6 flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-bold uppercase tracking-[0.15em] text-white/70">
+              <p className="min-w-0 flex-1 break-words">{location}</p>
+
+              {mapsUrl && (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Route in Google Maps öffnen"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/20 text-white/55 transition hover:border-red-500/50 hover:bg-red-600/15 hover:text-red-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Z" />
+                    <circle cx="12" cy="9" r="2.5" />
+                  </svg>
+                </a>
+              )}
+            </div>
           )}
 
           {event.team?.name_de && (

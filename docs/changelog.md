@@ -21,6 +21,7 @@ Diese Datei sammelt größere Änderungen am Projekt.
 - Öffentliche Abteilungsseiten modularisiert
 - Sponsorenmodul mit Kategorien, Banner-Upload, Social-Media-Links und öffentlicher Sponsorenübersicht fertiggestellt
 - Sponsoren-Komponenten modularisiert und SocialLinks als gemeinsames Modul eingeführt
+- Events-Modul um wiederkehrende Termine erweitert (Admin-Optionen, Laufzeit-Expansion in der Übersicht, Wiederholungshinweis auf Detailseite)
 
 ## Regel
 
