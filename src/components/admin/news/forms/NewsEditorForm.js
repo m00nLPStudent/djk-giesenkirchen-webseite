@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FormActions,
@@ -12,14 +12,26 @@ import {
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import NewsImageUpload from "../components/NewsImageUpload";
 import { createSlug } from "../utils/slug";
-import { uploadNewsImage, createNews, updateNews } from "../services/news.service";
-import NewsCategoryFields, { getCategoryKeyFromLabel } from "./NewsCategoryFields";
+import {
+  createNews,
+  deleteNewsDocument,
+  getNewsDocuments,
+  updateNews,
+  updateNewsDocument,
+  uploadNewsDocument,
+  uploadNewsImage,
+} from "../services/news.service";
+import NewsCategoryFields, {
+  getCategoryKeyFromLabel,
+} from "./NewsCategoryFields";
+import NewsDocumentsManager from "../components/NewsDocumentsManager";
 
 const NEWS_FORM_TABS = [
   { id: "basic", label: "Grunddaten" },
   { id: "category", label: "Kategorie" },
   { id: "content", label: "Inhalt" },
   { id: "media", label: "Medien" },
+  { id: "documents", label: "Dokumente" },
   { id: "settings", label: "Einstellungen" },
 ];
 
@@ -53,12 +65,37 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
   const [form, setForm] = useState(() => createInitialNewsForm(news));
+  const [documents, setDocuments] = useState(news?.news_documents || []);
+  const [documentsLoading, setDocumentsLoading] = useState(Boolean(news?.id));
   const [loading, setLoading] = useState(false);
   const isEdit = Boolean(news?.id);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
   }
+
+  useEffect(() => {
+    if (!news?.id) {
+      setDocuments([]);
+      setDocumentsLoading(false);
+      return;
+    }
+
+    async function loadDocuments() {
+      setDocumentsLoading(true);
+      const { data, error } = await getNewsDocuments(news.id);
+      setDocumentsLoading(false);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      setDocuments(data || []);
+    }
+
+    loadDocuments();
+  }, [news?.id]);
 
   async function uploadImage(file) {
     const { data, error } = await uploadNewsImage(file);
@@ -69,6 +106,41 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
     }
 
     updateField("image_url", data);
+  }
+
+  async function handleDocumentUpload(file) {
+    if (!news?.id) {
+      alert("Bitte speichere die News erst, bevor du Dokumente hochlädst.");
+      return;
+    }
+
+    setDocumentsLoading(true);
+    const { data, error } = await uploadNewsDocument(file, news.id);
+    setDocumentsLoading(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    if (data) {
+      setDocuments((current) => [...current, data]);
+    }
+  }
+
+  async function handleDocumentDelete(documentItem) {
+    if (!documentItem?.id) return;
+
+    const { error } = await deleteNewsDocument(documentItem);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setDocuments((current) =>
+      current.filter((item) => item.id !== documentItem.id),
+    );
   }
 
   async function handleSubmit(event) {
@@ -98,7 +170,7 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
       published_at: publishedAt,
     };
 
-    const { error } = isEdit
+    const { data: savedNews, error } = isEdit
       ? await updateNews(news.id, payload)
       : await createNews(payload);
 
@@ -109,13 +181,21 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
       return;
     }
 
+    if (!isEdit && savedNews?.id) {
+      setDocuments([]);
+    }
+
     router.push("/admin/news");
     router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-      <TabNavigation tabs={NEWS_FORM_TABS} activeTab={activeTab} onChange={setActiveTab} />
+      <TabNavigation
+        tabs={NEWS_FORM_TABS}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+      />
 
       {activeTab === "basic" && (
         <FormSection
@@ -160,7 +240,11 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
           title="News einordnen"
           description="Wähle aus, ob es eine allgemeine Vereinsmeldung, Fußball-News oder eine andere Kategorie ist. Bei Fußball kannst du zusätzlich eine Mannschaft auswählen."
         >
-          <NewsCategoryFields form={form} teams={teams} updateField={updateField} />
+          <NewsCategoryFields
+            form={form}
+            teams={teams}
+            updateField={updateField}
+          />
         </FormSection>
       )}
 
@@ -175,13 +259,17 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
               label="Inhalt Deutsch"
               rows={14}
               value={form.content_de}
-              onChange={(event) => updateField("content_de", event.target.value)}
+              onChange={(event) =>
+                updateField("content_de", event.target.value)
+              }
             />
             <TextareaField
               label="Inhalt Englisch"
               rows={14}
               value={form.content_en}
-              onChange={(event) => updateField("content_en", event.target.value)}
+              onChange={(event) =>
+                updateField("content_en", event.target.value)
+              }
             />
           </div>
         </FormSection>
@@ -201,6 +289,23 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
         </FormSection>
       )}
 
+      {activeTab === "documents" && (
+        <FormSection
+          eyebrow="Dokumente"
+          title="Downloads und Anhänge"
+          description="Füge der News öffentliche Dokumente wie PDFs, Bilder oder Office-Dateien hinzu."
+        >
+          <NewsDocumentsManager
+            newsId={news?.id}
+            documents={documents}
+            setDocuments={setDocuments}
+            onUploadDocument={handleDocumentUpload}
+            onDeleteDocument={handleDocumentDelete}
+            loading={documentsLoading}
+          />
+        </FormSection>
+      )}
+
       {activeTab === "settings" && (
         <FormSection
           eyebrow="Einstellungen"
@@ -211,7 +316,9 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
             <input
               type="checkbox"
               checked={form.is_published}
-              onChange={(event) => updateField("is_published", event.target.checked)}
+              onChange={(event) =>
+                updateField("is_published", event.target.checked)
+              }
             />
             Zur Veröffentlichung freigeben
           </label>
@@ -221,10 +328,13 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
               label="Veröffentlichungsdatum"
               type="datetime-local"
               value={form.published_at}
-              onChange={(event) => updateField("published_at", event.target.value)}
+              onChange={(event) =>
+                updateField("published_at", event.target.value)
+              }
             />
             <p className="mt-2 text-sm text-white/40">
-              Leer lassen = direkte Veröffentlichung. Datum in der Zukunft = geplante Veröffentlichung.
+              Leer lassen = direkte Veröffentlichung. Datum in der Zukunft =
+              geplante Veröffentlichung.
             </p>
           </div>
         </FormSection>

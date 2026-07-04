@@ -6,14 +6,14 @@ import DropdownMenu from "./DropdownMenu";
 import { footballMenuItems } from "./footballMenu";
 
 const newsMenuItems = [
-  { label: "News", href: "/" },
+  { label: "Aktuelle Meldungen", href: "/news" },
   { label: "News Übersicht", href: "/news/uebersicht" },
 ];
 
 const navigationItems = [
   {
     label: "News",
-    href: "/",
+    href: "/news",
     children: newsMenuItems,
   },
   {

@@ -14,12 +14,20 @@ export function FieldLabel({ children, required = false }) {
   );
 }
 
-export function InputField({ error, label, required = false, className = "", ...props }) {
+export function InputField({
+  error,
+  label,
+  required = false,
+  className = "",
+  onBlur,
+  ...props
+}) {
   return (
     <div>
       <FieldLabel required={required}>{label}</FieldLabel>
       <input
         {...props}
+        onBlur={onBlur}
         className={`h-14 w-full rounded-2xl border bg-white/5 px-4 outline-none ${
           error ? "border-red-500" : "border-white/10 focus:border-red-500"
         } ${className}`}
@@ -29,7 +37,14 @@ export function InputField({ error, label, required = false, className = "", ...
   );
 }
 
-export function SelectField({ error, label, required = false, children, className = "", ...props }) {
+export function SelectField({
+  error,
+  label,
+  required = false,
+  children,
+  className = "",
+  ...props
+}) {
   return (
     <div>
       <FieldLabel required={required}>{label}</FieldLabel>
@@ -46,12 +61,19 @@ export function SelectField({ error, label, required = false, children, classNam
   );
 }
 
-export function TextareaField({ label, required = false, className = "", ...props }) {
+export function TextareaField({
+  label,
+  required = false,
+  className = "",
+  onBlur,
+  ...props
+}) {
   return (
     <div>
       <FieldLabel required={required}>{label}</FieldLabel>
       <textarea
         {...props}
+        onBlur={onBlur}
         className={`w-full rounded-2xl border border-white/10 bg-white/5 p-4 outline-none focus:border-red-500 ${className}`}
       />
     </div>

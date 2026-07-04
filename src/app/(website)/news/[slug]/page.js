@@ -1,12 +1,22 @@
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
+
+function formatFileSize(bytes) {
+  if (!bytes || Number.isNaN(Number(bytes))) return null;
+
+  const size = Number(bytes);
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export default async function NewsDetailPage({ params }) {
   const { slug } = await params;
 
   const { data: article } = await supabase
     .from("news")
-    .select("*, football_team:football_team_id(name_de)")
+    .select("*, football_team:football_team_id(name_de), news_documents(*)")
     .eq("slug", slug)
     .eq("is_published", true)
     .lte("published_at", new Date().toISOString())
@@ -21,6 +31,10 @@ export default async function NewsDetailPage({ params }) {
       </main>
     );
   }
+
+  const documents = (article.news_documents || [])
+    .filter((document) => document.is_public)
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
@@ -50,6 +64,42 @@ export default async function NewsDetailPage({ params }) {
           <div className="mt-12 text-lg leading-9 text-white/80">
             {article.content_de}
           </div>
+
+          {documents.length > 0 && (
+            <div className="mt-10">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.3em] text-white/60">
+                {documents.length > 1 ? "Downloads" : "Download"}
+              </h2>
+
+              <ul className="mt-3 space-y-2">
+                {documents.map((document) => {
+                  const fileSize = formatFileSize(document.file_size);
+
+                  return (
+                    <li key={document.id}>
+                      <Link
+                        href={document.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between gap-3 py-1 text-sm text-white/80 transition hover:text-red-400"
+                      >
+                        <span className="truncate">
+                          {document.display_name_de ||
+                            document.file_name ||
+                            "Download"}
+                        </span>
+                        {fileSize && (
+                          <span className="shrink-0 text-xs uppercase tracking-[0.2em] text-white/40">
+                            {fileSize}
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       </section>
     </main>

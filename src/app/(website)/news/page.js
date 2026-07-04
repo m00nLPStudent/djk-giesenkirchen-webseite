@@ -1,51 +1,64 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import NewsCard from "@/components/website/news/NewsCard";
 
 export default async function NewsPage() {
-  const { data: news } = await supabase
+  const { data: latestNews } = await supabase
     .from("news")
-    .select("*")
+    .select("*, football_team:football_team_id(name_de)")
     .eq("is_published", true)
     .lte("published_at", new Date().toISOString())
-    .order("published_at", { ascending: false });
+    .order("published_at", { ascending: false })
+    .limit(6);
+
+  const featuredNews = latestNews?.[0];
+  const secondaryNews = latestNews?.slice(1) || [];
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-20 text-white">
-      <div className="mx-auto max-w-7xl">
-        <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-          Aktuelles
-        </p>
+    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-24 text-white">
+      <section className="mx-auto max-w-7xl">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
+              Aktuelles
+            </p>
+            <h1 className="mt-6 text-5xl font-black leading-tight md:text-6xl lg:text-7xl">
+              Aktuelle News
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/65">
+              Die neuesten Meldungen aus dem Verein – deutlich dargestellt und
+              direkt erreichbar.
+            </p>
+          </div>
 
-        <h1 className="mt-6 text-6xl font-black">News</h1>
-
-        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {news?.map((item) => (
-            <Link href={`/news/${item.slug}`} key={item.id}>
-              <article className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 transition hover:border-red-500/50 hover:bg-white/10">
-                {item.image_url && (
-                  <div className="flex h-56 items-center justify-center bg-white/5 p-6">
-                    <img
-                      src={item.image_url}
-                      alt={item.title_de}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                )}
-
-                <div className="p-6">
-                  <p className="text-xs uppercase tracking-[0.25em] text-red-400">
-                    {item.category}
-                  </p>
-
-                  <h2 className="mt-4 text-2xl font-black">{item.title_de}</h2>
-
-                  <p className="mt-4 text-white/60">{item.teaser_de}</p>
-                </div>
-              </article>
-            </Link>
-          ))}
+          <Link
+            href="/news/uebersicht"
+            className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-black uppercase tracking-[0.2em] text-white/70 transition hover:border-red-500 hover:text-white"
+          >
+            Zur Übersicht
+          </Link>
         </div>
-      </div>
+
+        {featuredNews ? (
+          <div className="mt-12 space-y-8">
+            <NewsCard item={featuredNews} featured />
+
+            {secondaryNews.length > 0 && (
+              <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+                {secondaryNews.map((item) => (
+                  <NewsCard item={item} key={item.id} compactMeta />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-12 rounded-[2rem] border border-white/10 bg-white/5 p-8">
+            <p className="text-lg text-white/65">
+              Aktuell sind noch keine News veröffentlicht.
+            </p>
+          </div>
+        )}
+      </section>
     </main>
   );
 }

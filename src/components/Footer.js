@@ -4,36 +4,36 @@ const footerColumns = [
   {
     title: "Verein",
     links: [
-      { label: "Über uns", href: "#" },
-      { label: "Vorstand", href: "#" },
-      { label: "Kontakt", href: "#" },
-      { label: "Mitglied werden", href: "#" },
+      { label: "Kontakt", href: "/kontakt" },
+      { label: "Vorstand", href: "/fussball/abteilung/vorstand" },
+      { label: "Trainer", href: "/fussball/abteilung/trainer" },
+      { label: "Sponsoren", href: "/fussball/sponsoren" },
     ],
   },
   {
     title: "Abteilungen",
     links: [
       { label: "Fußball", href: "/fussball" },
-      { label: "Tischtennis", href: "#" },
-      { label: "Damen-Gymnastik", href: "#" },
-      { label: "Turniere & Events", href: "#" },
+      { label: "Tischtennis", href: "/tischtennis" },
+      { label: "Damen-Gymnastik", href: "/damen-gymnastik" },
+      { label: "Termine", href: "/termine" },
     ],
   },
   {
     title: "Service",
     links: [
       { label: "News", href: "/news" },
-      { label: "Termine", href: "#" },
-      { label: "Downloads", href: "#" },
-      { label: "Sponsoren", href: "#" },
+      { label: "News Übersicht", href: "/news/uebersicht" },
+      { label: "Aktuelle Termine", href: "/termine" },
+      { label: "Kontakt", href: "/kontakt" },
     ],
   },
   {
     title: "Rechtliches",
     links: [
-      { label: "Impressum", href: "#" },
-      { label: "Datenschutz", href: "#" },
-      { label: "Cookie-Einstellungen", href: "#" },
+      { label: "Impressum", href: "/impressum" },
+      { label: "Datenschutz", href: "/datenschutz" },
+      { label: "Kontakt", href: "/kontakt" },
     ],
   },
 ];
@@ -59,7 +59,7 @@ export default function Footer() {
             </div>
 
             <p className="mt-6 max-w-md text-sm leading-7 text-white/55">
-              Platzhalter für Vereinsinformationen, Anschrift, Kontaktzeiten und kurze Beschreibung der DJK/VfL Giesenkirchen 05/09 e.V.
+              Die DJK/VfL Giesenkirchen 05/09 e.V. informiert über Sportangebote, Neuigkeiten, Termine und die Arbeit der Abteilungen im Verein.
             </p>
           </div>
 
@@ -87,7 +87,7 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 text-sm text-white/40 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} DJK/VfL Giesenkirchen 05/09 e.V.</p>
-          <p>Footer-Platzhalter · Inhalte werden später final gepflegt.</p>
+          <p>Vereinswebseite · News, Mannschaften und Termine</p>
         </div>
       </div>
     </footer>
