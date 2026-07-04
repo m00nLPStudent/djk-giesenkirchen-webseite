@@ -1,7 +1,11 @@
 import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
 import { HomeEventsSection } from "@/components/website/events";
-import { getUpcomingPublishedEvents } from "@/components/admin/events/services/events.service";
+import {
+  expandRecurringEvents,
+  getVirtualTrainingEvents,
+  mergeEventsWithVirtualTrainings,
+} from "@/lib/events";
 
 export default async function Home() {
   const { data: latestNews } = await supabase
@@ -14,7 +18,34 @@ export default async function Home() {
 
   const featuredNews = latestNews?.[0];
   const secondaryNews = latestNews?.slice(1, 4) || [];
-  const { data: upcomingEvents } = await getUpcomingPublishedEvents(4);
+
+  const { data: publishedEvents } = await supabase
+    .from("events")
+    .select("*")
+    .eq("is_published", true)
+    .order("starts_at", { ascending: true })
+    .limit(120);
+
+  const now = new Date();
+  const from = now;
+  const to = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+  const expandedEvents = expandRecurringEvents(publishedEvents || [], {
+    from,
+    to,
+    maxOccurrencesPerEvent: 180,
+  });
+  const upcomingEventsOnly = expandedEvents.filter(
+    (event) => new Date(event.starts_at) >= now,
+  );
+  const virtualTrainings = await getVirtualTrainingEvents({
+    from,
+    to,
+    maxOccurrencesPerTraining: 180,
+  });
+  const mergedUpcomingEvents = mergeEventsWithVirtualTrainings(
+    upcomingEventsOnly,
+    virtualTrainings,
+  ).slice(0, 4);
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
@@ -52,7 +83,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <HomeEventsSection events={upcomingEvents || []} />
+      <HomeEventsSection events={mergedUpcomingEvents} />
     </main>
   );
 }

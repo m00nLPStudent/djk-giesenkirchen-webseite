@@ -39,6 +39,14 @@ export default function DashboardToday({ events = [] }) {
             const location = [event.location_name, event.location_city]
               .filter(Boolean)
               .join(" · ");
+            const editHref = event.is_virtual
+              ? event.team_id
+                ? `/admin/teams/edit/${event.team_id}`
+                : null
+              : `/admin/events/edit/${event.id}`;
+            const editLabel = event.is_virtual
+              ? "Mannschaft bearbeiten"
+              : "Termin bearbeiten";
 
             return (
               <div
@@ -74,14 +82,16 @@ export default function DashboardToday({ events = [] }) {
                     </div>
                   </div>
 
-                  <Link
-                    href={`/admin/events/edit/${event.id}`}
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/60 transition hover:border-red-500/50 hover:text-red-300"
-                    aria-label="Termin bearbeiten"
-                    title="Termin bearbeiten"
-                  >
-                    <PencilLine size={16} />
-                  </Link>
+                  {editHref ? (
+                    <Link
+                      href={editHref}
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/60 transition hover:border-red-500/50 hover:text-red-300"
+                      aria-label={editLabel}
+                      title={editLabel}
+                    >
+                      <PencilLine size={16} />
+                    </Link>
+                  ) : null}
                 </div>
               </div>
             );

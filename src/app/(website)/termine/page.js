@@ -1,6 +1,11 @@
 import { EventsSection } from "@/components/website/events";
 import { getPublishedEvents } from "@/components/admin/events/services/events.service";
-import { expandRecurringEvents, splitEventsByTimeline } from "@/lib/events";
+import {
+  expandRecurringEvents,
+  getVirtualTrainingEvents,
+  mergeEventsWithVirtualTrainings,
+  splitEventsByTimeline,
+} from "@/lib/events";
 
 export default async function EventsPage() {
   const { data: events } = await getPublishedEvents();
@@ -10,7 +15,16 @@ export default async function EventsPage() {
     to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
     maxOccurrencesPerEvent: 180,
   });
-  const { upcoming, past } = splitEventsByTimeline(expandedEvents, now);
+  const virtualTrainings = await getVirtualTrainingEvents({
+    from: new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000),
+    to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+    maxOccurrencesPerTraining: 180,
+  });
+  const mergedEvents = mergeEventsWithVirtualTrainings(
+    expandedEvents,
+    virtualTrainings,
+  );
+  const { upcoming, past } = splitEventsByTimeline(mergedEvents, now);
 
   return (
     <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-24 text-white">

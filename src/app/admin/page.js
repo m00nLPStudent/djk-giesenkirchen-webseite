@@ -6,7 +6,11 @@ import DashboardPlannedNews from "@/components/admin/dashboard/DashboardPlannedN
 import DashboardQuickActions from "@/components/admin/dashboard/DashboardQuickActions";
 import DashboardSystemStatus from "@/components/admin/dashboard/DashboardSystemStatus";
 import DashboardToday from "@/components/admin/dashboard/DashboardToday";
-import { expandRecurringEvents } from "@/lib/events";
+import {
+  expandRecurringEvents,
+  getVirtualTrainingEvents,
+  mergeEventsWithVirtualTrainings,
+} from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 
 async function getCount(table) {
@@ -51,11 +55,25 @@ export default async function AdminPage() {
     .limit(100);
 
   const now = new Date();
-  const upcomingEvents = expandRecurringEvents(dashboardEvents || [], {
+  const from = now;
+  const to = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+  const expandedEvents = expandRecurringEvents(dashboardEvents || [], {
     from: now,
-    to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
+    to,
     maxOccurrencesPerEvent: 120,
-  }).slice(0, 5);
+  });
+  const upcomingRealEvents = expandedEvents.filter(
+    (event) => new Date(event.starts_at) >= now,
+  );
+  const virtualTrainings = await getVirtualTrainingEvents({
+    from,
+    to,
+    maxOccurrencesPerTraining: 120,
+  });
+  const upcomingEvents = mergeEventsWithVirtualTrainings(
+    upcomingRealEvents,
+    virtualTrainings,
+  ).slice(0, 5);
 
   const counts = {
     news: newsCount,
