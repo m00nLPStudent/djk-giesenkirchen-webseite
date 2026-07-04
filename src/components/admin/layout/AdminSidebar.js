@@ -14,6 +14,7 @@ import {
   Settings,
   Building2,
   Handshake,
+  BookOpen,
 } from "lucide-react";
 
 const logoUrl =
@@ -29,6 +30,7 @@ const navItems = [
   { href: "/admin/players", label: "Spieler", icon: Users },
   { href: "/admin/media", label: "Medien", icon: Image },
   { href: "/admin/events", label: "Termine", icon: CalendarDays },
+  { href: "/admin/club-history", label: "Vereinsgeschichte", icon: BookOpen },
   { href: "/admin/tournaments", label: "Turniere", icon: Trophy },
   { href: "/admin/settings", label: "Einstellungen", icon: Settings },
 ];
