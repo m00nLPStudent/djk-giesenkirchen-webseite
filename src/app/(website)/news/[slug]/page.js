@@ -1,15 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { formatFileSize } from "@/lib/files";
 import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
-
-function formatFileSize(bytes) {
-  if (!bytes || Number.isNaN(Number(bytes))) return null;
-
-  const size = Number(bytes);
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export default async function NewsDetailPage({ params }) {
   const { slug } = await params;

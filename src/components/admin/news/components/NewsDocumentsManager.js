@@ -1,16 +1,8 @@
 "use client";
 
 import { InputField, TextareaField } from "@/components/admin/forms";
+import { formatFileSize } from "@/lib/files";
 import { updateNewsDocument } from "../services/news.service";
-
-function formatFileSize(bytes) {
-  if (!bytes || Number.isNaN(Number(bytes))) return null;
-
-  const size = Number(bytes);
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export default function NewsDocumentsManager({
   newsId,

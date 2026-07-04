@@ -2,6 +2,25 @@ import { supabase } from "@/lib/supabase";
 
 const PUBLIC_MEDIA_MARKER = "/storage/v1/object/public/media/";
 
+export async function uploadStorageFile(bucket, path, file, options = {}) {
+  if (!bucket || !path || !file) return { data: null, error: null };
+  return await supabase.storage.from(bucket).upload(path, file, options);
+}
+
+export function getStoragePublicUrl(bucket, path) {
+  if (!bucket || !path) return { publicUrl: null };
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data;
+}
+
+export async function removeStorageFiles(bucket, paths = []) {
+  if (!bucket || !Array.isArray(paths) || paths.length === 0) {
+    return { data: null, error: null };
+  }
+
+  return await supabase.storage.from(bucket).remove(paths);
+}
+
 export function getStoragePathFromPublicUrl(url, ignoredUrls = []) {
   if (!url) return null;
   if (ignoredUrls.includes(url)) return null;
@@ -20,25 +39,30 @@ export function getFileExtension(fileName = "") {
 }
 
 export function slugifyFileName(value = "datei") {
-  return String(value)
-    .toLowerCase()
-    .trim()
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "datei";
+  return (
+    String(value)
+      .toLowerCase()
+      .trim()
+      .replace(/ä/g, "ae")
+      .replace(/ö/g, "oe")
+      .replace(/ü/g, "ue")
+      .replace(/ß/g, "ss")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "datei"
+  );
 }
 
 export async function deleteMediaFile(publicUrl, options = {}) {
-  const path = getStoragePathFromPublicUrl(publicUrl, options.ignoredUrls || []);
+  const path = getStoragePathFromPublicUrl(
+    publicUrl,
+    options.ignoredUrls || [],
+  );
 
   if (!path) {
     return { error: null };
   }
 
-  return await supabase.storage.from("media").remove([path]);
+  return await removeStorageFiles("media", [path]);
 }
 
 export async function uploadMediaFile(file, options = {}) {
@@ -56,18 +80,18 @@ export async function uploadMediaFile(file, options = {}) {
   const fileName = `${folder}/${slugifyFileName(name)}.${extension}`;
 
   if (previousPath && previousPath !== fileName) {
-    await supabase.storage.from("media").remove([previousPath]);
+    await removeStorageFiles("media", [previousPath]);
   }
 
-  const { error } = await supabase.storage
-    .from("media")
-    .upload(fileName, file, { upsert: true });
+  const { error } = await uploadStorageFile("media", fileName, file, {
+    upsert: true,
+  });
 
   if (error) {
     return { data: null, error };
   }
 
-  const { data } = supabase.storage.from("media").getPublicUrl(fileName);
+  const data = getStoragePublicUrl("media", fileName);
 
   return {
     data: `${data.publicUrl}?v=${Date.now()}`,

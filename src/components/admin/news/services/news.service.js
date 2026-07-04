@@ -1,40 +1,27 @@
 import { supabase } from "@/lib/supabase";
-
-const ALLOWED_DOCUMENT_TYPES = [
-  "pdf",
-  "doc",
-  "docx",
-  "xls",
-  "xlsx",
-  "ppt",
-  "pptx",
-  "zip",
-  "jpg",
-  "png",
-  "webp",
-];
-
-function getFileExtension(fileName = "") {
-  const extension = fileName.split(".").pop()?.toLowerCase();
-  return extension || "";
-}
-
-function deriveDisplayName(fileName = "") {
-  return (fileName || "").replace(/\.[^/.]+$/, "");
-}
+import {
+  getStoragePublicUrl,
+  removeStorageFiles,
+  uploadStorageFile,
+} from "@/lib/storage";
+import {
+  ALLOWED_DOCUMENT_TYPES,
+  deriveDisplayName,
+  getFileExtension,
+} from "@/lib/files";
 
 export async function uploadNewsImage(file) {
   if (!file) return { data: null, error: null };
 
   const fileName = `news/${Date.now()}-${file.name}`;
 
-  const { error } = await supabase.storage.from("media").upload(fileName, file);
+  const { error } = await uploadStorageFile("media", fileName, file);
 
   if (error) {
     return { data: null, error };
   }
 
-  const { data } = supabase.storage.from("media").getPublicUrl(fileName);
+  const data = getStoragePublicUrl("media", fileName);
 
   return {
     data: data.publicUrl,
@@ -80,20 +67,21 @@ export async function uploadNewsDocument(file, newsId) {
   const fileName = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
   const path = `${newsId}/${fileName}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from("news-documents")
-    .upload(path, file, {
+  const { error: uploadError } = await uploadStorageFile(
+    "news-documents",
+    path,
+    file,
+    {
       cacheControl: "3600",
       upsert: false,
-    });
+    },
+  );
 
   if (uploadError) {
     return { data: null, error: uploadError };
   }
 
-  const { data: publicUrlData } = supabase.storage
-    .from("news-documents")
-    .getPublicUrl(path);
+  const publicUrlData = getStoragePublicUrl("news-documents", path);
 
   const payload = {
     news_id: newsId,
@@ -138,9 +126,9 @@ export async function deleteNewsDocument(documentItem) {
     : null;
 
   if (storagePath) {
-    const { error: storageError } = await supabase.storage
-      .from("news-documents")
-      .remove([storagePath]);
+    const { error: storageError } = await removeStorageFiles("news-documents", [
+      storagePath,
+    ]);
     if (storageError) {
       return { data: null, error: storageError };
     }

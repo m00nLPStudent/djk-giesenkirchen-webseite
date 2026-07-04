@@ -6,6 +6,7 @@ Diese Datei sammelt größere Änderungen am Projekt.
 
 ## Bisherige Meilensteine
 
+- Dokumentationsstruktur in `architecture/`, `modules/`, `decisions/` und `development/` gegliedert
 - Projektbasis mit Next.js erstellt
 - Adminbereich aufgebaut
 - News-Modul gestartet

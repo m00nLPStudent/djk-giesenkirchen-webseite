@@ -1,13 +1,20 @@
 # Projektdokumentation
 
-Diese Dokumentation beschreibt die technische Planung, Architektur, Module, Roadmap und spätere Migration der Vereinsplattform der DJK/VfL Giesenkirchen 05/09 e.V.
+Diese Dokumentation beschreibt Architektur, Module, Entwicklungsabläufe und den aktuellen Projektstand der Plattform der DJK/VfL Giesenkirchen 05/09 e.V.
 
-## Struktur
+## Zielstruktur
 
-- `architecture/` – technische Architektur, Regeln und Zielstruktur
-- `roadmap/` – Projektplanung, Fortschritt und nächste Schritte
-- `modules/` – Dokumentation der einzelnen Website- und Adminmodule
-- `migration/` – Planung für Datenbank-, Server- und Livegang-Migration
+- `architecture/` – Gesamtarchitektur, Routen, Komponenten, Datenbank und Supabase-Storage
+- `modules/` – fachliche Modulbeschreibungen (News, Teams, Spieler, Trainer, Sponsoren, Vorstand, Events)
+- `decisions/` – zentrale Architekturentscheidungen
+- `development/` – Coding-Regeln, Workflow und Deployment-Hinweise
+- `roadmap.md` – mittel- und langfristige Planung
+- `changelog.md` – wesentliche Änderungen
+- `todo.md` – aktuelle Arbeitspunkte
+
+## Legacy-Dokumente
+
+Vorhandene Root-Dokumente (z. B. `architecture-overview.md`, `database.md`, `coding-guidelines.md`) bleiben erhalten und werden schrittweise in die Zielstruktur überführt.
 
 ## Grundregel
 

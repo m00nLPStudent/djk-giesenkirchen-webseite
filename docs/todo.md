@@ -92,3 +92,31 @@ Diese Datei sammelt offene Aufgaben und technische Baustellen.
 Mannschaftsseiten weiter ausbauen.
 
 Ziel: Spieler, Trainer und Betreuer auf den öffentlichen Mannschaftsseiten sauber zusammenführen und die Mannschaftsverwaltung als nächstes Admin-Modul nach dem neuen gemeinsamen Muster aufbauen.
+
+## Struktur-Review To-do 2: Duplikate identifiziert
+
+### Bestätigte Duplikate
+
+- `formatFileSize` ist doppelt vorhanden:
+  - `src/app/(website)/news/[slug]/page.js`
+  - `src/components/admin/news/components/NewsDocumentsManager.js`
+- `getFileExtension` ist doppelt vorhanden:
+  - `src/components/admin/news/services/news.service.js`
+  - `src/lib/storage.js`
+- Ableitung des Anzeigenamens aus Dateinamen (`deriveDisplayName`) liegt aktuell nur im News-Service und sollte als gemeinsamer File-Helper zentralisiert werden.
+- Public-URL-Ermittlung für Storage ist mehrfach in ähnlicher Form vorhanden (`media` und `news-documents`) und sollte in gemeinsame Bucket-Helfer überführt werden.
+
+### Priorisierte Refactor-Ziele (nächste To-dos)
+
+- Gemeinsame Datei-Helfer in `src/lib/files.js` anlegen:
+  - erlaubte Dokumenttypen
+  - Dateiendung ermitteln
+  - Anzeigenamen aus Dateinamen ableiten
+  - Dateigröße formatieren
+- News-Dokumente-Komponente und News-Detailseite auf gemeinsame Formatter umstellen.
+- News-Service und Storage-Helfer auf gemeinsame Bucket-/Upload-Utilities ausrichten, ohne Feature-Verhalten zu ändern.
+
+### Abgrenzung
+
+- Dieser Schritt ist reine Analyse/Bestandsaufnahme.
+- Es wurden in diesem To-do keine Runtime-Funktionen geändert.
