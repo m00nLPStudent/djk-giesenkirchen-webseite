@@ -10,6 +10,12 @@ const newsMenuItems = [
   { label: "News Übersicht", href: "/news/uebersicht" },
 ];
 
+const termineMenuItems = [
+  { label: "Übersicht", href: "/termine" },
+  { label: "Trainingstermine", href: "/termine/training" },
+  { label: "Allgemeine Termine", href: "/termine/allgemein" },
+];
+
 const navigationItems = [
   {
     label: "News",
@@ -23,7 +29,7 @@ const navigationItems = [
   },
   { label: "Tischtennis", href: "/tischtennis" },
   { label: "Damen-Gymnastik", href: "/damen-gymnastik" },
-  { label: "Termine", href: "/termine" },
+  { label: "Termine", href: "/termine", children: termineMenuItems },
   { label: "Kontakt", href: "/kontakt" },
 ];
 
@@ -37,7 +43,9 @@ export default function Navigation() {
           key={item.label}
           item={{
             ...item,
-            dropdown: item.children ? <DropdownMenu items={item.children} /> : null,
+            dropdown: item.children ? (
+              <DropdownMenu items={item.children} />
+            ) : null,
           }}
           openMenu={openMenu}
           setOpenMenu={setOpenMenu}

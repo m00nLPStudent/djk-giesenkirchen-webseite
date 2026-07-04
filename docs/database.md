@@ -132,6 +132,128 @@ Regeln:
 - Pro Saison darf ein Slug nur einmal vorkommen.
 - Diese Tabelle ist die Hauptquelle für öffentliche Mannschaftsseiten.
 
+### team_training_times
+
+Strukturierte regelmäßige Trainingszeiten pro Mannschafts-Saison.
+
+Wichtige Felder:
+
+- id
+- team_season_id
+- weekday
+- start_time
+- end_time
+- training_type
+- location_name
+- location_address
+- location_city
+- effective_from
+- effective_until
+- note
+- is_active
+- created_at
+
+Regeln:
+
+- ein Datensatz beschreibt genau einen Trainingstag
+- Mehrfachauswahl im Admin erzeugt mehrere Datensätze, verändert aber nicht die Datenbankstruktur
+- diese Tabelle ist die Basis für virtuelle Trainingstermine
+
+### team_training_exceptions
+
+Ausnahmen zu regulären Trainingszeiten.
+
+Wichtige Felder:
+
+- id
+- team_training_time_id
+- exception_date
+- exception_type
+- override_start_time
+- override_end_time
+- override_training_type
+- override_location_name
+- override_location_address
+- override_location_city
+- note
+- is_active
+- created_at
+
+Regeln:
+
+- `cancelled` entfernt das virtuelle Training an diesem Datum
+- `moved` überschreibt Uhrzeit, Ort oder Trainingsart für genau dieses Vorkommen
+
+### club_closure_periods
+
+Vereinssperrzeiten für Trainings.
+
+Wichtige Felder:
+
+- id
+- team_season_id
+- starts_on
+- ends_on
+- applies_to_all
+- is_active
+
+Regeln:
+
+- kann für einzelne Team-Saisons oder global gelten
+- wird nur in der Laufzeitberechnung virtueller Trainings verwendet
+
+### events
+
+Allgemeine Vereinstermine und klassische Events.
+
+Zusätzliche wichtige Felder im aktuellen Stand:
+
+- slug
+- event_type
+- starts_at
+- ends_at
+- is_all_day
+- location_name
+- location_address
+- location_city
+- image_url
+- external_url
+- recurrence_type
+- recurrence_interval
+- recurrence_until
+- recurrence_count
+- is_published
+- is_featured
+
+Regeln:
+
+- virtuelle Trainings werden **nicht** in dieser Tabelle gespeichert
+- Wiederholungen werden zur Laufzeit expandiert, nicht als eigene Zeilen angelegt
+
+### event_documents
+
+Dateien für echte Events.
+
+Wichtige Felder:
+
+- id
+- event_id
+- file_name
+- file_path
+- display_name_de
+- description_de
+- file_url
+- mime_type
+- file_size
+- is_public
+- sort_order
+- created_at
+
+Regeln:
+
+- nur echte Events nutzen diese Tabelle
+- virtuelle Trainings haben aktuell keine Dokumente
+
 ### players
 
 Zentrale Spieler des Vereins.
@@ -468,10 +590,10 @@ Noch nicht löschen, aber später prüfen:
 - description_de / description_en
 - training_times_de / training_times_en
 - team_image_url
-- contact_*
-- fussball_de_*
-- fupa_*
-- dfb_*
+- contact\_\*
+- fussball*de*\*
+- fupa\_\*
+- dfb\_\*
 
 Diese Felder liegen langfristig saisonabhängig in `team_seasons`.
 

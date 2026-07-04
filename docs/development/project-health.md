@@ -17,6 +17,7 @@
 - Auffällig:
   - Einzelne Utility-Logik ist noch parallel vorhanden (z. B. getFileExtension in src/lib/storage.js und src/lib/files.js).
   - Ein serverseitiger Scraper-Helfer scheint aktuell ohne Referenz im Code zu sein: src/lib/fussball-de/fussballDe.server.js.
+  - Der Events-/Trainingsbereich ist funktional stark gewachsen und enthält mehrere große Dateien.
 
 ## Modularisierung
 
@@ -28,6 +29,7 @@
     - src/components/admin/news/utils/slug.js
     - src/components/admin/coaches/utils/slug.js
     - src/components/admin/teams/utils/slug.js
+  - Große Feature-Dateien im Events-/Trainingsbereich weiter intern zerlegen.
 
 ## Wiederverwendbarkeit
 
@@ -71,6 +73,7 @@ Hauptbefunde:
 - getFileExtension auf eine gemeinsame Quelle reduzieren.
 - Unreferenzierten fussball.de-Serverhelper fachlich verifizieren und ggf. entfernen oder anbinden.
 - Bildoptimierung (Next Image) schrittweise in kritischen Seiten priorisieren.
+- Struktur-Refactor im Events-/Trainingsmodul schrittweise fortsetzen.
 
 ## Empfehlungen für die nächsten Entwicklungsschritte
 
@@ -79,6 +82,7 @@ Hauptbefunde:
 3. Doppelte getFileExtension-Funktion bereinigen.
 4. Unreferenzierte Dateien mit Team fachlich validieren und aufräumen.
 5. Danach Performance-Hinweise zu img schrittweise angehen.
+6. Events-/Trainingsbereich intern modularisieren, ohne Runtime-Logik zu verändern.
 
 ## Prioritäten
 
@@ -88,6 +92,7 @@ Hauptbefunde:
   - Doppelte Slug-Utilities
   - Doppelte getFileExtension-Logik
   - no-img-element Warnungen in häufigen Seiten
+  - Große Containerdateien in Events-/Trainingsverwaltung
 - Niedrig:
   - Dokumentierte Legacy-Dokumente weiter konsolidieren
   - Potenziell tote Datei nur nach fachlicher Bestätigung bereinigen
@@ -98,3 +103,4 @@ Hauptbefunde:
 - Storage-Operationen sind modularisiert, wodurch Services konsistenter und wartbarer sind.
 - Der Docs-Bereich ist strukturiert und für neue Entwickler schneller navigierbar.
 - Die wichtigsten verbleibenden Risiken sind klar priorisiert und umsetzbar beschrieben.
+- Das Events-/Trainingsmodul ist fachlich vollständig, benötigt aber weitere interne Entkopplung für bessere Wartbarkeit.

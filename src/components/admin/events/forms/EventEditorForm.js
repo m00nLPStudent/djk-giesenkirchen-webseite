@@ -2,18 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  FormActions,
-  FormGrid,
-  FormSection,
-  InputField,
-  SelectField,
-  TextareaField,
-} from "@/components/admin/forms";
+import { FormActions } from "@/components/admin/forms";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
-import AdminImageUpload from "@/components/admin/media/AdminImageUpload";
-import EventDocumentsManager from "../components/EventDocumentsManager";
 import { createSlug } from "@/lib/slug";
+import { EVENT_FORM_TABS } from "./eventEditor.constants";
+import {
+  createInitialEventForm,
+  sortDocuments,
+} from "./eventEditor.initialState";
+import { buildEventPayload } from "./eventEditor.payload";
+import EventBasicTab from "./tabs/EventBasicTab";
+import EventDocumentsTab from "./tabs/EventDocumentsTab";
+import EventLocationTab from "./tabs/EventLocationTab";
+import EventMediaTab from "./tabs/EventMediaTab";
+import EventSettingsTab from "./tabs/EventSettingsTab";
+import EventTimeTab from "./tabs/EventTimeTab";
 import {
   createEvent,
   deleteEventDocument,
@@ -22,95 +25,6 @@ import {
   uploadEventDocument,
   uploadEventImage,
 } from "../services/events.service";
-
-const EVENT_FORM_TABS = [
-  { id: "basic", label: "Grunddaten" },
-  { id: "time", label: "Datum & Zeit" },
-  { id: "location", label: "Ort" },
-  { id: "media", label: "Medien" },
-  { id: "documents", label: "Dokumente" },
-  { id: "settings", label: "Einstellungen" },
-];
-
-const EVENT_TYPES = [
-  ["vereinstermin", "Vereinstermin"],
-  ["training", "Training"],
-  ["spiel", "Spiel"],
-  ["turnier", "Turnier"],
-  ["sonstiges", "Sonstiges"],
-];
-
-const RECURRENCE_TYPES = [
-  ["none", "Keine Wiederholung"],
-  ["daily", "Täglich"],
-  ["weekly", "Wöchentlich"],
-  ["monthly", "Monatlich"],
-  ["yearly", "Jährlich"],
-];
-
-function formatDateTimeLocal(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 16);
-}
-
-function formatDateLocal(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 10);
-}
-
-function createInitialEventForm(event) {
-  const initialSlug = event?.slug || createSlug(event?.title_de || "");
-
-  return {
-    title_de: event?.title_de || "",
-    title_en: event?.title_en || "",
-    teaser_de: event?.teaser_de || "",
-    teaser_en: event?.teaser_en || "",
-    description_de: event?.description_de || "",
-    description_en: event?.description_en || "",
-    event_type: event?.event_type || "vereinstermin",
-    starts_at: formatDateTimeLocal(event?.starts_at),
-    ends_at: formatDateTimeLocal(event?.ends_at),
-    is_all_day: event?.is_all_day ?? false,
-    location_name: event?.location_name || "",
-    location_address: event?.location_address || "",
-    location_city: event?.location_city || "",
-    team_id: event?.team_id || "",
-    external_url: event?.external_url || "",
-    image_url: event?.image_url || "",
-    slug: initialSlug,
-    recurrence_type: event?.recurrence_type || "none",
-    recurrence_interval: event?.recurrence_interval ?? 1,
-    recurrence_until: formatDateLocal(event?.recurrence_until),
-    recurrence_count: event?.recurrence_count ?? "",
-    is_published: event?.is_published ?? false,
-    is_featured: event?.is_featured ?? false,
-    sort_order: event?.sort_order ?? 0,
-  };
-}
-
-function toIsoOrNull(value) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toISOString();
-}
-
-function sortDocuments(items = []) {
-  return [...items].sort((a, b) => {
-    const sortA = a.sort_order || 0;
-    const sortB = b.sort_order || 0;
-    if (sortA !== sortB) return sortA - sortB;
-    return (
-      new Date(a.created_at || 0).getTime() -
-      new Date(b.created_at || 0).getTime()
-    );
-  });
-}
 
 export default function EventEditorForm({ event = null, teams = [] }) {
   const router = useRouter();
@@ -205,41 +119,7 @@ export default function EventEditorForm({ event = null, teams = [] }) {
     }
 
     setLoading(true);
-
-    const payload = {
-      title_de: form.title_de.trim(),
-      title_en: form.title_en.trim() || null,
-      teaser_de: form.teaser_de.trim() || null,
-      teaser_en: form.teaser_en.trim() || null,
-      description_de: form.description_de.trim() || null,
-      description_en: form.description_en.trim() || null,
-      event_type: form.event_type,
-      starts_at: toIsoOrNull(form.starts_at),
-      ends_at: toIsoOrNull(form.ends_at),
-      is_all_day: Boolean(form.is_all_day),
-      location_name: form.location_name.trim() || null,
-      location_address: form.location_address.trim() || null,
-      location_city: form.location_city.trim() || null,
-      team_id: form.team_id || null,
-      external_url: form.external_url.trim() || null,
-      image_url: form.image_url || null,
-      slug: publicSlug || null,
-      recurrence_type: hasRecurrence ? form.recurrence_type : "none",
-      recurrence_interval: hasRecurrence
-        ? Math.max(1, Number(form.recurrence_interval || 1))
-        : null,
-      recurrence_until:
-        hasRecurrence && form.recurrence_until
-          ? toIsoOrNull(`${form.recurrence_until}T23:59`)
-          : null,
-      recurrence_count:
-        hasRecurrence && form.recurrence_count !== ""
-          ? Math.max(1, Number(form.recurrence_count || 1))
-          : null,
-      is_published: Boolean(form.is_published),
-      is_featured: Boolean(form.is_featured),
-      sort_order: Number(form.sort_order || 0),
-    };
+    const payload = buildEventPayload({ form, publicSlug, hasRecurrence });
 
     const { error } = isEdit
       ? await updateEvent(event.id, payload)
@@ -265,344 +145,52 @@ export default function EventEditorForm({ event = null, teams = [] }) {
       />
 
       {activeTab === "basic" && (
-        <FormSection
-          eyebrow="Termine"
-          title="Grunddaten"
-          description="Titel, Teaser und Beschreibung für den Termin oder die Veranstaltung."
-        >
-          <FormGrid>
-            <InputField
-              label="Titel Deutsch"
-              required
-              value={form.title_de}
-              onChange={(eventValue) => {
-                const nextTitle = eventValue.target.value;
-                updateField("title_de", nextTitle);
-                if (!isEdit || !event?.slug || event.slug === form.slug) {
-                  updateField("slug", createSlug(nextTitle));
-                }
-              }}
-            />
-            <InputField
-              label="Titel Englisch"
-              value={form.title_en}
-              onChange={(eventValue) =>
-                updateField("title_en", eventValue.target.value)
-              }
-            />
-          </FormGrid>
-
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
-            <TextareaField
-              label="Teaser Deutsch"
-              rows={4}
-              value={form.teaser_de}
-              onChange={(eventValue) =>
-                updateField("teaser_de", eventValue.target.value)
-              }
-            />
-            <TextareaField
-              label="Teaser Englisch"
-              rows={4}
-              value={form.teaser_en}
-              onChange={(eventValue) =>
-                updateField("teaser_en", eventValue.target.value)
-              }
-            />
-          </div>
-
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
-            <TextareaField
-              label="Beschreibung Deutsch"
-              rows={8}
-              value={form.description_de}
-              onChange={(eventValue) =>
-                updateField("description_de", eventValue.target.value)
-              }
-            />
-            <TextareaField
-              label="Beschreibung Englisch"
-              rows={8}
-              value={form.description_en}
-              onChange={(eventValue) =>
-                updateField("description_en", eventValue.target.value)
-              }
-            />
-          </div>
-        </FormSection>
+        <EventBasicTab
+          form={form}
+          isEdit={isEdit}
+          event={event}
+          updateField={updateField}
+        />
       )}
 
       {activeTab === "time" && (
-        <FormSection
-          eyebrow="Termin"
-          title="Datum und Zeit"
-          description="Lege Zeitraum, Tagesstatus und Typ des Events fest."
-        >
-          <FormGrid>
-            <SelectField
-              label="Typ"
-              value={form.event_type}
-              onChange={(eventValue) =>
-                updateField("event_type", eventValue.target.value)
-              }
-            >
-              {EVENT_TYPES.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </SelectField>
-
-            <SelectField
-              label="Mannschaft (optional)"
-              value={form.team_id}
-              onChange={(eventValue) =>
-                updateField("team_id", eventValue.target.value)
-              }
-            >
-              <option value="">Keine Mannschaft</option>
-              {teams.map((team) => (
-                <option key={team.id} value={team.id}>
-                  {team.name_de}
-                </option>
-              ))}
-            </SelectField>
-          </FormGrid>
-
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
-            <InputField
-              label="Start"
-              type="datetime-local"
-              required
-              value={form.starts_at}
-              onChange={(eventValue) =>
-                updateField("starts_at", eventValue.target.value)
-              }
-            />
-            <InputField
-              label="Ende"
-              type="datetime-local"
-              value={form.ends_at}
-              onChange={(eventValue) =>
-                updateField("ends_at", eventValue.target.value)
-              }
-            />
-          </div>
-
-          <label className="mt-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-white/70">
-            <input
-              type="checkbox"
-              checked={form.is_all_day}
-              onChange={(eventValue) =>
-                updateField("is_all_day", eventValue.target.checked)
-              }
-            />
-            Ganztägiger Termin
-          </label>
-
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-              Wiederholung
-            </p>
-
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              {RECURRENCE_TYPES.map(([value, label]) => (
-                <label
-                  key={value}
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-sm text-white/75"
-                >
-                  <input
-                    type="radio"
-                    name="recurrence_type"
-                    value={value}
-                    checked={form.recurrence_type === value}
-                    onChange={(eventValue) =>
-                      updateField("recurrence_type", eventValue.target.value)
-                    }
-                  />
-                  {label}
-                </label>
-              ))}
-            </div>
-
-            {hasRecurrence && (
-              <div className="mt-5 grid gap-5 md:grid-cols-3">
-                <InputField
-                  label="Intervall"
-                  type="number"
-                  min="1"
-                  value={form.recurrence_interval}
-                  onChange={(eventValue) =>
-                    updateField(
-                      "recurrence_interval",
-                      Math.max(1, Number(eventValue.target.value || 1)),
-                    )
-                  }
-                />
-
-                <InputField
-                  label="Enddatum der Serie"
-                  type="date"
-                  value={form.recurrence_until}
-                  onChange={(eventValue) =>
-                    updateField("recurrence_until", eventValue.target.value)
-                  }
-                />
-
-                <InputField
-                  label="Maximale Wiederholungen"
-                  type="number"
-                  min="1"
-                  value={form.recurrence_count}
-                  onChange={(eventValue) => {
-                    const next = eventValue.target.value;
-                    updateField(
-                      "recurrence_count",
-                      next === "" ? "" : Math.max(1, Number(next)),
-                    );
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </FormSection>
+        <EventTimeTab
+          form={form}
+          teams={teams}
+          hasRecurrence={hasRecurrence}
+          updateField={updateField}
+        />
       )}
 
       {activeTab === "location" && (
-        <FormSection
-          eyebrow="Ort"
-          title="Veranstaltungsort"
-          description="Pflege Ort und optionale externe URL für weitere Informationen."
-        >
-          <FormGrid>
-            <InputField
-              label="Ort"
-              value={form.location_name}
-              onChange={(eventValue) =>
-                updateField("location_name", eventValue.target.value)
-              }
-            />
-            <InputField
-              label="Stadt"
-              value={form.location_city}
-              onChange={(eventValue) =>
-                updateField("location_city", eventValue.target.value)
-              }
-            />
-          </FormGrid>
-
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
-            <InputField
-              label="Adresse"
-              value={form.location_address}
-              onChange={(eventValue) =>
-                updateField("location_address", eventValue.target.value)
-              }
-            />
-            <InputField
-              label="Externer Link"
-              placeholder="https://..."
-              value={form.external_url}
-              onChange={(eventValue) =>
-                updateField("external_url", eventValue.target.value)
-              }
-            />
-          </div>
-        </FormSection>
+        <EventLocationTab form={form} updateField={updateField} />
       )}
 
       {activeTab === "media" && (
-        <FormSection
-          eyebrow="Medien"
-          title="Event-Bild"
-          description="Optionales Bild für Kartenansicht und spätere öffentliche Darstellung."
-        >
-          <AdminImageUpload
-            imageUrl={form.image_url}
-            onUpload={handleImageUpload}
-            onRemove={() => updateField("image_url", "")}
-            description="Lade ein Bild für den Termin hoch."
-            uploadLabel="Bild hochladen"
-            removeLabel="Bild entfernen"
-            alt={form.title_de || "Event-Bild"}
-          />
-        </FormSection>
+        <EventMediaTab
+          form={form}
+          handleImageUpload={handleImageUpload}
+          updateField={updateField}
+        />
       )}
 
       {activeTab === "documents" && (
-        <FormSection
-          eyebrow="Dokumente"
-          title="Dateien zum Termin"
-          description="Anhänge für die öffentliche Termin-Detailseite verwalten."
-        >
-          {!isEdit ? (
-            <div className="rounded-[1.75rem] border border-dashed border-white/10 bg-black/10 p-8 text-center text-sm text-white/55">
-              Speichere den Termin zuerst, danach können Dokumente hochgeladen
-              werden.
-            </div>
-          ) : (
-            <EventDocumentsManager
-              documents={documents}
-              setDocuments={setDocuments}
-              onUploadDocument={handleDocumentUpload}
-              onDeleteDocument={handleDocumentDelete}
-              loading={documentsLoading}
-            />
-          )}
-        </FormSection>
+        <EventDocumentsTab
+          isEdit={isEdit}
+          documents={documents}
+          setDocuments={setDocuments}
+          onUploadDocument={handleDocumentUpload}
+          onDeleteDocument={handleDocumentDelete}
+          documentsLoading={documentsLoading}
+        />
       )}
 
       {activeTab === "settings" && (
-        <FormSection
-          eyebrow="Einstellungen"
-          title="Sichtbarkeit und Sortierung"
-          description="Steuere Veröffentlichung und Hervorhebung im Vereinssystem."
-        >
-          <div className="grid gap-5 md:grid-cols-2">
-            <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-white/70">
-              <input
-                type="checkbox"
-                checked={form.is_published}
-                onChange={(eventValue) =>
-                  updateField("is_published", eventValue.target.checked)
-                }
-              />
-              Veröffentlicht
-            </label>
-
-            <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-white/70">
-              <input
-                type="checkbox"
-                checked={form.is_featured}
-                onChange={(eventValue) =>
-                  updateField("is_featured", eventValue.target.checked)
-                }
-              />
-              Auf Startseite hervorheben
-            </label>
-          </div>
-
-          <div className="mt-5 max-w-sm">
-            <InputField
-              label="Sortierung"
-              type="number"
-              min="0"
-              value={form.sort_order}
-              onChange={(eventValue) =>
-                updateField("sort_order", Number(eventValue.target.value || 0))
-              }
-            />
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-400">
-              Öffentlicher Link
-            </p>
-            <p className="mt-2 break-all text-sm text-white/70">
-              {publicUrl || "Slug wird automatisch aus dem Titel erzeugt."}
-            </p>
-          </div>
-        </FormSection>
+        <EventSettingsTab
+          form={form}
+          publicUrl={publicUrl}
+          updateField={updateField}
+        />
       )}
 
       <FormActions

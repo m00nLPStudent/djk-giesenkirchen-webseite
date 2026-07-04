@@ -9,7 +9,13 @@ export default function EventCard({ event }) {
   const locationLabel = [event.location_name, event.location_city]
     .filter(Boolean)
     .join(" · ");
-  const href = event.slug ? `/termine/${event.slug}` : "/termine";
+  const isVirtualTraining =
+    event.is_virtual === true && event.source_type === "team_training";
+  const href = isVirtualTraining
+    ? `/termine/training/${event.occurrence_id}`
+    : event.slug
+      ? `/termine/${event.slug}`
+      : "/termine";
 
   const shortDescription =
     event.teaser_de ||
@@ -61,7 +67,7 @@ export default function EventCard({ event }) {
         </p>
 
         <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-red-400">
-          Zum Termin
+          {isVirtualTraining ? "Zum Training" : "Zum Termin"}
         </p>
       </div>
     </Link>

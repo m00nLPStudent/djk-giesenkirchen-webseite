@@ -213,7 +213,14 @@ Geplante Umsetzung:
 
 - [ ] Vorstand
 - [ ] Sponsoren
-- [ ] Termine
+- [x] Termine
+- [x] Wiederkehrende Events
+- [x] Event-Dokumente
+- [x] Kalenderexport für echte Events
+- [x] Virtuelle Trainingszeiten über eigene Runtime-Logik
+- [x] Admin-Verwaltung für `team_training_times`
+- [x] Admin-Verwaltung für `team_training_exceptions`
+- [ ] Admin-Verwaltung für `club_closure_periods`
 - [ ] Turniere
 - [ ] Medienverwaltung
 - [ ] Rollen- und Rechtesystem
@@ -224,7 +231,11 @@ Geplante Umsetzung:
 - [x] Fußballbereich Grundstruktur
 - [x] Mannschaftsdetailseiten
 - [x] Trainerprofilseiten
-- [ ] Termine
+- [x] Termine-Landingpage
+- [x] Trainingstermine als eigene Route
+- [x] Allgemeine Termine als eigene Route
+- [x] Event-Detailseiten mit Wiederholung, Maps und Dokumenten
+- [x] Virtuelle Trainings-Detailseite
 - [ ] Kontakt
 - [ ] Tischtennis
 - [ ] Damen-Gymnastik
@@ -242,7 +253,7 @@ Geplante Umsetzung:
 
 ## Aktueller nächster Fokus
 
-Als nächstes werden Navigation und Footer finalisiert. Danach wird das News-Modul abgeschlossen, inklusive Dokumentanhängen/Downloads für News.
+Als nächstes werden Navigation/Footer-Feinschliff, restliche Doku-Aktualisierung und weitere interne Struktur-Refactors fortgeführt. Offene fachliche Punkte im Termine-Bereich sind vor allem `club_closure_periods`-Admin, virtuelle Trainings-Exports und spätere Bereinigung der Legacy-Trainingsfelder.
 
 ## Regel
 

@@ -37,8 +37,15 @@ export default function HomeEventsSection({ events = [] }) {
           <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {events.map((event) => (
               <Link
-                key={event.id}
-                href={event.slug ? `/termine/${event.slug}` : "/termine"}
+                key={event.occurrence_id || `${event.id}-${event.starts_at}`}
+                href={
+                  event.is_virtual === true &&
+                  event.source_type === "team_training"
+                    ? `/termine/training/${event.occurrence_id}`
+                    : event.slug
+                      ? `/termine/${event.slug}`
+                      : "/termine"
+                }
                 className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 transition hover:border-red-500/50 hover:bg-white/10"
               >
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-red-400">

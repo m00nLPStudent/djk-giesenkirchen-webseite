@@ -16,6 +16,8 @@ import {
   TextareaField,
 } from "@/components/admin/forms";
 import TeamLogoUpload from "../components/TeamLogoUpload";
+import TrainingExceptionsManager from "../components/TrainingExceptionsManager";
+import TrainingTimesManager from "../components/TrainingTimesManager";
 import { createSlug } from "../utils/slug";
 import { saveTeamWithSeason, uploadTeamImage } from "../services/teams.service";
 import TeamFootballDeFields from "./fields/TeamFootballDeFields";
@@ -24,7 +26,7 @@ const TEAM_FORM_TABS = [
   { id: "season", label: "Saison" },
   { id: "base", label: "Mannschaft" },
   { id: "description", label: "Beschreibung" },
-  { id: "training", label: "Training" },
+  { id: "training", label: "Trainingszeiten" },
   { id: "players", label: "Kader" },
   { id: "staff", label: "Trainer" },
   { id: "competition", label: "Spielbetrieb" },
@@ -38,7 +40,9 @@ function getCurrentSeason(seasons = []) {
 }
 
 function findTeamSeason(teamSeasons = [], seasonId) {
-  return teamSeasons.find((teamSeason) => teamSeason.season_id === seasonId) || null;
+  return (
+    teamSeasons.find((teamSeason) => teamSeason.season_id === seasonId) || null
+  );
 }
 
 function getAssignedIds(assignments = [], teamSeasonId, fieldName) {
@@ -51,7 +55,8 @@ function getAssignedIds(assignments = [], teamSeasonId, fieldName) {
 }
 
 function getPersonName(person = {}) {
-  const fullName = `${person.first_name || ""} ${person.last_name || ""}`.trim();
+  const fullName =
+    `${person.first_name || ""} ${person.last_name || ""}`.trim();
   return fullName || person.name || person.name_de || "Ohne Namen";
 }
 
@@ -60,7 +65,14 @@ function belongsToTeam(item = {}, teamId) {
   return !item.team_id || item.team_id === teamId;
 }
 
-function SelectionList({ items = [], selectedIds = [], onChange, getLabel, getMeta, emptyText }) {
+function SelectionList({
+  items = [],
+  selectedIds = [],
+  onChange,
+  getLabel,
+  getMeta,
+  emptyText,
+}) {
   function toggleItem(id) {
     const nextValue = selectedIds.includes(id)
       ? selectedIds.filter((selectedId) => selectedId !== id)
@@ -96,14 +108,20 @@ function SelectionList({ items = [], selectedIds = [], onChange, getLabel, getMe
             <div className="flex items-start gap-3">
               <span
                 className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-xs font-black ${
-                  isSelected ? "border-red-500 bg-red-600 text-white" : "border-white/20"
+                  isSelected
+                    ? "border-red-500 bg-red-600 text-white"
+                    : "border-white/20"
                 }`}
               >
                 {isSelected ? "✓" : ""}
               </span>
               <span>
                 <span className="block font-bold">{getLabel(item)}</span>
-                {getMeta?.(item) && <span className="mt-1 block text-xs text-white/45">{getMeta(item)}</span>}
+                {getMeta?.(item) && (
+                  <span className="mt-1 block text-xs text-white/45">
+                    {getMeta(item)}
+                  </span>
+                )}
               </span>
             </div>
           </button>
@@ -126,7 +144,9 @@ function TeamFormTabs({ activeTab, onChange }) {
               type="button"
               onClick={() => onChange(tab.id)}
               className={`shrink-0 rounded-full px-5 py-3 text-sm font-black transition ${
-                isActive ? "bg-red-600 text-white" : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
+                isActive
+                  ? "bg-red-600 text-white"
+                  : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white"
               }`}
             >
               {tab.label}
@@ -138,9 +158,17 @@ function TeamFormTabs({ activeTab, onChange }) {
   );
 }
 
-function createInitialForm({ team, seasons = [], teamSeasons = [], playerAssignments = [], coachAssignments = [], seasonId = null }) {
+function createInitialForm({
+  team,
+  seasons = [],
+  teamSeasons = [],
+  playerAssignments = [],
+  coachAssignments = [],
+  seasonId = null,
+}) {
   const publicSeason = getCurrentSeason(seasons);
-  const selectedSeason = seasons.find((season) => season.id === seasonId) || publicSeason;
+  const selectedSeason =
+    seasons.find((season) => season.id === seasonId) || publicSeason;
   const selectedTeamSeason = findTeamSeason(teamSeasons, selectedSeason?.id);
   const source = selectedTeamSeason || team || {};
 
@@ -149,8 +177,16 @@ function createInitialForm({ team, seasons = [], teamSeasons = [], playerAssignm
     season: selectedSeason?.name || team?.season || "2026/2027",
     public_season_id: publicSeason?.id || selectedSeason?.id || "",
     team_season_id: selectedTeamSeason?.id || "",
-    selected_player_ids: getAssignedIds(playerAssignments, selectedTeamSeason?.id, "player_id"),
-    selected_coach_ids: getAssignedIds(coachAssignments, selectedTeamSeason?.id, "coach_id"),
+    selected_player_ids: getAssignedIds(
+      playerAssignments,
+      selectedTeamSeason?.id,
+      "player_id",
+    ),
+    selected_coach_ids: getAssignedIds(
+      coachAssignments,
+      selectedTeamSeason?.id,
+      "coach_id",
+    ),
     team_template_id: "",
     name_de: source.name_de || team?.name_de || "",
     name_en: source.name_en || team?.name_en || "",
@@ -158,20 +194,30 @@ function createInitialForm({ team, seasons = [], teamSeasons = [], playerAssignm
     age_group: source.age_group || team?.age_group || "Jugend",
     description_de: source.description_de || team?.description_de || "",
     description_en: source.description_en || team?.description_en || "",
-    training_times_de: source.training_times_de || team?.training_times_de || "",
-    training_times_en: source.training_times_en || team?.training_times_en || "",
+    training_times_de:
+      source.training_times_de || team?.training_times_de || "",
+    training_times_en:
+      source.training_times_en || team?.training_times_en || "",
     team_image_url: source.team_image_url || team?.team_image_url || "",
     sort_order: source.sort_order ?? team?.sort_order ?? 0,
     is_active: source.is_active ?? team?.is_active ?? true,
     contact_name: source.contact_name || team?.contact_name || "",
     contact_email: source.contact_email || team?.contact_email || "",
     contact_phone: source.contact_phone || team?.contact_phone || "",
-    contact_image_url: source.contact_image_url || team?.contact_image_url || "",
+    contact_image_url:
+      source.contact_image_url || team?.contact_image_url || "",
     fussball_de_matches_widget_code: "",
     fussball_de_table_widget_code: "",
-    fussball_de_matches_widget_id: source.fussball_de_matches_widget_id || team?.fussball_de_matches_widget_id || "",
-    fussball_de_table_widget_id: source.fussball_de_table_widget_id || team?.fussball_de_table_widget_id || "",
-    fussball_de_team_url: source.fussball_de_team_url || team?.fussball_de_team_url || "",
+    fussball_de_matches_widget_id:
+      source.fussball_de_matches_widget_id ||
+      team?.fussball_de_matches_widget_id ||
+      "",
+    fussball_de_table_widget_id:
+      source.fussball_de_table_widget_id ||
+      team?.fussball_de_table_widget_id ||
+      "",
+    fussball_de_team_url:
+      source.fussball_de_team_url || team?.fussball_de_team_url || "",
   };
 }
 
@@ -189,13 +235,26 @@ export default function AdminTeamsForm({
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
   const [activeTab, setActiveTab] = useState("season");
   const [form, setForm] = useState(() =>
-    createInitialForm({ team, seasons, teamSeasons, playerAssignments, coachAssignments, seasonId: initialSeason?.id }),
+    createInitialForm({
+      team,
+      seasons,
+      teamSeasons,
+      playerAssignments,
+      coachAssignments,
+      seasonId: initialSeason?.id,
+    }),
   );
   const [loading, setLoading] = useState(false);
   const isEditMode = Boolean(team?.id);
 
-  const filteredPlayers = useMemo(() => players.filter((player) => belongsToTeam(player, team?.id)), [players, team?.id]);
-  const filteredCoaches = useMemo(() => coaches.filter((coach) => belongsToTeam(coach, team?.id)), [coaches, team?.id]);
+  const filteredPlayers = useMemo(
+    () => players.filter((player) => belongsToTeam(player, team?.id)),
+    [players, team?.id],
+  );
+  const filteredCoaches = useMemo(
+    () => coaches.filter((coach) => belongsToTeam(coach, team?.id)),
+    [coaches, team?.id],
+  );
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -203,9 +262,20 @@ export default function AdminTeamsForm({
 
   function updateSeason(seasonId) {
     const season = seasons.find((item) => item.id === seasonId);
-    const nextForm = createInitialForm({ team, seasons, teamSeasons, playerAssignments, coachAssignments, seasonId: season?.id });
+    const nextForm = createInitialForm({
+      team,
+      seasons,
+      teamSeasons,
+      playerAssignments,
+      coachAssignments,
+      seasonId: season?.id,
+    });
 
-    setForm((current) => ({ ...nextForm, public_season_id: current.public_season_id, team_template_id: current.team_template_id }));
+    setForm((current) => ({
+      ...nextForm,
+      public_season_id: current.public_season_id,
+      team_template_id: current.team_template_id,
+    }));
   }
 
   function updateTeamTemplate(templateId) {
@@ -300,11 +370,17 @@ export default function AdminTeamsForm({
           title="Bearbeitungs-Saison auswählen"
           description="Wähle hier nur aus, welche Saison dieser Mannschaft du gerade bearbeiten möchtest. Welche Saison öffentlich angezeigt wird, stellst du unter Einstellungen ein."
         >
-          <SelectField label="Diese Saison bearbeiten" required value={form.season_id} onChange={(event) => updateSeason(event.target.value)}>
+          <SelectField
+            label="Diese Saison bearbeiten"
+            required
+            value={form.season_id}
+            onChange={(event) => updateSeason(event.target.value)}
+          >
             <option value="">Saison auswählen</option>
             {seasons.map((season) => (
               <option key={season.id} value={season.id}>
-                {season.name}{season.is_current ? " · aktuell öffentlich" : ""}
+                {season.name}
+                {season.is_current ? " · aktuell öffentlich" : ""}
               </option>
             ))}
           </SelectField>
@@ -315,25 +391,49 @@ export default function AdminTeamsForm({
         <FormSection
           eyebrow="Mannschaft"
           title="Grunddaten"
-          description={isEditMode ? "Diese Grunddaten werden nur beim Erstellen einer Mannschaft festgelegt und sind danach gesperrt." : "Wähle eine Mannschaft aus der Vorlage aus. Slug und Altersgruppe werden automatisch übernommen."}
+          description={
+            isEditMode
+              ? "Diese Grunddaten werden nur beim Erstellen einer Mannschaft festgelegt und sind danach gesperrt."
+              : "Wähle eine Mannschaft aus der Vorlage aus. Slug und Altersgruppe werden automatisch übernommen."
+          }
         >
           {isEditMode ? (
             <>
               <FormHintBox eyebrow="Gesperrte Grunddaten">
-                Name, Slug und Altersgruppe können nach dem Erstellen nicht mehr direkt geändert werden, damit Spieler-, Trainer- und Saisonzuordnungen stabil bleiben.
+                Name, Slug und Altersgruppe können nach dem Erstellen nicht mehr
+                direkt geändert werden, damit Spieler-, Trainer- und
+                Saisonzuordnungen stabil bleiben.
               </FormHintBox>
               <div className="mt-6">
                 <FormGrid>
-                  <InputField label="Mannschaft" required value={form.name_de} disabled />
+                  <InputField
+                    label="Mannschaft"
+                    required
+                    value={form.name_de}
+                    disabled
+                  />
                   <InputField label="Slug" value={form.slug} disabled />
-                  <InputField label="Altersgruppe" value={form.age_group} disabled />
-                  <InputField label="Bearbeitete Saison" value={form.season} disabled />
+                  <InputField
+                    label="Altersgruppe"
+                    value={form.age_group}
+                    disabled
+                  />
+                  <InputField
+                    label="Bearbeitete Saison"
+                    value={form.season}
+                    disabled
+                  />
                 </FormGrid>
               </div>
             </>
           ) : (
             <FormGrid>
-              <SelectField label="Mannschaft auswählen" required value={form.team_template_id} onChange={(event) => updateTeamTemplate(event.target.value)}>
+              <SelectField
+                label="Mannschaft auswählen"
+                required
+                value={form.team_template_id}
+                onChange={(event) => updateTeamTemplate(event.target.value)}
+              >
                 <option value="">Mannschaft auswählen</option>
                 {teamTemplates.map((template) => (
                   <option key={template.id} value={template.id}>
@@ -342,8 +442,16 @@ export default function AdminTeamsForm({
                 ))}
               </SelectField>
               <InputField label="Slug" value={form.slug} disabled />
-              <InputField label="Altersgruppe" value={form.age_group} disabled />
-              <InputField label="Bearbeitete Saison" value={form.season} disabled />
+              <InputField
+                label="Altersgruppe"
+                value={form.age_group}
+                disabled
+              />
+              <InputField
+                label="Bearbeitete Saison"
+                value={form.season}
+                disabled
+              />
             </FormGrid>
           )}
         </FormSection>
@@ -352,49 +460,100 @@ export default function AdminTeamsForm({
       {activeTab === "description" && (
         <FormSection eyebrow="Beschreibung" title="Mannschaftsbeschreibung">
           <div className="space-y-4">
-            <TextareaField label="Beschreibung Deutsch" rows={8} value={form.description_de} onChange={(event) => updateField("description_de", event.target.value)} />
-            <TextareaField label="Beschreibung Englisch" rows={8} value={form.description_en} onChange={(event) => updateField("description_en", event.target.value)} />
+            <TextareaField
+              label="Beschreibung Deutsch"
+              rows={8}
+              value={form.description_de}
+              onChange={(event) =>
+                updateField("description_de", event.target.value)
+              }
+            />
+            <TextareaField
+              label="Beschreibung Englisch"
+              rows={8}
+              value={form.description_en}
+              onChange={(event) =>
+                updateField("description_en", event.target.value)
+              }
+            />
           </div>
         </FormSection>
       )}
 
       {activeTab === "training" && (
-        <FormSection eyebrow="Training" title="Trainingsinformationen">
-          <div className="space-y-4">
-            <TextareaField label="Trainingszeiten Deutsch" rows={5} value={form.training_times_de} onChange={(event) => updateField("training_times_de", event.target.value)} />
-            <TextareaField label="Trainingszeiten Englisch" rows={5} value={form.training_times_en} onChange={(event) => updateField("training_times_en", event.target.value)} />
+        <FormSection eyebrow="Training" title="Trainingszeiten & Ausnahmen">
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <TextareaField
+                label="Trainingszeiten Deutsch"
+                rows={5}
+                value={form.training_times_de}
+                onChange={(event) =>
+                  updateField("training_times_de", event.target.value)
+                }
+              />
+              <TextareaField
+                label="Trainingszeiten Englisch"
+                rows={5}
+                value={form.training_times_en}
+                onChange={(event) =>
+                  updateField("training_times_en", event.target.value)
+                }
+              />
+            </div>
+
+            <TrainingTimesManager teamSeasonId={form.team_season_id} />
+            <TrainingExceptionsManager teamSeasonId={form.team_season_id} />
           </div>
         </FormSection>
       )}
 
       {activeTab === "players" && (
-        <FormSection eyebrow="Kader" title="Spieler dieser Saison" description="Angezeigt werden nur Spieler, die bei der Spielererstellung dieser Mannschaft zugeordnet wurden.">
+        <FormSection
+          eyebrow="Kader"
+          title="Spieler dieser Saison"
+          description="Angezeigt werden nur Spieler, die bei der Spielererstellung dieser Mannschaft zugeordnet wurden."
+        >
           <SelectionList
             items={filteredPlayers}
             selectedIds={form.selected_player_ids}
             onChange={(value) => updateField("selected_player_ids", value)}
             getLabel={getPersonName}
-            getMeta={(player) => [player.position_de, player.year_group].filter(Boolean).join(" · ")}
+            getMeta={(player) =>
+              [player.position_de, player.year_group]
+                .filter(Boolean)
+                .join(" · ")
+            }
             emptyText="Für diese Mannschaft sind noch keine Spieler angelegt oder zugeordnet."
           />
         </FormSection>
       )}
 
       {activeTab === "staff" && (
-        <FormSection eyebrow="Team" title="Trainer & Betreuer dieser Saison" description="Angezeigt werden nur Trainer und Betreuer, die bei der Trainererstellung dieser Mannschaft zugeordnet wurden.">
+        <FormSection
+          eyebrow="Team"
+          title="Trainer & Betreuer dieser Saison"
+          description="Angezeigt werden nur Trainer und Betreuer, die bei der Trainererstellung dieser Mannschaft zugeordnet wurden."
+        >
           <SelectionList
             items={filteredCoaches}
             selectedIds={form.selected_coach_ids}
             onChange={(value) => updateField("selected_coach_ids", value)}
             getLabel={getPersonName}
-            getMeta={(coach) => [coach.role_de, coach.license].filter(Boolean).join(" · ")}
+            getMeta={(coach) =>
+              [coach.role_de, coach.license].filter(Boolean).join(" · ")
+            }
             emptyText="Für diese Mannschaft sind noch keine Trainer oder Betreuer angelegt oder zugeordnet."
           />
         </FormSection>
       )}
 
       {activeTab === "competition" && (
-        <FormSection eyebrow="Spielbetrieb" title="fussball.de Integration" description="Widget-Code aus fussball.de einfügen. Gespeichert werden automatisch nur die Widget-IDs.">
+        <FormSection
+          eyebrow="Spielbetrieb"
+          title="fussball.de Integration"
+          description="Widget-Code aus fussball.de einfügen. Gespeichert werden automatisch nur die Widget-IDs."
+        >
           <TeamFootballDeFields form={form} updateField={updateField} />
         </FormSection>
       )}
@@ -402,40 +561,84 @@ export default function AdminTeamsForm({
       {activeTab === "contact" && (
         <FormSection eyebrow="Kontakt" title="Ansprechpartner">
           <div className="space-y-4">
-            <InputField label="Ansprechpartner" value={form.contact_name} onChange={(event) => updateField("contact_name", event.target.value)} />
-            <EmailField value={form.contact_email} onChange={(value) => updateField("contact_email", value)} />
-            <PhoneField value={form.contact_phone} onChange={(value) => updateField("contact_phone", value)} />
-            <TeamLogoUpload imageUrl={form.contact_image_url} onUpload={uploadContactImage} onRemove={() => updateField("contact_image_url", "")} />
+            <InputField
+              label="Ansprechpartner"
+              value={form.contact_name}
+              onChange={(event) =>
+                updateField("contact_name", event.target.value)
+              }
+            />
+            <EmailField
+              value={form.contact_email}
+              onChange={(value) => updateField("contact_email", value)}
+            />
+            <PhoneField
+              value={form.contact_phone}
+              onChange={(value) => updateField("contact_phone", value)}
+            />
+            <TeamLogoUpload
+              imageUrl={form.contact_image_url}
+              onUpload={uploadContactImage}
+              onRemove={() => updateField("contact_image_url", "")}
+            />
           </div>
         </FormSection>
       )}
 
       {activeTab === "media" && (
         <FormSection eyebrow="Medien" title="Mannschaftsbild">
-          <TeamLogoUpload imageUrl={form.team_image_url} onUpload={uploadImage} onRemove={() => updateField("team_image_url", "")} />
+          <TeamLogoUpload
+            imageUrl={form.team_image_url}
+            onUpload={uploadImage}
+            onRemove={() => updateField("team_image_url", "")}
+          />
         </FormSection>
       )}
 
       {activeTab === "settings" && (
-        <FormSection eyebrow="Einstellungen" title="Status, Sortierung & öffentliche Saison">
+        <FormSection
+          eyebrow="Einstellungen"
+          title="Status, Sortierung & öffentliche Saison"
+        >
           <div className="space-y-6">
             <FormHintBox eyebrow="Öffentliche Anzeige">
-              Diese Auswahl gilt für die komplette Website. Die hier gewählte Saison wird auf den öffentlichen Mannschaftsseiten angezeigt.
+              Diese Auswahl gilt für die komplette Website. Die hier gewählte
+              Saison wird auf den öffentlichen Mannschaftsseiten angezeigt.
             </FormHintBox>
-            <SelectField label="Öffentlich angezeigte Saison" value={form.public_season_id} onChange={(event) => updateField("public_season_id", event.target.value)}>
+            <SelectField
+              label="Öffentlich angezeigte Saison"
+              value={form.public_season_id}
+              onChange={(event) =>
+                updateField("public_season_id", event.target.value)
+              }
+            >
               {seasons.map((season) => (
                 <option key={season.id} value={season.id}>
-                  {season.name}{season.id === form.public_season_id ? " · wird angezeigt" : ""}
+                  {season.name}
+                  {season.id === form.public_season_id
+                    ? " · wird angezeigt"
+                    : ""}
                 </option>
               ))}
             </SelectField>
-            <SortOrderField value={form.sort_order} onChange={(value) => updateField("sort_order", value)} />
-            <ActiveStatusField checked={form.is_active} onChange={(value) => updateField("is_active", value)} entityLabel="Mannschaft" />
+            <SortOrderField
+              value={form.sort_order}
+              onChange={(value) => updateField("sort_order", value)}
+            />
+            <ActiveStatusField
+              checked={form.is_active}
+              onChange={(value) => updateField("is_active", value)}
+              entityLabel="Mannschaft"
+            />
           </div>
         </FormSection>
       )}
 
-      <FormActions loading={loading} submitLabel="Mannschaft speichern" cancelHref="/admin/teams" />
+      <FormActions
+        loading={loading}
+        submitLabel="Mannschaft speichern"
+        cancelHref="/admin/teams"
+      />
     </form>
   );
 }

@@ -136,6 +136,21 @@ function getTeamIdFromTraining(slot = {}) {
   );
 }
 
+function getTeamSlugFromTraining(slot = {}) {
+  return (
+    slot.team_slug ||
+    slot.team_seasons?.team_slug ||
+    slot.team_season?.team_slug ||
+    slot.teams?.slug ||
+    slot.team?.slug ||
+    null
+  );
+}
+
+function getTeamSeasonSlugFromTraining(slot = {}) {
+  return slot.team_seasons?.slug || slot.team_season?.slug || null;
+}
+
 function getTrainingTypeLabel(type = "training") {
   const map = {
     training: "Training",
@@ -154,6 +169,8 @@ function toOccurrenceLikeEvent(slot, startDate, endDate, occurrenceIndex) {
   const trainingType = slot.training_type || "training";
   const teamName = getTeamNameFromTraining(slot);
   const teamId = getTeamIdFromTraining(slot);
+  const teamSlug = getTeamSlugFromTraining(slot);
+  const teamSeasonSlug = getTeamSeasonSlugFromTraining(slot);
   const dateKey = dateToKeyLocal(startDate);
   const baseId = `team-training-${slot.id}`;
 
@@ -169,6 +186,9 @@ function toOccurrenceLikeEvent(slot, startDate, endDate, occurrenceIndex) {
 
     team_id: teamId,
     team_season_id: slot.team_season_id || null,
+    team_slug: teamSlug,
+    team_season_slug: teamSeasonSlug,
+    team_name_de: teamName,
     training_type: trainingType,
 
     title_de: `${getTrainingTypeLabel(trainingType)} ${teamName}`,
@@ -472,7 +492,7 @@ export async function getVirtualTrainingEvents({
   if (teamSeasonIds.length > 0) {
     const seasonsResult = await supabase
       .from("team_seasons")
-      .select("id, team_id, name_de")
+      .select("id, team_id, name_de, slug")
       .in("id", teamSeasonIds);
 
     if (seasonsResult.error) {
@@ -497,7 +517,7 @@ export async function getVirtualTrainingEvents({
     if (teamIds.length > 0) {
       const teamsResult = await supabase
         .from("teams")
-        .select("id, name_de")
+        .select("id, name_de, slug")
         .in("id", teamIds);
 
       if (teamsResult.error) {
@@ -521,6 +541,7 @@ export async function getVirtualTrainingEvents({
       team_seasons: season,
       teams: team,
       team_name_de: slot.team_name_de || team?.name_de || null,
+      team_slug: slot.team_slug || team?.slug || null,
     };
   });
 
