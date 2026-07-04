@@ -44,9 +44,14 @@ Es wird immer erst geprüft, welche Datenbankstruktur vorhanden ist. Danach werd
 
 Grund: Die finale Darstellung und Domain-Freigabe können erst sauber getestet werden, wenn die Website auf dem Server beziehungsweise auf der finalen Domain läuft.
 
+### In Bearbeitung / nächster Fokus
+
+- Navigation und Footer sauber finalisieren
+- News-Modul finalisieren
+- News-Downloads / Dokumentanhänge für öffentliche News und Adminbereich ergänzen
+
 ### Offen
 
-- News-Modul finalisieren
 - Termine / Kalender
 - Sponsoren
 - Vorstand
@@ -161,7 +166,50 @@ Grund: Die finale Darstellung und Domain-Freigabe können erst sauber getestet w
 - [ ] Darstellung auf echter Domain testen
 - [ ] Responsive Feinschliff der Widgets
 
-### Phase 7: Weitere Adminmodule
+### Phase 7: Navigation und Footer finalisieren
+
+- [ ] Hauptnavigation vollständig mit echten Zielseiten verlinken
+- [ ] Footer-Platzhalter (`#`) durch echte Routen ersetzen
+- [ ] fehlende öffentliche Seiten als Grundseiten anlegen
+- [ ] Kontakt, Impressum und Datenschutz erreichbar machen
+- [ ] Mobile Navigation prüfen und bei Bedarf ergänzen
+- [ ] Hover-, Fokus- und aktive Zustände einheitlich im Vereinsrot umsetzen
+- [ ] Responsive Verhalten von Header, Logo, Navigation und Footer testen
+
+### Phase 8: News-Modul finalisieren
+
+- [x] News auf Startseite anzeigen
+- [x] News-Übersicht mit Suche und Pagination anzeigen
+- [x] News-Detailseite anzeigen
+- [ ] News-Datenstruktur final prüfen
+- [ ] Admin-Newsformular final prüfen und bereinigen
+- [ ] News-Kategorien finalisieren
+- [ ] Veröffentlichungsdatum, Entwurf und Sichtbarkeit final testen
+- [ ] Newsdetailseite optisch finalisieren
+- [ ] SEO-Metadaten für News ergänzen
+- [ ] News-Downloads / Dokumentanhänge ergänzen
+
+#### News-Downloads / Dokumentanhänge
+
+Ziel: Einer News sollen ein oder mehrere Dokumente angehangen werden können. Beispiel: Eine News zur Jahreshauptversammlung enthält unten einen Downloadbereich mit dem Linktext „Offizielle Einladung herunterladen“.
+
+Geplante Umsetzung:
+
+- [ ] Datenbanktabelle für News-Dokumente anlegen, z. B. `news_documents`
+- [ ] Felder vorsehen: `id`, `news_id`, `file_url`, `file_path`, `file_name`, `display_name_de`, `description_de`, `mime_type`, `file_size`, `sort_order`, `is_public`, `created_at`, `updated_at`
+- [ ] Supabase-Storage-Bucket oder vorhandenen Medien-Bucket für News-Dokumente festlegen
+- [ ] Adminbereich News erstellen/bearbeiten um Reiter „Dokumente“ erweitern
+- [ ] PDF/Dokument hochladen können
+- [ ] automatisch erkannten Dateinamen anzeigen
+- [ ] frei wählbaren Anzeigenamen pro Datei pflegen können, z. B. „Jahreshauptversammlung 2026“ statt technischem Dateinamen
+- [ ] optionale Kurzbeschreibung pro Dokument pflegen können
+- [ ] Reihenfolge der Dokumente pflegen können
+- [ ] Dokument löschen und dabei Storage-Cleanup berücksichtigen
+- [ ] öffentliche News-Detailseite um Downloadbereich erweitern
+- [ ] Downloadbereich nur anzeigen, wenn öffentliche Dokumente vorhanden sind
+- [ ] Downloadlink gut sichtbar gestalten, z. B. „Hier die offizielle Einladung downloaden“
+
+### Phase 9: Weitere Adminmodule
 
 - [ ] Vorstand
 - [ ] Sponsoren
@@ -171,19 +219,18 @@ Grund: Die finale Darstellung und Domain-Freigabe können erst sauber getestet w
 - [ ] Rollen- und Rechtesystem
 - [ ] Beitragsstatus
 
-### Phase 8: Öffentliche Webseite ausbauen
+### Phase 10: Öffentliche Webseite ausbauen
 
 - [x] Fußballbereich Grundstruktur
 - [x] Mannschaftsdetailseiten
 - [x] Trainerprofilseiten
-- [ ] Newsdetailseiten
 - [ ] Termine
 - [ ] Kontakt
 - [ ] Tischtennis
 - [ ] Damen-Gymnastik
 - [ ] Sponsorenbereich
 
-### Phase 9: Abschluss / Deployment
+### Phase 11: Abschluss / Deployment
 
 - [ ] Responsive Design gesamter Website prüfen
 - [ ] SEO-Grundlagen prüfen
@@ -195,7 +242,7 @@ Grund: Die finale Darstellung und Domain-Freigabe können erst sauber getestet w
 
 ## Aktueller nächster Fokus
 
-Das Mannschaftsmodul ist abgeschlossen. Als nächstes sollte mit einem neuen Hauptmodul weitergemacht werden, sinnvollerweise News, Termine oder Sponsoren.
+Als nächstes werden Navigation und Footer finalisiert. Danach wird das News-Modul abgeschlossen, inklusive Dokumentanhängen/Downloads für News.
 
 ## Regel
 
