@@ -1,11 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import DashboardWelcome from "@/components/admin/dashboard/DashboardWelcome";
-import DashboardStats from "@/components/admin/dashboard/DashboardStats";
-import DashboardLatestNews from "@/components/admin/dashboard/DashboardLatestNews";
-import DashboardPlannedNews from "@/components/admin/dashboard/DashboardPlannedNews";
-import DashboardQuickActions from "@/components/admin/dashboard/DashboardQuickActions";
-import DashboardSystemStatus from "@/components/admin/dashboard/DashboardSystemStatus";
-import DashboardToday from "@/components/admin/dashboard/DashboardToday";
+import DashboardPageShell from "@/components/admin/dashboard/DashboardPageShell";
 import {
   expandRecurringEvents,
   getVirtualTrainingEvents,
@@ -13,37 +7,84 @@ import {
 } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 
-async function getCount(table) {
-  const { count } = await supabase
-    .from(table)
-    .select("*", { count: "exact", head: true });
+async function getCount(table, applyFilters) {
+  let query = supabase.from(table).select("*", { count: "exact", head: true });
 
+  if (typeof applyFilters === "function") {
+    query = applyFilters(query);
+  }
+
+  const { count } = await query;
   return count || 0;
 }
 
 export default async function AdminPage() {
-  const [newsCount, teamsCount, coachesCount, playersCount] = await Promise.all(
-    [
-      getCount("news"),
-      getCount("teams"),
-      getCount("coaches"),
-      getCount("players"),
-    ],
-  );
+  const now = new Date();
+  const nowIso = now.toISOString();
+
+  const [
+    newsTotal,
+    newsPublishedWithDate,
+    newsPublishedWithoutDate,
+    newsPlanned,
+    newsDraft,
+    teamsTotal,
+    coachesTotal,
+    sponsorsTotal,
+    eventsTotal,
+    membershipOpenTotal,
+    recipientActiveTotal,
+  ] = await Promise.all([
+    getCount("news"),
+    getCount("news", (query) =>
+      query.eq("is_published", true).lte("published_at", nowIso),
+    ),
+    getCount("news", (query) =>
+      query.eq("is_published", true).is("published_at", null),
+    ),
+    getCount("news", (query) =>
+      query.eq("is_published", true).gt("published_at", nowIso),
+    ),
+    getCount("news", (query) => query.eq("is_published", false)),
+    getCount("teams"),
+    getCount("coaches"),
+    getCount("sponsors"),
+    getCount("events"),
+    getCount("membership_requests", (query) =>
+      query.in("status", ["new", "in_progress"]),
+    ),
+    getCount("membership_request_recipients", (query) =>
+      query.eq("is_active", true),
+    ),
+  ]);
+
+  const newsPublished = newsPublishedWithDate + newsPublishedWithoutDate;
+  const newsPlannedOrDraft = newsPlanned + newsDraft;
 
   const { data: latestNews } = await supabase
     .from("news")
-    .select("*")
+    .select("id, title_de, category, is_published, published_at, created_at")
     .order("created_at", { ascending: false })
     .limit(5);
 
-  const { data: plannedNews } = await supabase
+  const { data: draftOrPlannedNews } = await supabase
     .from("news")
-    .select("*")
-    .eq("is_published", true)
-    .gt("published_at", new Date().toISOString())
-    .order("published_at", { ascending: true })
+    .select("id, title_de, category, is_published, published_at, created_at")
+    .or(
+      `is_published.eq.false,and(is_published.eq.true,published_at.gt.${nowIso})`,
+    )
+    .order("published_at", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: false })
     .limit(5);
+
+  const { data: latestOpenMembershipRequests } = await supabase
+    .from("membership_requests")
+    .select(
+      "id, first_name, last_name, request_type, status, created_at, teams(name_de)",
+    )
+    .in("status", ["new", "in_progress"])
+    .order("created_at", { ascending: false })
+    .limit(6);
 
   const { data: dashboardEvents } = await supabase
     .from("events")
@@ -54,7 +95,6 @@ export default async function AdminPage() {
     .order("starts_at", { ascending: true })
     .limit(100);
 
-  const now = new Date();
   const from = now;
   const to = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
   const expandedEvents = expandRecurringEvents(dashboardEvents || [], {
@@ -73,32 +113,47 @@ export default async function AdminPage() {
   const upcomingEvents = mergeEventsWithVirtualTrainings(
     upcomingRealEvents,
     virtualTrainings,
-  ).slice(0, 5);
+  ).slice(0, 8);
 
-  const counts = {
-    news: newsCount,
-    teams: teamsCount,
-    coaches: coachesCount,
-    players: playersCount,
+  const { data: legalPages } = await supabase
+    .from("pages")
+    .select("slug, is_published")
+    .in("slug", ["impressum", "datenschutz"]);
+
+  const pageBySlug = Object.fromEntries(
+    (legalPages || []).map((page) => [page.slug, page]),
+  );
+
+  const stats = {
+    newsTotal,
+    newsPublished,
+    newsPlannedOrDraft,
+    teamsTotal,
+    coachesTotal,
+    sponsorsTotal,
+    eventsTotal,
+    membershipOpenTotal,
+  };
+
+  const statusSignals = {
+    impressumPublished: Boolean(pageBySlug.impressum?.is_published),
+    datenschutzPublished: Boolean(pageBySlug.datenschutz?.is_published),
+    membershipOpenTotal,
+    newsPlannedOrDraft,
+    hasActiveMembershipRecipients: recipientActiveTotal > 0,
   };
 
   return (
-    <AdminLayout title="Dashboard" subtitle="Adminbereich">
-      <DashboardWelcome plannedNewsCount={plannedNews?.length || 0} />
-
-      <DashboardStats counts={counts} />
-
-      <div className="mt-10 grid gap-6 xl:grid-cols-2">
-        <DashboardLatestNews news={latestNews || []} />
-        <DashboardPlannedNews news={plannedNews || []} />
-      </div>
-
-      <DashboardQuickActions />
-
-      <div className="mt-10 grid gap-6 xl:grid-cols-2">
-        <DashboardToday events={upcomingEvents} />
-        <DashboardSystemStatus />
-      </div>
+    <AdminLayout title="Dashboard" subtitle="Adminbereich" showHeader={false}>
+      <DashboardPageShell
+        now={now}
+        stats={stats}
+        openMembershipRequests={latestOpenMembershipRequests || []}
+        upcomingEvents={upcomingEvents}
+        latestNews={latestNews || []}
+        draftOrPlannedNews={draftOrPlannedNews || []}
+        statusSignals={statusSignals}
+      />
     </AdminLayout>
   );
 }

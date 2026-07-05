@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
+import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminNewsList, NewsStats } from "@/components/admin/news";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
@@ -38,15 +39,24 @@ export default async function AdminNewsPage() {
   ).length;
 
   return (
-    <AdminLayout title="News verwalten" subtitle="Adminbereich">
-      <div className="mb-8 flex justify-end">
-        <Link
-          href="/admin/news/new"
-          className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-        >
-          Neue News
-        </Link>
-      </div>
+    <AdminLayout
+      title="News verwalten"
+      subtitle="Adminbereich"
+      showHeader={false}
+    >
+      <AdminPageHeader
+        eyebrow="News"
+        title="News verwalten"
+        description="Neuigkeiten anlegen, veröffentlichen und schnell im Überblick filtern."
+        actions={
+          <Link
+            href="/admin/news/new"
+            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+          >
+            Neue News
+          </Link>
+        }
+      />
 
       <NewsStats
         total={newsList.length}

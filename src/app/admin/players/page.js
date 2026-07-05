@@ -1,5 +1,6 @@
 import Link from "next/link";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
+import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminPlayersList, PlayerStats } from "@/components/admin/players";
 import PlayerNationalityList from "@/components/admin/players/stats/PlayerNationalityList";
 import { getPlayerStats } from "@/components/admin/players/stats/playerStats.helpers";
@@ -25,15 +26,24 @@ export default async function AdminPlayersPage({ searchParams }) {
   const showNationalities = params?.view === "nationalities";
 
   return (
-    <AdminLayout title="Spieler verwalten" subtitle="Adminbereich">
-      <div className="mb-8 flex justify-end">
-        <Link
-          href="/admin/players/new"
-          className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-        >
-          Neuer Spieler
-        </Link>
-      </div>
+    <AdminLayout
+      title="Spieler verwalten"
+      subtitle="Adminbereich"
+      showHeader={false}
+    >
+      <AdminPageHeader
+        eyebrow="Spieler"
+        title="Spieler verwalten"
+        description="Spielerprofile, Positionen und Nationalitäten mit schnellen Filtern organisieren."
+        actions={
+          <Link
+            href="/admin/players/new"
+            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+          >
+            Neuer Spieler
+          </Link>
+        }
+      />
 
       <PlayerStats
         total={stats.total}

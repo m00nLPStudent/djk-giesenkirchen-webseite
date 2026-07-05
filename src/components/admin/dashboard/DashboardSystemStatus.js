@@ -1,64 +1,61 @@
-import { Database, HardDrive, GitBranch, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, CircleCheck, Info } from "lucide-react";
+import DashboardEmptyState from "./DashboardEmptyState";
+import AdminPanel from "@/components/admin/common/AdminPanel";
+import AdminSectionHeader from "@/components/admin/common/AdminSectionHeader";
+import { buildSystemStatusItems } from "./dashboard.helpers";
 
-const statusItems = [
-  {
-    title: "Supabase",
-    value: "Verbunden",
-    icon: Database,
-    color: "text-green-400",
-    bg: "bg-green-500/20",
-  },
-  {
-    title: "Storage",
-    value: "Erreichbar",
-    icon: HardDrive,
-    color: "text-green-400",
-    bg: "bg-green-500/20",
-  },
-  {
-    title: "Backup",
-    value: "GitHub",
-    icon: GitBranch,
-    color: "text-blue-400",
-    bg: "bg-blue-500/20",
-  },
-  {
-    title: "Version",
-    value: "v0.1",
-    icon: CheckCircle2,
-    color: "text-red-400",
-    bg: "bg-red-500/20",
-  },
-];
+function StatusItem({ item }) {
+  const icon =
+    item.level === "warning" ? (
+      <AlertTriangle size={18} className="text-yellow-300" />
+    ) : item.level === "info" ? (
+      <Info size={18} className="text-blue-300" />
+    ) : (
+      <CircleCheck size={18} className="text-green-300" />
+    );
 
-export default function DashboardSystemStatus() {
   return (
-    <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
-      <h2 className="text-2xl font-black">Systemstatus</h2>
+    <li className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+      <span className="mt-0.5 shrink-0">{icon}</span>
+      <span className="text-sm text-white/75">{item.text}</span>
+    </li>
+  );
+}
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        {statusItems.map((item) => {
-          const Icon = item.icon;
+export default function DashboardSystemStatus({ statusSignals }) {
+  const items = buildSystemStatusItems(statusSignals);
 
-          return (
-            <div
-              key={item.title}
-              className="flex items-center gap-4 rounded-2xl border border-white/10 bg-black/20 p-4"
-            >
-              <div
-                className={`flex h-12 w-12 items-center justify-center rounded-xl ${item.bg}`}
-              >
-                <Icon className={item.color} size={24} />
-              </div>
+  return (
+    <AdminPanel>
+      <AdminSectionHeader
+        eyebrow="System"
+        title="Systemstatus"
+        description="Hinweise aus vorhandenen Datenquellen zur Pflege von Inhalten."
+        actionLabel="Einstellungen pruefen"
+        actionHref="/admin/settings"
+      />
 
-              <div>
-                <p className="font-bold">{item.title}</p>
-                <p className="text-sm text-white/50">{item.value}</p>
-              </div>
-            </div>
-          );
-        })}
+      {items.length === 0 ? (
+        <div className="mt-5">
+          <DashboardEmptyState text="Keine offenen Systemhinweise. Alle geprueften Bereiche sind unauffaellig." />
+        </div>
+      ) : (
+        <ul className="mt-5 space-y-3">
+          {items.map((item) => (
+            <StatusItem key={item.id} item={item} />
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-5 flex justify-end">
+        <Link
+          href="/admin/settings"
+          className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-white/70 transition hover:border-red-500/50 hover:text-white"
+        >
+          Einstellungen pruefen
+        </Link>
       </div>
-    </section>
+    </AdminPanel>
   );
 }

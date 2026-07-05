@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
+import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminTeamsList, TeamStats } from "@/components/admin/teams";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
@@ -34,7 +35,8 @@ export default async function AdminTeamsPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  const publicSeason = (seasons || []).find((season) => season.is_current) || seasons?.[0] || null;
+  const publicSeason =
+    (seasons || []).find((season) => season.is_current) || seasons?.[0] || null;
 
   const teamIds = (teams || []).map((team) => team.id);
 
@@ -74,7 +76,8 @@ export default async function AdminTeamsPage() {
     return {
       ...displayTeam,
       players_count: playerList.filter(
-        (player) => player.team_season_id === teamSeason?.id && player.is_active,
+        (player) =>
+          player.team_season_id === teamSeason?.id && player.is_active,
       ).length,
       coaches_count: coachList.filter(
         (coach) => coach.team_season_id === teamSeason?.id && coach.is_active,
@@ -85,19 +88,29 @@ export default async function AdminTeamsPage() {
   const active = teamList.filter((team) => team.is_active).length;
   const inactive = teamList.filter((team) => !team.is_active).length;
   const footballDeReady = teamsWithCounts.filter(
-    (team) => team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
+    (team) =>
+      team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
   ).length;
 
   return (
-    <AdminLayout title="Mannschaften verwalten" subtitle="Adminbereich">
-      <div className="mb-8 flex justify-end">
-        <Link
-          href="/admin/teams/new"
-          className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-        >
-          Neue Mannschaft
-        </Link>
-      </div>
+    <AdminLayout
+      title="Mannschaften verwalten"
+      subtitle="Adminbereich"
+      showHeader={false}
+    >
+      <AdminPageHeader
+        eyebrow="Mannschaften"
+        title="Mannschaften verwalten"
+        description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
+        actions={
+          <Link
+            href="/admin/teams/new"
+            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+          >
+            Neue Mannschaft
+          </Link>
+        }
+      />
 
       <TeamStats
         total={teamList.length}

@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
+import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { ClubHistoryEditorForm } from "@/components/admin/club-history";
 import { supabase } from "@/lib/supabase";
 
@@ -32,7 +33,17 @@ export default async function AdminClubHistoryPage() {
   ]);
 
   return (
-    <AdminLayout title="Vereinsgeschichte" subtitle="Adminbereich">
+    <AdminLayout
+      title="Vereinsgeschichte"
+      subtitle="Adminbereich"
+      showHeader={false}
+    >
+      <AdminPageHeader
+        eyebrow="Vereinsgeschichte"
+        title="Vereinsgeschichte"
+        description="Chronik, Bilder und Meilensteine für die öffentliche Abteilungsseite pflegen."
+      />
+
       <ClubHistoryEditorForm
         page={page || null}
         initialImages={imagesResult?.data || []}

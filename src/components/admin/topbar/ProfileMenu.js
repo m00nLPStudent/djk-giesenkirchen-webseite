@@ -23,14 +23,17 @@ export default function ProfileMenu() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-left transition hover:border-red-500/70 hover:bg-white/[0.07]"
+        className="flex h-11 items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-3 text-left transition hover:border-red-500/70 hover:bg-white/[0.07]"
       >
         <UserCircle size={27} className="text-white/75" />
         <div className="hidden leading-tight lg:block">
           <p className="text-sm font-black text-white">Swen Verbocket</p>
           <p className="text-xs text-white/40">Administrator</p>
         </div>
-        <ChevronDown size={16} className={`text-white/45 transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          size={16}
+          className={`text-white/45 transition ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && (
@@ -40,12 +43,18 @@ export default function ProfileMenu() {
             <p className="mt-1 text-xs text-white/45">Administrator</p>
           </div>
 
-          <button type="button" className="flex w-full items-center gap-3 px-5 py-4 text-left text-sm font-bold text-white/75 transition hover:bg-white/5 hover:text-white">
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 px-5 py-4 text-left text-sm font-bold text-white/75 transition hover:bg-white/5 hover:text-white"
+          >
             <UserCog size={18} />
             Profil anpassen
           </button>
 
-          <button type="button" className="flex w-full items-center gap-3 border-t border-white/10 px-5 py-4 text-left text-sm font-bold text-red-300 transition hover:bg-red-600/10 hover:text-red-200">
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 border-t border-white/10 px-5 py-4 text-left text-sm font-bold text-red-300 transition hover:bg-red-600/10 hover:text-red-200"
+          >
             <LogOut size={18} />
             Ausloggen
           </button>

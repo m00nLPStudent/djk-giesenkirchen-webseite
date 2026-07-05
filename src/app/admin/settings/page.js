@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
+import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminSettingsEditor } from "@/components/admin/settings";
 import { supabase } from "@/lib/supabase";
 
@@ -47,7 +48,17 @@ export default async function AdminSettingsPage() {
   ]);
 
   return (
-    <AdminLayout title="Einstellungen" subtitle="Adminbereich">
+    <AdminLayout
+      title="Einstellungen"
+      subtitle="Adminbereich"
+      showHeader={false}
+    >
+      <AdminPageHeader
+        eyebrow="System"
+        title="Einstellungen"
+        description="Globale Inhalte, Kontaktangaben und interne Zuordnungen zentral verwalten."
+      />
+
       <AdminSettingsEditor
         initialClubSettings={settingsResult?.data || null}
         initialClubContacts={contactsResult?.data || []}
