@@ -4,14 +4,25 @@ const ALLOWED_TAGS = new Set([
   "p",
   "strong",
   "em",
+  "u",
   "ul",
   "ol",
   "li",
   "a",
+  "span",
   "br",
 ]);
 
 const ALLOWED_LINK_PROTOCOLS = ["http:", "https:", "mailto:"];
+const ALLOWED_FONT_SIZES = new Set([
+  "14px",
+  "16px",
+  "18px",
+  "20px",
+  "24px",
+  "28px",
+  "32px",
+]);
 
 function escapeText(value) {
   return String(value)
@@ -26,6 +37,21 @@ function escapeAttribute(value) {
     .replace(/"/g, "&quot;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+function normalizeTextChunk(value) {
+  return String(value || "")
+    .replace(/&nbsp;|&#160;|&#xA0;/gi, " ")
+    .replace(/\u00a0/g, " ");
+}
+
+function decodeEditableEntities(value) {
+  return String(value || "")
+    .replace(/&nbsp;|&#160;|&#xA0;/gi, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/\u00a0/g, " ");
 }
 
 function normalizeHref(rawHref) {
@@ -64,8 +90,32 @@ function extractHref(attributes) {
   return hrefMatch[1] || hrefMatch[2] || hrefMatch[3] || null;
 }
 
+function extractStyle(attributes) {
+  if (!attributes) return null;
+
+  const styleMatch = attributes.match(
+    /style\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'`=<>]+))/i,
+  );
+
+  if (!styleMatch) return null;
+
+  return styleMatch[1] || styleMatch[2] || styleMatch[3] || null;
+}
+
+function normalizeSpanStyle(rawStyle) {
+  if (typeof rawStyle !== "string") return null;
+
+  const fontSizeMatch = rawStyle.match(/font-size\s*:\s*([^;]+)/i);
+  if (!fontSizeMatch) return null;
+
+  const value = String(fontSizeMatch[1] || "")
+    .trim()
+    .toLowerCase();
+  return ALLOWED_FONT_SIZES.has(value) ? value : null;
+}
+
 export function sanitizeRichTextHtml(input) {
-  const source = typeof input === "string" ? input : "";
+  const source = typeof input === "string" ? normalizeTextChunk(input) : "";
 
   if (!source) return "";
 
@@ -81,7 +131,9 @@ export function sanitizeRichTextHtml(input) {
     const tagName = rawName.toLowerCase();
     const isClosing = fullTag.startsWith("</");
 
-    result += escapeText(html.slice(lastIndex, match.index));
+    result += escapeText(
+      normalizeTextChunk(html.slice(lastIndex, match.index)),
+    );
     lastIndex = tagRegex.lastIndex;
 
     if (!ALLOWED_TAGS.has(tagName)) {
@@ -111,10 +163,21 @@ export function sanitizeRichTextHtml(input) {
       continue;
     }
 
+    if (tagName === "span") {
+      const fontSize = normalizeSpanStyle(extractStyle(rawAttributes));
+
+      if (fontSize) {
+        result += `<span style="font-size: ${escapeAttribute(fontSize)}">`;
+      } else {
+        result += "<span>";
+      }
+      continue;
+    }
+
     result += `<${tagName}>`;
   }
 
-  result += escapeText(html.slice(lastIndex));
+  result += escapeText(normalizeTextChunk(html.slice(lastIndex)));
 
   return result;
 }
@@ -147,11 +210,13 @@ export function plainTextToParagraphHtml(input) {
 export function toEditableHtml(input) {
   if (typeof input !== "string" || !input.trim()) return "";
 
-  if (containsHtmlTags(input)) {
-    return sanitizeRichTextHtml(input);
+  const decoded = decodeEditableEntities(input);
+
+  if (containsHtmlTags(decoded)) {
+    return sanitizeRichTextHtml(decoded);
   }
 
-  return plainTextToParagraphHtml(input);
+  return plainTextToParagraphHtml(decoded);
 }
 
 export function stripHtmlToText(input) {

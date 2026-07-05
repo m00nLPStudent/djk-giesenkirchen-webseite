@@ -1,21 +1,40 @@
-export default function ContactPage() {
+import {
+  DepartmentPageLayout,
+  DepartmentPersonCard,
+  DepartmentPersonGrid,
+} from "@/components/website/department";
+import { supabase } from "@/lib/supabase";
+
+function mapClubContactForDisplay(contact = {}) {
+  return {
+    ...contact,
+    name: contact.contact_name,
+  };
+}
+
+export default async function ContactPage() {
+  const { data: contacts } = await supabase
+    .from("club_contacts")
+    .select("*")
+    .eq("is_public", true)
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-24 text-white">
-      <section className="mx-auto max-w-7xl rounded-3xl border border-white/10 bg-white/5 p-10">
-        <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-          Kontakt
-        </p>
-
-        <h1 className="mt-4 text-5xl font-black md:text-7xl">
-          Ansprechpartner
-        </h1>
-
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70">
-          Hier entsteht die Kontaktseite der DJK/VfL Giesenkirchen 05/09 e.V.
-          mit den wichtigsten Ansprechpartnern, Kontaktmöglichkeiten und
-          Informationen zur Sportanlage.
-        </p>
-      </section>
-    </main>
+    <DepartmentPageLayout
+      eyebrow="Kontakt"
+      title="Ansprechpartner"
+      description="Allgemeine Vereinskontakte wie Webmaster, Jugendschutzbeauftragte oder Ansprechpartner für Verwaltung und Platzanlage."
+    >
+      <DepartmentPersonGrid emptyText="Noch keine allgemeinen Kontakte veröffentlicht.">
+        {(contacts || []).map((contact) => (
+          <DepartmentPersonCard
+            key={contact.id}
+            person={mapClubContactForDisplay(contact)}
+          />
+        ))}
+      </DepartmentPersonGrid>
+    </DepartmentPageLayout>
   );
 }

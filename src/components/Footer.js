@@ -1,44 +1,92 @@
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
+import { formatGermanPhoneNumberReadable } from "@/lib/phone";
 
-const footerColumns = [
-  {
-    title: "Verein",
-    links: [
-      { label: "Kontakt", href: "/kontakt" },
-      { label: "Vorstand", href: "/fussball/abteilung/vorstand" },
-      { label: "Trainer", href: "/fussball/abteilung/trainer" },
-      { label: "Sponsoren", href: "/fussball/sponsoren" },
-    ],
-  },
-  {
-    title: "Abteilungen",
-    links: [
-      { label: "Fußball", href: "/fussball" },
-      { label: "Tischtennis", href: "/tischtennis" },
-      { label: "Damen-Gymnastik", href: "/damen-gymnastik" },
-      { label: "Termine", href: "/termine" },
-    ],
-  },
-  {
-    title: "Service",
-    links: [
-      { label: "News", href: "/news" },
-      { label: "News Übersicht", href: "/news/uebersicht" },
-      { label: "Aktuelle Termine", href: "/termine" },
-      { label: "Kontakt", href: "/kontakt" },
-    ],
-  },
-  {
-    title: "Rechtliches",
-    links: [
-      { label: "Impressum", href: "/impressum" },
-      { label: "Datenschutz", href: "/datenschutz" },
-      { label: "Kontakt", href: "/kontakt" },
-    ],
-  },
-];
+function formatAddress(settings) {
+  const street = [settings?.street, settings?.house_number]
+    .filter(Boolean)
+    .join(" ");
+  const city = [settings?.postal_code, settings?.city]
+    .filter(Boolean)
+    .join(" ");
+  return [street, city].filter(Boolean);
+}
 
-export default function Footer() {
+export default async function Footer() {
+  const [settingsResult, pagesResult] = await Promise.all([
+    supabase
+      .from("club_settings")
+      .select("*")
+      .eq("singleton", true)
+      .maybeSingle(),
+    supabase
+      .from("pages")
+      .select("slug, title_de, title_en, sort_order")
+      .eq("show_in_footer", true)
+      .eq("is_published", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const settings = settingsResult?.data || null;
+  const footerPages = pagesResult?.data || [];
+  const pageBySlug = Object.fromEntries(
+    footerPages.map((page) => [page.slug, page]),
+  );
+  const additionalLegalPages = footerPages.filter(
+    (page) =>
+      !["datenschutz", "impressum", "mitglied-werden"].includes(page.slug),
+  );
+  const addressLines = formatAddress(settings);
+  const phone = formatGermanPhoneNumberReadable(settings?.phone || "");
+  const footerColumns = [
+    {
+      title: "Verein",
+      links: [
+        { label: "News", href: "/news" },
+        { label: "News Übersicht", href: "/news/uebersicht" },
+        { label: "Termine", href: "/termine" },
+        { label: "Vereinsgeschichte", href: "/fussball/vereinsgeschichte" },
+      ],
+    },
+    {
+      title: "Abteilungen",
+      links: [
+        { label: "Fußball", href: "/fussball" },
+        { label: "Tischtennis", href: "/tischtennis" },
+        { label: "Damen-Gymnastik", href: "/damen-gymnastik" },
+        { label: "Mitglied werden", href: "/mitglied-werden" },
+      ],
+    },
+    {
+      title: "Rechtliches",
+      links: [
+        ...(pageBySlug.datenschutz
+          ? [
+              {
+                label: pageBySlug.datenschutz.title_de || "Datenschutz",
+                href: "/datenschutz",
+              },
+            ]
+          : []),
+        ...(pageBySlug.impressum
+          ? [
+              {
+                label: pageBySlug.impressum.title_de || "Impressum",
+                href: "/impressum",
+              },
+            ]
+          : []),
+        ...additionalLegalPages.map((page) => ({
+          label: page.title_de || page.title_en || page.slug,
+          href: `/${page.slug}`,
+        })),
+        { label: "Kontakt", href: "/kontakt" },
+        { label: "Cookie-Einstellungen", href: "#" },
+      ],
+    },
+  ];
+
   return (
     <footer className="border-t border-white/10 bg-[#0b0b0f] px-6 py-16 text-white">
       <div className="mx-auto max-w-7xl">
@@ -54,13 +102,34 @@ export default function Footer() {
                 <p className="text-xs font-black uppercase tracking-[0.32em] text-red-400">
                   Gemeinsam. Stark.
                 </p>
-                <h2 className="mt-1 text-2xl font-black">Giesenkirchen</h2>
+                <h2 className="mt-1 text-2xl font-black">
+                  {settings?.short_name || "Giesenkirchen"}
+                </h2>
               </div>
             </div>
 
             <p className="mt-6 max-w-md text-sm leading-7 text-white/55">
-              Die DJK/VfL Giesenkirchen 05/09 e.V. informiert über Sportangebote, Neuigkeiten, Termine und die Arbeit der Abteilungen im Verein.
+              {settings?.club_name || "DJK/VfL Giesenkirchen 05/09 e.V."}{" "}
+              informiert über Sportangebote, Neuigkeiten, Termine und die Arbeit
+              der Abteilungen im Verein.
             </p>
+
+            <div className="mt-6 space-y-2 text-sm text-white/60">
+              {addressLines.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+              {settings?.email && (
+                <p>
+                  <a
+                    href={`mailto:${settings.email}`}
+                    className="transition hover:text-white"
+                  >
+                    {settings.email}
+                  </a>
+                </p>
+              )}
+              {phone && <p>{phone}</p>}
+            </div>
           </div>
 
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -86,7 +155,10 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 text-sm text-white/40 md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} DJK/VfL Giesenkirchen 05/09 e.V.</p>
+          <p>
+            © {new Date().getFullYear()}{" "}
+            {settings?.club_name || "DJK/VfL Giesenkirchen 05/09 e.V."}
+          </p>
           <p>Vereinswebseite · News, Mannschaften und Termine</p>
         </div>
       </div>
