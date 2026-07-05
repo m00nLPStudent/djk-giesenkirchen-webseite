@@ -27,19 +27,19 @@ function formatYearRange(from, to) {
 
 function Placeholder() {
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-40 pb-24 text-white md:pt-52">
-      <section className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/5 p-10 md:p-12">
+    <main className="min-h-screen bg-[#101014] overflow-x-hidden px-4 pt-32 pb-20 text-white sm:px-6 md:pt-52 md:pb-24">
+      <section className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/5 p-6 md:p-12">
         <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
           Fußballabteilung
         </p>
-        <h1 className="mt-4 text-3xl font-black leading-tight md:text-5xl">
+        <h1 className="mt-4 break-words text-3xl font-black leading-tight md:text-5xl">
           Vereinsgeschichte
         </h1>
-        <p className="mt-6 text-lg leading-8 text-white/70">
+        <p className="mt-6 text-base leading-7 text-white/70 md:text-lg md:leading-8">
           Die Inhalte zur Vereinsgeschichte werden aktuell vorbereitet und in
           Kürze veröffentlicht.
         </p>
-        <p className="mt-4 text-lg leading-8 text-white/70">
+        <p className="mt-4 text-base leading-7 text-white/70 md:text-lg md:leading-8">
           Vielen Dank für eure Geduld.
         </p>
       </section>
@@ -105,35 +105,35 @@ export default async function ClubHistoryPublicPage() {
   const milestones = milestonesResult?.data || [];
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-40 pb-24 text-white md:pt-52">
+    <main className="min-h-screen bg-[#101014] overflow-x-hidden px-4 pt-32 pb-20 text-white sm:px-6 md:pt-52 md:pb-24">
       <section className="mx-auto max-w-7xl">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 md:p-12">
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-12">
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Fußballabteilung
           </p>
-          <h1 className="mt-5 text-3xl font-black leading-tight md:text-5xl">
+          <h1 className="mt-5 break-words text-3xl font-black leading-tight md:text-5xl">
             {pageTitle}
           </h1>
 
           {pageTeaser && (
-            <p className="mt-6 max-w-4xl text-lg leading-8 text-white/70">
+            <p className="mt-6 max-w-4xl break-words text-base leading-7 text-white/70 md:text-lg md:leading-8">
               {pageTeaser}
             </p>
           )}
         </div>
 
-        <article className="mt-10 rounded-3xl border border-white/10 bg-black/20 p-8 md:p-10">
+        <article className="mt-10 min-w-0 rounded-3xl border border-white/10 bg-black/20 p-6 md:p-10">
           <RichTextContent content={pageContent} />
         </article>
 
         {images.length > 0 && (
           <section className="mt-10">
             <h2 className="text-3xl font-black md:text-4xl">Bilder</h2>
-            <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-6 grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {images.map((image) => (
                 <figure
                   key={image.id}
-                  className="overflow-hidden rounded-3xl border border-white/10 bg-white/5"
+                  className="min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-white/5"
                 >
                   <img
                     src={image.image_url}
@@ -157,7 +157,9 @@ export default async function ClubHistoryPublicPage() {
 
         {milestones.length > 0 && (
           <section className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-7 md:p-9">
-            <h2 className="text-2xl font-black md:text-3xl">Meilensteine</h2>
+            <h2 className="break-words text-2xl font-black md:text-3xl">
+              Meilensteine
+            </h2>
             <div className="relative mt-7 pl-8 md:pl-12">
               <div className="absolute left-2.5 top-1 bottom-1 w-px bg-gradient-to-b from-red-500/85 via-red-400/60 to-red-800/15 md:left-4" />
 
@@ -172,7 +174,7 @@ export default async function ClubHistoryPublicPage() {
                         item.milestone_year_until,
                       )}
                     </p>
-                    <p className="mt-2.5 max-w-4xl whitespace-pre-line text-base leading-7 text-white/72">
+                    <p className="mt-2.5 max-w-4xl whitespace-pre-line break-words text-base leading-7 text-white/72">
                       {pickDeFirst(
                         item.description_de,
                         item.description_en,

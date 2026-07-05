@@ -2,7 +2,7 @@
 
 ## Status
 
-Umgesetzt und produktiv genutzt.
+Abgeschlossen, modularisiert und produktiv genutzt.
 
 ## Funktionen
 
@@ -15,6 +15,7 @@ Umgesetzt und produktiv genutzt.
 - Einzelne News-Detailseite
 - Dokumente/Downloads pro News
 - Suche und Pagination in der News-Übersicht
+- mobile responsive Darstellung auf Karten- und Detailseiten
 
 ## Datenbank
 
@@ -36,4 +37,7 @@ Wichtige Felder:
 ## Hinweise
 
 - News-Dokumente werden im Admin gepflegt und öffentlich auf der Detailseite angezeigt.
-- Offene Weiterentwicklungen (z. B. zusätzliche Taxonomien) sind kein Blocker für den aktuellen Live-Stand.
+
+## Architekturhinweis
+
+Editor- und Formularlogik wurde intern modularisiert (Container + Helper + Komponenten), ohne Funktionsänderung.

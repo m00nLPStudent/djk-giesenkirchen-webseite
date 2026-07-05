@@ -9,11 +9,15 @@ export default function TeamPlayerCard({ player }) {
 
   return (
     <article className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-      <div className="relative flex h-72 items-center justify-center bg-black/20">
-        <img src={imageUrl} alt={fullName} className="h-full w-full object-cover" />
+      <div className="relative flex h-56 items-center justify-center bg-black/20 md:h-72">
+        <img
+          src={imageUrl}
+          alt={fullName}
+          className="h-full w-full object-cover"
+        />
 
         {player.shirt_number && (
-          <div className="absolute left-4 top-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl font-black text-white shadow-xl">
+          <div className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-2xl bg-red-600 text-lg font-black text-white shadow-xl md:h-14 md:w-14 md:text-2xl">
             {player.shirt_number}
           </div>
         )}

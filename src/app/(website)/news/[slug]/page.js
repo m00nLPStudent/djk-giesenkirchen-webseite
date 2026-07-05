@@ -17,9 +17,11 @@ export default async function NewsDetailPage({ params }) {
 
   if (!article) {
     return (
-      <main className="min-h-screen bg-[#101014] pt-32 text-white">
-        <div className="mx-auto max-w-4xl px-6">
-          <h1 className="text-5xl font-black">Artikel nicht gefunden</h1>
+      <main className="min-h-screen bg-[#101014] pt-28 text-white md:pt-32">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <h1 className="text-3xl font-black sm:text-5xl">
+            Artikel nicht gefunden
+          </h1>
         </div>
       </main>
     );
@@ -31,13 +33,13 @@ export default async function NewsDetailPage({ params }) {
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
-      <section className="px-6 pt-32 pb-20">
+      <section className="px-4 pt-28 pb-16 sm:px-6 md:pt-32 md:pb-20">
         <div className="mx-auto max-w-5xl">
           {article.image_url && (
             <img
               src={article.image_url}
               alt={article.title_de}
-              className="mb-10 max-h-[420px] w-full rounded-3xl bg-white/5 object-contain p-8"
+              className="mb-8 max-h-[320px] w-full rounded-3xl bg-white/5 object-contain p-4 sm:max-h-[360px] md:mb-10 md:max-h-[420px] md:p-8"
             />
           )}
 
@@ -45,9 +47,11 @@ export default async function NewsDetailPage({ params }) {
             {getNewsCategoryDisplay(article)}
           </p>
 
-          <h1 className="mt-4 text-6xl font-black">{article.title_de}</h1>
+          <h1 className="mt-4 text-3xl font-black leading-tight sm:text-5xl md:text-6xl">
+            {article.title_de}
+          </h1>
 
-          <div className="mt-6 flex gap-6 text-white/60">
+          <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/60 sm:gap-6 sm:text-base">
             <span>{article.author}</span>
             <span>{formatGermanDate(article.published_at)}</span>
           </div>

@@ -44,16 +44,16 @@ export default async function TrainingEventsPage({ searchParams }) {
   });
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-24 text-white">
+    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
       <section className="mx-auto max-w-7xl space-y-14">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Training
           </p>
-          <h1 className="mt-4 text-5xl font-black md:text-7xl">
+          <h1 className="mt-4 text-4xl font-black md:text-7xl">
             Trainingstermine
           </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70">
+          <p className="mt-6 max-w-3xl text-base leading-7 text-white/70 md:text-lg md:leading-8">
             Automatisch erzeugte Trainingszeiten der Mannschaften für die
             nächsten Tage.
           </p>

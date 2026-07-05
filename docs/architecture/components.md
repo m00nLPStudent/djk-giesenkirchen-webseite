@@ -2,26 +2,63 @@
 
 ## Schichten
 
-- `src/components/website` – öffentliche Seitenbausteine (Navigation, Footer, Module)
-- `src/components/admin` – Adminlisten, Formulare, Services, modulare UI-Bausteine
-- `src/components/common` – geteilte Komponenten
+- `src/components/website`: öffentliche UI
+- `src/components/admin`: Admin-UI
+- `src/components/common`: bereichsübergreifende UI
 
-## Wichtige Website-Komponenten
+## Öffentliche Kernkomponenten
 
-- Header/Navigationssystem inklusive CTA-Link "Mitglied werden"
-- dynamischer Footer auf Basis von `club_settings` und `pages`
-- Modulkomponenten für News, Fußball, Termine, Mitgliedschaft
+- Header
+  - `Header`
+  - `Navigation`
+  - `NavigationItem`
+  - `DropdownMenu`
+- Footer
+  - `Footer` (dynamisch über `club_settings`/`pages`)
+- Hero-Bereiche
+  - Home-Hero
+  - Team-Hero (`TeamHero`)
+- Cards
+  - `NewsCard`
+  - `EventCard`
+  - `SponsorCard`
+  - `DepartmentPersonCard`
+  - `TeamPlayerCard`
+- Department-Komponenten
+  - `DepartmentPageLayout`
+  - `DepartmentPersonGrid`
+  - `DepartmentPersonCard`
+- Team-Komponenten
+  - `TeamIntroCard`
+  - `TeamInfoGrid`
+  - `TeamTrainingInfo`
+  - `TeamContact`
+  - `TeamDetailTabs`
+  - `TeamPlayerSection`
+  - `TeamTable`
+- Sponsor-Komponenten
+  - `SponsorTabs`
+  - `SponsorSection`
+  - `SponsorGrid`
+  - `SponsorBanner`
+  - `SponsorActions`
+- Membership-Komponenten
+  - `MembershipRequestForm`
+  - `MembershipPersonalData`
+  - `MembershipFootballData`
+  - `MembershipPrivacySection`
+  - `MembershipSuccessCard`
 
-## Wichtige Admin-Komponenten
+## Admin Shared-Komponenten (Konsolidierung)
 
-- gemeinsame Formularfelder (`components/admin/forms`)
-- gemeinsame Hooks (`components/admin/hooks`)
-- gemeinsame UI-Bausteine (`components/admin/ui`)
-- Lösch-/Delete-Flow (`components/admin/delete`)
-- modulare Fachkomponenten pro Bereich (`news`, `teams`, `events`, `settings`, `club-history`, ...)
+- `AdminToolbar`
+- `AdminSaveBar`
+- `AdminEmptyState`
+- `AdminSelectionList`
+- gemeinsame Admin-Form- und Hook-Bausteine in `src/components/admin/*`
 
-## Wiederverwendungsprinzip
+## Komponentenprinzipien
 
-- Erst vorhandene Bausteine prüfen, dann neue Komponente einführen.
-- Fachlogik in modulnahe Services/Helper auslagern.
-- Komplexe Editor-/Form-Komponenten schrittweise intern modularisieren, ohne externes Verhalten zu ändern.
+- mobile-first Layoutregeln
+- möglichst modulnahe Logik, geteilte UI separat
+- keine Feature-Änderung bei reinem Refactoring

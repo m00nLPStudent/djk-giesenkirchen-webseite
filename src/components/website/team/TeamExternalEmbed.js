@@ -22,7 +22,7 @@ export default function TeamExternalEmbed({
           <iframe
             src={url}
             title={title}
-            className="h-[620px] w-full"
+            className="h-[420px] w-full md:h-[620px]"
             loading="lazy"
           />
         </div>

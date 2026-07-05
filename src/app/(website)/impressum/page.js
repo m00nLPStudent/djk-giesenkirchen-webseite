@@ -21,16 +21,16 @@ export default async function ImpressumPage() {
   const page = await getPublishedPage("impressum");
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-40 pb-24 text-white md:pt-52">
-      <section className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/5 p-10 md:p-12">
+    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-52 md:pb-24">
+      <section className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/5 p-6 md:p-12">
         <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
           Rechtliches
         </p>
-        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">
+        <h1 className="mt-4 text-3xl font-black leading-tight md:text-6xl">
           {page.title_de || page.title_en || "Impressum"}
         </h1>
 
-        <article className="mt-8 rounded-3xl border border-white/10 bg-black/20 p-7 md:p-9">
+        <article className="mt-8 rounded-3xl border border-white/10 bg-black/20 p-5 md:p-9">
           <RichTextContent content={page.content_de || page.content_en || ""} />
         </article>
       </section>

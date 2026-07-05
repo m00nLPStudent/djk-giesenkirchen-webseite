@@ -51,22 +51,22 @@ const overviewCards = [
 
 export default async function FootballPage() {
   return (
-    <main className="min-h-screen bg-[#101014] pt-32 pb-24 text-white">
-      <div className="mx-auto max-w-7xl px-6">
-        <section className="rounded-3xl border border-white/10 bg-black/20 p-7 md:p-9">
+    <main className="min-h-screen bg-[#101014] pt-28 pb-20 text-white md:pt-32 md:pb-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <section className="rounded-3xl border border-white/10 bg-black/20 p-6 md:p-9">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Übersicht
             </p>
-            <h2 className="mt-4 text-3xl font-black md:text-5xl">
+            <h2 className="mt-4 text-2xl font-black sm:text-3xl md:text-5xl">
               Fußballbereich im Überblick
             </h2>
-            <p className="mt-4 text-lg leading-8 text-white/65">
+            <p className="mt-4 text-base leading-7 text-white/65 md:text-lg md:leading-8">
               Wähle direkt den Bereich aus, den du suchst.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {overviewCards.map((card) => (
               <Link
                 key={card.title}

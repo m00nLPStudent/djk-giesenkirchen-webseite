@@ -36,8 +36,8 @@ function TextParagraphs({ text = "", className = "" }) {
 
 export default function RichTextContent({
   content,
-  className = "text-lg leading-9 text-white/80",
-  richTextClassName = "space-y-4 [&_h2]:text-2xl [&_h2]:font-black [&_h2]:text-white [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_p]:text-lg [&_p]:leading-9 [&_strong]:font-bold [&_a]:underline [&_a]:decoration-red-400 [&_a]:underline-offset-4 hover:[&_a]:text-red-300",
+  className = "text-base leading-8 text-white/80 md:text-lg md:leading-9",
+  richTextClassName = "space-y-4 [&_h2]:text-2xl [&_h2]:font-black [&_h2]:text-white [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-white [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_p]:text-base [&_p]:leading-8 md:[&_p]:text-lg md:[&_p]:leading-9 [&_strong]:font-bold [&_a]:underline [&_a]:decoration-red-400 [&_a]:underline-offset-4 hover:[&_a]:text-red-300",
 }) {
   const source = typeof content === "string" ? content : "";
 

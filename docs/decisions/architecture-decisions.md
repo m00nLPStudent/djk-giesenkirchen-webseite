@@ -7,8 +7,10 @@ Nachvollziehbare Architekturentscheidungen im Zeitverlauf.
 - Gemeinsame Datei-Helfer in src/lib/files.js zentralisiert.
 - Storage-Zugriffe über gemeinsame Hilfen in src/lib/storage.js modularisiert.
 - Docs-Struktur in Unterordner für Architektur, Entwicklung und Entscheidungen gegliedert.
+- Öffentliche Website auf finalen Responsive-Stand konsolidiert.
+- Hauptnavigation um Vereinsübersicht `/verein` ergänzt.
+- Legacy-/Duplikat-Dokumente bereinigt.
 
-## Offene Entscheidungen
+## Aktueller Stand
 
-- Weitere Vereinheitlichung von Modul-Services.
-- Schrittweise Konsolidierung alter Legacy-Dokumente.
+Die zentralen Architekturentscheidungen aus der Refactoring- und Responsive-Phase sind umgesetzt und dokumentiert.

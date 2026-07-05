@@ -18,16 +18,16 @@ export default async function GeneralEventsPage() {
   const { upcoming, past } = splitEventsByTimeline(realEvents, now);
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-24 text-white">
+    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
       <section className="mx-auto max-w-7xl space-y-14">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Verein
           </p>
-          <h1 className="mt-4 text-5xl font-black md:text-7xl">
+          <h1 className="mt-4 text-4xl font-black md:text-7xl">
             Allgemeine Termine
           </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70">
+          <p className="mt-6 max-w-3xl text-base leading-7 text-white/70 md:text-lg md:leading-8">
             Vereinsveranstaltungen, Sitzungen, Turniere,
             Jahreshauptversammlungen und weitere öffentliche Termine.
           </p>
@@ -38,7 +38,7 @@ export default async function GeneralEventsPage() {
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Kommende Termine
             </p>
-            <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
+            <h2 className="mt-4 text-3xl font-black leading-tight md:text-5xl">
               Als Nächstes im Verein
             </h2>
           </div>
@@ -64,7 +64,7 @@ export default async function GeneralEventsPage() {
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Rückblick
             </p>
-            <h2 className="mt-4 text-4xl font-black leading-tight md:text-5xl">
+            <h2 className="mt-4 text-3xl font-black leading-tight md:text-5xl">
               Vergangene Termine
             </h2>
           </div>

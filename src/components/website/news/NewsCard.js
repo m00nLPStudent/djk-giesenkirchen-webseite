@@ -13,7 +13,8 @@ export function formatNewsDate(value) {
 function getFootballTeamName(item = {}) {
   if (item.football_team?.name_de) return item.football_team.name_de;
   if (item.teams?.name_de) return item.teams.name_de;
-  if (Array.isArray(item.teams) && item.teams[0]?.name_de) return item.teams[0].name_de;
+  if (Array.isArray(item.teams) && item.teams[0]?.name_de)
+    return item.teams[0].name_de;
   return "";
 }
 
@@ -28,7 +29,11 @@ export function getNewsCategoryDisplay(item = {}) {
   return category;
 }
 
-export default function NewsCard({ item, featured = false, compactMeta = false }) {
+export default function NewsCard({
+  item,
+  featured = false,
+  compactMeta = false,
+}) {
   return (
     <Link href={`/news/${item.slug}`} className="group block h-full">
       <article
@@ -37,7 +42,9 @@ export default function NewsCard({ item, featured = false, compactMeta = false }
         }`}
       >
         {item.image_url && (
-          <div className={`${featured ? "h-72 lg:h-full" : "h-56"} bg-white/5 p-5`}>
+          <div
+            className={`${featured ? "h-48 md:h-72 lg:h-full" : "h-44 sm:h-48 md:h-56"} bg-white/5 p-4 md:p-5`}
+          >
             <img
               src={item.image_url}
               alt={item.title_de}
@@ -46,24 +53,32 @@ export default function NewsCard({ item, featured = false, compactMeta = false }
           </div>
         )}
 
-        <div className={`${featured ? "flex h-full flex-col p-8 md:p-10" : "p-6"}`}>
+        <div
+          className={`${featured ? "flex h-full flex-col p-6 md:p-10" : "p-6"}`}
+        >
           <div className="flex flex-wrap justify-end gap-3">
             <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-white">
               {getNewsCategoryDisplay(item)}
             </span>
           </div>
 
-          <h2 className={`${featured ? "mt-7 text-4xl md:text-5xl" : "mt-5 text-2xl"} font-black leading-tight text-white`}>
+          <h2
+            className={`${featured ? "mt-6 text-3xl sm:text-4xl md:mt-7 md:text-5xl" : "mt-5 text-2xl"} font-black leading-tight text-white`}
+          >
             {item.title_de}
           </h2>
 
           {item.teaser_de && (
-            <p className={`${featured ? "mt-6 text-lg leading-8" : "mt-4 text-sm leading-6"} text-white/65`}>
+            <p
+              className={`${featured ? "mt-5 text-base leading-7 md:mt-6 md:text-lg md:leading-8" : "mt-4 text-sm leading-6"} text-white/65`}
+            >
               {item.teaser_de}
             </p>
           )}
 
-          <div className={`${featured ? "mt-auto pt-8" : "mt-6"} flex items-end justify-between gap-4`}>
+          <div
+            className={`${featured ? "mt-auto pt-8" : "mt-6"} flex items-end justify-between gap-4`}
+          >
             {featured && !compactMeta ? (
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/45">
                 {item.author || "DJK/VfL Giesenkirchen"}

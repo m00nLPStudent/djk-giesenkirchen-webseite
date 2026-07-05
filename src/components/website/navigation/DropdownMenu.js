@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 
 export default function DropdownMenu({ items }) {
   return (
-    <div className="w-80 origin-top overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#111116]/95 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl animate-[navDrop_180ms_ease-out]">
+    <div className="w-80 max-w-[calc(100vw-2rem)] origin-top overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#111116]/95 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl animate-[navDrop_180ms_ease-out]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,#c4001a22,transparent_48%)]" />
 
       <div className="relative space-y-1">

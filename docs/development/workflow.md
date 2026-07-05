@@ -1,16 +1,15 @@
 # Workflow
 
-Arbeitsablauf für sichere Weiterentwicklung.
+Arbeitsablauf für sichere Pflege und Weiterentwicklung.
 
 ## Empfohlener Ablauf
 
 1. Analyse des Ist-Zustands
 2. Kleine, abgegrenzte Änderungen
-3. Validierung auf Fehler
-4. Dokumentation und Changelog aktualisieren
+3. Build/Fehlerprüfung
+4. Dokumentation synchron aktualisieren
+5. Diff prüfen und freigeben
 
-## Quellen
+## Quelle
 
-- [Todo](../todo.md)
-- [Roadmap](../roadmap.md)
-- [Changelog](../changelog.md)
+- [../changelog.md](../changelog.md)

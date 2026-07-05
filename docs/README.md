@@ -1,29 +1,52 @@
 # Projektdokumentation
 
-Diese Dokumentation bildet den aktuellen Stand der Vereinswebsite und des Adminbereichs ab.
+Diese Dokumentation beschreibt den finalen Stand der öffentlichen Website (Responsive Release) und den aktuellen Stand des Admin-CMS.
+
+## Leitlinien
+
+- Dokumentation folgt strikt dem Ist-Stand im Code.
+- Keine Legacy-/Duplikat-Dokumente als zweite Wahrheit.
+- Bei Änderungen gilt immer: Datenmodell -> Service/Lib -> UI -> Doku.
 
 ## Struktur
 
-- `architecture/` – technische Gesamtarchitektur (Überblick, Routen, Datenbank, Komponenten, Storage)
-- `modules/` – fachliche Moduldokumente für Website und Admin
-- `development/` – Entwicklungsregeln, Workflow, Deployment und Projektzustand
-- `decisions/` – Architekturentscheidungen
-- `roadmap.md` – aktuelle Prioritäten und nächste Phasen
-- `changelog.md` – größere Meilensteine
+- `architecture/`
+  - [architecture/overview.md](architecture/overview.md)
+  - [architecture/routes.md](architecture/routes.md)
+  - [architecture/components.md](architecture/components.md)
+  - [architecture/database.md](architecture/database.md)
+  - [architecture/navigation.md](architecture/navigation.md)
+  - [architecture/responsive.md](architecture/responsive.md)
+  - [architecture/supabase-storage.md](architecture/supabase-storage.md)
+- `modules/`
+  - [modules/website.md](modules/website.md)
+  - [modules/membership.md](modules/membership.md)
+  - [modules/news.md](modules/news.md)
+  - [modules/events.md](modules/events.md)
+  - [modules/teams.md](modules/teams.md)
+  - [modules/settings.md](modules/settings.md)
+  - [modules/department.md](modules/department.md)
+  - [modules/club-history.md](modules/club-history.md)
+  - [modules/shared-components.md](modules/shared-components.md)
+  - [modules/admin-framework.md](modules/admin-framework.md)
+- `development/`
+  - [development/coding-rules.md](development/coding-rules.md)
+  - [development/workflow.md](development/workflow.md)
+  - [development/deployment.md](development/deployment.md)
+  - [development/project-health.md](development/project-health.md)
+- `decisions/`
+  - [decisions/architecture-decisions.md](decisions/architecture-decisions.md)
+- Historie
+  - [changelog.md](changelog.md)
 
-## Leitlinie
+## Abdeckung
 
-- Dokumentation folgt immer dem Ist-Stand in Code und Datenbank.
-- Größere Änderungen immer entlang der Kette Datenbank -> Service -> UI prüfen.
+Vollständig dokumentiert sind:
 
-## Aktuell vollständig dokumentiert
-
-- Dynamischer Footer
-- Kontaktseite, Impressum, Datenschutz
-- Pages-CMS (`pages`), Vereinseinstellungen (`club_settings`), Kontaktverwaltung (`club_contacts`)
-- Mitglied-werden-Formular, Mitgliedsanfragen und Weiterleitung
-- Vereinsgeschichte mit RichText
-- News, Termine, wiederkehrende Termine, virtuelle Trainings
-- Fußball-Übersichtsseiten und Mannschaftsseiten
-- Vorstand, Trainer, Sponsoren
-- Admin-Einstellungen
+- Architektur und finale Routing-Struktur
+- Mobile-first Responsive-Verhalten je Zielbreite
+- Navigation/Header/Burger-Menü
+- Komponentenlandschaft (Website + Admin Shared)
+- Datenmodell
+- Membership, News, Teams, Events, Settings
+- Durchgeführte Modularisierungs- und Refactoring-Schritte

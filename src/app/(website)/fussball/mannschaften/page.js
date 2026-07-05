@@ -32,21 +32,21 @@ export default async function FootballTeamsOverviewPage() {
   const groups = groupFootballTeams(teams);
 
   return (
-    <main className="min-h-screen bg-[#101014] pt-32 pb-24 text-white">
-      <div className="mx-auto max-w-7xl px-6">
-        <section className="rounded-3xl border border-white/10 bg-white/5 p-8 md:p-10">
+    <main className="min-h-screen bg-[#101014] pt-28 pb-20 text-white md:pt-32 md:pb-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-10">
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Mannschaften
           </p>
-          <h1 className="mt-4 text-4xl font-black md:text-6xl">
+          <h1 className="mt-4 text-3xl font-black md:text-6xl">
             Unsere Mannschaften
           </h1>
-          <p className="mt-4 max-w-3xl text-lg leading-8 text-white/65">
+          <p className="mt-4 max-w-3xl text-base leading-7 text-white/65 md:text-lg md:leading-8">
             Wähle die passende Mannschaftsgruppe aus und öffne danach die
             gewünschte Teamseite.
           </p>
 
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 md:grid-cols-3">
             {GROUP_CARDS.map((card) => (
               <Link
                 key={card.key}

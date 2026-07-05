@@ -2,20 +2,24 @@
 
 ## Aktueller Projektstatus
 
-- Projektbasis ist stabil: Next.js App Router, klare Trennung zwischen Website und Admin.
-- Öffentliche Website ist weitgehend abgeschlossen.
-- Adminbereich ist weitgehend funktionsfähig.
-- Settings/CMS sind aktiv in Nutzung (Footer, Kontakt, Rechtstexte, Mitgliedschaftsprozesse).
+- Projektbasis stabil: Next.js App Router mit klarer Trennung Website/Admin.
+- Öffentliche Website abgeschlossen (Responsive Release).
+- Adminbereich funktionsfähig und modularisiert.
+- Settings/CMS produktiv in Nutzung.
 
-## Architektur-Bewertung
+## Refactoring-Stand
 
-- Positiv:
-  - Gute Trennung zwischen App-Routen (`src/app`), UI-Komponenten (`src/components`) und Basis-Helfern (`src/lib`).
-  - Feature-nahe Services im jeweiligen Modul sind konsistent organisiert.
-- Auffällig:
-  - Einzelne Utility-Logik ist noch parallel vorhanden (z. B. Slug-Helfer in mehreren Modulen).
-  - Der Events-/Trainingsbereich ist funktional stark gewachsen und enthält große Dateien.
-  - Der Settings-Editor ist funktional umfassend und als interner Refactor-Kandidat markiert.
+Durchgeführt:
+
+- Utilities ausgelagert
+- Events modularisiert
+- Team-Form modularisiert
+- Settings modularisiert
+- News modularisiert
+- gemeinsame Admin-Komponenten erstellt
+- gemeinsame Helper erstellt
+- Codebasis vereinheitlicht
+- große Dateien in kleinere Module aufgeteilt
 
 ## Funktionsstand (fachlich)
 
@@ -31,25 +35,6 @@
   - Vorstand, Trainer, Sponsoren
   - Admin-Einstellungen
 
-## Technische Schulden (priorisiert)
-
-- hoch:
-  - interne Entkopplung sehr großer Dateien ohne Funktionsänderung
-- mittel:
-  - Utility-Duplikate konsolidieren
-  - Lint-/Qualitätsbaustellen schrittweise abbauen
-- niedrig:
-  - finale Dokumentationspflege im Tagesgeschäft
-
-## Empfehlungen für Phase 2
-
-1. Mailversand für Mitgliedsanfragen finalisieren.
-2. Mitgliedsanfragen-Historie ergänzen.
-3. Dashboard-Erinnerungen einführen.
-4. Cookie-Einstellungen ergänzen.
-5. Rollen/Rechte ausbauen.
-6. Performance/Deployment/Backups operationalisieren.
-
 ## Fazit
 
-Das Projekt ist fachlich in einem stabilen Zustand mit hoher Abdeckung der Vereinsanforderungen. Der Fokus verschiebt sich von Grundfunktionalität auf Betriebsreife, Governance und gezielte interne Refactors.
+Die öffentliche Website ist fachlich und responsive abgeschlossen. Der verbleibende Schwerpunkt liegt auf Betrieb, Qualitätssicherung und gezielten internen Verbesserungen ohne Funktionsbruch.

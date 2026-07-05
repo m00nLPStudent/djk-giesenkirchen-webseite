@@ -2,7 +2,7 @@
 
 ## Status
 
-Umgesetzt und aktiv genutzt.
+Abgeschlossen, modularisiert und aktiv genutzt.
 
 ## Öffentliche Funktionen
 
@@ -21,6 +21,7 @@ Umgesetzt und aktiv genutzt.
 - Google-Maps-Links
 - virtuelle Trainings aus strukturierten Trainingszeiten
 - Zusammenführung von echten Events und virtuellen Trainings in Übersichten
+- mobile responsive Karten- und Detaillayouts
 
 ## Datenbasis
 
@@ -33,9 +34,3 @@ Umgesetzt und aktiv genutzt.
 ## Architekturhinweis
 
 Wiederholungen und virtuelle Trainings werden zur Laufzeit berechnet. Es werden keine zusätzlichen Event-Zeilen für jedes Vorkommen gespeichert.
-
-## Offene Punkte (später)
-
-- keine Dokumente für virtuelle Trainings
-- kein Kalenderexport für virtuelle Trainings
-- keine eigene Admin-Oberfläche für `club_closure_periods`

@@ -2,13 +2,14 @@
 
 ## Status
 
-Umgesetzt.
+Abgeschlossen und produktiv nutzbar.
 
 ## Öffentliche Funktionen
 
 - Seite `/mitglied-werden`
-- Formular für Mitgliedsanfragen (u. a. aktives Mitglied Fußball, passives Mitglied)
+- Formular für Mitgliedsanfragen (u. a. aktives Mitglied Fußball, passives Mitglied, Trainer werden)
 - Teambezug bei aktiven Fußball-Anfragen
+- mobile-first Formularlayout
 
 ## Admin-Funktionen
 
@@ -21,10 +22,14 @@ Umgesetzt.
 
 1. Anfrage wird öffentlich erfasst.
 2. Anfrage wird in `membership_requests` gespeichert.
-3. Optionaler Mailversand/Weiterleitung erfolgt über Service-Logik.
+3. Weiterleitung erfolgt über Admin-Flow und Empfängerregeln.
 4. Bearbeitung und Statuspflege erfolgen im Adminbereich.
 
-## Offener Ausbau (Phase 2)
+## Tabellen
 
-- finaler Mailversand-Flow
-- Historie/Protokollierung von Weiterleitungen
+- `membership_requests`
+- `membership_request_recipients`
+
+## Release-Hinweis
+
+Öffentliche Website enthält keine offenen Membership-Feature-Baustellen im Responsive-Release.

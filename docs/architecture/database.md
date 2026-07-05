@@ -2,48 +2,59 @@
 
 ## Grundsatz
 
-Dokumentiert ist der aktuell genutzte Datenstand. Datenbankanpassungen werden immer gegen Service- und UI-Logik geprüft.
+Alle Module sind auf den produktiv genutzten Tabellenstand dokumentiert.
 
-## Website/CMS-nahe Tabellen
+## Content und Website-Basis
 
-- `club_settings` – zentrale Vereins- und Website-Grundeinstellungen
-- `club_contacts` – Kontaktblöcke und Ansprechpartner
-- `pages` – CMS-Seiten (u. a. Rechtstexte und Footer-Seiten)
-- `club_history_pages` – Vereinsgeschichte mit RichText-Inhalten
+- `club_settings`: globale Vereins-/Website-Einstellungen
+- `club_contacts`: öffentliche Kontaktpersonen
+- `pages`: CMS-Seiten (z. B. Rechtstexte)
+- `club_history_pages`: Vereinsgeschichte-Seiten
+- `club_history_images`
+- `club_history_milestones`
 
 ## News
 
-- `news` – Beiträge
-- `news_documents` – Dokumente/Downloads zu News
+- `news`
+- `news_documents`
 
-## Events
+## Events und Termine
 
-- `events` – echte Vereinstermine inkl. Wiederholungsfeldern
-- `event_documents` – Dokumente für echte Events
-- Wiederholung in `events` über Felder wie `recurrence_type`, `recurrence_interval`, `recurrence_until`, `recurrence_count`
+- `events`
+- `event_documents`
+- Wiederholungsfelder in `events` (u. a. Intervall/Ende/Anzahl)
 
-## Trainings-Runtime
+## Trainings-Runtime (virtuelle Trainings)
 
-- `team_training_times` – regelmäßige Trainingszeiten
-- `team_training_exceptions` – Ausfälle/Verlegungen
-- `club_closure_periods` – Sperrzeiten
+- `team_training_times`
+- `team_training_exceptions`
+- `club_closure_periods`
 
-Virtuelle Trainings werden aus diesen Tabellen zur Laufzeit berechnet und nicht als eigene Event-Datensätze gespeichert.
+Virtuelle Trainings werden zur Laufzeit erzeugt und nicht als persistente Event-Reihen abgelegt.
 
-## Fußball/Abteilung
+## Fußball, Abteilung, Personen
 
-- `departments`, `teams`, `team_seasons`, `seasons`
-- `players`, `player_team_seasons`
-- `coaches`, `coach_team_seasons`
-- `board_members`, `board_roles`
-- `sponsors`, `sponsor_categories`
+- `teams`
+- `team_seasons`
+- `seasons`
+- `players`
+- `player_team_seasons`
+- `coaches`
+- `coach_team_seasons`
+- `board_members`
+- `board_roles`
 
-## Mitgliedschaft
+## Sponsoren
 
-- `membership_requests` – öffentliche Mitgliedsanfragen
-- `membership_request_recipients` – Empfängerregeln für Weiterleitung
+- `sponsor_categories`
+- `sponsors`
 
-## Hinweise
+## Membership
 
-- Keine Feature-Änderung ohne Datenbankabgleich.
-- Legacy-/Fallback-Felder bleiben bis zu gezielter Bereinigung bestehen.
+- `membership_requests`
+- `membership_request_recipients`
+
+## Modellregeln
+
+- Keine UI- oder Service-Änderung ohne Schema-Abgleich
+- Keine Doku-Aussage ohne tatsächliche Tabellennutzung im Code

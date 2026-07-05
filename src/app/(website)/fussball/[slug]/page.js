@@ -231,8 +231,8 @@ export default async function TeamPage({ params }) {
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
-      <section className="px-6 pt-32 pb-24">
-        <div className="mx-auto max-w-7xl space-y-8">
+      <section className="overflow-x-hidden px-4 pt-28 pb-20 sm:px-6 md:pt-32 md:pb-24">
+        <div className="mx-auto max-w-7xl min-w-0 space-y-8">
           <TeamHero team={displayTeam} />
           <TeamIntroCard team={displayTeam} />
 

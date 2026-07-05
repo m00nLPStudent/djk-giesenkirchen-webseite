@@ -43,14 +43,14 @@ export default async function NewsOverviewPage({ searchParams }) {
   const totalPages = Math.max(1, Math.ceil((count || 0) / PAGE_SIZE));
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-48 pb-24 text-white md:pt-56">
+    <main className="min-h-screen bg-[#101014] px-4 pt-32 pb-20 text-white sm:px-6 md:pt-56 md:pb-24">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               News Übersicht
             </p>
-            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-tight md:text-7xl">
+            <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight md:text-7xl">
               Alle Meldungen
             </h1>
           </div>
@@ -74,7 +74,8 @@ export default async function NewsOverviewPage({ searchParams }) {
         {search && (
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <p className="text-sm text-white/55">
-              Suchergebnisse für <span className="font-bold text-white">{search}</span>
+              Suchergebnisse für{" "}
+              <span className="font-bold text-white">{search}</span>
             </p>
             <Link
               href="/news/uebersicht"

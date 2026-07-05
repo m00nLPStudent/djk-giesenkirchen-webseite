@@ -1,25 +1,47 @@
 # Architecture Overview
 
+## Zielbild
+
+Das Projekt besteht aus:
+
+- einer abgeschlossenen öffentlichen Vereinswebsite (mobile-first responsive)
+- einem modularisierten Admin-CMS
+- einem gemeinsamen Daten- und Helper-Layer auf Supabase-Basis
+
 ## Systemaufbau
 
-- Next.js App Router mit Trennung in öffentlichen Bereich (`src/app/(website)`) und Adminbereich (`src/app/admin`).
-- Komponenten nach Domäne in `src/components/website`, `src/components/admin` und `src/components/common`.
-- Datenzugriffe über Supabase (Tabellen, Storage, RPC), modulnahe Services und gemeinsame Helper in `src/lib`.
+- App Router mit Segmenten
+  - öffentliche Website: `src/app/(website)`
+  - Admin: `src/app/admin`
+- Komponentenstruktur
+  - Website: `src/components/website`
+  - Admin: `src/components/admin`
+  - Shared: `src/components/common`
+- Infrastruktur und Services
+  - `src/lib/*` für wiederverwendbare Helper/Service-Funktionen
+  - Supabase als Daten- und Storage-Backend
 
-## Fachliche Bereiche
+## Public-Website Architektur
 
-- Öffentliche Website: Startseite, News, Termine, Fußball, Abteilung, Sponsoren, Kontakt, Impressum, Datenschutz, Mitglied werden.
-- Admin: Dashboard, News, Teams, Spieler, Trainer, Events, Department/Vorstand, Sponsoren, Club-History, Settings.
-- Settings/CMS: zentrale Pflege von `club_settings`, `club_contacts`, `pages` und Mitgliedsanfragen-Konfiguration.
+- Layout über `src/app/(website)/layout.js` mit globalem Header/Footer
+- Header mit Desktop-Navigation und mobilem Burger-Menü
+- Seitenmodule für:
+  - Verein
+  - Fußball
+  - News
+  - Termine
+  - Mitglied werden
+  - Kontakt
+  - Rechtstexte
 
-## Architekturprinzipien
+## Admin-Architektur
 
-- Feature-Logik bleibt in Modulen gekapselt.
-- Gemeinsame Infrastruktur wird zentral gehalten (z. B. Slug-, Storage-, Phone-, Event- und RichText-Helfer).
-- Datenbankstruktur und UI werden synchron entwickelt; keine UI-Logik ohne abgesicherte Datenbasis.
+- Modulorientierte Admin-Bereiche für Inhalte und Stammdaten
+- zentrale Settings-Verwaltung für `club_settings`, `club_contacts`, `pages`, Mitgliedsanfragen
+- geteilte Admin-Komponenten und Helper statt monolithischer Einzelimplementierungen
 
-## Aktueller Reifegrad
+## Grundprinzipien
 
-- Öffentliche Website weitgehend abgeschlossen.
-- Adminbereich weitgehend funktionsfähig.
-- Offene Themen sind überwiegend Betriebs- und Erweiterungsthemen (Mailversand, Rollen/Rechte, Performance/Deployment/Backups).
+- Keine Feature-Entwicklung ohne konsistente Modell-/Service-/UI-Kette
+- Modullogik kapseln, Shared-Code zentralisieren
+- Dokumentation ist Teil des Produktstands und wird synchron gepflegt

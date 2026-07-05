@@ -15,17 +15,17 @@ export default async function NewsPage() {
   const secondaryNews = latestNews?.slice(1) || [];
 
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-32 pb-24 text-white">
+    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Aktuelles
             </p>
-            <h1 className="mt-6 text-5xl font-black leading-tight md:text-6xl lg:text-7xl">
+            <h1 className="mt-6 text-4xl font-black leading-tight md:text-6xl lg:text-7xl">
               Aktuelle News
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/65">
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/65 md:text-lg md:leading-8">
               Die neuesten Meldungen aus dem Verein – deutlich dargestellt und
               direkt erreichbar.
             </p>

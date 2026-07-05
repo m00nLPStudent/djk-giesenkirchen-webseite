@@ -1,9 +1,14 @@
 export default function SponsorBanner({ sponsor }) {
   const image = sponsor.image_url;
   const hasWebsite = Boolean(sponsor.website_url);
-  const className = "flex h-44 items-center justify-center bg-white p-6";
+  const className =
+    "flex min-w-0 h-32 items-center justify-center overflow-hidden bg-white p-4 sm:h-40 sm:p-5 md:h-44 md:p-6";
   const imageContent = image ? (
-    <img src={image} alt={sponsor.name} className="h-full w-full object-contain" />
+    <img
+      src={image}
+      alt={sponsor.name}
+      className="h-full w-full object-contain"
+    />
   ) : (
     <span className="text-sm font-bold text-black/50">Kein Banner</span>
   );

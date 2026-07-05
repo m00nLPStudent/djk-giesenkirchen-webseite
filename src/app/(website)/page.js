@@ -49,15 +49,15 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
-      <section className="relative overflow-hidden px-6 pt-48 pb-24 md:pt-56">
+      <section className="relative overflow-hidden px-4 pt-28 pb-20 sm:px-6 md:pt-56 md:pb-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#c4001a55,transparent_35%),linear-gradient(120deg,#101014_20%,#1b1b22_60%,#c4001a_140%)]" />
 
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div>
+        <div className="relative z-10 mx-auto max-w-7xl min-w-0">
+          <div className="min-w-0">
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Aktuelles aus dem Verein
             </p>
-            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-tight md:text-7xl">
+            <h1 className="mt-5 max-w-4xl break-words text-3xl font-black leading-[1.1] sm:text-4xl md:text-6xl lg:text-7xl">
               Neuigkeiten aus Giesenkirchen
             </h1>
           </div>
@@ -74,8 +74,8 @@ export default async function Home() {
               )}
             </div>
           ) : (
-            <div className="mt-12 rounded-[2rem] border border-white/10 bg-white/5 p-8">
-              <p className="text-lg text-white/65">
+            <div className="mt-12 rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8">
+              <p className="text-base text-white/65 md:text-lg">
                 Aktuell sind noch keine News veröffentlicht.
               </p>
             </div>
