@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FormActions } from "@/components/admin/forms";
+import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import { createSlug } from "@/lib/slug";
 import { EVENT_FORM_TABS } from "./eventEditor.constants";
@@ -193,7 +193,7 @@ export default function EventEditorForm({ event = null, teams = [] }) {
         />
       )}
 
-      <FormActions
+      <AdminSaveBar
         loading={loading}
         submitLabel={isEdit ? "Änderungen speichern" : "Termin speichern"}
         cancelHref="/admin/events"

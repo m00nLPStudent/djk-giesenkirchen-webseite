@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
+import { createSlug } from "@/lib/slug";
 
 export const CLUB_CONTACT_PLACEHOLDER_IMAGE = "";
 
@@ -8,22 +9,10 @@ function normalizeText(value) {
   return trimmed || null;
 }
 
-function normalizeSlug(value = "") {
-  return String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
 function createRoleKey(form = {}) {
   const rawRole = normalizeText(form.role_de);
   const rawName = normalizeText(form.contact_name);
-  return normalizeSlug(rawRole || rawName || "kontakt");
+  return createSlug(rawRole || rawName || "kontakt");
 }
 
 export function normalizeClubSettingsForm(form = {}) {

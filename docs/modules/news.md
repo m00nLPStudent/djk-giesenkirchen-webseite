@@ -2,7 +2,7 @@
 
 ## Status
 
-In Arbeit.
+Umgesetzt und produktiv genutzt.
 
 ## Funktionen
 
@@ -13,10 +13,12 @@ In Arbeit.
 - Fußball-News optional einer Mannschaft zuordnen
 - Öffentliche News-Karten auf Startseite und Übersicht
 - Einzelne News-Detailseite
+- Dokumente/Downloads pro News
+- Suche und Pagination in der News-Übersicht
 
 ## Datenbank
 
-Aktuelle Tabelle: `news`
+Aktuelle Tabellen: `news`, `news_documents`
 
 Wichtige Felder:
 
@@ -31,8 +33,7 @@ Wichtige Felder:
 - `is_published`
 - `published_at`
 
-## Geplant
+## Hinweise
 
-- Kategorien später über Admin-Einstellungen pflegen
-- Autor später aus eingeloggtem Benutzer übernehmen
-- Optional Tags einführen
+- News-Dokumente werden im Admin gepflegt und öffentlich auf der Detailseite angezeigt.
+- Offene Weiterentwicklungen (z. B. zusätzliche Taxonomien) sind kein Blocker für den aktuellen Live-Stand.

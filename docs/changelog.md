@@ -1,33 +1,24 @@
 # Changelog
 
-## Aktueller Stand
+## 2026-07-05
 
-Diese Datei sammelt größere Änderungen am Projekt.
+### Public website and admin settings finalized
 
-## Bisherige Meilensteine
+Großer Meilenstein:
 
-- Dokumentationsstruktur in `architecture/`, `modules/`, `decisions/` und `development/` gegliedert
-- Projektbasis mit Next.js erstellt
-- Adminbereich aufgebaut
-- News-Modul gestartet
-- Spieler-Modul erstellt
-- Trainer-Modul erstellt
-- Mannschaftsmodul saisonfähig aufgebaut
-- team templates eingeführt
-- zentrale Löschlogik eingeführt
-- Startseite und Navigation überarbeitet
-- Dokumentationsstruktur erweitert
-- Abteilungsmodul mit Vorstand, Vorstandsfunktionen und Trainerübersicht fertiggestellt
-- Öffentliche Abteilungsseiten modularisiert
-- Sponsorenmodul mit Kategorien, Banner-Upload, Social-Media-Links und öffentlicher Sponsorenübersicht fertiggestellt
-- Sponsoren-Komponenten modularisiert und SocialLinks als gemeinsames Modul eingeführt
-- Events-Modul um wiederkehrende Termine erweitert (Admin-Optionen, Laufzeit-Expansion in der Übersicht, Wiederholungshinweis auf Detailseite)
-- Events-Modul um Dokumentanhänge für echte Events erweitert
-- Öffentliche Termine in Übersicht, Trainingstermine und allgemeine Termine getrennt
-- Virtuelle Trainingsdetailseiten mit Google-Maps-Link und Mannschaftslink eingeführt
-- Strukturierte Team-Trainingszeiten und Trainings-Ausnahmen im Admin eingebunden
-- Virtuelle Trainings aus `team_training_times`, `team_training_exceptions` und `club_closure_periods` zur Laufzeit berechnet
+- öffentliche Website fachlich weitgehend abgeschlossen
+- dynamischer Footer, Kontaktseite, Impressum, Datenschutz umgesetzt
+- Pages-CMS, `club_settings` und `club_contacts` aktiv integriert
+- Mitglied-werden-Formular und Mitgliedsanfragen mit Weiterleitungslogik umgesetzt
+- Vereinsgeschichte mit RichText in Website und Admin umgesetzt
+- News, Termine, wiederkehrende Termine und virtuelle Trainings stabil integriert
+- Fußball-Übersichtsseiten und Mannschaftsseiten final strukturiert
+- Vorstand, Trainer und Sponsoren produktiv angebunden
+- Admin-Einstellungen als zentrale Pflegeoberfläche abgeschlossen
 
-## Regel
+## Frühere Meilensteine
 
-Größere Änderungen werden hier kurz dokumentiert.
+- Projektbasis mit Next.js App Router und Supabase aufgebaut
+- modulare Admin-Bausteine eingeführt
+- saisonfähige Mannschaftsstruktur umgesetzt
+- Events-Modul um Wiederholung, Dokumente und virtuelle Trainings erweitert

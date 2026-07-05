@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { FootballHero } from "@/components/website/football";
 
 const overviewCards = [
   {
     title: "Mannschaften",
     description:
       "Alle Junioren-, Senioren- und Damenmannschaften im Überblick.",
-    href: "#mannschaften",
+    href: "/fussball/mannschaften",
     eyebrow: "Spielbetrieb",
   },
   {
@@ -38,7 +37,7 @@ const overviewCards = [
     title: "Turniere & Events",
     description:
       "Turniere, Veranstaltungen und weitere Termine rund um den Fußballbereich.",
-    href: "/termine",
+    href: "/fussball/turniere-events",
     eyebrow: "Events",
   },
   {
@@ -54,9 +53,7 @@ export default async function FootballPage() {
   return (
     <main className="min-h-screen bg-[#101014] pt-32 pb-24 text-white">
       <div className="mx-auto max-w-7xl px-6">
-        <FootballHero />
-
-        <section className="mt-10 rounded-3xl border border-white/10 bg-black/20 p-7 md:p-9">
+        <section className="rounded-3xl border border-white/10 bg-black/20 p-7 md:p-9">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Übersicht

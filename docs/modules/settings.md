@@ -2,28 +2,30 @@
 
 ## Status
 
-Geplant.
+Umgesetzt und produktiv genutzt.
 
 ## Ziel
 
-Zentrale Verwaltung wiederverwendbarer Website- und Admin-Einstellungen.
+Zentrale Verwaltung von Website-Basisdaten, Kontaktdaten, Seiteninhalten und Mitgliedschaftsabläufen.
 
-## Geplante Funktionen
+## Umgesetzte Funktionen
 
-- Website-Grunddaten
-- Vereinsdaten
-- Kontaktinformationen
-- Social Links
-- News-Kategorien
-- öffentliche Saison
-- globale Anzeigeoptionen
+- Vereins-/Website-Grundeinstellungen pflegen (`club_settings`)
+- Kontaktdaten pflegen (`club_contacts`)
+- Seiten-CMS pflegen (`pages`)
+- Mitgliedsanfragen-Empfänger nach Anfragetyp pflegen (`membership_request_recipients`)
+- Mitgliedsanfragen einsehen, Status setzen und weiterleiten (`membership_requests`)
 
-## Geplante Datenbank
+## Relevante Tabellen
 
-- `settings`
-- `social_links`
-- `news_categories`
+- `club_settings`
+- `club_contacts`
+- `pages`
+- `membership_request_recipients`
+- `membership_requests`
 
-## Hinweis
+## Öffentliche Wirkung
 
-Ein Teil der Saison-Einstellungen existiert aktuell bereits über `seasons.is_current`.
+- Footer und Website-Basisdaten sind dynamisch.
+- Kontaktseite wird aus gepflegten Kontaktdaten gespeist.
+- Impressum/Datenschutz und weitere CMS-Seiten werden über `pages` bereitgestellt.

@@ -1,21 +1,29 @@
 # Projektdokumentation
 
-Diese Dokumentation beschreibt Architektur, Module, Entwicklungsabläufe und den aktuellen Projektstand der Plattform der DJK/VfL Giesenkirchen 05/09 e.V.
+Diese Dokumentation bildet den aktuellen Stand der Vereinswebsite und des Adminbereichs ab.
 
-## Zielstruktur
+## Struktur
 
-- `architecture/` – Gesamtarchitektur, Routen, Komponenten, Datenbank und Supabase-Storage
-- `modules/` – fachliche Modulbeschreibungen (News, Teams, Spieler, Trainer, Sponsoren, Vorstand, Events)
-- `decisions/` – zentrale Architekturentscheidungen
-- `development/` – Coding-Regeln, Workflow und Deployment-Hinweise
-- `roadmap.md` – mittel- und langfristige Planung
-- `changelog.md` – wesentliche Änderungen
-- `todo.md` – aktuelle Arbeitspunkte
+- `architecture/` – technische Gesamtarchitektur (Überblick, Routen, Datenbank, Komponenten, Storage)
+- `modules/` – fachliche Moduldokumente für Website und Admin
+- `development/` – Entwicklungsregeln, Workflow, Deployment und Projektzustand
+- `decisions/` – Architekturentscheidungen
+- `roadmap.md` – aktuelle Prioritäten und nächste Phasen
+- `changelog.md` – größere Meilensteine
 
-## Legacy-Dokumente
+## Leitlinie
 
-Vorhandene Root-Dokumente (z. B. `architecture-overview.md`, `database.md`, `coding-guidelines.md`) bleiben erhalten und werden schrittweise in die Zielstruktur überführt.
+- Dokumentation folgt immer dem Ist-Stand in Code und Datenbank.
+- Größere Änderungen immer entlang der Kette Datenbank -> Service -> UI prüfen.
 
-## Grundregel
+## Aktuell vollständig dokumentiert
 
-Keine größere Änderung ohne Abgleich zwischen Datenbank, Service-Logik und UI.
+- Dynamischer Footer
+- Kontaktseite, Impressum, Datenschutz
+- Pages-CMS (`pages`), Vereinseinstellungen (`club_settings`), Kontaktverwaltung (`club_contacts`)
+- Mitglied-werden-Formular, Mitgliedsanfragen und Weiterleitung
+- Vereinsgeschichte mit RichText
+- News, Termine, wiederkehrende Termine, virtuelle Trainings
+- Fußball-Übersichtsseiten und Mannschaftsseiten
+- Vorstand, Trainer, Sponsoren
+- Admin-Einstellungen

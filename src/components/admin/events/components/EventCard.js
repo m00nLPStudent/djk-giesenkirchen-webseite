@@ -1,16 +1,5 @@
 import Link from "next/link";
-
-function getEventTypeLabel(type) {
-  const map = {
-    training: "Training",
-    spiel: "Spiel",
-    vereinstermin: "Vereinstermin",
-    turnier: "Turnier",
-    sonstiges: "Sonstiges",
-  };
-
-  return map[type] || "Event";
-}
+import { getEventTypeLabel } from "@/lib/events";
 
 function getEventStatus(item) {
   const now = new Date();

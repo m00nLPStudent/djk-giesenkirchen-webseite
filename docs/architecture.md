@@ -1,3 +1,0 @@
-# Architecture
-
-Project documentation overview.

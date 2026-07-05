@@ -2,105 +2,54 @@
 
 ## Aktueller Projektstatus
 
-- Projektbasis ist stabil: Next.js App Router, klar getrennte Bereiche für Website und Admin.
-- News-Modul inklusive Dokumentanhängen ist funktional umgesetzt.
-- Gemeinsame Helfer wurden zuletzt erweitert:
-  - src/lib/files.js (Datei-Helfer)
-  - src/lib/storage.js (Storage-Helfer)
-- Dokumentation wurde in Strukturordner gegliedert (architecture, modules, decisions, development).
+- Projektbasis ist stabil: Next.js App Router, klare Trennung zwischen Website und Admin.
+- Öffentliche Website ist weitgehend abgeschlossen.
+- Adminbereich ist weitgehend funktionsfähig.
+- Settings/CMS sind aktiv in Nutzung (Footer, Kontakt, Rechtstexte, Mitgliedschaftsprozesse).
 
 ## Architektur-Bewertung
 
 - Positiv:
-  - Gute Trennung zwischen App-Routen (src/app), UI-Komponenten (src/components) und Basis-Helfern (src/lib).
+  - Gute Trennung zwischen App-Routen (`src/app`), UI-Komponenten (`src/components`) und Basis-Helfern (`src/lib`).
   - Feature-nahe Services im jeweiligen Modul sind konsistent organisiert.
 - Auffällig:
-  - Einzelne Utility-Logik ist noch parallel vorhanden (z. B. getFileExtension in src/lib/storage.js und src/lib/files.js).
-  - Ein serverseitiger Scraper-Helfer scheint aktuell ohne Referenz im Code zu sein: src/lib/fussball-de/fussballDe.server.js.
-  - Der Events-/Trainingsbereich ist funktional stark gewachsen und enthält mehrere große Dateien.
+  - Einzelne Utility-Logik ist noch parallel vorhanden (z. B. Slug-Helfer in mehreren Modulen).
+  - Der Events-/Trainingsbereich ist funktional stark gewachsen und enthält große Dateien.
+  - Der Settings-Editor ist funktional umfassend und als interner Refactor-Kandidat markiert.
 
-## Modularisierung
+## Funktionsstand (fachlich)
 
-- Fortschritt:
-  - Datei-Helfer (Dateiendung, Dateigröße, Anzeigename, erlaubte Dokumenttypen) sind zentral in src/lib/files.js gebündelt.
-  - Wiederkehrende Storage-Operationen (upload/getPublicUrl/remove) sind in src/lib/storage.js zentralisiert.
-- Restbedarf:
-  - Doppelte Slug-Helfer in drei Modulen können in einen gemeinsamen Helper überführt werden:
-    - src/components/admin/news/utils/slug.js
-    - src/components/admin/coaches/utils/slug.js
-    - src/components/admin/teams/utils/slug.js
-  - Große Feature-Dateien im Events-/Trainingsbereich weiter intern zerlegen.
+- umgesetzt:
+  - dynamischer Footer
+  - Kontaktseite, Impressum, Datenschutz
+  - Pages-CMS (`pages`), `club_settings`, `club_contacts`
+  - Mitglied-werden-Formular, Mitgliedsanfragen, Weiterleitung
+  - Vereinsgeschichte mit RichText
+  - News
+  - Termine, wiederkehrende Termine, virtuelle Trainings
+  - Mannschaftsseiten und Fußball-Übersichtsseiten
+  - Vorstand, Trainer, Sponsoren
+  - Admin-Einstellungen
 
-## Wiederverwendbarkeit
+## Technische Schulden (priorisiert)
 
-- Positiv:
-  - Viele Admin-Services nutzen bereits gemeinsame Storage-Helfer.
-  - Gemeinsame Form- und UI-Bausteine sind vorhanden.
-- Verbesserungsoption:
-  - Ein einheitlicher, gemeinsamer Slug-Helper für Admin-Module.
-  - Optional: getFileExtension nur noch aus einer Quelle verwenden.
+- hoch:
+  - interne Entkopplung sehr großer Dateien ohne Funktionsänderung
+- mittel:
+  - Utility-Duplikate konsolidieren
+  - Lint-/Qualitätsbaustellen schrittweise abbauen
+- niedrig:
+  - finale Dokumentationspflege im Tagesgeschäft
 
-## Prüfungsergebnisse (Code Health)
+## Empfehlungen für Phase 2
 
-Projektweiter Lint-Lauf (cmd /c npm run lint):
+1. Mailversand für Mitgliedsanfragen finalisieren.
+2. Mitgliedsanfragen-Historie ergänzen.
+3. Dashboard-Erinnerungen einführen.
+4. Cookie-Einstellungen ergänzen.
+5. Rollen/Rechte ausbauen.
+6. Performance/Deployment/Backups operationalisieren.
 
-- 28 Probleme insgesamt
-- 5 Errors
-- 23 Warnings
+## Fazit
 
-Hauptbefunde:
-
-- Errors (hoch):
-  - Mehrere Stellen mit react-hooks/set-state-in-effect
-  - Betroffene Dateien:
-    - src/components/admin/news/forms/NewsEditorForm.js
-    - src/components/admin/players/AdminPlayersList.js
-    - src/components/admin/topbar/AdminTopbarClock.js
-    - src/components/admin/ui/AdminClock.js
-    - src/components/website/football-de/FootballDeWidget.js
-- Warnings (mittel):
-  - Häufige Nutzung von img statt Next Image (Performance-Hinweis)
-- Doppelte Helper (mittel):
-  - createSlug in drei Admin-Modulen doppelt
-  - getFileExtension in src/lib/files.js und src/lib/storage.js doppelt
-- Potenziell tote Datei (niedrig bis mittel, fachlich prüfen):
-  - src/lib/fussball-de/fussballDe.server.js (keine Referenz gefunden)
-
-## Offene technische Schulden
-
-- React-Hook-Fehler im Lint (setState in useEffect) beheben.
-- Doppelte Slug-Helfer konsolidieren.
-- getFileExtension auf eine gemeinsame Quelle reduzieren.
-- Unreferenzierten fussball.de-Serverhelper fachlich verifizieren und ggf. entfernen oder anbinden.
-- Bildoptimierung (Next Image) schrittweise in kritischen Seiten priorisieren.
-- Struktur-Refactor im Events-/Trainingsmodul schrittweise fortsetzen.
-
-## Empfehlungen für die nächsten Entwicklungsschritte
-
-1. Lint-Errors zuerst beheben (ohne Featureänderung).
-2. Slug-Helfer zentralisieren (kleiner, risikoarmer Refactor).
-3. Doppelte getFileExtension-Funktion bereinigen.
-4. Unreferenzierte Dateien mit Team fachlich validieren und aufräumen.
-5. Danach Performance-Hinweise zu img schrittweise angehen.
-6. Events-/Trainingsbereich intern modularisieren, ohne Runtime-Logik zu verändern.
-
-## Prioritäten
-
-- Hoch:
-  - react-hooks/set-state-in-effect Fehler (5 Vorkommen)
-- Mittel:
-  - Doppelte Slug-Utilities
-  - Doppelte getFileExtension-Logik
-  - no-img-element Warnungen in häufigen Seiten
-  - Große Containerdateien in Events-/Trainingsverwaltung
-- Niedrig:
-  - Dokumentierte Legacy-Dokumente weiter konsolidieren
-  - Potenziell tote Datei nur nach fachlicher Bestätigung bereinigen
-
-## Was wurde durch dieses Refactoring verbessert?
-
-- Dateibezogene Regeln sind nun zentral dokumentiert und im Code wiederverwendbar.
-- Storage-Operationen sind modularisiert, wodurch Services konsistenter und wartbarer sind.
-- Der Docs-Bereich ist strukturiert und für neue Entwickler schneller navigierbar.
-- Die wichtigsten verbleibenden Risiken sind klar priorisiert und umsetzbar beschrieben.
-- Das Events-/Trainingsmodul ist fachlich vollständig, benötigt aber weitere interne Entkopplung für bessere Wartbarkeit.
+Das Projekt ist fachlich in einem stabilen Zustand mit hoher Abdeckung der Vereinsanforderungen. Der Fokus verschiebt sich von Grundfunktionalität auf Betriebsreife, Governance und gezielte interne Refactors.

@@ -2,11 +2,14 @@
 
 ## Status
 
-Mannschaftsmodul, Abteilungsmodul und Sponsorenmodul abgeschlossen. fussball.de Integration ist technisch vorbereitet und wird final auf der Live-Domain geprüft.
+Mannschaftsmodul, Abteilungsmodul und Sponsorenmodul abgeschlossen. Fußball-Übersichtsseiten und Mannschaftsgruppen sind umgesetzt.
 
 ## Öffentliche Funktionen
 
 - Fußballbereich auf der öffentlichen Website
+- Fußball-Übersichtsseite `/fussball`
+- Mannschaftsübersicht `/fussball/mannschaften`
+- Mannschaftsgruppen `/fussball/mannschaften/junioren`, `/senioren`, `/damen`
 - Mannschaftsdetailseiten
 - Saisonfähige Mannschaftsdaten
 - Spieler pro Saison zuordnen
@@ -14,11 +17,12 @@ Mannschaftsmodul, Abteilungsmodul und Sponsorenmodul abgeschlossen. fussball.de 
 - Trainingsinformationen
 - Kontaktbereich
 - Spielbetrieb-Reiter
-- fussball.de Spielplan und Tabelle als aufklappbare Kacheln
+- fussball.de Spielplan und Tabelle technisch vorbereitet
 - Abteilungsübersicht
 - separate Vorstandsseite
 - separate Trainer- und Betreuerseite
 - Sponsorenbereich mit Mannschaftssponsoren, Bannersponsoren und allgemeinen Sponsoren
+- Vereinsgeschichte im Fußballbereich (`/fussball/vereinsgeschichte`)
 
 ## Admin-Funktionen
 
@@ -65,6 +69,6 @@ Sponsoren:
 - `SponsorTabs`
 - `SocialLinks`
 
-## Pausiert
+## Offene Punkte
 
-Die finale fussball.de Darstellung wird erst auf der Live-Domain getestet.
+- Finale fussball.de Darstellungsabstimmung auf Live-Domain.

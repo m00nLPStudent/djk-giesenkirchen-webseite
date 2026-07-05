@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { formatFileSize } from "@/lib/files";
+import { formatGermanDate } from "@/lib/dates";
 import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
 
 export default async function NewsDetailPage({ params }) {
@@ -48,9 +49,7 @@ export default async function NewsDetailPage({ params }) {
 
           <div className="mt-6 flex gap-6 text-white/60">
             <span>{article.author}</span>
-            <span>
-              {new Date(article.published_at).toLocaleDateString("de-DE")}
-            </span>
+            <span>{formatGermanDate(article.published_at)}</span>
           </div>
 
           <div className="mt-12 text-lg leading-9 text-white/80">

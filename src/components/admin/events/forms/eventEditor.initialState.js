@@ -1,18 +1,5 @@
 import { createSlug } from "@/lib/slug";
-
-function formatDateTimeLocal(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 16);
-}
-
-function formatDateLocal(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 10);
-}
+import { formatDateLocalInput, formatDateTimeLocalInput } from "@/lib/dates";
 
 export function createInitialEventForm(event) {
   const initialSlug = event?.slug || createSlug(event?.title_de || "");
@@ -25,8 +12,8 @@ export function createInitialEventForm(event) {
     description_de: event?.description_de || "",
     description_en: event?.description_en || "",
     event_type: event?.event_type || "vereinstermin",
-    starts_at: formatDateTimeLocal(event?.starts_at),
-    ends_at: formatDateTimeLocal(event?.ends_at),
+    starts_at: formatDateTimeLocalInput(event?.starts_at),
+    ends_at: formatDateTimeLocalInput(event?.ends_at),
     is_all_day: event?.is_all_day ?? false,
     location_name: event?.location_name || "",
     location_address: event?.location_address || "",
@@ -37,7 +24,7 @@ export function createInitialEventForm(event) {
     slug: initialSlug,
     recurrence_type: event?.recurrence_type || "none",
     recurrence_interval: event?.recurrence_interval ?? 1,
-    recurrence_until: formatDateLocal(event?.recurrence_until),
+    recurrence_until: formatDateLocalInput(event?.recurrence_until),
     recurrence_count: event?.recurrence_count ?? "",
     is_published: event?.is_published ?? false,
     is_featured: event?.is_featured ?? false,

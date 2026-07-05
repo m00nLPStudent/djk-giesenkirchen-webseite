@@ -4,7 +4,7 @@ import { Navigation } from "@/components/website/navigation";
 export default function Header() {
   return (
     <header className="fixed top-0 left-0 z-50 w-full border-b border-white/10 bg-black/75 backdrop-blur">
-      <div className="relative mx-auto flex max-w-7xl items-center gap-8 px-6 py-4 pl-36 md:pl-44 lg:pl-48">
+      <div className="relative mx-auto flex max-w-7xl items-center gap-4 px-4 py-4 pl-32 md:gap-5 md:px-6 md:pl-40 lg:pl-44">
         <Link
           href="/"
           className="group absolute left-6 top-1/2 z-20 -translate-y-[38%]"
@@ -17,7 +17,10 @@ export default function Header() {
           />
         </Link>
 
-        <Link href="/" className="block w-[300px] shrink-0 min-w-0 xl:w-[340px]">
+        <Link
+          href="/"
+          className="block w-[220px] shrink-0 min-w-0 md:w-[250px] xl:w-[280px]"
+        >
           <p className="text-[0.68rem] font-black uppercase tracking-[0.32em] text-red-400">
             Gemeinsam. Stark.
           </p>

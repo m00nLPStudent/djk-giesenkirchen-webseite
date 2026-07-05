@@ -2,9 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ActiveStatusField, EmailField, FormActions, FormGrid, FormSection, InputField, PhoneField, SelectField, SortOrderField } from "@/components/admin/forms";
+import {
+  ActiveStatusField,
+  EmailField,
+  FormGrid,
+  FormSection,
+  InputField,
+  PhoneField,
+  SelectField,
+  SortOrderField,
+} from "@/components/admin/forms";
+import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import BoardMemberImageUpload from "../components/BoardMemberImageUpload";
-import { BOARD_PLACEHOLDER_IMAGE, saveBoardMember, uploadBoardImage } from "../services/board.service";
+import {
+  BOARD_PLACEHOLDER_IMAGE,
+  saveBoardMember,
+  uploadBoardImage,
+} from "../services/board.service";
 
 export default function AdminBoardMemberForm({ member, roles = [] }) {
   const router = useRouter();
@@ -37,7 +51,10 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
   }
 
   async function uploadImage(file) {
-    const { data, error } = await uploadBoardImage(file, { ...form, id: member?.id });
+    const { data, error } = await uploadBoardImage(file, {
+      ...form,
+      id: member?.id,
+    });
     if (error) {
       alert(error.message);
       return;
@@ -64,33 +81,75 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
     <form onSubmit={handleSubmit} className="mt-10 space-y-6">
       <FormSection eyebrow="Vorstand" title="Personendaten">
         <FormGrid>
-          <InputField label="Vorname" required value={form.first_name} onChange={(event) => updateField("first_name", event.target.value)} />
-          <InputField label="Nachname" required value={form.last_name} onChange={(event) => updateField("last_name", event.target.value)} />
-          <SelectField label="Funktion" required value={form.role_id} onChange={(event) => updateRole(event.target.value)}>
+          <InputField
+            label="Vorname"
+            required
+            value={form.first_name}
+            onChange={(event) => updateField("first_name", event.target.value)}
+          />
+          <InputField
+            label="Nachname"
+            required
+            value={form.last_name}
+            onChange={(event) => updateField("last_name", event.target.value)}
+          />
+          <SelectField
+            label="Funktion"
+            required
+            value={form.role_id}
+            onChange={(event) => updateRole(event.target.value)}
+          >
             <option value="">Funktion auswählen</option>
             {roles.map((role) => (
-              <option key={role.id} value={role.id}>{role.name_de}</option>
+              <option key={role.id} value={role.id}>
+                {role.name_de}
+              </option>
             ))}
           </SelectField>
-          <InputField label="Funktion Englisch" value={form.role_en} onChange={(event) => updateField("role_en", event.target.value)} />
+          <InputField
+            label="Funktion Englisch"
+            value={form.role_en}
+            onChange={(event) => updateField("role_en", event.target.value)}
+          />
         </FormGrid>
       </FormSection>
       <FormSection eyebrow="Kontakt" title="Kontaktdaten">
         <FormGrid>
-          <EmailField value={form.email} onChange={(value) => updateField("email", value)} />
-          <PhoneField value={form.phone} onChange={(value) => updateField("phone", value)} />
+          <EmailField
+            value={form.email}
+            onChange={(value) => updateField("email", value)}
+          />
+          <PhoneField
+            value={form.phone}
+            onChange={(value) => updateField("phone", value)}
+          />
         </FormGrid>
       </FormSection>
       <FormSection eyebrow="Bild" title="Profilbild">
-        <BoardMemberImageUpload imageUrl={form.image_url} onUpload={uploadImage} onRemove={() => updateField("image_url", BOARD_PLACEHOLDER_IMAGE)} />
+        <BoardMemberImageUpload
+          imageUrl={form.image_url}
+          onUpload={uploadImage}
+          onRemove={() => updateField("image_url", BOARD_PLACEHOLDER_IMAGE)}
+        />
       </FormSection>
       <FormSection eyebrow="Einstellungen" title="Status und Sortierung">
         <FormGrid>
-          <SortOrderField value={form.sort_order} onChange={(value) => updateField("sort_order", value)} />
-          <ActiveStatusField checked={form.is_active} onChange={(value) => updateField("is_active", value)} entityLabel="Vorstandsmitglied" />
+          <SortOrderField
+            value={form.sort_order}
+            onChange={(value) => updateField("sort_order", value)}
+          />
+          <ActiveStatusField
+            checked={form.is_active}
+            onChange={(value) => updateField("is_active", value)}
+            entityLabel="Vorstandsmitglied"
+          />
         </FormGrid>
       </FormSection>
-      <FormActions loading={loading} submitLabel="Vorstandsmitglied speichern" cancelHref="/admin/department" />
+      <AdminSaveBar
+        loading={loading}
+        submitLabel="Vorstandsmitglied speichern"
+        cancelHref="/admin/department"
+      />
     </form>
   );
 }

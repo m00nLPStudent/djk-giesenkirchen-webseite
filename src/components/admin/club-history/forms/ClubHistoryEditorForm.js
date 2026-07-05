@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from "react";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
+import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import {
-  FormActions,
   FormGrid,
   FormSection,
   InputField,
@@ -265,7 +265,7 @@ export default function ClubHistoryEditorForm({
         </FormSection>
       )}
 
-      <FormActions
+      <AdminSaveBar
         loading={loading}
         submitLabel="Vereinsgeschichte speichern"
         cancelHref="/admin"

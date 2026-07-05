@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
-import { FormActions, FormAlert, FormSection } from "@/components/admin/forms";
+import { FormAlert, FormSection } from "@/components/admin/forms";
+import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import useEntityForm from "@/components/admin/hooks/useEntityForm";
 import useImageUpload from "@/components/admin/hooks/useImageUpload";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
@@ -74,7 +75,10 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
 
     setLoading(true);
 
-    const { error } = await saveCoach(createCoachPayload(form), coach?.id ?? null);
+    const { error } = await saveCoach(
+      createCoachPayload(form),
+      coach?.id ?? null,
+    );
 
     setLoading(false);
 
@@ -89,7 +93,11 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
-      <TabNavigation tabs={COACH_FORM_TABS} activeTab={activeTab} onChange={setActiveTab} />
+      <TabNavigation
+        tabs={COACH_FORM_TABS}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+      />
 
       {hasErrors && <FormAlert>{REQUIRED_FIELDS_MESSAGE}</FormAlert>}
 
@@ -99,7 +107,11 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
           title="Persönliche Daten"
           description="Grunddaten für die interne Verwaltung und die öffentliche Trainerseite."
         >
-          <CoachBasicFields form={form} errors={errors} updateField={updateField} />
+          <CoachBasicFields
+            form={form}
+            errors={errors}
+            updateField={updateField}
+          />
         </FormSection>
       )}
 
@@ -109,7 +121,12 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
           title="Vereinsdaten"
           description="Funktion, Mannschaftszuordnung, Lizenz und Anzeige-Reihenfolge."
         >
-          <CoachRoleFields form={form} errors={errors} teams={teams} updateField={updateField} />
+          <CoachRoleFields
+            form={form}
+            errors={errors}
+            teams={teams}
+            updateField={updateField}
+          />
         </FormSection>
       )}
 
@@ -119,7 +136,11 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
           title="Kontaktdaten"
           description="Telefon und WhatsApp werden automatisch ins internationale Format für Links umgewandelt."
         >
-          <CoachContactFields form={form} errors={errors} updateField={updateField} />
+          <CoachContactFields
+            form={form}
+            errors={errors}
+            updateField={updateField}
+          />
         </FormSection>
       )}
 
@@ -129,7 +150,11 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
           title="Profilangaben"
           description="Weitere Angaben für die öffentliche Darstellung."
         >
-          <CoachProfileFields form={form} errors={errors} updateField={updateField} />
+          <CoachProfileFields
+            form={form}
+            errors={errors}
+            updateField={updateField}
+          />
         </FormSection>
       )}
 
@@ -154,7 +179,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         </FormSection>
       )}
 
-      <FormActions
+      <AdminSaveBar
         loading={loading}
         submitLabel="Trainer speichern"
         cancelHref="/admin/coaches"

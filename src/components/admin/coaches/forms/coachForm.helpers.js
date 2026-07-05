@@ -1,7 +1,7 @@
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { validateRequiredFields } from "@/components/admin/utils/validation";
+import { createSlug } from "@/lib/slug";
 import { normalizeGermanPhoneNumber } from "@/lib/phone";
-import { createSlug } from "../utils/slug";
 import { REQUIRED_COACH_FIELDS } from "./coachForm.config";
 
 export function splitCoachName(name = "") {
