@@ -25,7 +25,9 @@ export function uniqueValues(values = []) {
 }
 
 export function buildPermissionSet(permissions = []) {
-  return new Set((permissions || []).map((permission) => permission.key).filter(Boolean));
+  return new Set(
+    (permissions || []).map((permission) => permission.key).filter(Boolean),
+  );
 }
 
 export function hasPermission(permissionSet, permissionKey) {
@@ -34,9 +36,13 @@ export function hasPermission(permissionSet, permissionKey) {
 }
 
 export function hasAnyPermission(permissionSet, permissionKeys = []) {
-  return (permissionKeys || []).some((permissionKey) => hasPermission(permissionSet, permissionKey));
+  return (permissionKeys || []).some((permissionKey) =>
+    hasPermission(permissionSet, permissionKey),
+  );
 }
 
 export function hasAllPermissions(permissionSet, permissionKeys = []) {
-  return (permissionKeys || []).every((permissionKey) => hasPermission(permissionSet, permissionKey));
+  return (permissionKeys || []).every((permissionKey) =>
+    hasPermission(permissionSet, permissionKey),
+  );
 }

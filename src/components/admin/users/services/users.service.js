@@ -1,4 +1,7 @@
-import { loadAdminPermissions, loadAdminRoles } from "@/lib/admin-auth/adminAuth.service";
+import {
+  loadAdminPermissions,
+  loadAdminRoles,
+} from "@/lib/admin-auth/adminAuth.service";
 import { fetchRolePermissionsByRoleIds } from "@/lib/admin-auth/adminRoles.repository";
 import { fetchAdminProfiles } from "@/lib/admin-auth/adminProfiles.repository";
 import { fetchAllUserRoleLinks } from "@/lib/admin-auth/userRoles.repository";
@@ -44,7 +47,13 @@ function buildPermissionIdsByRole(rolePermissions = []) {
   }, {});
 }
 
-function enrichUser(profile, links, roleById, permissionsById, permissionIdsByRole) {
+function enrichUser(
+  profile,
+  links,
+  roleById,
+  permissionsById,
+  permissionIdsByRole,
+) {
   const mappedRoles = (links || [])
     .map((link) => mapUserRole(roleById.get(link.role_id), link))
     .filter((role) => Boolean(role?.id))
@@ -54,7 +63,8 @@ function enrichUser(profile, links, roleById, permissionsById, permissionIdsByRo
       return (a.sort_order || 0) - (b.sort_order || 0);
     });
 
-  const primaryRole = mappedRoles.find((role) => role.is_primary) || mappedRoles[0] || null;
+  const primaryRole =
+    mappedRoles.find((role) => role.is_primary) || mappedRoles[0] || null;
 
   const permissionIds = uniqueValues(
     mappedRoles.flatMap((role) => permissionIdsByRole[role.id] || []),
@@ -63,7 +73,11 @@ function enrichUser(profile, links, roleById, permissionsById, permissionIdsByRo
   const permissions = permissionIds
     .map((id) => permissionsById.get(id))
     .filter(Boolean)
-    .sort((a, b) => `${a.category || ""}.${a.key || ""}`.localeCompare(`${b.category || ""}.${b.key || ""}`));
+    .sort((a, b) =>
+      `${a.category || ""}.${a.key || ""}`.localeCompare(
+        `${b.category || ""}.${b.key || ""}`,
+      ),
+    );
 
   return {
     id: profile.id,
@@ -83,22 +97,29 @@ function enrichUser(profile, links, roleById, permissionsById, permissionIdsByRo
 }
 
 export async function getAdminUsersPageData() {
-  const [{ data: profiles, error: profilesError }, { data: roleLinks, error: roleLinksError }, roles, permissions] =
-    await Promise.all([
-      fetchAdminProfiles(),
-      fetchAllUserRoleLinks(),
-      loadAdminRoles({ onlyActive: false }),
-      loadAdminPermissions(),
-    ]);
+  const [
+    { data: profiles, error: profilesError },
+    { data: roleLinks, error: roleLinksError },
+    roles,
+    permissions,
+  ] = await Promise.all([
+    fetchAdminProfiles(),
+    fetchAllUserRoleLinks(),
+    loadAdminRoles({ onlyActive: false }),
+    loadAdminPermissions(),
+  ]);
 
   if (profilesError) throw profilesError;
   if (roleLinksError) throw roleLinksError;
 
   const roleById = new Map((roles || []).map((role) => [role.id, role]));
-  const permissionById = new Map((permissions || []).map((permission) => [permission.id, permission]));
+  const permissionById = new Map(
+    (permissions || []).map((permission) => [permission.id, permission]),
+  );
 
   const roleIds = uniqueValues((roles || []).map((role) => role.id));
-  const { data: rolePermissions, error: rolePermissionsError } = await fetchRolePermissionsByRoleIds(roleIds);
+  const { data: rolePermissions, error: rolePermissionsError } =
+    await fetchRolePermissionsByRoleIds(roleIds);
   if (rolePermissionsError) throw rolePermissionsError;
 
   const permissionIdsByRole = buildPermissionIdsByRole(rolePermissions || []);

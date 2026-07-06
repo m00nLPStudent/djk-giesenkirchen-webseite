@@ -1,11 +1,19 @@
 import { supabase } from "@/lib/supabase";
 
 export async function fetchAdminProfile(userId) {
-  return await supabase.from("admin_profiles").select("*").eq("id", userId).maybeSingle();
+  return await supabase
+    .from("admin_profiles")
+    .select("*")
+    .eq("id", userId)
+    .maybeSingle();
 }
 
 export async function fetchAdminRoles({ onlyActive = true } = {}) {
-  let query = supabase.from("admin_roles").select("*").order("sort_order", { ascending: true }).order("name", { ascending: true });
+  let query = supabase
+    .from("admin_roles")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
 
   if (onlyActive) {
     query = query.eq("is_active", true);
@@ -64,4 +72,38 @@ export async function fetchPermissionsByIds(permissionIds = []) {
     .in("id", permissionIds)
     .order("category", { ascending: true })
     .order("key", { ascending: true });
+}
+
+export async function fetchAdminRoleByKey(key) {
+  return await supabase
+    .from("admin_roles")
+    .select("id, key, name")
+    .eq("key", key)
+    .maybeSingle();
+}
+
+export async function createAdminRole(payload) {
+  return await supabase
+    .from("admin_roles")
+    .insert(payload)
+    .select("*")
+    .maybeSingle();
+}
+
+export async function updateAdminRole(roleId, payload) {
+  return await supabase
+    .from("admin_roles")
+    .update(payload)
+    .eq("id", roleId)
+    .select("*")
+    .maybeSingle();
+}
+
+export async function updateAdminRoleStatus(roleId, isActive) {
+  return await supabase
+    .from("admin_roles")
+    .update({ is_active: isActive })
+    .eq("id", roleId)
+    .select("id, key, is_active")
+    .maybeSingle();
 }

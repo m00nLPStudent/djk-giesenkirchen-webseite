@@ -19,9 +19,10 @@ export default function useAdminUsersViewModel(initialData) {
   const roles = initialData?.roles || [];
 
   const roleOptions = useMemo(
-    () => [{ value: "all", label: "Alle Rollen" }].concat(
-      roles.map((item) => ({ value: item.id, label: item.name })),
-    ),
+    () =>
+      [{ value: "all", label: "Alle Rollen" }].concat(
+        roles.map((item) => ({ value: item.id, label: item.name })),
+      ),
     [roles],
   );
 

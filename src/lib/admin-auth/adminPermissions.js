@@ -73,18 +73,8 @@ export const ADMIN_PERMISSION_GROUPS = {
     "events.publish",
   ],
   teams: ["teams.view", "teams.create", "teams.edit", "teams.delete"],
-  players: [
-    "players.view",
-    "players.create",
-    "players.edit",
-    "players.delete",
-  ],
-  coaches: [
-    "coaches.view",
-    "coaches.create",
-    "coaches.edit",
-    "coaches.delete",
-  ],
+  players: ["players.view", "players.create", "players.edit", "players.delete"],
+  coaches: ["coaches.view", "coaches.create", "coaches.edit", "coaches.delete"],
   sponsors: [
     "sponsors.view",
     "sponsors.create",

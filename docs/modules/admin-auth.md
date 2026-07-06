@@ -68,12 +68,12 @@ Technische Struktur:
 - src/app/admin/users/page.js
 - src/app/admin/users/actions.js
 - src/components/admin/users/
-	- components/
-	- forms/
-	- dialogs/
-	- hooks/
-	- helpers/
-	- services/
+  - components/
+  - forms/
+  - dialogs/
+  - hooks/
+  - helpers/
+  - services/
 
 Ergaenzte Datenzugriffsschicht:
 
@@ -87,6 +87,53 @@ Wichtige Abgrenzung (weiterhin offen):
 - keine Route-Guards
 - keine Permission-Pruefungen im UI
 - keine neuen Datenbanktabellen
+
+## B3 Rollenverwaltung (admin_roles)
+
+Route:
+
+- /admin/roles
+
+Umfang:
+
+- Rollenliste aus admin_roles mit Name, Key, Beschreibung, Status, Sortierung und erstellt am
+- Zusatzwerte je Rolle: Anzahl Benutzerzuweisungen und Anzahl zugewiesener Permissions
+- Statistik-Karten: Rollen gesamt, aktiv/inaktiv, zugewiesene Benutzerrollen, Permissions gesamt
+- Suche, Statusfilter und Sortierung (sort_order, name, created_at)
+- Detaildialog mit Read-Only-Ansicht fuer Benutzerliste und Permissionliste je Rolle
+- Rolle erstellen und bearbeiten (Name, Key, Beschreibung, Sortierung, Aktiv)
+- Aktivieren/Deaktivieren von Rollen
+
+Besonderheit:
+
+- superadmin kann in B3 nicht deaktiviert werden (vereinfachter Schutz)
+
+Technische Struktur:
+
+- src/app/admin/roles/page.js
+- src/app/admin/roles/actions.js
+- src/components/admin/roles/
+  - components/
+  - forms/
+  - hooks/
+  - helpers/
+  - services/
+
+Repository-Erweiterung:
+
+- src/lib/admin-auth/adminRoles.repository.js
+  - Rolle nach Key laden
+  - Rolle erstellen
+  - Rolle aktualisieren
+  - Rollenstatus aktiv/inaktiv setzen
+
+Weiterhin nicht umgesetzt:
+
+- Permissions einer Rolle bearbeiten
+- Benutzerzuweisung zu Rollen bearbeiten
+- Sidebar-Rechtefilter nach Permissions
+- Route-Guards
+- Login-/Logout-Anpassung
 
 ## Seed-Vorschlag
 

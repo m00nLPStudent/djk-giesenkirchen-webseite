@@ -58,46 +58,98 @@ function ActionButtons({ user, isUpdating, onOpenDetails, onToggleStatus }) {
   );
 }
 
-export default function UsersTable({ users, updatingUserId, onOpenDetails, onToggleStatus }) {
+export default function UsersTable({
+  users,
+  updatingUserId,
+  onOpenDetails,
+  onToggleStatus,
+  onCreate,
+}) {
+  if (!users?.length) {
+    return (
+      <AdminPanel className="p-7 md:p-8">
+        <div className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-8 text-center">
+          <p className="text-xl font-black text-white">
+            Noch keine Benutzer angelegt.
+          </p>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-white/60">
+            Benutzer werden spaeter ueber die Auth-Verwaltung angelegt.
+          </p>
+          <button
+            type="button"
+            onClick={onCreate}
+            className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+          >
+            Neuer Benutzer
+          </button>
+        </div>
+      </AdminPanel>
+    );
+  }
+
   return (
     <AdminPanel className="overflow-hidden p-0">
-      <div className="hidden overflow-x-auto lg:block">
-        <table className="w-full min-w-[980px]">
+      <div className="hidden lg:block">
+        <table className="w-full table-fixed">
+          <colgroup>
+            <col className="w-[26%]" />
+            <col className="w-[11%]" />
+            <col className="w-[14%]" />
+            <col className="w-[17%]" />
+            <col className="w-[12%]" />
+            <col className="w-[12%]" />
+            <col className="w-[8%]" />
+          </colgroup>
           <thead className="bg-black/30">
             <tr className="text-left text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
-              <th className="px-5 py-4">Benutzer</th>
-              <th className="px-4 py-4">Status</th>
-              <th className="px-4 py-4">Primaere Rolle</th>
-              <th className="px-4 py-4">Weitere Rollen</th>
-              <th className="px-4 py-4">Letzter Login</th>
-              <th className="px-4 py-4">Erstellt am</th>
-              <th className="px-4 py-4">Aktionen</th>
+              <th className="px-4 py-3">Benutzer</th>
+              <th className="px-3 py-3">Status</th>
+              <th className="px-3 py-3">Primaer</th>
+              <th className="px-3 py-3">Weitere Rollen</th>
+              <th className="px-3 py-3">Letzter Login</th>
+              <th className="px-3 py-3">Erstellt</th>
+              <th className="px-3 py-3">Aktionen</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => {
-              const secondaryRoles = (user.roles || []).filter((role) => !role.is_primary);
+              const secondaryRoles = (user.roles || []).filter(
+                (role) => !role.is_primary,
+              );
               return (
-                <tr key={user.id} className="border-t border-white/10 align-top">
-                  <td className="px-5 py-4">
+                <tr
+                  key={user.id}
+                  className="border-t border-white/10 align-top"
+                >
+                  <td className="px-4 py-3">
                     <div className="flex items-start gap-3">
                       <UserAvatar user={user} />
-                      <div>
+                      <div className="min-w-0">
                         <p className="font-bold text-white">{user.name}</p>
-                        <p className="text-sm text-white/60">{user.email || "-"}</p>
+                        <p className="truncate text-sm text-white/60">
+                          {user.email || "-"}
+                        </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4"><UserStatusBadge isActive={user.is_active} /></td>
-                  <td className="px-4 py-4 text-sm text-white/75">
-                    {user.primaryRole?.name || "Keine primaere Rolle"}
+                  <td className="px-3 py-3">
+                    <UserStatusBadge isActive={user.is_active} />
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="px-3 py-3 text-sm text-white/75">
+                    <span className="line-clamp-2">
+                      {user.primaryRole?.name || "Keine primaere Rolle"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3">
                     <RoleChips roles={secondaryRoles} />
                   </td>
-                  <td className="px-4 py-4 text-sm text-white/70">{formatDateTime(user.last_login_at)}</td>
-                  <td className="px-4 py-4 text-sm text-white/70">{formatDateTime(user.created_at)}</td>
-                  <td className="px-4 py-4">
+                  <td className="px-3 py-3 text-sm text-white/70">
+                    {formatDateTime(user.last_login_at)}
+                  </td>
+                  <td className="px-3 py-3 text-sm text-white/70">
+                    {formatDateTime(user.created_at)}
+                  </td>
+                  <td className="px-3 py-3">
                     <ActionButtons
                       user={user}
                       isUpdating={updatingUserId === user.id}
@@ -112,11 +164,16 @@ export default function UsersTable({ users, updatingUserId, onOpenDetails, onTog
         </table>
       </div>
 
-      <div className="grid gap-3 p-4 lg:hidden">
+      <div className="grid gap-3 overflow-x-auto p-4 lg:hidden">
         {users.map((user) => {
-          const secondaryRoles = (user.roles || []).filter((role) => !role.is_primary);
+          const secondaryRoles = (user.roles || []).filter(
+            (role) => !role.is_primary,
+          );
           return (
-            <div key={user.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div
+              key={user.id}
+              className="rounded-2xl border border-white/10 bg-black/20 p-4"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex gap-3">
                   <UserAvatar user={user} size="sm" />
@@ -129,11 +186,22 @@ export default function UsersTable({ users, updatingUserId, onOpenDetails, onTog
               </div>
 
               <div className="mt-4 space-y-2 text-sm text-white/70">
-                <p><span className="text-white/45">Primaer:</span> {user.primaryRole?.name || "Keine"}</p>
-                <p><span className="text-white/45">Weitere:</span></p>
+                <p>
+                  <span className="text-white/45">Primaer:</span>{" "}
+                  {user.primaryRole?.name || "Keine"}
+                </p>
+                <p>
+                  <span className="text-white/45">Weitere:</span>
+                </p>
                 <RoleChips roles={secondaryRoles} />
-                <p><span className="text-white/45">Letzter Login:</span> {formatDateTime(user.last_login_at)}</p>
-                <p><span className="text-white/45">Erstellt:</span> {formatDateTime(user.created_at)}</p>
+                <p>
+                  <span className="text-white/45">Letzter Login:</span>{" "}
+                  {formatDateTime(user.last_login_at)}
+                </p>
+                <p>
+                  <span className="text-white/45">Erstellt:</span>{" "}
+                  {formatDateTime(user.created_at)}
+                </p>
               </div>
 
               <div className="mt-4">

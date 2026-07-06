@@ -51,4 +51,5 @@ Vollständig dokumentiert sind:
 - Datenmodell
 - Membership, News, Teams, Events, Settings
 - Admin-Auth und Benutzerverwaltung im Adminbereich (/admin/users)
+- Rollenverwaltung im Adminbereich (/admin/roles)
 - Durchgeführte Modularisierungs- und Refactoring-Schritte

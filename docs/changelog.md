@@ -2,6 +2,18 @@
 
 ## 2026-07-06
 
+### Phase B3 Rollenverwaltung (admin_roles)
+
+- Neue Admin-Route `/admin/roles` mit modularer Rollenverwaltung hinzugefuegt
+- Rollenliste mit Suche, Statusfilter und Sortierung umgesetzt
+- Statistik-Karten fuer Rollen, aktive/inaktive Rollen, Benutzerzuweisungen und Permissions ergänzt
+- Detaildialog mit Read-Only-Ansicht fuer Benutzer und Permissions je Rolle implementiert
+- Rolle erstellen/bearbeiten (Name, Key, Beschreibung, Sortierung, Aktiv) implementiert
+- Aktivieren/Deaktivieren von Rollen implementiert
+- Schutz in B3: Rolle `superadmin` kann nicht deaktiviert werden
+- Sidebar und Dashboard-Schnellzugriffe um "Rollen" erweitert
+- Weiterhin offen: Permission-Zuordnung bearbeiten, Benutzerzuweisung bearbeiten, Sidebar-Rechte, Route-Guards, Login/Logout
+
 ### Phase B2 Benutzerverwaltung (Admin-Profile)
 
 - Neue Admin-Route `/admin/users` mit modularer Benutzerverwaltung hinzugefuegt

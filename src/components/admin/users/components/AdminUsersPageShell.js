@@ -66,6 +66,7 @@ export default function AdminUsersPageShell({ initialData }) {
         updatingUserId={vm.updatingUserId}
         onOpenDetails={vm.openDetails}
         onToggleStatus={handleToggleStatus}
+        onCreate={() => vm.setIsNewUserOpen(true)}
       />
 
       <UserDetailsDialog

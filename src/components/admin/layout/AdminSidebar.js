@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Newspaper,
+  Key,
   Shield,
   Users,
   UserRound,
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/admin/club-history", label: "Vereinsgeschichte", icon: BookOpen },
   { href: "/admin/tournaments", label: "Turniere", icon: Trophy },
   { href: "/admin/users", label: "Benutzer", icon: Users },
+  { href: "/admin/roles", label: "Rollen", icon: Key },
   { href: "/admin/settings", label: "Einstellungen", icon: Settings },
 ];
 
@@ -55,7 +57,7 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
     },
     {
       label: "System",
-      hrefs: ["/admin/users", "/admin/settings"],
+      hrefs: ["/admin/users", "/admin/roles", "/admin/settings"],
     },
   ];
 

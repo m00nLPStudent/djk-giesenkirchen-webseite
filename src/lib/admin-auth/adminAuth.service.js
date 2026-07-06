@@ -39,7 +39,8 @@ export async function loadAdminPermissions(options = {}) {
 }
 
 export async function loadUserRoles(userId) {
-  const { data: roleLinks, error: roleLinksError } = await fetchUserRoleLinks(userId);
+  const { data: roleLinks, error: roleLinksError } =
+    await fetchUserRoleLinks(userId);
   throwIfError(roleLinksError);
 
   const roleIds = uniqueValues((roleLinks || []).map((row) => row.role_id));
@@ -51,13 +52,19 @@ export async function loadUserRoles(userId) {
 
 export async function loadUserPermissions(userId) {
   const userRoles = await loadUserRoles(userId);
-  const roleIds = uniqueValues(userRoles.map((role) => role.role_id || role.id));
+  const roleIds = uniqueValues(
+    userRoles.map((role) => role.role_id || role.id),
+  );
 
-  const { data: rolePermissions, error: rolePermissionsError } = await fetchRolePermissionsByRoleIds(roleIds);
+  const { data: rolePermissions, error: rolePermissionsError } =
+    await fetchRolePermissionsByRoleIds(roleIds);
   throwIfError(rolePermissionsError);
 
-  const permissionIds = uniqueValues((rolePermissions || []).map((row) => row.permission_id));
-  const { data: permissions, error: permissionsError } = await fetchPermissionsByIds(permissionIds);
+  const permissionIds = uniqueValues(
+    (rolePermissions || []).map((row) => row.permission_id),
+  );
+  const { data: permissions, error: permissionsError } =
+    await fetchPermissionsByIds(permissionIds);
   throwIfError(permissionsError);
 
   return permissions || [];

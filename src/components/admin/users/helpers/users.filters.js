@@ -20,13 +20,21 @@ function sortUsers(users, sortBy) {
     case "name_desc":
       return copy.sort((a, b) => compareName(a, b, "desc"));
     case "created_desc":
-      return copy.sort((a, b) => compareDate(a.created_at, b.created_at, "desc"));
+      return copy.sort((a, b) =>
+        compareDate(a.created_at, b.created_at, "desc"),
+      );
     case "created_asc":
-      return copy.sort((a, b) => compareDate(a.created_at, b.created_at, "asc"));
+      return copy.sort((a, b) =>
+        compareDate(a.created_at, b.created_at, "asc"),
+      );
     case "last_login_desc":
-      return copy.sort((a, b) => compareDate(a.last_login_at, b.last_login_at, "desc"));
+      return copy.sort((a, b) =>
+        compareDate(a.last_login_at, b.last_login_at, "desc"),
+      );
     case "last_login_asc":
-      return copy.sort((a, b) => compareDate(a.last_login_at, b.last_login_at, "asc"));
+      return copy.sort((a, b) =>
+        compareDate(a.last_login_at, b.last_login_at, "asc"),
+      );
     case "name_asc":
     default:
       return copy.sort((a, b) => compareName(a, b, "asc"));
@@ -62,10 +70,18 @@ function includesSearch(user, search) {
 }
 
 export function applyUsersFilters(users, filters) {
-  const { search = "", status = "all", role = "all", sort = "name_asc" } = filters || {};
+  const {
+    search = "",
+    status = "all",
+    role = "all",
+    sort = "name_asc",
+  } = filters || {};
 
   const filtered = (users || []).filter(
-    (user) => includesSearch(user, search) && includesStatus(user, status) && includesRole(user, role),
+    (user) =>
+      includesSearch(user, search) &&
+      includesStatus(user, status) &&
+      includesRole(user, role),
   );
 
   return sortUsers(filtered, sort);
