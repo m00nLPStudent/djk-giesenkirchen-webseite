@@ -1,0 +1,90 @@
+"use client";
+
+import UserAvatar from "../components/UserAvatar";
+import UserStatusBadge from "../components/UserStatusBadge";
+import { formatDateTime } from "../helpers/users.formatters";
+
+function DetailRow({ label, value }) {
+  return (
+    <div>
+      <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">{label}</p>
+      <p className="mt-1 text-sm text-white/85">{value || "-"}</p>
+    </div>
+  );
+}
+
+export default function UserDetailsDialog({ user, open, onClose }) {
+  if (!open || !user) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] grid place-items-center bg-black/70 p-4 backdrop-blur-sm">
+      <div className="max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-[1.75rem] border border-white/15 bg-slate-950/95 p-6 shadow-[0_30px_90px_rgba(0,0,0,0.5)] md:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <UserAvatar user={user} />
+            <div>
+              <p className="text-[0.65rem] font-black uppercase tracking-[0.28em] text-red-300">Benutzerdetails</p>
+              <h3 className="mt-1 text-2xl font-black text-white">{user.name}</h3>
+              <p className="text-sm text-white/60">{user.email || "-"}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-9 rounded-xl border border-white/15 bg-white/[0.04] px-3 text-xs font-bold text-white/75"
+          >
+            Schliessen
+          </button>
+        </div>
+
+        <div className="mt-5">
+          <UserStatusBadge isActive={user.is_active} />
+        </div>
+
+        <div className="mt-5 grid gap-4 rounded-2xl border border-white/10 bg-black/25 p-4 md:grid-cols-2">
+          <DetailRow label="User-ID" value={user.id} />
+          <DetailRow label="Erstellt" value={formatDateTime(user.created_at)} />
+          <DetailRow label="Letzter Login" value={formatDateTime(user.last_login_at)} />
+          <DetailRow
+            label="Primaere Rolle"
+            value={user.primaryRole?.name || "Keine primaere Rolle"}
+          />
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4">
+          <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">Alle Rollen</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {(user.roles || []).map((role) => (
+              <span
+                key={role.id}
+                className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.1em] ${
+                  role.is_primary
+                    ? "border-red-400/40 bg-red-500/15 text-red-200"
+                    : "border-white/15 bg-white/[0.06] text-white/70"
+                }`}
+              >
+                {role.name}
+              </span>
+            ))}
+            {!user.roles?.length && <p className="text-sm text-white/45">Keine Rollen zugewiesen.</p>}
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4">
+          <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">Permissions (Read Only)</p>
+          <div className="mt-3 max-h-52 overflow-y-auto rounded-xl border border-white/10 bg-black/20 p-3">
+            {(user.permissions || []).map((permission) => (
+              <p key={permission.id} className="text-sm text-white/75">
+                <span className="font-bold text-white/90">{permission.key}</span>
+                {permission.category ? ` - ${permission.category}` : ""}
+              </p>
+            ))}
+            {!user.permissions?.length && (
+              <p className="text-sm text-white/45">Keine Permissions zugeordnet.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

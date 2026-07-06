@@ -21,6 +21,7 @@ Diese Dokumentation beschreibt den finalen Stand der öffentlichen Website (Resp
 - `modules/`
   - [modules/website.md](modules/website.md)
   - [modules/membership.md](modules/membership.md)
+  - [modules/admin-auth.md](modules/admin-auth.md)
   - [modules/news.md](modules/news.md)
   - [modules/events.md](modules/events.md)
   - [modules/teams.md](modules/teams.md)
@@ -49,4 +50,5 @@ Vollständig dokumentiert sind:
 - Komponentenlandschaft (Website + Admin Shared)
 - Datenmodell
 - Membership, News, Teams, Events, Settings
+- Admin-Auth und Benutzerverwaltung im Adminbereich (/admin/users)
 - Durchgeführte Modularisierungs- und Refactoring-Schritte

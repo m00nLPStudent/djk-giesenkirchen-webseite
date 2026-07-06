@@ -29,6 +29,7 @@ const navItems = [
   { href: "/admin/events", label: "Termine", icon: CalendarDays },
   { href: "/admin/club-history", label: "Vereinsgeschichte", icon: BookOpen },
   { href: "/admin/tournaments", label: "Turniere", icon: Trophy },
+  { href: "/admin/users", label: "Benutzer", icon: Users },
   { href: "/admin/settings", label: "Einstellungen", icon: Settings },
 ];
 
@@ -54,7 +55,7 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
     },
     {
       label: "System",
-      hrefs: ["/admin/settings"],
+      hrefs: ["/admin/users", "/admin/settings"],
     },
   ];
 

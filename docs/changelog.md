@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-06
+
+### Phase B2 Benutzerverwaltung (Admin-Profile)
+
+- Neue Admin-Route `/admin/users` mit modularer Benutzerverwaltung hinzugefuegt
+- Liste mit Suche, Status-/Rollenfilter und Sortierung implementiert
+- Stat-Karten fuer Benutzer gesamt, aktiv/inaktiv und Rollen gesamt integriert
+- Detaildialog mit Rollen und abgeleiteten Permissions (Read Only) umgesetzt
+- Aktivieren/Deaktivieren von Admin-Profilen vorbereitet und angebunden
+- Dialog "Neuer Benutzer" als B6-Vorbereitung ohne Auth-User-Erzeugung angelegt
+- Sidebar und Dashboard-Schnellzugriffe um "Benutzer" erweitert
+
+### Phase B1 vorbereitende Auth-/Rollenstruktur
+
+- Service-Schicht fuer Admin-Auth/Rollen unter `src/lib/admin-auth/` vorbereitet
+- Rollen-/Permission-Konstanten und Helper fuer spaetere Guards angelegt
+- SQL-Seed-Vorschlag fuer Standardrollen und Permissions dokumentiert (`docs/sql/admin-auth-seed.sql`)
+- Modul-Dokumentation fuer Admin-Auth hinzugefuegt (`docs/modules/admin-auth.md`)
+
 ## 2026-07-05
 
 ### Public website and admin settings finalized
