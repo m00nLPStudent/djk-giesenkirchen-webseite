@@ -6,7 +6,11 @@ export default async function AdminPermissionsMatrixPage() {
   const matrixData = await getPermissionMatrixPageData();
 
   return (
-    <AdminLayout title="Permissions Matrix" subtitle="Adminbereich" showHeader={false}>
+    <AdminLayout
+      title="Permissions Matrix"
+      subtitle="Adminbereich"
+      showHeader={false}
+    >
       <PermissionMatrix initialData={matrixData} />
     </AdminLayout>
   );

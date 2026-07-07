@@ -23,12 +23,19 @@ function ActionButtons({ permission, onOpenDetails, onEdit }) {
   );
 }
 
-export default function PermissionsTable({ permissions, onOpenDetails, onEdit, onCreate }) {
+export default function PermissionsTable({
+  permissions,
+  onOpenDetails,
+  onEdit,
+  onCreate,
+}) {
   if (!permissions?.length) {
     return (
       <AdminPanel className="p-7 md:p-8">
         <div className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-8 text-center">
-          <p className="text-xl font-black text-white">Noch keine Permissions angelegt.</p>
+          <p className="text-xl font-black text-white">
+            Noch keine Permissions angelegt.
+          </p>
           <p className="mx-auto mt-2 max-w-xl text-sm text-white/60">
             Lege die erste Permission an und erweitere danach die Rollen-Matrix.
           </p>
@@ -70,7 +77,10 @@ export default function PermissionsTable({ permissions, onOpenDetails, onEdit, o
           </thead>
           <tbody>
             {permissions.map((permission) => (
-              <tr key={permission.id} className="border-t border-white/10 align-top">
+              <tr
+                key={permission.id}
+                className="border-t border-white/10 align-top"
+              >
                 <td className="px-4 py-3">
                   <p className="font-bold text-white">{permission.name}</p>
                 </td>
@@ -83,8 +93,12 @@ export default function PermissionsTable({ permissions, onOpenDetails, onEdit, o
                 <td className="px-3 py-3">
                   <PermissionCategoryBadge category={permission.category} />
                 </td>
-                <td className="px-3 py-3 text-sm text-white/70">{permission.roles_count || 0}</td>
-                <td className="px-3 py-3 text-sm text-white/70">{formatPermissionDateTime(permission.created_at)}</td>
+                <td className="px-3 py-3 text-sm text-white/70">
+                  {permission.roles_count || 0}
+                </td>
+                <td className="px-3 py-3 text-sm text-white/70">
+                  {formatPermissionDateTime(permission.created_at)}
+                </td>
                 <td className="px-3 py-3">
                   <ActionButtons
                     permission={permission}
@@ -100,13 +114,26 @@ export default function PermissionsTable({ permissions, onOpenDetails, onEdit, o
 
       <div className="grid gap-3 p-4 lg:hidden">
         {permissions.map((permission) => (
-          <div key={permission.id} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div
+            key={permission.id}
+            className="rounded-2xl border border-white/10 bg-black/20 p-4"
+          >
             <p className="font-bold text-white">{permission.name}</p>
-            <p className="mt-1 text-sm text-white/60 break-all">{permission.key}</p>
-            <p className="mt-3 text-sm text-white/65">{permission.description || "-"}</p>
-            <div className="mt-3"><PermissionCategoryBadge category={permission.category} /></div>
-            <p className="mt-3 text-sm text-white/70">Rollen: {permission.roles_count || 0}</p>
-            <p className="mt-1 text-sm text-white/70">Erstellt: {formatPermissionDateTime(permission.created_at)}</p>
+            <p className="mt-1 text-sm text-white/60 break-all">
+              {permission.key}
+            </p>
+            <p className="mt-3 text-sm text-white/65">
+              {permission.description || "-"}
+            </p>
+            <div className="mt-3">
+              <PermissionCategoryBadge category={permission.category} />
+            </div>
+            <p className="mt-3 text-sm text-white/70">
+              Rollen: {permission.roles_count || 0}
+            </p>
+            <p className="mt-1 text-sm text-white/70">
+              Erstellt: {formatPermissionDateTime(permission.created_at)}
+            </p>
             <div className="mt-4">
               <ActionButtons
                 permission={permission}

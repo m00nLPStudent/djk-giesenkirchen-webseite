@@ -40,7 +40,8 @@ export function applyPermissionsFilters(items = [], filters = {}) {
   const query = normalizePermissionText(search);
 
   const filtered = (items || []).filter((permission) => {
-    const categoryMatch = category === "all" || permission.category === category;
+    const categoryMatch =
+      category === "all" || permission.category === category;
     const searchMatch =
       !query ||
       [permission.name, permission.key, permission.description]

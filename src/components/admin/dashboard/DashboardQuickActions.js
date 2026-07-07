@@ -1,15 +1,20 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { DASHBOARD_QUICK_ACTIONS } from "./dashboard.options";
+import { getVisibleDashboardQuickActions } from "./dashboard.options";
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
 
 export default function DashboardQuickActions() {
+  const visibleActions = getVisibleDashboardQuickActions(
+    getAdminFallbackUserContext(),
+  );
+
   return (
     <AdminPanel>
       <h2 className="text-xl font-black md:text-2xl">Schnellzugriffe</h2>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {DASHBOARD_QUICK_ACTIONS.map((action) => (
+        {visibleActions.map((action) => (
           <Link
             key={action.label}
             href={action.href}

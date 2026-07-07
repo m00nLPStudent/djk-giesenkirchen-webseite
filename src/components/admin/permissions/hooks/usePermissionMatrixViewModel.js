@@ -18,10 +18,11 @@ export default function usePermissionMatrixViewModel(initialData) {
     if (!normalized) return groupedPermissions;
 
     return Object.keys(groupedPermissions).reduce((acc, category) => {
-      const matches = (groupedPermissions[category] || []).filter((permission) =>
-        [permission.name, permission.key, permission.description]
-          .map((value) => (value || "").toLowerCase())
-          .some((value) => value.includes(normalized)),
+      const matches = (groupedPermissions[category] || []).filter(
+        (permission) =>
+          [permission.name, permission.key, permission.description]
+            .map((value) => (value || "").toLowerCase())
+            .some((value) => value.includes(normalized)),
       );
 
       if (matches.length) {

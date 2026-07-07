@@ -34,7 +34,9 @@ export default function PermissionEditorDialog({
       <div className="mx-auto w-full max-w-2xl rounded-[1.75rem] border border-white/15 bg-slate-950/95 p-4 shadow-[0_30px_90px_rgba(0,0,0,0.5)] sm:p-5 md:max-h-[85vh] md:overflow-y-auto md:p-7">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-[0.65rem] font-black uppercase tracking-[0.28em] text-red-300">Permissions</p>
+            <p className="text-[0.65rem] font-black uppercase tracking-[0.28em] text-red-300">
+              Permissions
+            </p>
             <h3 className="mt-1 text-2xl font-black text-white">
               {permission ? "Permission bearbeiten" : "Neue Permission"}
             </h3>
@@ -54,7 +56,9 @@ export default function PermissionEditorDialog({
           <PermissionEditorForm
             values={values}
             errors={errors || {}}
-            onChange={(patch) => setValues((current) => ({ ...current, ...patch }))}
+            onChange={(patch) =>
+              setValues((current) => ({ ...current, ...patch }))
+            }
           />
         </div>
 

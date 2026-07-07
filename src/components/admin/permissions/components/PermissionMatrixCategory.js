@@ -22,7 +22,9 @@ export default function PermissionMatrixCategory({
             <tr className="text-left text-[0.62rem] font-black uppercase tracking-[0.16em] text-white/45">
               <th className="px-4 py-2">Permission</th>
               {roles.map((role) => (
-                <th key={role.id} className="px-3 py-2 text-center">{role.key}</th>
+                <th key={role.id} className="px-3 py-2 text-center">
+                  {role.key}
+                </th>
               ))}
             </tr>
           </thead>
@@ -43,7 +45,10 @@ export default function PermissionMatrixCategory({
 
       <div className="mt-3 grid gap-3 lg:hidden">
         {permissions.map((permission) => (
-          <div key={permission.id} className="rounded-xl border border-white/10 bg-black/25 p-3">
+          <div
+            key={permission.id}
+            className="rounded-xl border border-white/10 bg-black/25 p-3"
+          >
             <p className="font-bold text-white">{permission.name}</p>
             <p className="text-xs text-white/55 break-all">{permission.key}</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -52,7 +57,10 @@ export default function PermissionMatrixCategory({
                 const checked = assignments.has(key);
                 const busy = busyKey === key;
                 return (
-                  <label key={role.id} className="flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80">
+                  <label
+                    key={role.id}
+                    className="flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80"
+                  >
                     <span className="mr-3 truncate">{role.name}</span>
                     <input
                       type="checkbox"

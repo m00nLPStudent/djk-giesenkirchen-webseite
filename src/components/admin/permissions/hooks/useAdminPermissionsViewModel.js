@@ -34,8 +34,9 @@ export default function useAdminPermissionsViewModel(initialData) {
 
   const selectedPermission = useMemo(
     () =>
-      permissions.find((permission) => permission.id === selectedPermissionId) ||
-      null,
+      permissions.find(
+        (permission) => permission.id === selectedPermissionId,
+      ) || null,
     [permissions, selectedPermissionId],
   );
 

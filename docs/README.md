@@ -53,4 +53,5 @@ Vollständig dokumentiert sind:
 - Admin-Auth und Benutzerverwaltung im Adminbereich (/admin/users)
 - Rollenverwaltung im Adminbereich (/admin/roles)
 - Permission-Verwaltung inkl. Matrix im Adminbereich (/admin/permissions)
+- Permission-Engine/Guard-Struktur vorbereitet (Enforcement aktuell deaktiviert)
 - Durchgeführte Modularisierungs- und Refactoring-Schritte

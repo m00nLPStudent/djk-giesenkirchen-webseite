@@ -20,11 +20,17 @@ export default function PermissionMatrix({ initialData }) {
     const key = `${roleId}:${permissionId}`;
     setBusyKey(key);
 
-    const result = await toggleRolePermissionAction({ roleId, permissionId, checked });
+    const result = await toggleRolePermissionAction({
+      roleId,
+      permissionId,
+      checked,
+    });
     setBusyKey("");
 
     if (!result?.ok) {
-      setError(result?.message || "Matrix-Zuordnung konnte nicht gespeichert werden.");
+      setError(
+        result?.message || "Matrix-Zuordnung konnte nicht gespeichert werden.",
+      );
       return;
     }
 
@@ -53,7 +59,9 @@ export default function PermissionMatrix({ initialData }) {
 
       <AdminPanel>
         <label className="block">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Suche</span>
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
+            Suche
+          </span>
           <input
             type="search"
             value={vm.query}

@@ -32,7 +32,9 @@ export default function AdminPermissionsPageShell({ initialData }) {
     setSaving(false);
 
     if (!result?.ok) {
-      setError(result?.message || "Permission konnte nicht gespeichert werden.");
+      setError(
+        result?.message || "Permission konnte nicht gespeichert werden.",
+      );
       setFormErrors(result?.errors || {});
       return;
     }

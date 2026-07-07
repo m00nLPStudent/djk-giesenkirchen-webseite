@@ -2,6 +2,15 @@
 
 ## 2026-07-06
 
+### Phase B5 Permission-Engine vorbereitet (Enforcement aus)
+
+- Permission-Engine, Guard-Strukturen und Fallbacks unter `src/lib/admin-auth/` vorbereitet
+- Zentrale Permission-Config mit Schalter `AUTH_ENFORCEMENT_ENABLED = false` eingefuehrt
+- Komponenten/Hooks fuer spaetere UI-Pruefung vorbereitet: `Can`, `usePermissions`, `AdminRouteGuard`
+- Sidebar-Items und Dashboard-Quick-Actions mit Permission-Metadaten erweitert (ohne aktive Filterung)
+- Route `/admin/unauthorized` als statische Info-Seite vorbereitet
+- Weiterhin keine aktive Sperrung: alle Admin-Seiten bleiben erreichbar
+
 ### Phase B4 Permission-Verwaltung und Matrix
 
 - Neue Admin-Route `/admin/permissions` mit modularer Permission-Verwaltung hinzugefuegt

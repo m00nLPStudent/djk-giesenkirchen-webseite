@@ -45,7 +45,10 @@ export async function saveAdminPermissionAction({ permissionId, values }) {
   if (permissionId) {
     const { error } = await updateAdminPermission(permissionId, payload);
     if (error) {
-      return { ok: false, message: "Permission konnte nicht aktualisiert werden." };
+      return {
+        ok: false,
+        message: "Permission konnte nicht aktualisiert werden.",
+      };
     }
   } else {
     const { error } = await createAdminPermission(payload);
@@ -59,17 +62,23 @@ export async function saveAdminPermissionAction({ permissionId, values }) {
   return { ok: true };
 }
 
-export async function toggleRolePermissionAction({ roleId, permissionId, checked }) {
+export async function toggleRolePermissionAction({
+  roleId,
+  permissionId,
+  checked,
+}) {
   if (!roleId || !permissionId) {
     return { ok: false, message: "Ungueltige Zuordnung." };
   }
 
   if (checked) {
     const { error } = await upsertRolePermissionLink(roleId, permissionId);
-    if (error) return { ok: false, message: "Zuordnung konnte nicht gesetzt werden." };
+    if (error)
+      return { ok: false, message: "Zuordnung konnte nicht gesetzt werden." };
   } else {
     const { error } = await removeRolePermissionLink(roleId, permissionId);
-    if (error) return { ok: false, message: "Zuordnung konnte nicht entfernt werden." };
+    if (error)
+      return { ok: false, message: "Zuordnung konnte nicht entfernt werden." };
   }
 
   revalidatePath("/admin/permissions");

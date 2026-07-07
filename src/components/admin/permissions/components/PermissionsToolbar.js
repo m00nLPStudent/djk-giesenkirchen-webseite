@@ -35,7 +35,11 @@ export default function PermissionsToolbar({
           className="h-12 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white focus:border-red-500/50 focus:outline-none"
         >
           {categoryOptions.map((option) => (
-            <option key={option.value} value={option.value} className="bg-slate-900">
+            <option
+              key={option.value}
+              value={option.value}
+              className="bg-slate-900"
+            >
               {option.label}
             </option>
           ))}
@@ -47,7 +51,11 @@ export default function PermissionsToolbar({
           className="h-12 rounded-2xl border border-white/10 bg-black/25 px-4 text-sm text-white focus:border-red-500/50 focus:outline-none"
         >
           {sortOptions.map((option) => (
-            <option key={option.value} value={option.value} className="bg-slate-900">
+            <option
+              key={option.value}
+              value={option.value}
+              className="bg-slate-900"
+            >
               {option.label}
             </option>
           ))}

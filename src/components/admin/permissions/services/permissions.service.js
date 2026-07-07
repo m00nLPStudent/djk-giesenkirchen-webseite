@@ -54,7 +54,11 @@ export async function getAdminPermissionsPageData() {
   ).length;
 
   const categories = Array.from(
-    new Set(enrichedPermissions.map((permission) => permission.category).filter(Boolean)),
+    new Set(
+      enrichedPermissions
+        .map((permission) => permission.category)
+        .filter(Boolean),
+    ),
   ).sort((a, b) => a.localeCompare(b, "de-DE"));
 
   return {

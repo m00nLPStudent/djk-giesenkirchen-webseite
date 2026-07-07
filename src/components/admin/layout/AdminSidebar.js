@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { canSeeAdminNavItem } from "@/lib/admin-auth/permissionEngine";
+import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
 import {
   LayoutDashboard,
   Newspaper,
@@ -20,25 +22,105 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/news", label: "News", icon: Newspaper },
-  { href: "/admin/department", label: "Abteilung", icon: Building2 },
-  { href: "/admin/sponsors", label: "Sponsoren", icon: Handshake },
-  { href: "/admin/teams", label: "Mannschaften", icon: Shield },
-  { href: "/admin/coaches", label: "Trainer", icon: UserRound },
-  { href: "/admin/players", label: "Spieler", icon: Users },
-  { href: "/admin/media", label: "Medien", icon: Image },
-  { href: "/admin/events", label: "Termine", icon: CalendarDays },
-  { href: "/admin/club-history", label: "Vereinsgeschichte", icon: BookOpen },
-  { href: "/admin/tournaments", label: "Turniere", icon: Trophy },
-  { href: "/admin/users", label: "Benutzer", icon: Users },
-  { href: "/admin/roles", label: "Rollen", icon: Key },
-  { href: "/admin/permissions", label: "Rechte", icon: Lock },
-  { href: "/admin/settings", label: "Einstellungen", icon: Settings },
+  {
+    href: "/admin",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    requiredPermission: "dashboard.view",
+  },
+  {
+    href: "/admin/news",
+    label: "News",
+    icon: Newspaper,
+    requiredPermission: "news.view",
+  },
+  {
+    href: "/admin/department",
+    label: "Abteilung",
+    icon: Building2,
+    requiredPermission: "system.view",
+  },
+  {
+    href: "/admin/sponsors",
+    label: "Sponsoren",
+    icon: Handshake,
+    requiredPermission: "sponsors.view",
+  },
+  {
+    href: "/admin/teams",
+    label: "Mannschaften",
+    icon: Shield,
+    requiredPermission: "teams.view",
+  },
+  {
+    href: "/admin/coaches",
+    label: "Trainer",
+    icon: UserRound,
+    requiredPermission: "coaches.view",
+  },
+  {
+    href: "/admin/players",
+    label: "Spieler",
+    icon: Users,
+    requiredPermission: "players.view",
+  },
+  {
+    href: "/admin/media",
+    label: "Medien",
+    icon: Image,
+    requiredPermission: "system.view",
+  },
+  {
+    href: "/admin/events",
+    label: "Termine",
+    icon: CalendarDays,
+    requiredPermission: "events.view",
+  },
+  {
+    href: "/admin/club-history",
+    label: "Vereinsgeschichte",
+    icon: BookOpen,
+    requiredPermission: "club_history.view",
+  },
+  {
+    href: "/admin/tournaments",
+    label: "Turniere",
+    icon: Trophy,
+    requiredPermission: "system.view",
+  },
+  {
+    href: "/admin/users",
+    label: "Benutzer",
+    icon: Users,
+    requiredPermission: "users.view",
+  },
+  {
+    href: "/admin/roles",
+    label: "Rollen",
+    icon: Key,
+    requiredPermission: "roles.view",
+  },
+  {
+    href: "/admin/permissions",
+    label: "Rechte",
+    icon: Lock,
+    requiredPermission: "system.view",
+  },
+  {
+    href: "/admin/settings",
+    label: "Einstellungen",
+    icon: Settings,
+    requiredPermission: "settings.view",
+  },
 ];
 
 export default function AdminSidebar({ mobile = false, onNavigate }) {
   const pathname = usePathname();
+  const userContext = getAdminFallbackUserContext();
+
+  const visibleNavItems = navItems.filter((item) =>
+    canSeeAdminNavItem(userContext, item),
+  );
 
   const navSections = [
     {
@@ -59,7 +141,12 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
     },
     {
       label: "System",
-      hrefs: ["/admin/users", "/admin/roles", "/admin/permissions", "/admin/settings"],
+      hrefs: [
+        "/admin/users",
+        "/admin/roles",
+        "/admin/permissions",
+        "/admin/settings",
+      ],
     },
   ];
 
@@ -81,7 +168,7 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
             </p>
 
             <div className="space-y-2">
-              {navItems
+              {visibleNavItems
                 .filter((item) =>
                   section.hrefs.some((href) => item.href === href),
                 )

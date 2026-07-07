@@ -173,6 +173,66 @@ Wichtige Abgrenzung (weiterhin offen):
 - keine Permission-Enforcement-Logik in UI/Routes
 - keine Login-/Logout-Anpassung
 
+## B5 Permission-Engine (vorbereitet, nicht enforced)
+
+Ziel von B5:
+
+- Technische Permission-Engine vorbereiten
+- Route-/Nav-/Action-Konfiguration zentralisieren
+- Komponenten/Hooks fuer spaetere UI-Pruefungen bereitstellen
+- Ohne aktive Sperrung von Adminseiten
+
+Zentraler Schalter:
+
+- AUTH_ENFORCEMENT_ENABLED = false
+- Datei: src/lib/admin-auth/adminPermissionConfig.js
+
+Solange false:
+
+- alle Admin-Routen bleiben erreichbar
+- Sidebar und Dashboard-Action-Buttons bleiben sichtbar
+- Guard-Strukturen blockieren nicht
+
+Neue B5-Dateien:
+
+- src/lib/admin-auth/adminPermissionConfig.js
+- src/lib/admin-auth/permissionConfig.js
+- src/lib/admin-auth/permissionFallbacks.js
+- src/lib/admin-auth/permissionEngine.js
+- src/lib/admin-auth/permissionGuards.js
+- src/components/admin/auth/Can.js
+- src/components/admin/auth/usePermissions.js
+- src/components/admin/auth/AdminRouteGuard.js
+- src/app/admin/unauthorized/page.js
+
+Vorbereitete Funktionalitaet:
+
+- hasPermission / hasAnyPermission / hasAllPermissions
+- canAccessAdminRoute
+- canSeeAdminNavItem
+- canSeeDashboardAction
+- getUserPermissionKeys
+- Route-Guard-Entscheidungsstruktur (Session/Permission)
+
+Config-Inhalte:
+
+- Admin-Routen und benoetigte Permissions
+- Sidebar-Items mit Permission-Metadaten
+- Dashboard-Quick-Actions mit Permission-Metadaten
+- Fallback-Verhalten bei unbekannten Eintraegen
+
+Weiterhin nicht umgesetzt:
+
+- aktive Sidebar-Filterung nach Permissions (nur vorbereitet)
+- aktive Route-Guards/Redirects
+- aktive Permission-Enforcement-Logik im UI
+- Login-/Logout-Enforcement
+
+Naechste Schritte:
+
+- B6: Auth-User-Erzeugung und Session-Datenfluss stabilisieren
+- B7: Enforcement schrittweise aktivieren (zuerst soft, dann strikt)
+
 ## Seed-Vorschlag
 
 SQL-Vorschlag fuer Standardrollen, Standardpermissions und Role-Permission-Mapping:

@@ -16,7 +16,9 @@ export default function PermissionEditorForm({ values, errors, onChange }) {
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Name *</span>
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
+            Name *
+          </span>
           <input
             type="text"
             value={values.name}
@@ -27,7 +29,9 @@ export default function PermissionEditorForm({ values, errors, onChange }) {
         </label>
 
         <label className="space-y-2">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Key *</span>
+          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
+            Key *
+          </span>
           <input
             type="text"
             value={values.key}
@@ -39,7 +43,9 @@ export default function PermissionEditorForm({ values, errors, onChange }) {
       </div>
 
       <label className="space-y-2 block">
-        <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Beschreibung</span>
+        <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
+          Beschreibung
+        </span>
         <textarea
           rows={3}
           value={values.description}
@@ -49,15 +55,21 @@ export default function PermissionEditorForm({ values, errors, onChange }) {
       </label>
 
       <label className="space-y-2 block">
-        <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">Kategorie *</span>
+        <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
+          Kategorie *
+        </span>
         <input
           type="text"
           value={values.category}
-          onChange={(event) => onChange({ category: event.target.value.toLowerCase() })}
+          onChange={(event) =>
+            onChange({ category: event.target.value.toLowerCase() })
+          }
           placeholder="z. B. news"
           className="h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-sm text-white"
         />
-        {errors.category && <p className="text-xs text-red-300">{errors.category}</p>}
+        {errors.category && (
+          <p className="text-xs text-red-300">{errors.category}</p>
+        )}
       </label>
     </div>
   );

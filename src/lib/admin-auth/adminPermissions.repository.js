@@ -35,7 +35,10 @@ export async function fetchAllRolePermissionLinks() {
 export async function upsertRolePermissionLink(roleId, permissionId) {
   return await supabase
     .from("admin_role_permissions")
-    .upsert({ role_id: roleId, permission_id: permissionId }, { onConflict: "role_id,permission_id" })
+    .upsert(
+      { role_id: roleId, permission_id: permissionId },
+      { onConflict: "role_id,permission_id" },
+    )
     .select("role_id, permission_id")
     .maybeSingle();
 }
