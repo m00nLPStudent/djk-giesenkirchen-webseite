@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Newspaper,
   Key,
+  Lock,
   Shield,
   Users,
   UserRound,
@@ -32,6 +33,7 @@ const navItems = [
   { href: "/admin/tournaments", label: "Turniere", icon: Trophy },
   { href: "/admin/users", label: "Benutzer", icon: Users },
   { href: "/admin/roles", label: "Rollen", icon: Key },
+  { href: "/admin/permissions", label: "Rechte", icon: Lock },
   { href: "/admin/settings", label: "Einstellungen", icon: Settings },
 ];
 
@@ -57,7 +59,7 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
     },
     {
       label: "System",
-      hrefs: ["/admin/users", "/admin/roles", "/admin/settings"],
+      hrefs: ["/admin/users", "/admin/roles", "/admin/permissions", "/admin/settings"],
     },
   ];
 

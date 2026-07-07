@@ -52,4 +52,5 @@ Vollständig dokumentiert sind:
 - Membership, News, Teams, Events, Settings
 - Admin-Auth und Benutzerverwaltung im Adminbereich (/admin/users)
 - Rollenverwaltung im Adminbereich (/admin/roles)
+- Permission-Verwaltung inkl. Matrix im Adminbereich (/admin/permissions)
 - Durchgeführte Modularisierungs- und Refactoring-Schritte

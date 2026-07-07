@@ -135,6 +135,44 @@ Weiterhin nicht umgesetzt:
 - Route-Guards
 - Login-/Logout-Anpassung
 
+## B4 Permission-Verwaltung und Matrix
+
+Routen:
+
+- /admin/permissions
+- /admin/permissions/matrix
+
+Umfang:
+
+- Permissions-Liste aus admin_permissions mit Name, Key, Beschreibung, Kategorie, Rollenanzahl und erstellt am
+- Statistik-Karten: Permissions gesamt, Kategorien gesamt, zugeordnete Rollen-Permissions, nicht zugeordnete Permissions
+- Suche, Kategorie-Filter und Sortierung (category/name/created_at/key)
+- Detaildialog fuer Permission mit Rollenliste (Read Only)
+- Permission erstellen und bearbeiten (Name, Key, Beschreibung, Kategorie)
+
+Matrix:
+
+- Rollen-Permission-Matrix als eigene Route
+- Permissions nach Kategorie gruppiert
+- Rollen als Spalten (Desktop) bzw. bedienbare Kartenstruktur (Mobile)
+- Checkboxen speichern Zuordnungen in admin_role_permissions (setzen/entfernen)
+
+Ergaenzte B4-Datenzugriffsschicht:
+
+- src/lib/admin-auth/adminPermissions.repository.js
+  - Permission nach Key laden
+  - Permission erstellen
+  - Permission aktualisieren
+  - Role-Permission-Links laden
+  - Role-Permission-Link setzen/entfernen
+
+Wichtige Abgrenzung (weiterhin offen):
+
+- keine Sidebar-Filterung nach Permissions
+- keine Route-Guards
+- keine Permission-Enforcement-Logik in UI/Routes
+- keine Login-/Logout-Anpassung
+
 ## Seed-Vorschlag
 
 SQL-Vorschlag fuer Standardrollen, Standardpermissions und Role-Permission-Mapping:

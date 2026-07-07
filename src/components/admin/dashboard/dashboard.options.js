@@ -3,6 +3,7 @@ export const DASHBOARD_QUICK_ACTIONS = [
   { label: "Neuer Termin", href: "/admin/events/new", tone: "neutral" },
   { label: "Benutzer", href: "/admin/users", tone: "neutral" },
   { label: "Rollen", href: "/admin/roles", tone: "neutral" },
+  { label: "Rechte", href: "/admin/permissions", tone: "neutral" },
   { label: "Neue Mannschaft", href: "/admin/teams/new", tone: "neutral" },
   { label: "Einstellungen", href: "/admin/settings", tone: "neutral" },
   { label: "Mitgliedsanfragen", href: "/admin/settings", tone: "neutral" },

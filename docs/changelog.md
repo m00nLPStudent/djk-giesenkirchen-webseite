@@ -2,6 +2,17 @@
 
 ## 2026-07-06
 
+### Phase B4 Permission-Verwaltung und Matrix
+
+- Neue Admin-Route `/admin/permissions` mit modularer Permission-Verwaltung hinzugefuegt
+- Neue Admin-Route `/admin/permissions/matrix` fuer Rollen-Permission-Zuordnungen hinzugefuegt
+- Permissions-Liste mit Suche, Kategorie-Filter und Sortierung umgesetzt
+- Statistik-Karten fuer Permissions, Kategorien und Zuordnungsstatus integriert
+- Detaildialog sowie Erstellen/Bearbeiten fuer Permissions implementiert
+- Matrix speichert Zuordnungen in `admin_role_permissions` (setzen/entfernen)
+- Sidebar und Dashboard-Schnellzugriffe um "Rechte" erweitert
+- Weiterhin offen: Sidebar-Rechtefilter, Route-Guards, systemweite Permission-Enforcement-Logik, Login/Logout
+
 ### Phase B3 Rollenverwaltung (admin_roles)
 
 - Neue Admin-Route `/admin/roles` mit modularer Rollenverwaltung hinzugefuegt
