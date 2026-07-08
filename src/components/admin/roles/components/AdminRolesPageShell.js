@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import useAdminRolesViewModel from "../hooks/useAdminRolesViewModel";
 import RolesStatsGrid from "./RolesStatsGrid";
@@ -13,14 +13,47 @@ import {
   saveAdminRoleAction,
   updateAdminRoleStatusAction,
 } from "@/app/admin/roles/actions";
+import { getAdminRolesPageData } from "../services/roles.service";
+import {
+  getReadableErrorMessage,
+  logAdminDebugError,
+} from "@/lib/admin-auth/adminDiagnostics";
 
 export default function AdminRolesPageShell({ initialData }) {
   const router = useRouter();
-  const vm = useAdminRolesViewModel(initialData);
+  const [runtimeData, setRuntimeData] = useState(initialData);
+  const vm = useAdminRolesViewModel(runtimeData);
 
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function refreshRolesData() {
+      try {
+        const nextData = await getAdminRolesPageData();
+        if (!active) return;
+        setRuntimeData(nextData);
+      } catch (loadError) {
+        if (!active) return;
+        logAdminDebugError("admin-roles", loadError);
+        setError(
+          `Daten konnten nicht geladen werden: ${getReadableErrorMessage(
+            loadError,
+            "Rollendaten konnten nicht geladen werden.",
+          )}`,
+        );
+      }
+    }
+
+    refreshRolesData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function handleSave(values) {
     setError("");

@@ -2,6 +2,12 @@ import {
   loadAdminPermissions,
   loadAdminRoles,
 } from "@/lib/admin-auth/adminAuth.service";
+import {
+  assertBrowserSession,
+  buildRlsHint,
+  isBrowserRuntime,
+  toAdminError,
+} from "@/lib/admin-auth/adminDiagnostics";
 import { fetchRolePermissionsByRoleIds } from "@/lib/admin-auth/adminRoles.repository";
 import { fetchAdminProfiles } from "@/lib/admin-auth/adminProfiles.repository";
 import { fetchAllUserRoleLinks } from "@/lib/admin-auth/userRoles.repository";
@@ -11,7 +17,7 @@ function uniqueValues(values = []) {
 }
 
 function buildDisplayName(profile) {
-  const explicitName = profile?.name || profile?.full_name;
+  const explicitName = profile?.full_name || profile?.name;
   if (explicitName) return explicitName;
 
   const first = profile?.first_name || "";
@@ -97,6 +103,10 @@ function enrichUser(
 }
 
 export async function getAdminUsersPageData() {
+  if (isBrowserRuntime()) {
+    await assertBrowserSession("admin-users");
+  }
+
   const [
     { data: profiles, error: profilesError },
     { data: roleLinks, error: roleLinksError },
@@ -109,8 +119,8 @@ export async function getAdminUsersPageData() {
     loadAdminPermissions(),
   ]);
 
-  if (profilesError) throw profilesError;
-  if (roleLinksError) throw roleLinksError;
+  if (profilesError) throw toAdminError("admin_profiles", profilesError);
+  if (roleLinksError) throw toAdminError("admin_user_roles", roleLinksError);
 
   const roleById = new Map((roles || []).map((role) => [role.id, role]));
   const permissionById = new Map(
@@ -120,7 +130,22 @@ export async function getAdminUsersPageData() {
   const roleIds = uniqueValues((roles || []).map((role) => role.id));
   const { data: rolePermissions, error: rolePermissionsError } =
     await fetchRolePermissionsByRoleIds(roleIds);
-  if (rolePermissionsError) throw rolePermissionsError;
+  if (rolePermissionsError) {
+    throw toAdminError("admin_role_permissions", rolePermissionsError);
+  }
+
+  if (
+    isBrowserRuntime() &&
+    !profiles?.length &&
+    !roles?.length &&
+    !permissions?.length
+  ) {
+    throw buildRlsHint("admin-users", [
+      "admin_profiles",
+      "admin_roles",
+      "admin_permissions",
+    ]);
+  }
 
   const permissionIdsByRole = buildPermissionIdsByRole(rolePermissions || []);
 

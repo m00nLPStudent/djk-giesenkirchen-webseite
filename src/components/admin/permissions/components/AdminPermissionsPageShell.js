@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import useAdminPermissionsViewModel from "../hooks/useAdminPermissionsViewModel";
 import PermissionsStatsGrid from "./PermissionsStatsGrid";
@@ -10,14 +10,47 @@ import PermissionsTable from "./PermissionsTable";
 import PermissionDetailsDialog from "./PermissionDetailsDialog";
 import PermissionEditorDialog from "../forms/PermissionEditorDialog";
 import { saveAdminPermissionAction } from "@/app/admin/permissions/actions";
+import { getAdminPermissionsPageData } from "../services/permissions.service";
+import {
+  getReadableErrorMessage,
+  logAdminDebugError,
+} from "@/lib/admin-auth/adminDiagnostics";
 
 export default function AdminPermissionsPageShell({ initialData }) {
   const router = useRouter();
-  const vm = useAdminPermissionsViewModel(initialData);
+  const [runtimeData, setRuntimeData] = useState(initialData);
+  const vm = useAdminPermissionsViewModel(runtimeData);
 
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function refreshPermissionsData() {
+      try {
+        const nextData = await getAdminPermissionsPageData();
+        if (!active) return;
+        setRuntimeData(nextData);
+      } catch (loadError) {
+        if (!active) return;
+        logAdminDebugError("admin-permissions", loadError);
+        setError(
+          `Daten konnten nicht geladen werden: ${getReadableErrorMessage(
+            loadError,
+            "Permissions konnten nicht geladen werden.",
+          )}`,
+        );
+      }
+    }
+
+    refreshPermissionsData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function handleSave(values) {
     setError("");

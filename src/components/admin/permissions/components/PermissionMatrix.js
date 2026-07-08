@@ -2,18 +2,51 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import AdminPanel from "@/components/admin/common/AdminPanel";
 import { toggleRolePermissionAction } from "@/app/admin/permissions/actions";
 import usePermissionMatrixViewModel from "../hooks/usePermissionMatrixViewModel";
 import PermissionMatrixCategory from "./PermissionMatrixCategory";
+import { getPermissionMatrixPageData } from "../services/permissions.service";
+import {
+  getReadableErrorMessage,
+  logAdminDebugError,
+} from "@/lib/admin-auth/adminDiagnostics";
 
 export default function PermissionMatrix({ initialData }) {
-  const vm = usePermissionMatrixViewModel(initialData);
+  const [runtimeData, setRuntimeData] = useState(initialData);
+  const vm = usePermissionMatrixViewModel(runtimeData);
   const router = useRouter();
   const [busyKey, setBusyKey] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function refreshMatrixData() {
+      try {
+        const nextData = await getPermissionMatrixPageData();
+        if (!active) return;
+        setRuntimeData(nextData);
+      } catch (loadError) {
+        if (!active) return;
+        logAdminDebugError("admin-permissions-matrix", loadError);
+        setError(
+          `Daten konnten nicht geladen werden: ${getReadableErrorMessage(
+            loadError,
+            "Matrixdaten konnten nicht geladen werden.",
+          )}`,
+        );
+      }
+    }
+
+    refreshMatrixData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function handleToggle({ roleId, permissionId, checked }) {
     setError("");
@@ -42,7 +75,7 @@ export default function PermissionMatrix({ initialData }) {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 overflow-x-hidden">
       <AdminPageHeader
         eyebrow="Permissions"
         title="Rollen-Permission-Matrix"
@@ -78,7 +111,7 @@ export default function PermissionMatrix({ initialData }) {
         </p>
       )}
 
-      <div className="space-y-5">
+      <div className="space-y-5 overflow-x-hidden">
         {categories.map((category) => (
           <PermissionMatrixCategory
             key={category}

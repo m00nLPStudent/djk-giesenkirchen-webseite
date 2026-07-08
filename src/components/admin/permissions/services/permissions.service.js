@@ -2,6 +2,12 @@ import {
   loadAdminPermissions,
   loadAdminRoles,
 } from "@/lib/admin-auth/adminAuth.service";
+import {
+  assertBrowserSession,
+  buildRlsHint,
+  isBrowserRuntime,
+  toAdminError,
+} from "@/lib/admin-auth/adminDiagnostics";
 import { fetchAllRolePermissionLinks } from "@/lib/admin-auth/adminPermissions.repository";
 
 function buildLookup(items = []) {
@@ -18,6 +24,10 @@ function buildCategoryGroups(permissions = []) {
 }
 
 export async function getAdminPermissionsPageData() {
+  if (isBrowserRuntime()) {
+    await assertBrowserSession("admin-permissions");
+  }
+
   const [permissions, roles, { data: links, error: linksError }] =
     await Promise.all([
       loadAdminPermissions(),
@@ -25,7 +35,15 @@ export async function getAdminPermissionsPageData() {
       fetchAllRolePermissionLinks(),
     ]);
 
-  if (linksError) throw linksError;
+  if (linksError) throw toAdminError("admin_role_permissions", linksError);
+
+  if (isBrowserRuntime() && !permissions?.length && !roles?.length) {
+    throw buildRlsHint("admin-permissions", [
+      "admin_permissions",
+      "admin_roles",
+      "admin_role_permissions",
+    ]);
+  }
 
   const rolesById = buildLookup(roles || []);
 
@@ -75,6 +93,10 @@ export async function getAdminPermissionsPageData() {
 }
 
 export async function getPermissionMatrixPageData() {
+  if (isBrowserRuntime()) {
+    await assertBrowserSession("admin-permissions-matrix");
+  }
+
   const [permissions, roles, { data: links, error: linksError }] =
     await Promise.all([
       loadAdminPermissions(),
@@ -82,7 +104,15 @@ export async function getPermissionMatrixPageData() {
       fetchAllRolePermissionLinks(),
     ]);
 
-  if (linksError) throw linksError;
+  if (linksError) throw toAdminError("admin_role_permissions", linksError);
+
+  if (isBrowserRuntime() && !permissions?.length && !roles?.length) {
+    throw buildRlsHint("admin-permissions-matrix", [
+      "admin_permissions",
+      "admin_roles",
+      "admin_role_permissions",
+    ]);
+  }
 
   const grouped = buildCategoryGroups(permissions || []);
 

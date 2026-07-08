@@ -20,7 +20,9 @@ export default function usePermissions(userContext) {
   return {
     permissions,
     roles: context.roles,
+    primaryRole: context.primaryRole,
     isActive: context.isActive,
+    hasAdminProfile: context.hasAdminProfile,
     isSuperAdmin: context.isSuperAdmin,
     can: (permission) => hasPermission(context, permission),
     canAny: (requiredPermissions) =>

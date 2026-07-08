@@ -1,11 +1,42 @@
 import { supabase } from "@/lib/supabase";
+import { toAdminError } from "./adminDiagnostics";
 
-export async function fetchAdminProfile(userId) {
-  return await supabase
+export async function fetchAdminProfile(userId, email) {
+  const byId = await supabase
     .from("admin_profiles")
     .select("*")
     .eq("id", userId)
     .maybeSingle();
+
+  if (byId?.error) {
+    return {
+      data: null,
+      error: toAdminError("admin_profiles.by-id", byId.error),
+    };
+  }
+
+  if (byId?.data) {
+    return byId;
+  }
+
+  if (!email) {
+    return byId;
+  }
+
+  const byEmail = await supabase
+    .from("admin_profiles")
+    .select("*")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (byEmail?.error) {
+    return {
+      data: null,
+      error: toAdminError("admin_profiles.by-email", byEmail.error),
+    };
+  }
+
+  return byEmail;
 }
 
 export async function fetchAdminRoles({ onlyActive = true } = {}) {

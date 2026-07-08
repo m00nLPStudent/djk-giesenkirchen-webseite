@@ -1,4 +1,7 @@
-import { AUTH_REQUIRED_FOR_ADMIN, ADMIN_AUTH_PUBLIC_ROUTES } from "./adminAuthConfig";
+import {
+  AUTH_REQUIRED_FOR_ADMIN,
+  ADMIN_AUTH_PUBLIC_ROUTES,
+} from "./adminAuthConfig";
 import { AUTH_ENFORCEMENT_ENABLED } from "./adminPermissionConfig";
 import { canAccessAdminRoute } from "./permissionEngine";
 import { normalizeUserContext } from "./permissionFallbacks";

@@ -7,11 +7,15 @@ export async function fetchAdminProfiles() {
     .order("created_at", { ascending: false });
 }
 
-export async function updateAdminProfileStatus(userId, isActive) {
+async function updateProfileStatusBy(column, userId, isActive) {
   return await supabase
     .from("admin_profiles")
     .update({ is_active: isActive })
-    .eq("id", userId)
+    .eq(column, userId)
     .select("id, is_active")
     .maybeSingle();
+}
+
+export async function updateAdminProfileStatus(userId, isActive) {
+  return await updateProfileStatusBy("id", userId, isActive);
 }

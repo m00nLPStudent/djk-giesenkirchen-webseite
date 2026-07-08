@@ -12,18 +12,32 @@ export default function PermissionMatrixCategory({
 }) {
   return (
     <section className="rounded-2xl border border-white/10 bg-black/20 p-4">
-      <h3 className="text-sm font-black uppercase tracking-[0.22em] text-red-300">
+      <h3 className="rounded-xl border border-red-400/25 bg-red-500/10 px-3 py-2 text-sm font-black uppercase tracking-[0.22em] text-red-300">
         {category}
       </h3>
 
-      <div className="mt-3 hidden lg:block overflow-x-auto">
-        <table className="w-full table-fixed">
+      <div className="mt-3 hidden lg:block overflow-x-auto rounded-xl border border-white/10">
+        <table className="min-w-[980px] w-max table-fixed border-collapse">
+          <colgroup>
+            <col className="w-[320px] min-w-[320px]" />
+            {roles.map((role) => (
+              <col key={role.id} className="w-[128px] min-w-[128px]" />
+            ))}
+          </colgroup>
           <thead>
-            <tr className="text-left text-[0.62rem] font-black uppercase tracking-[0.16em] text-white/45">
-              <th className="px-4 py-2">Permission</th>
+            <tr className="h-12 text-left text-[0.62rem] font-black uppercase tracking-[0.16em] text-white/45">
+              <th className="sticky left-0 top-0 z-20 border-b border-white/10 bg-[#15151a] px-4 py-3 text-left">
+                Permission
+              </th>
               {roles.map((role) => (
-                <th key={role.id} className="px-3 py-2 text-center">
-                  {role.key}
+                <th
+                  key={role.id}
+                  className="sticky top-0 z-10 border-b border-white/10 bg-[#15151a] px-2 py-3 text-center"
+                  title={role.name}
+                >
+                  <span className="block break-words text-[0.6rem] leading-4">
+                    {role.key}
+                  </span>
                 </th>
               ))}
             </tr>

@@ -9,17 +9,18 @@ function RoleChips({ roles = [] }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap items-center gap-1.5">
       {roles.map((role) => (
         <span
           key={`${role.id}-${role.is_primary ? "primary" : "secondary"}`}
-          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.1em] ${
+          className={`inline-flex h-6 max-w-full items-center rounded-full border px-2.5 text-[0.62rem] font-bold uppercase tracking-[0.1em] ${
             role.is_primary
               ? "border-red-400/40 bg-red-500/15 text-red-200"
               : "border-white/15 bg-white/[0.06] text-white/70"
           }`}
+          title={role.name}
         >
-          {role.name}
+          <span className="truncate">{role.name}</span>
         </span>
       ))}
     </div>
@@ -28,12 +29,12 @@ function RoleChips({ roles = [] }) {
 
 function ActionButtons({ user, isUpdating, onOpenDetails, onToggleStatus }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="grid gap-2">
       <button
         type="button"
         disabled
         title="Bearbeiten folgt in spaeterer Phase."
-        className="h-9 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-bold text-white/40"
+        className="h-9 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-bold text-white/40"
       >
         Bearbeiten
       </button>
@@ -41,7 +42,7 @@ function ActionButtons({ user, isUpdating, onOpenDetails, onToggleStatus }) {
       <button
         type="button"
         onClick={() => onOpenDetails(user.id)}
-        className="h-9 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:text-white"
+        className="h-9 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
       >
         Details
       </button>
@@ -50,7 +51,7 @@ function ActionButtons({ user, isUpdating, onOpenDetails, onToggleStatus }) {
         type="button"
         disabled={isUpdating}
         onClick={() => onToggleStatus(user.id, !user.is_active)}
-        className="h-9 rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="h-9 w-full rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
       >
         {user.is_active ? "Deaktivieren" : "Aktivieren"}
       </button>
@@ -92,23 +93,23 @@ export default function UsersTable({
       <div className="hidden lg:block">
         <table className="w-full table-fixed">
           <colgroup>
-            <col className="w-[26%]" />
-            <col className="w-[11%]" />
-            <col className="w-[14%]" />
+            <col className="w-[23%]" />
+            <col className="w-[10%]" />
             <col className="w-[17%]" />
+            <col className="w-[18%]" />
+            <col className="w-[10%]" />
+            <col className="w-[10%]" />
             <col className="w-[12%]" />
-            <col className="w-[12%]" />
-            <col className="w-[8%]" />
           </colgroup>
           <thead className="bg-black/30">
-            <tr className="text-left text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
-              <th className="px-4 py-3">Benutzer</th>
-              <th className="px-3 py-3">Status</th>
-              <th className="px-3 py-3">Primaer</th>
-              <th className="px-3 py-3">Weitere Rollen</th>
-              <th className="px-3 py-3">Letzter Login</th>
-              <th className="px-3 py-3">Erstellt</th>
-              <th className="px-3 py-3">Aktionen</th>
+            <tr className="h-12 text-left text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
+              <th className="px-4 py-3.5">Benutzer</th>
+              <th className="px-3 py-3.5 text-center">Status</th>
+              <th className="px-3 py-3.5">Primaer</th>
+              <th className="px-3 py-3.5">Weitere Rollen</th>
+              <th className="px-3 py-3.5">Letzter Login</th>
+              <th className="px-3 py-3.5">Erstellt</th>
+              <th className="px-3 py-3.5">Aktionen</th>
             </tr>
           </thead>
           <tbody>
@@ -119,37 +120,48 @@ export default function UsersTable({
               return (
                 <tr
                   key={user.id}
-                  className="border-t border-white/10 align-top"
+                  className="border-t border-white/10 align-top transition hover:bg-white/[0.03]"
                 >
-                  <td className="px-4 py-3">
-                    <div className="flex items-start gap-3">
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-3">
                       <UserAvatar user={user} />
                       <div className="min-w-0">
-                        <p className="font-bold text-white">{user.name}</p>
-                        <p className="truncate text-sm text-white/60">
+                        <p className="truncate font-bold text-white">
+                          {user.name}
+                        </p>
+                        <p className="mt-0.5 truncate text-sm text-white/60">
                           {user.email || "-"}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-3 py-3">
-                    <UserStatusBadge isActive={user.is_active} />
+                  <td className="px-4 py-3.5 text-center align-middle">
+                    <div className="inline-flex items-center justify-center whitespace-nowrap">
+                      <UserStatusBadge isActive={user.is_active} />
+                    </div>
                   </td>
-                  <td className="px-3 py-3 text-sm text-white/75">
-                    <span className="line-clamp-2">
+                  <td className="px-4 py-3.5 text-sm text-white/75 align-middle">
+                    <span
+                      className="block truncate"
+                      title={user.primaryRole?.name || "Keine primaere Rolle"}
+                    >
                       {user.primaryRole?.name || "Keine primaere Rolle"}
                     </span>
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-3 py-3.5 align-middle">
                     <RoleChips roles={secondaryRoles} />
                   </td>
-                  <td className="px-3 py-3 text-sm text-white/70">
-                    {formatDateTime(user.last_login_at)}
+                  <td className="px-3 py-3.5 text-sm text-white/70 align-middle">
+                    <span className="block leading-snug">
+                      {formatDateTime(user.last_login_at)}
+                    </span>
                   </td>
-                  <td className="px-3 py-3 text-sm text-white/70">
-                    {formatDateTime(user.created_at)}
+                  <td className="px-3 py-3.5 text-sm text-white/70 align-middle">
+                    <span className="block leading-snug">
+                      {formatDateTime(user.created_at)}
+                    </span>
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="px-3 py-3.5 align-middle">
                     <ActionButtons
                       user={user}
                       isUpdating={updatingUserId === user.id}
@@ -164,7 +176,7 @@ export default function UsersTable({
         </table>
       </div>
 
-      <div className="grid gap-3 overflow-x-auto p-4 lg:hidden">
+      <div className="grid gap-3 p-4 lg:hidden">
         {users.map((user) => {
           const secondaryRoles = (user.roles || []).filter(
             (role) => !role.is_primary,

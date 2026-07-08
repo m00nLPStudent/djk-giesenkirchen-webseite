@@ -1,42 +1,62 @@
 import { supabase } from "@/lib/supabase";
 import { loadAdminAuthContext } from "./adminAuth.service";
+import {
+  formatSupabaseError,
+  logAdminDebugError,
+  toAdminError,
+} from "./adminDiagnostics";
 
 export async function getCurrentSession() {
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) return null;
-    return data?.session || null;
-  } catch {
-    return null;
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    throw toAdminError("auth.getSession", error);
   }
+
+  return data?.session || null;
 }
 
 export async function getCurrentUser() {
-  try {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) return null;
-    return data?.user || null;
-  } catch {
-    return null;
+  const { data, error } = await supabase.auth.getUser();
+  if (error) {
+    throw toAdminError("auth.getUser", error);
   }
+
+  return data?.user || null;
 }
 
 export async function getCurrentAdminProfile() {
-  try {
-    const user = await getCurrentUser();
-    if (!user?.id) return null;
+  const user = await getCurrentUser();
+  if (!user?.id) return null;
 
-    const { data, error } = await supabase
-      .from("admin_profiles")
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle();
+  const byId = await supabase
+    .from("admin_profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
 
-    if (error) return null;
-    return data || null;
-  } catch {
+  if (byId?.error) {
+    throw toAdminError("admin_profiles.by-id", byId.error);
+  }
+
+  if (byId?.data) {
+    return byId.data;
+  }
+
+  if (!user?.email) {
     return null;
   }
+
+  const byEmail = await supabase
+    .from("admin_profiles")
+    .select("*")
+    .eq("email", user.email)
+    .maybeSingle();
+
+  if (byEmail?.error) {
+    throw toAdminError("admin_profiles.by-email", byEmail.error);
+  }
+
+  return byEmail?.data || null;
 }
 
 export async function getCurrentAdminContext() {
@@ -49,40 +69,75 @@ export async function getCurrentAdminContext() {
       return {
         session,
         user: null,
+        userId: null,
         profile: null,
+        fullName: "Admin",
         roles: [],
+        primaryRole: null,
         permissions: [],
+        permissionSet: new Set(),
         isActive: false,
         hasAdminProfile: false,
+        isSuperAdmin: false,
+        debugError: null,
       };
     }
 
-    const authContext = await loadAdminAuthContext(user.id);
+    const authContext = await loadAdminAuthContext(user.id, user.email);
+    const resolvedProfile = authContext?.profile || profile;
+    const resolvedRoles = authContext?.roles || [];
+    const primaryRole =
+      authContext?.primaryRole ||
+      resolvedRoles.find((role) => role?.is_primary) ||
+      resolvedRoles[0] ||
+      null;
+    const fullName =
+      resolvedProfile?.full_name ||
+      resolvedProfile?.name ||
+      [resolvedProfile?.first_name, resolvedProfile?.last_name]
+        .filter(Boolean)
+        .join(" ") ||
+      user?.email ||
+      "Admin";
 
     return {
       session,
       user,
-      profile: authContext?.profile || profile,
-      roles: authContext?.roles || [],
+      userId: user.id,
+      profile: resolvedProfile,
+      fullName,
+      roles: resolvedRoles,
+      primaryRole,
       permissions: authContext?.permissions || [],
       permissionSet: authContext?.permissionSet || new Set(),
       isActive: Boolean(authContext?.isActive),
-      hasAdminProfile: Boolean((authContext?.profile || profile)?.id),
+      hasAdminProfile: Boolean(resolvedProfile?.id),
       isSuperAdmin: Boolean(
-        (authContext?.roles || []).some((role) => role?.key === "superadmin"),
+        resolvedRoles.some((role) => role?.key === "superadmin"),
       ),
+      debugError: null,
     };
-  } catch {
+  } catch (error) {
+    logAdminDebugError("admin-context", error);
+    const debugError = formatSupabaseError(
+      error,
+      "Admin-Kontext konnte nicht geladen werden.",
+    );
+
     return {
       session: null,
       user: null,
+      userId: null,
       profile: null,
+      fullName: "Admin",
       roles: [],
+      primaryRole: null,
       permissions: [],
       permissionSet: new Set(),
       isActive: false,
       hasAdminProfile: false,
       isSuperAdmin: false,
+      debugError,
     };
   }
 }
@@ -97,6 +152,7 @@ export async function updateLastLoginAt(userId) {
       .eq("id", userId);
 
     if (error) {
+      logAdminDebugError("update-last-login", error);
       return { ok: false, reason: "update-failed" };
     }
 

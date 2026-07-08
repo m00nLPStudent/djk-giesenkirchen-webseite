@@ -6,6 +6,7 @@ import { ChevronDown, LogOut, UserCog, UserCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { AUTH_REQUIRED_FOR_ADMIN } from "@/lib/admin-auth/adminAuthConfig";
 import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
+import { logAdminDebugError } from "@/lib/admin-auth/adminDiagnostics";
 
 export default function ProfileMenu() {
   const router = useRouter();
@@ -15,7 +16,8 @@ export default function ProfileMenu() {
   const [userState, setUserState] = useState({
     isLoggedIn: false,
     name: "Admin",
-    roleLabel: "Nicht angemeldet",
+    roleLabel: "Keine Rolle",
+    statusLabel: "Nicht angemeldet",
     email: "",
   });
 
@@ -33,8 +35,24 @@ export default function ProfileMenu() {
   useEffect(() => {
     async function loadAuthContext() {
       const context = await getCurrentAdminContext();
-      const firstRole = context?.roles?.[0]?.name;
+      if (context?.debugError) {
+        logAdminDebugError("profile-menu", context.debugError);
+      }
+      const primaryRoleName =
+        context?.primaryRole?.name ||
+        context?.roles?.find((role) => role?.is_primary)?.name ||
+        context?.roles?.[0]?.name ||
+        "Keine Rolle";
+      const statusLabel = !context?.user?.id
+        ? "Nicht angemeldet"
+        : !context?.hasAdminProfile
+          ? "Kein Profil"
+          : context?.isActive
+            ? "Aktiv"
+            : "Inaktiv";
       const profileName =
+        context?.fullName ||
+        context?.profile?.full_name ||
         context?.profile?.name ||
         [context?.profile?.first_name, context?.profile?.last_name]
           .filter(Boolean)
@@ -45,7 +63,8 @@ export default function ProfileMenu() {
       setUserState({
         isLoggedIn: Boolean(context?.user?.id),
         name: profileName,
-        roleLabel: firstRole || (context?.isActive ? "Administrator" : "Inaktiv"),
+        roleLabel: primaryRoleName,
+        statusLabel,
         email: context?.user?.email || "",
       });
     }
@@ -78,7 +97,9 @@ export default function ProfileMenu() {
         <UserCircle size={27} className="text-white/75" />
         <div className="hidden leading-tight lg:block">
           <p className="text-sm font-black text-white">{userState.name}</p>
-          <p className="text-xs text-white/40">{userState.roleLabel}</p>
+          <p className="text-xs text-white/40">
+            {userState.roleLabel} · {userState.statusLabel}
+          </p>
         </div>
         <ChevronDown
           size={16}
@@ -91,7 +112,10 @@ export default function ProfileMenu() {
           <div className="border-b border-white/10 px-5 py-4">
             <p className="font-black">{userState.name}</p>
             <p className="mt-1 text-xs text-white/45">
-              {userState.email || userState.roleLabel}
+              {userState.email || "-"}
+            </p>
+            <p className="mt-1 text-xs text-white/45">
+              {userState.roleLabel} · {userState.statusLabel}
             </p>
           </div>
 

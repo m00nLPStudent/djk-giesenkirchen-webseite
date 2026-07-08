@@ -2,6 +2,12 @@ import {
   loadAdminPermissions,
   loadAdminRoles,
 } from "@/lib/admin-auth/adminAuth.service";
+import {
+  assertBrowserSession,
+  buildRlsHint,
+  isBrowserRuntime,
+  toAdminError,
+} from "@/lib/admin-auth/adminDiagnostics";
 import { fetchRolePermissionsByRoleIds } from "@/lib/admin-auth/adminRoles.repository";
 import { fetchAdminProfiles } from "@/lib/admin-auth/adminProfiles.repository";
 import { fetchAllUserRoleLinks } from "@/lib/admin-auth/userRoles.repository";
@@ -25,6 +31,7 @@ function buildProfileLookup(profiles = []) {
         profile.id,
         {
           id: profile.id,
+          user_id: profile.id,
           name: fullName,
           email: profile.email || "",
           is_active: profile.is_active !== false,
@@ -51,6 +58,10 @@ function groupByRoleId(links = [], valueMapper) {
 }
 
 export async function getAdminRolesPageData() {
+  if (isBrowserRuntime()) {
+    await assertBrowserSession("admin-roles");
+  }
+
   const [
     roles,
     permissions,
@@ -63,13 +74,21 @@ export async function getAdminRolesPageData() {
     fetchAdminProfiles(),
   ]);
 
-  if (userRoleLinksError) throw userRoleLinksError;
-  if (profilesError) throw profilesError;
+  if (userRoleLinksError) {
+    throw toAdminError("admin_user_roles", userRoleLinksError);
+  }
+  if (profilesError) throw toAdminError("admin_profiles", profilesError);
 
   const roleIds = (roles || []).map((role) => role.id);
   const { data: rolePermissions, error: rolePermissionsError } =
     await fetchRolePermissionsByRoleIds(roleIds);
-  if (rolePermissionsError) throw rolePermissionsError;
+  if (rolePermissionsError) {
+    throw toAdminError("admin_role_permissions", rolePermissionsError);
+  }
+
+  if (isBrowserRuntime() && !roles?.length && !permissions?.length) {
+    throw buildRlsHint("admin-roles", ["admin_roles", "admin_permissions"]);
+  }
 
   const permissionsById = buildPermissionLookup(permissions || []);
   const profilesById = buildProfileLookup(profiles || []);

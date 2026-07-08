@@ -6,4 +6,7 @@ export {
   ADMIN_PERMISSION_DEFAULTS,
 } from "./adminPermissionConfig";
 
-export { AUTH_REQUIRED_FOR_ADMIN, ADMIN_AUTH_PUBLIC_ROUTES } from "./adminAuthConfig";
+export {
+  AUTH_REQUIRED_FOR_ADMIN,
+  ADMIN_AUTH_PUBLIC_ROUTES,
+} from "./adminAuthConfig";

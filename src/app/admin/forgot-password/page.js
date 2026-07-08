@@ -77,7 +77,10 @@ export default function AdminForgotPasswordPage() {
           </form>
 
           <div className="mt-5">
-            <Link href="/admin/login" className="text-sm text-white/60 hover:text-white">
+            <Link
+              href="/admin/login"
+              className="text-sm text-white/60 hover:text-white"
+            >
               Zurueck zum Login
             </Link>
           </div>

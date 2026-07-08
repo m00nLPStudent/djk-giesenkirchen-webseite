@@ -10,11 +10,11 @@ function ActionButtons({
   onToggleStatus,
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col gap-2 xl:flex-row xl:flex-wrap">
       <button
         type="button"
         onClick={() => onOpenDetails(role.id)}
-        className="h-9 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:text-white"
+        className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
       >
         Details
       </button>
@@ -22,7 +22,7 @@ function ActionButtons({
       <button
         type="button"
         onClick={() => onEdit(role.id)}
-        className="h-9 rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:text-white"
+        className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
       >
         Bearbeiten
       </button>
@@ -31,7 +31,7 @@ function ActionButtons({
         type="button"
         disabled={isUpdating}
         onClick={() => onToggleStatus(role.id, role.key, !role.is_active)}
-        className="h-9 rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
       >
         {role.is_active ? "Deaktivieren" : "Aktivieren"}
       </button>
@@ -75,57 +75,64 @@ export default function RolesTable({
       <div className="hidden lg:block">
         <table className="w-full table-fixed">
           <colgroup>
-            <col className="w-[26%]" />
-            <col className="w-[15%]" />
+            <col className="w-[29%]" />
+            <col className="w-[13%]" />
             <col className="w-[11%]" />
-            <col className="w-[8%]" />
+            <col className="w-[7%]" />
             <col className="w-[8%]" />
             <col className="w-[9%]" />
-            <col className="w-[12%]" />
-            <col className="w-[11%]" />
+            <col className="w-[10%]" />
+            <col className="w-[13%]" />
           </colgroup>
           <thead className="bg-black/30">
-            <tr className="text-left text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
-              <th className="px-4 py-3">Rolle</th>
-              <th className="px-3 py-3">Key</th>
-              <th className="px-3 py-3">Status</th>
-              <th className="px-3 py-3">Sort.</th>
-              <th className="px-3 py-3">User</th>
-              <th className="px-3 py-3">Perm.</th>
-              <th className="px-3 py-3">Erstellt</th>
-              <th className="px-3 py-3">Aktionen</th>
+            <tr className="h-12 text-left text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
+              <th className="px-4 py-3.5">Rolle</th>
+              <th className="px-3 py-3.5">Key</th>
+              <th className="px-3 py-3.5 text-center">Status</th>
+              <th className="px-3 py-3.5 text-center">Sort.</th>
+              <th className="px-3 py-3.5 text-center">User</th>
+              <th className="px-3 py-3.5 text-center">Perm.</th>
+              <th className="px-3 py-3.5">Erstellt</th>
+              <th className="px-3 py-3.5">Aktionen</th>
             </tr>
           </thead>
           <tbody>
             {roles.map((role) => (
-              <tr key={role.id} className="border-t border-white/10 align-top">
-                <td className="px-4 py-3">
+              <tr
+                key={role.id}
+                className="border-t border-white/10 align-top transition hover:bg-white/[0.03]"
+              >
+                <td className="px-4 py-3.5">
                   <p className="font-bold text-white">{role.name}</p>
-                  <p className="mt-1 line-clamp-2 text-sm text-white/60">
+                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-white/60">
                     {role.description || "-"}
                   </p>
                 </td>
-                <td className="px-3 py-3 text-sm text-white/70">
-                  <span className="block break-all">{role.key}</span>
+                <td className="px-3 py-3.5 text-xs font-bold uppercase tracking-[0.08em] text-white/75 align-middle">
+                  <span className="block truncate" title={role.key}>
+                    {role.key}
+                  </span>
                 </td>
-                <td className="px-3 py-3">
-                  <RoleStatusBadge isActive={role.is_active} />
+                <td className="px-3 py-3.5 text-center align-middle">
+                  <div className="inline-flex items-center justify-center">
+                    <RoleStatusBadge isActive={role.is_active} />
+                  </div>
                 </td>
-                <td className="px-3 py-3 text-sm text-white/70">
+                <td className="px-3 py-3.5 text-center text-sm text-white/70 align-middle">
                   {role.sort_order ?? 0}
                 </td>
-                <td className="px-3 py-3 text-sm text-white/70">
+                <td className="px-3 py-3.5 text-center text-sm text-white/70 align-middle">
                   {role.users_count || 0}
                 </td>
-                <td className="px-3 py-3 text-sm text-white/70">
+                <td className="px-3 py-3.5 text-center text-sm text-white/70 align-middle">
                   {role.permissions_count || 0}
                 </td>
-                <td className="px-3 py-3 text-sm text-white/70">
-                  <span className="block break-words">
+                <td className="px-3 py-3.5 text-sm text-white/70 align-middle">
+                  <span className="block leading-snug">
                     {formatRoleDateTime(role.created_at)}
                   </span>
                 </td>
-                <td className="px-3 py-3">
+                <td className="px-3 py-3.5 align-middle">
                   <ActionButtons
                     role={role}
                     isUpdating={updatingRoleId === role.id}
@@ -140,7 +147,7 @@ export default function RolesTable({
         </table>
       </div>
 
-      <div className="grid gap-3 overflow-x-auto p-4 lg:hidden">
+      <div className="grid gap-3 p-4 lg:hidden">
         {roles.map((role) => (
           <div
             key={role.id}

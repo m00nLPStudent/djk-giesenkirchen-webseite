@@ -16,22 +16,45 @@ export function normalizeUserContext(userContext) {
     return getAdminFallbackUserContext();
   }
 
+  const roles = userContext.roles || [];
+
   const permissionKeys = (userContext.permissions || []).map((permission) =>
     typeof permission === "string" ? permission : permission?.key,
   );
 
+  const derivedUserId =
+    userContext.userId ||
+    userContext.user_id ||
+    userContext.user?.id ||
+    userContext.profile?.id ||
+    null;
+
+  const hasAdminProfile = Boolean(
+    userContext.hasAdminProfile || userContext.profile?.id,
+  );
+
+  const resolvedIsActive =
+    typeof userContext.isActive === "boolean"
+      ? userContext.isActive
+      : hasAdminProfile
+        ? userContext.profile?.is_active !== false
+        : true;
+
   return {
-    userId: userContext.userId || userContext.user_id || null,
-    isActive: userContext.isActive !== false,
-    hasAdminProfile: Boolean(
-      userContext.hasAdminProfile || userContext.profile?.id,
-    ),
-    roles: userContext.roles || [],
+    userId: derivedUserId,
+    isActive: resolvedIsActive,
+    hasAdminProfile,
+    roles,
+    primaryRole:
+      userContext.primaryRole ||
+      roles.find((role) => role?.is_primary) ||
+      roles[0] ||
+      null,
     permissions: userContext.permissions || [],
     permissionSet: new Set((permissionKeys || []).filter(Boolean)),
     isSuperAdmin: Boolean(
       userContext.isSuperAdmin ||
-      (userContext.roles || []).some((role) => role?.key === "superadmin"),
+      roles.some((role) => role?.key === "superadmin"),
     ),
     source: userContext.source || "runtime",
   };

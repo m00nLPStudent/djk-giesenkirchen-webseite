@@ -78,6 +78,9 @@ values
   ('roles.view', 'Rollen ansehen', 'Rollen lesen', 'roles'),
   ('roles.edit', 'Rollen bearbeiten', 'Rollen bearbeiten', 'roles'),
 
+  ('permissions.view', 'Permissions ansehen', 'Permissions lesen', 'permissions'),
+  ('permissions.edit', 'Permissions bearbeiten', 'Permissions bearbeiten', 'permissions'),
+
   ('system.view', 'Systembereich ansehen', 'Systeminformationen lesen', 'system')
 on conflict (key) do update
 set
@@ -102,6 +105,7 @@ with role_permission_map(role_key, permission_key) as (
     ('superadmin', 'membership_requests.view'), ('superadmin', 'membership_requests.edit'), ('superadmin', 'membership_requests.forward'),
     ('superadmin', 'users.view'), ('superadmin', 'users.create'), ('superadmin', 'users.edit'), ('superadmin', 'users.delete'),
     ('superadmin', 'roles.view'), ('superadmin', 'roles.edit'),
+    ('superadmin', 'permissions.view'), ('superadmin', 'permissions.edit'),
     ('superadmin', 'system.view'),
 
     -- vorstand
@@ -137,8 +141,7 @@ with role_permission_map(role_key, permission_key) as (
     ('trainer', 'dashboard.view'),
     ('trainer', 'teams.view'), ('trainer', 'teams.edit'),
     ('trainer', 'players.view'), ('trainer', 'players.edit'),
-    ('trainer', 'events.view'), ('trainer', 'events.edit'),
-    ('trainer', 'coaches.view'),
+    ('trainer', 'events.view'), ('trainer', 'events.create'), ('trainer', 'events.edit'),
 
     -- betreuer
     ('betreuer', 'dashboard.view'),
@@ -167,16 +170,13 @@ with role_permission_map(role_key, permission_key) as (
     ('webmaster', 'settings.view'), ('webmaster', 'settings.edit'),
     ('webmaster', 'users.view'), ('webmaster', 'users.edit'),
     ('webmaster', 'roles.view'),
+    ('webmaster', 'permissions.view'),
     ('webmaster', 'system.view'),
 
     -- gast
     ('gast', 'dashboard.view'),
     ('gast', 'news.view'),
     ('gast', 'events.view'),
-    ('gast', 'teams.view'),
-    ('gast', 'players.view'),
-    ('gast', 'coaches.view'),
-    ('gast', 'sponsors.view'),
     ('gast', 'club_history.view')
 )
 insert into admin_role_permissions (role_id, permission_id)

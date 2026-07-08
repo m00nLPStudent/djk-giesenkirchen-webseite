@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import useAdminUsersViewModel from "../hooks/useAdminUsersViewModel";
@@ -10,12 +10,45 @@ import UsersTable from "./UsersTable";
 import UserDetailsDialog from "../dialogs/UserDetailsDialog";
 import NewUserDialog from "../dialogs/NewUserDialog";
 import { updateAdminUserStatusAction } from "@/app/admin/users/actions";
+import { getAdminUsersPageData } from "../services/users.service";
+import {
+  getReadableErrorMessage,
+  logAdminDebugError,
+} from "@/lib/admin-auth/adminDiagnostics";
 
 export default function AdminUsersPageShell({ initialData }) {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [runtimeData, setRuntimeData] = useState(initialData);
 
-  const vm = useAdminUsersViewModel(initialData);
+  useEffect(() => {
+    let active = true;
+
+    async function refreshUsersData() {
+      try {
+        const nextData = await getAdminUsersPageData();
+        if (!active) return;
+        setRuntimeData(nextData);
+      } catch (loadError) {
+        if (!active) return;
+        logAdminDebugError("admin-users", loadError);
+        setError(
+          `Daten konnten nicht geladen werden: ${getReadableErrorMessage(
+            loadError,
+            "Benutzerdaten konnten nicht geladen werden.",
+          )}`,
+        );
+      }
+    }
+
+    refreshUsersData();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const vm = useAdminUsersViewModel(runtimeData);
 
   async function handleToggleStatus(userId, isActive) {
     setError("");
