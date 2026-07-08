@@ -10,7 +10,10 @@ import {
 import { normalizeUserContext } from "@/lib/admin-auth/permissionFallbacks";
 
 export default function usePermissions(userContext) {
-  const context = useMemo(() => normalizeUserContext(userContext), [userContext]);
+  const context = useMemo(
+    () => normalizeUserContext(userContext),
+    [userContext],
+  );
 
   const permissions = useMemo(() => getUserPermissionKeys(context), [context]);
 
@@ -20,7 +23,9 @@ export default function usePermissions(userContext) {
     isActive: context.isActive,
     isSuperAdmin: context.isSuperAdmin,
     can: (permission) => hasPermission(context, permission),
-    canAny: (requiredPermissions) => hasAnyPermission(context, requiredPermissions),
-    canAll: (requiredPermissions) => hasAllPermissions(context, requiredPermissions),
+    canAny: (requiredPermissions) =>
+      hasAnyPermission(context, requiredPermissions),
+    canAll: (requiredPermissions) =>
+      hasAllPermissions(context, requiredPermissions),
   };
 }

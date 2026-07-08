@@ -233,6 +233,57 @@ Naechste Schritte:
 - B6: Auth-User-Erzeugung und Session-Datenfluss stabilisieren
 - B7: Enforcement schrittweise aktivieren (zuerst soft, dann strikt)
 
+## B6 Login/Logout/Auth-Flow vorbereitet (noch nicht verpflichtend)
+
+Neuer Schalter:
+
+- AUTH_REQUIRED_FOR_ADMIN = false
+- Datei: src/lib/admin-auth/adminAuthConfig.js
+
+Solange false:
+
+- /admin und alle Admin-Unterseiten bleiben erreichbar
+- keine automatische Login-Weiterleitung
+- keine Sperrung bei fehlender Session/fehlendem Profil
+
+Neue Auth-Services und Helpers:
+
+- src/lib/admin-auth/adminSession.service.js
+  - getCurrentSession
+  - getCurrentUser
+  - getCurrentAdminProfile
+  - getCurrentAdminContext
+  - updateLastLoginAt
+
+Neue Auth-Routen:
+
+- /admin/login
+- /admin/forgot-password (vorbereiteter Reset-Flow)
+- /admin/unauthorized (bereits vorhanden)
+
+UI-Integration:
+
+- ProfileMenu nutzt vorbereitete Session-/Context-Ladung
+- Logout ueber echte signOut-Struktur vorbereitet
+- Bei fehlendem User neutraler Zustand im Menü
+
+Guard-Vorbereitung:
+
+- AdminRouteGuard kennt AUTH_REQUIRED_FOR_ADMIN
+- Wenn spaeter true: Session/Profile/Aktivstatus pruefbar
+- Aktuell keine aktive Sperrung, da Schalter false
+
+Weiterhin nicht aktiv:
+
+- verpflichtender Admin-Login
+- aktives Aussperren bei fehlendem Profil
+- aktive Permission-Enforcement-Sperren
+
+Naechste Phase:
+
+- User/Seed-Daten vervollstaendigen
+- AUTH_REQUIRED_FOR_ADMIN und danach AUTH_ENFORCEMENT_ENABLED schrittweise aktivieren
+
 ## Seed-Vorschlag
 
 SQL-Vorschlag fuer Standardrollen, Standardpermissions und Role-Permission-Mapping:

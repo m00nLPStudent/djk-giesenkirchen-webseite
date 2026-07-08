@@ -54,4 +54,5 @@ Vollständig dokumentiert sind:
 - Rollenverwaltung im Adminbereich (/admin/roles)
 - Permission-Verwaltung inkl. Matrix im Adminbereich (/admin/permissions)
 - Permission-Engine/Guard-Struktur vorbereitet (Enforcement aktuell deaktiviert)
+- Login/Logout/Auth-Flow im Adminbereich vorbereitet (AUTH_REQUIRED_FOR_ADMIN = false)
 - Durchgeführte Modularisierungs- und Refactoring-Schritte

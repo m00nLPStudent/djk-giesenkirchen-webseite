@@ -32,12 +32,16 @@ export function hasPermission(userContext, permission) {
 
 export function hasAnyPermission(userContext, permissions = []) {
   if (!permissions?.length) return true;
-  return permissions.some((permission) => hasPermission(userContext, permission));
+  return permissions.some((permission) =>
+    hasPermission(userContext, permission),
+  );
 }
 
 export function hasAllPermissions(userContext, permissions = []) {
   if (!permissions?.length) return true;
-  return permissions.every((permission) => hasPermission(userContext, permission));
+  return permissions.every((permission) =>
+    hasPermission(userContext, permission),
+  );
 }
 
 export function canAccessAdminRoute(userContext, route) {

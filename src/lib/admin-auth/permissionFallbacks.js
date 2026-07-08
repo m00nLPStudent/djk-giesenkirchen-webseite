@@ -2,6 +2,7 @@ export function getAdminFallbackUserContext() {
   return {
     userId: null,
     isActive: true,
+    hasAdminProfile: false,
     roles: [],
     permissions: [],
     permissionSet: new Set(),
@@ -22,12 +23,15 @@ export function normalizeUserContext(userContext) {
   return {
     userId: userContext.userId || userContext.user_id || null,
     isActive: userContext.isActive !== false,
+    hasAdminProfile: Boolean(
+      userContext.hasAdminProfile || userContext.profile?.id,
+    ),
     roles: userContext.roles || [],
     permissions: userContext.permissions || [],
     permissionSet: new Set((permissionKeys || []).filter(Boolean)),
     isSuperAdmin: Boolean(
       userContext.isSuperAdmin ||
-        (userContext.roles || []).some((role) => role?.key === "superadmin"),
+      (userContext.roles || []).some((role) => role?.key === "superadmin"),
     ),
     source: userContext.source || "runtime",
   };
