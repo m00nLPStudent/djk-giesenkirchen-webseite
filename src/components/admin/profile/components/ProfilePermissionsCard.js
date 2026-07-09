@@ -2,6 +2,7 @@ import AdminPanel from "@/components/admin/common/AdminPanel";
 
 export default function ProfilePermissionsCard({ profileData }) {
   const permissions = profileData?.permissions || [];
+  const canSeeTechnical = Boolean(profileData?.canSeeTechnicalDetails);
 
   return (
     <AdminPanel className="space-y-4">
@@ -12,9 +13,15 @@ export default function ProfilePermissionsCard({ profileData }) {
         <h2 className="mt-2 text-xl font-black text-white">Permissions</h2>
       </div>
 
-      <p className="text-sm text-white/70">
-        Insgesamt zugewiesen: <strong>{permissions.length}</strong>
-      </p>
+      {canSeeTechnical ? (
+        <p className="text-sm text-white/70">
+          Insgesamt zugewiesen: <strong>{permissions.length}</strong>
+        </p>
+      ) : (
+        <p className="text-sm text-white/70">
+          Dir zugewiesene Rechte werden unten angezeigt.
+        </p>
+      )}
 
       <div className="max-h-52 overflow-y-auto rounded-xl border border-white/10 bg-black/20 p-3">
         {permissions.length ? (
@@ -27,8 +34,14 @@ export default function ProfilePermissionsCard({ profileData }) {
                 <span className="font-bold text-white/90">
                   {permission.name || permission.key}
                 </span>
-                {permission.key ? (
+                {canSeeTechnical && permission.key ? (
                   <span className="text-white/50"> ({permission.key})</span>
+                ) : null}
+                {!canSeeTechnical && permission.category ? (
+                  <span className="text-white/50">
+                    {" "}
+                    - {permission.category}
+                  </span>
                 ) : null}
               </p>
             ))}

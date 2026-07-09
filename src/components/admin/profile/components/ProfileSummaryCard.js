@@ -16,6 +16,8 @@ function Row({ label, value }) {
 }
 
 export default function ProfileSummaryCard({ profileData }) {
+  const canSeeTechnical = Boolean(profileData?.canSeeTechnicalDetails);
+
   return (
     <AdminPanel className="space-y-4">
       <div>
@@ -38,11 +40,15 @@ export default function ProfileSummaryCard({ profileData }) {
           label="Erstellt am"
           value={formatProfileDateTime(profileData?.createdAt)}
         />
-        <Row label="User-ID" value={profileData?.userId} />
-        <Row
-          label="Permissions"
-          value={String(profileData?.permissionCount || 0)}
-        />
+        {canSeeTechnical ? (
+          <Row label="User-ID" value={profileData?.userId} />
+        ) : null}
+        {canSeeTechnical ? (
+          <Row
+            label="Permissions"
+            value={String(profileData?.permissionCount || 0)}
+          />
+        ) : null}
       </div>
     </AdminPanel>
   );

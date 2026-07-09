@@ -1,14 +1,25 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import {
   formatSupabaseError,
   isLikelyRlsError,
   toAdminError,
 } from "@/lib/admin-auth/adminDiagnostics";
+import { validateAdminPassword } from "@/lib/admin-auth/passwordPolicy";
 import {
   formatPermissionCount,
   formatRoleList,
 } from "../helpers/profile.formatters";
+
+export function isSuperAdmin(userContext) {
+  return Boolean(
+    (userContext?.roles || []).some((role) => role?.key === "superadmin"),
+  );
+}
+
+export function canSeeTechnicalProfileDetails(userContext) {
+  return isSuperAdmin(userContext);
+}
 
 function mapProfileData(context) {
   const roles = context?.roles || [];
@@ -20,6 +31,8 @@ function mapProfileData(context) {
   const additionalRoles = roles.filter((role) => role?.id !== primaryRole?.id);
 
   return {
+    isSuperAdmin: isSuperAdmin(context),
+    canSeeTechnicalDetails: canSeeTechnicalProfileDetails(context),
     userId: context?.user?.id || context?.userId || "-",
     profileId: context?.profile?.id || "-",
     fullName: context?.fullName || context?.profile?.full_name || "",
@@ -51,6 +64,7 @@ export async function getOwnAdminProfileData() {
 }
 
 export async function updateOwnProfileFullName(fullName) {
+  const supabaseBrowser = getSupabaseBrowserClient();
   const context = await getCurrentAdminContext();
 
   if (!context?.profile?.id) {
@@ -66,7 +80,7 @@ export async function updateOwnProfileFullName(fullName) {
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await supabase
+  const { error } = await supabaseBrowser
     .from("admin_profiles")
     .update(payload)
     .eq("id", context.profile.id);
@@ -87,14 +101,18 @@ export async function updateOwnProfileFullName(fullName) {
 }
 
 export async function changeOwnPassword(newPassword) {
-  if (!newPassword || newPassword.length < 8) {
+  const supabaseBrowser = getSupabaseBrowserClient();
+  const validation = validateAdminPassword(newPassword, newPassword);
+  if (!validation.isValid) {
     return {
       ok: false,
-      message: "Passwort muss mindestens 8 Zeichen lang sein.",
+      message: validation.errors[0] || "Passwortregeln nicht erfuellt.",
     };
   }
 
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  const { error } = await supabaseBrowser.auth.updateUser({
+    password: newPassword,
+  });
 
   if (error) {
     return {
@@ -110,6 +128,7 @@ export async function changeOwnPassword(newPassword) {
 }
 
 export async function sendOwnPasswordResetEmail() {
+  const supabaseBrowser = getSupabaseBrowserClient();
   const context = await getCurrentAdminContext();
   const email = context?.user?.email || context?.profile?.email;
 
@@ -122,7 +141,7 @@ export async function sendOwnPasswordResetEmail() {
   }
 
   const redirectTo = `${window.location.origin}/admin/login`;
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await supabaseBrowser.auth.resetPasswordForEmail(email, {
     redirectTo,
   });
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { AUTH_REQUIRED_FOR_ADMIN } from "@/lib/admin-auth/adminAuthConfig";
 import {
   getCurrentAdminContext,
@@ -23,12 +23,18 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    const { data, error: signInError } = await supabase.auth.signInWithPassword(
-      {
+    const supabaseBrowser = getSupabaseBrowserClient();
+    if (!supabaseBrowser) {
+      setLoading(false);
+      setError("Browser-Kontext fehlt. Bitte Seite neu laden.");
+      return;
+    }
+
+    const { data, error: signInError } =
+      await supabaseBrowser.auth.signInWithPassword({
         email,
         password,
-      },
-    );
+      });
 
     if (signInError) {
       setLoading(false);

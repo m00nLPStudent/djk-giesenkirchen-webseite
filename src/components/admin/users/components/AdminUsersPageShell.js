@@ -8,8 +8,11 @@ import UsersStatsGrid from "./UsersStatsGrid";
 import UsersToolbar from "./UsersToolbar";
 import UsersTable from "./UsersTable";
 import UserDetailsDialog from "../dialogs/UserDetailsDialog";
-import NewUserDialog from "../dialogs/NewUserDialog";
-import { updateAdminUserStatusAction } from "@/app/admin/users/actions";
+import UserEditorDialog from "../dialogs/UserEditorDialog";
+import {
+  saveAdminUserAction,
+  updateAdminUserStatusAction,
+} from "@/app/admin/users/actions";
 import { getAdminUsersPageData } from "../services/users.service";
 import {
   getReadableErrorMessage,
@@ -50,11 +53,21 @@ export default function AdminUsersPageShell({ initialData }) {
 
   const vm = useAdminUsersViewModel(runtimeData);
 
+  async function refreshUsersData() {
+    const nextData = await getAdminUsersPageData();
+    setRuntimeData(nextData);
+    router.refresh();
+  }
+
   async function handleToggleStatus(userId, isActive) {
     setError("");
     vm.setUpdatingUserId(userId);
 
-    const result = await updateAdminUserStatusAction({ userId, isActive });
+    const result = await updateAdminUserStatusAction({
+      userId,
+      isActive,
+      currentUserId: vm.currentUserId,
+    });
 
     if (!result?.ok) {
       setError(result?.message || "Status konnte nicht aktualisiert werden.");
@@ -63,7 +76,21 @@ export default function AdminUsersPageShell({ initialData }) {
     }
 
     vm.setUpdatingUserId(null);
-    router.refresh();
+    await refreshUsersData();
+  }
+
+  async function handleSubmitUserEditor(values) {
+    const result = await saveAdminUserAction({
+      userId: vm.editingUser?.id || null,
+      values,
+      currentUserId: vm.currentUserId,
+    });
+
+    if (result?.ok) {
+      await refreshUsersData();
+    }
+
+    return result;
   }
 
   return (
@@ -85,7 +112,7 @@ export default function AdminUsersPageShell({ initialData }) {
         onStatusChange={vm.setStatus}
         onRoleChange={vm.setRole}
         onSortChange={vm.setSort}
-        onOpenNewUser={() => vm.setIsNewUserOpen(true)}
+        onOpenNewUser={vm.openCreate}
       />
 
       {error && (
@@ -97,9 +124,11 @@ export default function AdminUsersPageShell({ initialData }) {
       <UsersTable
         users={vm.filteredUsers}
         updatingUserId={vm.updatingUserId}
+        currentUserId={vm.currentUserId}
         onOpenDetails={vm.openDetails}
+        onEditUser={vm.openEdit}
         onToggleStatus={handleToggleStatus}
-        onCreate={() => vm.setIsNewUserOpen(true)}
+        onCreate={vm.openCreate}
       />
 
       <UserDetailsDialog
@@ -108,10 +137,15 @@ export default function AdminUsersPageShell({ initialData }) {
         onClose={vm.closeDetails}
       />
 
-      <NewUserDialog
-        open={vm.isNewUserOpen}
-        roles={vm.roles}
-        onClose={() => vm.setIsNewUserOpen(false)}
+      <UserEditorDialog
+        open={vm.isEditorOpen}
+        mode={vm.editingUser ? "edit" : "create"}
+        user={vm.editingUser}
+        roles={vm.roles || []}
+        currentUserId={vm.currentUserId}
+        createCapabilities={vm.createCapabilities}
+        onSubmit={handleSubmitUserEditor}
+        onClose={vm.closeEditor}
       />
     </div>
   );

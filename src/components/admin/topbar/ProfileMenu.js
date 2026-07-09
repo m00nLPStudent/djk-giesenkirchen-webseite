@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, UserCog, UserCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { AUTH_REQUIRED_FOR_ADMIN } from "@/lib/admin-auth/adminAuthConfig";
 import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import { logAdminDebugError } from "@/lib/admin-auth/adminDiagnostics";
+import { adminLogoutAction } from "@/app/admin/logout/actions";
 
 export default function ProfileMenu() {
   const router = useRouter();
@@ -80,7 +80,7 @@ export default function ProfileMenu() {
 
   async function handleLogout() {
     setLoggingOut(true);
-    await supabase.auth.signOut();
+    await adminLogoutAction();
     setOpen(false);
     setLoggingOut(false);
 

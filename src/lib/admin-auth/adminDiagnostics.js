@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 
 function normalizeMessage(message) {
   return (message || "Unbekannter Fehler").toString().trim();
@@ -33,7 +33,9 @@ export function isBrowserRuntime() {
 export async function assertBrowserSession(scope) {
   if (!isBrowserRuntime()) return;
 
-  const { data, error } = await supabase.auth.getSession();
+  const supabaseBrowser = getSupabaseBrowserClient();
+
+  const { data, error } = await supabaseBrowser.auth.getSession();
 
   if (error) {
     throw toAdminError(scope, error, "Session konnte nicht gelesen werden.");

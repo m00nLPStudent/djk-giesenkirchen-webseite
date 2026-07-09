@@ -12,11 +12,17 @@ export default function useAdminUsersViewModel(initialData) {
 
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [isNewUserOpen, setIsNewUserOpen] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
   const [updatingUserId, setUpdatingUserId] = useState(null);
 
   const users = initialData?.users || [];
   const roles = initialData?.roles || [];
+  const currentUserId = initialData?.currentUserId || null;
+  const createCapabilities = initialData?.createCapabilities || {
+    serviceRoleEnabled: false,
+    createFlowEnabled: false,
+  };
 
   const roleOptions = useMemo(
     () =>
@@ -36,6 +42,11 @@ export default function useAdminUsersViewModel(initialData) {
     [users, selectedUserId],
   );
 
+  const editingUser = useMemo(
+    () => users.find((user) => user.id === editingUserId) || null,
+    [users, editingUserId],
+  );
+
   function openDetails(userId) {
     setSelectedUserId(userId);
     setIsDetailsOpen(true);
@@ -45,10 +56,27 @@ export default function useAdminUsersViewModel(initialData) {
     setIsDetailsOpen(false);
   }
 
+  function openCreate() {
+    setEditingUserId(null);
+    setIsEditorOpen(true);
+  }
+
+  function openEdit(userId) {
+    setEditingUserId(userId);
+    setIsEditorOpen(true);
+  }
+
+  function closeEditor() {
+    setEditingUserId(null);
+    setIsEditorOpen(false);
+  }
+
   return {
     users,
     filteredUsers,
     roles,
+    currentUserId,
+    createCapabilities,
     stats: initialData?.stats,
     filters: {
       search,
@@ -64,11 +92,14 @@ export default function useAdminUsersViewModel(initialData) {
     sortOptions: USER_SORT_OPTIONS,
     roleOptions,
     selectedUser,
+    editingUser,
     isDetailsOpen,
     openDetails,
     closeDetails,
-    isNewUserOpen,
-    setIsNewUserOpen,
+    isEditorOpen,
+    openCreate,
+    openEdit,
+    closeEditor,
     updatingUserId,
     setUpdatingUserId,
   };

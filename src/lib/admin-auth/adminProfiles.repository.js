@@ -7,8 +7,38 @@ export async function fetchAdminProfiles() {
     .order("created_at", { ascending: false });
 }
 
-async function updateProfileStatusBy(column, userId, isActive) {
-  return await supabase
+export async function createAdminProfile(payload, client = supabase) {
+  return await client
+    .from("admin_profiles")
+    .insert(payload)
+    .select("*")
+    .maybeSingle();
+}
+
+export async function updateAdminProfileById(
+  profileId,
+  payload,
+  client = supabase,
+) {
+  return await client
+    .from("admin_profiles")
+    .update(payload)
+    .eq("id", profileId)
+    .select("*")
+    .maybeSingle();
+}
+
+export async function deleteAdminProfileById(profileId, client = supabase) {
+  return await client.from("admin_profiles").delete().eq("id", profileId);
+}
+
+async function updateProfileStatusBy(
+  column,
+  userId,
+  isActive,
+  client = supabase,
+) {
+  return await client
     .from("admin_profiles")
     .update({ is_active: isActive })
     .eq(column, userId)
@@ -16,6 +46,10 @@ async function updateProfileStatusBy(column, userId, isActive) {
     .maybeSingle();
 }
 
-export async function updateAdminProfileStatus(userId, isActive) {
-  return await updateProfileStatusBy("id", userId, isActive);
+export async function updateAdminProfileStatus(
+  userId,
+  isActive,
+  client = supabase,
+) {
+  return await updateProfileStatusBy("id", userId, isActive, client);
 }

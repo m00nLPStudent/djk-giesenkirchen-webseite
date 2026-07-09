@@ -27,14 +27,28 @@ function RoleChips({ roles = [] }) {
   );
 }
 
-function ActionButtons({ user, isUpdating, onOpenDetails, onToggleStatus }) {
+function ActionButtons({
+  user,
+  currentUserId,
+  isUpdating,
+  onOpenDetails,
+  onToggleStatus,
+  onEditUser,
+}) {
+  const isSelfDeactivate = Boolean(
+    currentUserId && currentUserId === user.id && user.is_active,
+  );
+
   return (
     <div className="grid gap-2">
       <button
         type="button"
-        disabled
-        title="Bearbeiten folgt in spaeterer Phase."
-        className="h-9 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-bold text-white/40"
+        disabled={!onEditUser}
+        title={
+          onEditUser ? "Benutzer bearbeiten" : "Bearbeiten nicht verfuegbar."
+        }
+        onClick={() => onEditUser?.(user.id)}
+        className="h-9 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white disabled:opacity-45"
       >
         Bearbeiten
       </button>
@@ -49,8 +63,13 @@ function ActionButtons({ user, isUpdating, onOpenDetails, onToggleStatus }) {
 
       <button
         type="button"
-        disabled={isUpdating}
+        disabled={isUpdating || isSelfDeactivate}
         onClick={() => onToggleStatus(user.id, !user.is_active)}
+        title={
+          isSelfDeactivate
+            ? "Eigener Benutzer kann nicht deaktiviert werden."
+            : undefined
+        }
         className="h-9 w-full rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
       >
         {user.is_active ? "Deaktivieren" : "Aktivieren"}
@@ -62,7 +81,9 @@ function ActionButtons({ user, isUpdating, onOpenDetails, onToggleStatus }) {
 export default function UsersTable({
   users,
   updatingUserId,
+  currentUserId,
   onOpenDetails,
+  onEditUser,
   onToggleStatus,
   onCreate,
 }) {
@@ -164,8 +185,10 @@ export default function UsersTable({
                   <td className="px-3 py-3.5 align-middle">
                     <ActionButtons
                       user={user}
+                      currentUserId={currentUserId}
                       isUpdating={updatingUserId === user.id}
                       onOpenDetails={onOpenDetails}
+                      onEditUser={onEditUser}
                       onToggleStatus={onToggleStatus}
                     />
                   </td>
@@ -219,8 +242,10 @@ export default function UsersTable({
               <div className="mt-4">
                 <ActionButtons
                   user={user}
+                  currentUserId={currentUserId}
                   isUpdating={updatingUserId === user.id}
                   onOpenDetails={onOpenDetails}
+                  onEditUser={onEditUser}
                   onToggleStatus={onToggleStatus}
                 />
               </div>

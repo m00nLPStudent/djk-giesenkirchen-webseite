@@ -2,6 +2,8 @@ import {
   loadAdminPermissions,
   loadAdminRoles,
 } from "@/lib/admin-auth/adminAuth.service";
+import { getAdminUserCreateCapabilities } from "@/lib/admin-auth/adminUserInvite.service";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import {
   assertBrowserSession,
   buildRlsHint,
@@ -107,6 +109,13 @@ export async function getAdminUsersPageData() {
     await assertBrowserSession("admin-users");
   }
 
+  let currentUserId = null;
+  if (isBrowserRuntime()) {
+    const supabaseBrowser = getSupabaseBrowserClient();
+    const { data: authData } = await supabaseBrowser.auth.getUser();
+    currentUserId = authData?.user?.id || null;
+  }
+
   const [
     { data: profiles, error: profilesError },
     { data: roleLinks, error: roleLinksError },
@@ -166,9 +175,13 @@ export async function getAdminUsersPageData() {
     ),
   );
 
+  const createCapabilities = getAdminUserCreateCapabilities();
+
   return {
     users,
     roles: roles || [],
+    currentUserId,
+    createCapabilities,
     stats: {
       totalUsers: users.length,
       activeUsers: users.filter((user) => user.is_active).length,

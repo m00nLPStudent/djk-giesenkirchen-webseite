@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 
 export default function AdminForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -16,12 +16,17 @@ export default function AdminForgotPasswordPage() {
     setSuccess("");
     setLoading(true);
 
+    const supabaseBrowser = getSupabaseBrowserClient();
+    if (!supabaseBrowser) {
+      setLoading(false);
+      setError("Browser-Kontext fehlt. Bitte Seite neu laden.");
+      return;
+    }
+
     const redirectTo = `${window.location.origin}/admin/login`;
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      email,
-      { redirectTo },
-    );
+    const { error: resetError } =
+      await supabaseBrowser.auth.resetPasswordForEmail(email, { redirectTo });
 
     setLoading(false);
 

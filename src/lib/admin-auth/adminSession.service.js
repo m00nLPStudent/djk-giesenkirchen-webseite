@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { loadAdminAuthContext } from "./adminAuth.service";
 import {
   formatSupabaseError,
@@ -7,7 +7,8 @@ import {
 } from "./adminDiagnostics";
 
 export async function getCurrentSession() {
-  const { data, error } = await supabase.auth.getSession();
+  const supabaseBrowser = getSupabaseBrowserClient();
+  const { data, error } = await supabaseBrowser.auth.getSession();
   if (error) {
     throw toAdminError("auth.getSession", error);
   }
@@ -16,7 +17,8 @@ export async function getCurrentSession() {
 }
 
 export async function getCurrentUser() {
-  const { data, error } = await supabase.auth.getUser();
+  const supabaseBrowser = getSupabaseBrowserClient();
+  const { data, error } = await supabaseBrowser.auth.getUser();
   if (error) {
     throw toAdminError("auth.getUser", error);
   }
@@ -28,7 +30,9 @@ export async function getCurrentAdminProfile() {
   const user = await getCurrentUser();
   if (!user?.id) return null;
 
-  const byId = await supabase
+  const supabaseBrowser = getSupabaseBrowserClient();
+
+  const byId = await supabaseBrowser
     .from("admin_profiles")
     .select("*")
     .eq("id", user.id)
@@ -46,7 +50,7 @@ export async function getCurrentAdminProfile() {
     return null;
   }
 
-  const byEmail = await supabase
+  const byEmail = await supabaseBrowser
     .from("admin_profiles")
     .select("*")
     .eq("email", user.email)
@@ -146,7 +150,8 @@ export async function updateLastLoginAt(userId) {
   if (!userId) return { ok: false, reason: "missing-user-id" };
 
   try {
-    const { error } = await supabase
+    const supabaseBrowser = getSupabaseBrowserClient();
+    const { error } = await supabaseBrowser
       .from("admin_profiles")
       .update({ last_login_at: new Date().toISOString() })
       .eq("id", userId);
