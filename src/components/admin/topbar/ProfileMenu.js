@@ -32,45 +32,51 @@ export default function ProfileMenu() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  useEffect(() => {
-    async function loadAuthContext() {
-      const context = await getCurrentAdminContext();
-      if (context?.debugError) {
-        logAdminDebugError("profile-menu", context.debugError);
-      }
-      const primaryRoleName =
-        context?.primaryRole?.name ||
-        context?.roles?.find((role) => role?.is_primary)?.name ||
-        context?.roles?.[0]?.name ||
-        "Keine Rolle";
-      const statusLabel = !context?.user?.id
-        ? "Nicht angemeldet"
-        : !context?.hasAdminProfile
-          ? "Kein Profil"
-          : context?.isActive
-            ? "Aktiv"
-            : "Inaktiv";
-      const profileName =
-        context?.fullName ||
-        context?.profile?.full_name ||
-        context?.profile?.name ||
-        [context?.profile?.first_name, context?.profile?.last_name]
-          .filter(Boolean)
-          .join(" ") ||
-        context?.user?.email ||
-        "Admin";
-
-      setUserState({
-        isLoggedIn: Boolean(context?.user?.id),
-        name: profileName,
-        roleLabel: primaryRoleName,
-        statusLabel,
-        email: context?.user?.email || "",
-      });
+  async function loadAuthContext() {
+    const context = await getCurrentAdminContext();
+    if (context?.debugError) {
+      logAdminDebugError("profile-menu", context.debugError);
     }
+    const primaryRoleName =
+      context?.primaryRole?.name ||
+      context?.roles?.find((role) => role?.is_primary)?.name ||
+      context?.roles?.[0]?.name ||
+      "Keine Rolle";
+    const statusLabel = !context?.user?.id
+      ? "Nicht angemeldet"
+      : !context?.hasAdminProfile
+        ? "Kein Profil"
+        : context?.isActive
+          ? "Aktiv"
+          : "Inaktiv";
+    const profileName =
+      context?.fullName ||
+      context?.profile?.full_name ||
+      context?.profile?.name ||
+      [context?.profile?.first_name, context?.profile?.last_name]
+        .filter(Boolean)
+        .join(" ") ||
+      context?.user?.email ||
+      "Admin";
 
+    setUserState({
+      isLoggedIn: Boolean(context?.user?.id),
+      name: profileName,
+      roleLabel: primaryRoleName,
+      statusLabel,
+      email: context?.user?.email || "",
+    });
+  }
+
+  useEffect(() => {
     loadAuthContext();
   }, []);
+
+  useEffect(() => {
+    if (open) {
+      loadAuthContext();
+    }
+  }, [open]);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -85,6 +91,12 @@ export default function ProfileMenu() {
   function handleGoToLogin() {
     setOpen(false);
     router.push("/admin/login");
+  }
+
+  function handleGoToProfile() {
+    setOpen(false);
+    router.push("/admin/profile");
+    router.refresh();
   }
 
   return (
@@ -122,6 +134,7 @@ export default function ProfileMenu() {
           <button
             type="button"
             disabled={!userState.isLoggedIn}
+            onClick={handleGoToProfile}
             className="flex w-full items-center gap-3 px-5 py-4 text-left text-sm font-bold text-white/75 transition hover:bg-white/5 hover:text-white"
           >
             <UserCog size={18} />
