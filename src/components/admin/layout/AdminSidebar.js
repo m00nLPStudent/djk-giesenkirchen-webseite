@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { canSeeAdminNavItem } from "@/lib/admin-auth/permissionEngine";
 import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
+import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import {
   LayoutDashboard,
   Newspaper,
@@ -104,7 +106,7 @@ const navItems = [
     href: "/admin/permissions",
     label: "Rechte",
     icon: Lock,
-    requiredPermission: "system.view",
+    requiredPermission: "permissions.view",
   },
   {
     href: "/admin/settings",
@@ -116,7 +118,28 @@ const navItems = [
 
 export default function AdminSidebar({ mobile = false, onNavigate }) {
   const pathname = usePathname();
-  const userContext = getAdminFallbackUserContext();
+  const [userContext, setUserContext] = useState(getAdminFallbackUserContext());
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadContext() {
+      try {
+        const context = await getCurrentAdminContext();
+        if (!active) return;
+        setUserContext(context || getAdminFallbackUserContext());
+      } catch {
+        if (!active) return;
+        setUserContext(getAdminFallbackUserContext());
+      }
+    }
+
+    loadContext();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const visibleNavItems = navItems.filter((item) =>
     canSeeAdminNavItem(userContext, item),

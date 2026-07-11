@@ -13,6 +13,7 @@ import {
   normalizePermissionKey,
   validatePermissionPayload,
 } from "@/components/admin/permissions/helpers/permissions.payload";
+import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 
 function isSamePermission(existing, permissionId) {
   if (!existing || !permissionId) return false;
@@ -20,6 +21,13 @@ function isSamePermission(existing, permissionId) {
 }
 
 export async function saveAdminPermissionAction({ permissionId, values }) {
+  const access = await assertAdminActionPermission({
+    requiredPermission: "permissions.edit",
+  });
+  if (!access.ok) {
+    return access;
+  }
+
   const payload = buildPermissionPayload(values);
   const validation = validatePermissionPayload(payload);
 
@@ -67,6 +75,13 @@ export async function toggleRolePermissionAction({
   permissionId,
   checked,
 }) {
+  const access = await assertAdminActionPermission({
+    requiredPermission: "permissions.edit",
+  });
+  if (!access.ok) {
+    return access;
+  }
+
   if (!roleId || !permissionId) {
     return { ok: false, message: "Ungueltige Zuordnung." };
   }

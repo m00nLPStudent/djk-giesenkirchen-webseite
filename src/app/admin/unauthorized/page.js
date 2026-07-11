@@ -13,8 +13,10 @@ function getReasonText(reason) {
   }
 }
 
-export default function AdminUnauthorizedPage({ searchParams }) {
-  const reason = searchParams?.reason || "";
+export default async function AdminUnauthorizedPage({ searchParams }) {
+  const resolvedSearchParams = await searchParams;
+  const reason = resolvedSearchParams?.reason || "";
+  const permission = resolvedSearchParams?.permission || "";
 
   return (
     <AdminLayout
@@ -27,9 +29,12 @@ export default function AdminUnauthorizedPage({ searchParams }) {
           Unauthorized
         </p>
         <h2 className="mt-2 text-2xl font-black text-white">Kein Zugriff</h2>
-        <p className="mt-3 text-sm text-white/60">
-          {getReasonText(reason)}
-        </p>
+        <p className="mt-3 text-sm text-white/60">{getReasonText(reason)}</p>
+        {reason === "missing-permission" && permission && (
+          <p className="mt-2 text-xs font-bold uppercase tracking-[0.18em] text-red-300/90">
+            Fehlende Permission: {permission}
+          </p>
+        )}
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
             href="/admin/login"

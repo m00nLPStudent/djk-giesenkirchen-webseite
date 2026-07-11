@@ -29,7 +29,7 @@ export const DASHBOARD_QUICK_ACTIONS = [
     label: "Rechte",
     href: "/admin/permissions",
     tone: "neutral",
-    requiredPermission: "system.view",
+    requiredPermission: "permissions.view",
   },
   {
     label: "Neue Mannschaft",
@@ -64,20 +64,52 @@ export function getVisibleDashboardQuickActions(userContext) {
 }
 
 export const DASHBOARD_STAT_ITEMS = [
-  { key: "newsTotal", label: "News gesamt", href: "/admin/news" },
-  { key: "newsPublished", label: "News veröffentlicht", href: "/admin/news" },
+  {
+    key: "newsTotal",
+    label: "News gesamt",
+    href: "/admin/news",
+    requiredPermission: "news.view",
+  },
+  {
+    key: "newsPublished",
+    label: "News veröffentlicht",
+    href: "/admin/news",
+    requiredPermission: "news.view",
+  },
   {
     key: "newsPlannedOrDraft",
     label: "News Entwürfe/Geplant",
     href: "/admin/news",
+    requiredPermission: "news.view",
   },
-  { key: "teamsTotal", label: "Mannschaften", href: "/admin/teams" },
-  { key: "coachesTotal", label: "Trainer", href: "/admin/coaches" },
-  { key: "sponsorsTotal", label: "Sponsoren", href: "/admin/sponsors" },
-  { key: "eventsTotal", label: "Termine", href: "/admin/events" },
+  {
+    key: "teamsTotal",
+    label: "Mannschaften",
+    href: "/admin/teams",
+    requiredPermission: "teams.view",
+  },
+  {
+    key: "coachesTotal",
+    label: "Trainer",
+    href: "/admin/coaches",
+    requiredPermission: "coaches.view",
+  },
+  {
+    key: "sponsorsTotal",
+    label: "Sponsoren",
+    href: "/admin/sponsors",
+    requiredPermission: "sponsors.view",
+  },
+  {
+    key: "eventsTotal",
+    label: "Termine",
+    href: "/admin/events",
+    requiredPermission: "events.view",
+  },
   {
     key: "membershipOpenTotal",
     label: "Mitgliedsanfragen offen",
     href: "/admin/settings",
+    requiredPermission: "settings.view",
   },
 ];

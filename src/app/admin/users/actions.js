@@ -14,16 +14,20 @@ import {
 } from "@/lib/admin-auth/adminDiagnostics";
 import { createServerActionSupabaseClient } from "@/lib/supabase.server";
 import {
-  getActorContext,
   replaceUserRoleLinks,
   validateSelfSuperadminRoleChange,
   withRlsHint,
 } from "@/components/admin/users/services/usersActionWriteHelpers";
 import { createAdminUserWithInvite } from "@/lib/admin-auth/adminUserCreate.service";
+import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 
 export async function saveAdminUserAction({ userId, values, currentUserId }) {
   const supabaseServer = await createServerActionSupabaseClient();
-  const actorContext = await getActorContext(supabaseServer);
+  const requiredPermission = userId ? "users.edit" : "users.create";
+  const actorContext = await assertAdminActionPermission({
+    requiredPermission,
+    supabaseServer,
+  });
 
   if (!actorContext.ok) {
     return {
@@ -47,8 +51,8 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
 
   if (
     userId &&
-    currentUserId &&
-    userId === currentUserId &&
+    actorContext.userId &&
+    userId === actorContext.userId &&
     !payload.is_active
   ) {
     return {
@@ -77,7 +81,7 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
 
   const selfSuperadminValidation = await validateSelfSuperadminRoleChange({
     userId,
-    currentUserId,
+    currentUserId: actorContext.userId || currentUserId,
     payload,
     supabaseServer,
   });
@@ -170,14 +174,13 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
   };
 }
 
-export async function updateAdminUserStatusAction({
-  userId,
-  isActive,
-  currentUserId,
-}) {
+export async function updateAdminUserStatusAction({ userId, isActive }) {
   try {
     const supabaseServer = await createServerActionSupabaseClient();
-    const actorContext = await getActorContext(supabaseServer);
+    const actorContext = await assertAdminActionPermission({
+      requiredPermission: "users.edit",
+      supabaseServer,
+    });
 
     if (!actorContext.ok) {
       return {
@@ -191,7 +194,11 @@ export async function updateAdminUserStatusAction({
       return { ok: false, message: "Ungueltige Benutzer-ID." };
     }
 
-    if (currentUserId && userId === currentUserId && isActive === false) {
+    if (
+      actorContext.userId &&
+      userId === actorContext.userId &&
+      isActive === false
+    ) {
       return {
         ok: false,
         message: "Du kannst deinen eigenen Benutzer nicht deaktivieren.",

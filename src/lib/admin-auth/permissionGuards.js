@@ -3,7 +3,10 @@ import {
   ADMIN_AUTH_PUBLIC_ROUTES,
 } from "./adminAuthConfig";
 import { AUTH_ENFORCEMENT_ENABLED } from "./adminPermissionConfig";
-import { canAccessAdminRoute } from "./permissionEngine";
+import {
+  canAccessAdminRoute,
+  getRequiredAdminRoutePermission,
+} from "./permissionEngine";
 import { normalizeUserContext } from "./permissionFallbacks";
 import {
   buildLoginRedirectTarget,
@@ -56,10 +59,15 @@ export function resolveAdminRouteGuardResult({ userContext, route }) {
   }
 
   if (!canAccessAdminRoute(normalized, route)) {
+    const requiredPermission = getRequiredAdminRoutePermission(route || "");
     return {
       allow: false,
       reason: "missing-permission",
-      redirectTo: "/admin/unauthorized?reason=missing-permission",
+      redirectTo: `/admin/unauthorized?reason=missing-permission${
+        requiredPermission
+          ? `&permission=${encodeURIComponent(requiredPermission)}`
+          : ""
+      }`,
     };
   }
 

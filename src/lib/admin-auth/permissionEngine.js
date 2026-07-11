@@ -2,18 +2,29 @@ import {
   ADMIN_DASHBOARD_ACTION_PERMISSION_MAP,
   ADMIN_NAV_PERMISSION_MAP,
   ADMIN_PERMISSION_DEFAULTS,
-  ADMIN_ROUTE_PERMISSIONS,
   AUTH_ENFORCEMENT_ENABLED,
+  resolveAdminRoutePermission,
 } from "./adminPermissionConfig";
 import { normalizeUserContext } from "./permissionFallbacks";
 
 function resolveRoutePermission(route = "") {
-  return ADMIN_ROUTE_PERMISSIONS.find((entry) => {
-    if (entry.exact) {
-      return route === entry.matcher;
-    }
-    return route.startsWith(entry.matcher);
-  });
+  const resolution = resolveAdminRoutePermission(route || "");
+  if (!resolution.matched) {
+    return null;
+  }
+
+  return {
+    matcher: resolution.routePattern,
+    routePattern: resolution.routePattern,
+    permission: resolution.permission,
+    exact: resolution.matchType === "exact",
+    matchType: resolution.matchType,
+    priority: resolution.priority,
+  };
+}
+
+export function getRequiredAdminRoutePermission(route = "") {
+  return resolveRoutePermission(route)?.permission || null;
 }
 
 export function getUserPermissionKeys(userContext) {

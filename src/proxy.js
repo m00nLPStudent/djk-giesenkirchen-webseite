@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { AUTH_REQUIRED_FOR_ADMIN } from "./lib/admin-auth/adminAuthConfig";
+import { AUTH_ENFORCEMENT_ENABLED } from "./lib/admin-auth/adminPermissionConfig";
 import {
   buildLoginRedirectTarget,
   normalizeAdminRedirectPath,
 } from "./lib/admin-auth/adminAuthRedirects";
+import { hasPermission } from "./lib/admin-auth/permissionEngine";
 import { createSupabaseProxyClient } from "./lib/supabase.proxy";
 
 const PUBLIC_ADMIN_ROUTES = new Set([
@@ -47,10 +49,111 @@ function redirectToLogin(request) {
   );
 }
 
-function redirectToUnauthorized(request, reason) {
+function redirectToUnauthorized(request, reason, permission = null) {
   return NextResponse.redirect(
-    buildRedirectUrl(request, "/admin/unauthorized", { reason }),
+    buildRedirectUrl(request, "/admin/unauthorized", {
+      reason,
+      permission,
+    }),
   );
+}
+
+async function loadProxyPermissionContext(
+  supabase,
+  user,
+  profile,
+  { includePermissions = false } = {},
+) {
+  const { data: roleLinks, error: roleLinksError } = await supabase
+    .from("admin_user_roles")
+    .select("role_id, is_primary")
+    .eq("user_id", profile.id || user.id);
+
+  if (roleLinksError) {
+    return { ok: false };
+  }
+
+  const roleIds = Array.from(
+    new Set((roleLinks || []).map((row) => row?.role_id).filter(Boolean)),
+  );
+
+  if (!roleIds.length) {
+    return {
+      ok: true,
+      userContext: {
+        userId: user.id,
+        hasAdminProfile: true,
+        isActive: profile?.is_active !== false,
+        roles: [],
+        permissions: [],
+        isSuperAdmin: false,
+      },
+    };
+  }
+
+  const { data: roles, error: rolesError } = await supabase
+    .from("admin_roles")
+    .select("id, key")
+    .in("id", roleIds);
+
+  if (rolesError) {
+    return { ok: false };
+  }
+
+  const baseContext = {
+    userId: user.id,
+    hasAdminProfile: true,
+    isActive: profile?.is_active !== false,
+    roles: roles || [],
+    permissions: [],
+    isSuperAdmin: (roles || []).some((role) => role?.key === "superadmin"),
+  };
+
+  if (!includePermissions) {
+    return {
+      ok: true,
+      userContext: baseContext,
+    };
+  }
+
+  const { data: rolePermissions, error: rolePermissionsError } = await supabase
+    .from("admin_role_permissions")
+    .select("permission_id")
+    .in("role_id", roleIds);
+
+  if (rolePermissionsError) {
+    return { ok: false };
+  }
+
+  const permissionIds = Array.from(
+    new Set(
+      (rolePermissions || []).map((row) => row?.permission_id).filter(Boolean),
+    ),
+  );
+
+  if (!permissionIds.length) {
+    return {
+      ok: true,
+      userContext: baseContext,
+    };
+  }
+
+  const { data: permissions, error: permissionsError } = await supabase
+    .from("admin_permissions")
+    .select("key")
+    .in("id", permissionIds);
+
+  if (permissionsError) {
+    return { ok: false };
+  }
+
+  return {
+    ok: true,
+    userContext: {
+      ...baseContext,
+      permissions: (permissions || []).map((permission) => permission?.key),
+    },
+  };
 }
 
 export async function proxy(request) {
@@ -119,6 +222,44 @@ export async function proxy(request) {
 
   if (profile.is_active === false) {
     return redirectToUnauthorized(request, "inactive-user");
+  }
+
+  if (!AUTH_ENFORCEMENT_ENABLED) {
+    return response;
+  }
+
+  const { resolveAdminRoutePermission } =
+    await import("./lib/admin-auth/adminPermissionConfig");
+  const routeResolution = resolveAdminRoutePermission(pathname);
+  const requiredPermission = routeResolution.permission;
+
+  if (!requiredPermission) {
+    return redirectToUnauthorized(request, "missing-permission");
+  }
+
+  const permissionContext = await loadProxyPermissionContext(
+    supabase,
+    user,
+    profile,
+    {
+      includePermissions: true,
+    },
+  );
+
+  if (!permissionContext.ok) {
+    return redirectToUnauthorized(
+      request,
+      "missing-permission",
+      requiredPermission,
+    );
+  }
+
+  if (!hasPermission(permissionContext.userContext, requiredPermission)) {
+    return redirectToUnauthorized(
+      request,
+      "missing-permission",
+      requiredPermission,
+    );
   }
 
   return response;

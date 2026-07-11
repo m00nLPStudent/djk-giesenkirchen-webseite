@@ -2,6 +2,52 @@
 
 ## 2026-07-11
 
+### Phase B11.2a Route-/Permission-Mapping vollstaendig und auditierbar (Enforcement aus)
+
+- `AUTH_REQUIRED_FOR_ADMIN = true` bleibt aktiv
+- `AUTH_ENFORCEMENT_ENABLED = false` bleibt aktiv
+- zentrale Route-Permission-Map in `src/lib/admin-auth/adminPermissionConfig.js` auf reale Adminrouten erweitert
+- deterministisches Matching eingefuehrt: `resolveAdminRoutePermission(pathname)`
+- dynamische Segmente (`:id`, `[id]`), `new`/`edit`, verschachtelte Unterrouten, Query-Parameter und Trailing-Slash werden robust verarbeitet
+- Match-Reihenfolge abgesichert (spezifische Routen vor Elternrouten)
+- Development-Diagnostik im Proxy erweitert: Log von `pathname`, `routePattern`, `permission`, `matched`, `isSuperadmin`
+- unbekannte Adminrouten werden in Development gewarnt, aber nicht blockiert (weil Enforcement aus)
+- Audit-Script hinzugefuegt: `npm.cmd run audit:admin-routes`
+- Dashboard-Metadaten fuer spaetere Filterung vorbereitet (`requiredPermission` bei Stat-Items), ohne aktuelle UI-Filterung
+- keine SQL-Aenderungen, keine Datenbankmigrationen, keine Public-Website-Anpassungen
+- Regression nach der Einfuehrung des Permission-Enforcements vollstaendig behoben
+- Runtime-Endzustand wieder stabil mit `AUTH_ENFORCEMENT_ENABLED = false`
+- Stabilisierung gegengeprueft ueber Clean-Rebuild, Next.js-Neustart, Cloudflare-Tunnel-Neustart und aktualisierte Tunnel-URLs in Supabase
+- Beobachtete `ChunkLoadError`-Meldungen und fehlgeschlagene `/_next/static`-Requests nur als Symptom dokumentiert, nicht als abschliessend bewiesene Einzelursache
+- Erfolgreich gegengepruefte Module:
+  - Benutzer
+  - Rollen
+  - Rechte
+  - Matrix
+  - Profil
+  - News
+  - Termine
+  - Mannschaften
+  - Trainer
+  - Spieler
+  - Sponsoren
+  - Vereinsgeschichte
+  - Einstellungen
+
+### Phase B11.2 Rollen und Permissions produktiv durchgesetzt
+
+- `AUTH_ENFORCEMENT_ENABLED = true` aktiviert
+- zentrale Routenpruefung in `src/proxy.js` erweitert: fehlende Permission blockiert jetzt vor dem Rendern
+- fehlende Route-Permission wird nach `/admin/unauthorized?reason=missing-permission&permission=<key>` umgeleitet
+- `ADMIN_ROUTE_PERMISSIONS` fuer konkrete Admin-Unterrouten vervollstaendigt (new/edit/matrix/profile)
+- unscharfe Zuordnungen auf spezifische Keys korrigiert (`permissions.view` statt `system.view`)
+- unbekannte Routen/Nav/Dashboard-Actions werden im Enforcement nicht mehr pauschal erlaubt
+- serverseitige Permission-Assertion fuer mutierende Actions hinzugefuegt:
+  - `roles.edit` fuer Rollen-Schreiboperationen
+  - `permissions.edit` fuer Permission-/Matrix-Schreiboperationen
+  - `users.create`/`users.edit` fuer Benutzer-Schreiboperationen
+- Sidebar und Dashboard-Schnellzugriffe lesen jetzt den echten Admin-Kontext statt statischem Fallback
+
 ### Phase B11.1.1 Zentrale Auth-Pflicht fuer den Adminbereich
 
 - zentrale Middleware schirmt nun den gesamten Adminbereich vor dem Rendern ab

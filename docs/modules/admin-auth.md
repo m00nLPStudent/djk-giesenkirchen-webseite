@@ -291,28 +291,79 @@ Nächste Phase:
 - /admin/forgot-password (vorbereiteter Reset-Flow)
 - /admin/unauthorized (bereits vorhanden)
 
+## B11.2a Route-/Permission-Mapping und Audit abgesichert (ohne Enforcement)
+
+Zentraler Status:
+
+- `AUTH_REQUIRED_FOR_ADMIN = true`
+- `AUTH_ENFORCEMENT_ENABLED = false`
+
+Wirkung von B11.2a:
+
+- Die zentrale Route-Permission-Map wurde auf reale Adminrouten erweitert und deterministisch priorisiert.
+- Dynamische Segmente (`:id` und `[id]`) werden zentral aufgeloest.
+- Spezifische Unterrouten (`new`, `edit`, `matrix`) matchen vor Elternrouten.
+- Sidebar- und Dashboard-Metadaten wurden vorbereitet, ohne aktive Filterung.
+
+Wichtig in B11.2a:
+
+- Keine zusaetzlichen Redirects wegen fehlender Permission.
+- Keine zusaetzliche Sperrung von Server Actions.
+- Keine Sidebar-Filterung und keine Dashboard-Filterung.
+- Keine Aenderung an SQL oder Datenbankstruktur.
+
+Superadmin-Verhalten:
+
+- Superadmin wird weiterhin zentral als globaler Bypass behandelt.
+- Erkennung basiert auf `role.key === "superadmin"` und beruecksichtigt Mehrfachrollen.
+
+Regression und Stabilisierung:
+
+- Waehrend der Einfuehrung des Permission-Enforcements traten Regressionen im Adminbereich auf.
+- Die Runtime ist anschliessend wieder stabilisiert worden, ohne Auth-Guard oder Login-Pflicht zurueckzunehmen.
+- Die Stabilisierung erfolgte durch:
+  - `AUTH_ENFORCEMENT_ENABLED = false`
+  - vollstaendigen Clean-Rebuild mit geloeschtem `.next`-Verzeichnis
+  - Neustart von Next.js
+  - Neustart des Cloudflare Tunnels
+  - Aktualisierung der Tunnel-URLs in Supabase
+- Beobachtet wurden zwischenzeitlich `ChunkLoadError`-Meldungen und fehlgeschlagene `/_next/static`-Requests. Diese werden nur als Symptom der Regression dokumentiert, nicht als eindeutig bewiesene alleinige Hauptursache.
+
+Status B11.2a:
+
+- ✓ Auth Guard produktiv
+- ✓ Login Redirect produktiv
+- ✓ Middleware produktiv
+- ✓ vollstaendiges Route Mapping
+- ✓ vollstaendiges Permission Mapping
+- ✓ Runtime stabil
+- ✓ `AUTH_REQUIRED_FOR_ADMIN = true`
+- ✓ `AUTH_ENFORCEMENT_ENABLED = false`
+
+Audit-Helper:
+
+- Script: `npm.cmd run audit:admin-routes`
+- Quelle: `scripts/admin-route-permission-audit.js`
+- Ausgabe zeigt:
+  - gemappte reale Adminrouten mit Pattern, Permission, Match-Typ, Prioritaet
+  - oeffentliche Auth-Routen
+  - ungemappte Routen
+  - konfigurierte Pattern ohne reale `page.*`-Datei
+  - doppelte oder ueberlappende Patterns
+
+Bekannte Routen ohne reale `page.*`-Datei (derzeit nur konfiguriert):
+
+- `/admin/media`
+- `/admin/tournaments`
+- `/admin/settings/pages`
+- `/admin/settings/pages/new`
+- `/admin/settings/pages/[id]/edit`
+
 UI-Integration:
 
 - ProfileMenu nutzt vorbereitete Session-/Context-Ladung
 - Logout ueber echte signOut-Struktur vorbereitet
 - Bei fehlendem User neutraler Zustand im Menü
-
-Guard-Vorbereitung:
-
-- AdminRouteGuard kennt AUTH_REQUIRED_FOR_ADMIN
-- Wenn spaeter true: Session/Profile/Aktivstatus pruefbar
-- Aktuell keine aktive Sperrung, da Schalter false
-
-Weiterhin nicht aktiv:
-
-- verpflichtender Admin-Login
-- aktives Aussperren bei fehlendem Profil
-- aktive Permission-Enforcement-Sperren
-
-Naechste Phase:
-
-- User/Seed-Daten vervollstaendigen
-- AUTH_REQUIRED_FOR_ADMIN und danach AUTH_ENFORCEMENT_ENABLED schrittweise aktivieren
 
 ## Seed-Vorschlag
 
