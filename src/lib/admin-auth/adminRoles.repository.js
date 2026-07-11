@@ -1,8 +1,16 @@
 import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { toAdminError } from "./adminDiagnostics";
 
+function getReadClient() {
+  if (typeof window === "undefined") return supabase;
+  return getSupabaseBrowserClient() || supabase;
+}
+
 export async function fetchAdminProfile(userId, email) {
-  const byId = await supabase
+  const client = getReadClient();
+
+  const byId = await client
     .from("admin_profiles")
     .select("*")
     .eq("id", userId)
@@ -23,7 +31,7 @@ export async function fetchAdminProfile(userId, email) {
     return byId;
   }
 
-  const byEmail = await supabase
+  const byEmail = await client
     .from("admin_profiles")
     .select("*")
     .eq("email", email)
@@ -40,7 +48,9 @@ export async function fetchAdminProfile(userId, email) {
 }
 
 export async function fetchAdminRoles({ onlyActive = true } = {}) {
-  let query = supabase
+  const client = getReadClient();
+
+  let query = client
     .from("admin_roles")
     .select("*")
     .order("sort_order", { ascending: true })
@@ -54,7 +64,9 @@ export async function fetchAdminRoles({ onlyActive = true } = {}) {
 }
 
 export async function fetchAdminPermissions({ category } = {}) {
-  let query = supabase
+  const client = getReadClient();
+
+  let query = client
     .from("admin_permissions")
     .select("*")
     .order("category", { ascending: true })
@@ -68,7 +80,9 @@ export async function fetchAdminPermissions({ category } = {}) {
 }
 
 export async function fetchUserRoleLinks(userId) {
-  return await supabase
+  const client = getReadClient();
+
+  return await client
     .from("admin_user_roles")
     .select("user_id, role_id, is_primary, created_at")
     .eq("user_id", userId);
@@ -77,7 +91,9 @@ export async function fetchUserRoleLinks(userId) {
 export async function fetchRolesByIds(roleIds = []) {
   if (!roleIds.length) return { data: [], error: null };
 
-  return await supabase
+  const client = getReadClient();
+
+  return await client
     .from("admin_roles")
     .select("*")
     .in("id", roleIds)
@@ -88,7 +104,9 @@ export async function fetchRolesByIds(roleIds = []) {
 export async function fetchRolePermissionsByRoleIds(roleIds = []) {
   if (!roleIds.length) return { data: [], error: null };
 
-  return await supabase
+  const client = getReadClient();
+
+  return await client
     .from("admin_role_permissions")
     .select("role_id, permission_id")
     .in("role_id", roleIds);
@@ -97,7 +115,9 @@ export async function fetchRolePermissionsByRoleIds(roleIds = []) {
 export async function fetchPermissionsByIds(permissionIds = []) {
   if (!permissionIds.length) return { data: [], error: null };
 
-  return await supabase
+  const client = getReadClient();
+
+  return await client
     .from("admin_permissions")
     .select("*")
     .in("id", permissionIds)

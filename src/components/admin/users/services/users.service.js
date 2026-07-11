@@ -3,10 +3,11 @@ import {
   loadAdminRoles,
 } from "@/lib/admin-auth/adminAuth.service";
 import { getAdminUserCreateCapabilities } from "@/lib/admin-auth/adminUserInvite.service";
-import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import {
-  assertBrowserSession,
   buildRlsHint,
+  formatSupabaseError,
+  getBrowserAuthState,
+  isLikelyRlsError,
   isBrowserRuntime,
   toAdminError,
 } from "@/lib/admin-auth/adminDiagnostics";
@@ -105,15 +106,66 @@ function enrichUser(
 }
 
 export async function getAdminUsersPageData() {
-  if (isBrowserRuntime()) {
-    await assertBrowserSession("admin-users");
-  }
-
   let currentUserId = null;
+  let loadState = {
+    status: "ready",
+    authInitDone: !isBrowserRuntime(),
+    hasSession: true,
+    hasUser: true,
+    errorCode: null,
+    message: "",
+  };
+
   if (isBrowserRuntime()) {
-    const supabaseBrowser = getSupabaseBrowserClient();
-    const { data: authData } = await supabaseBrowser.auth.getUser();
-    currentUserId = authData?.user?.id || null;
+    const authState = await getBrowserAuthState("admin-users");
+    loadState = {
+      status: authState.hasSession ? "ready" : "no-session",
+      authInitDone: authState.authInitDone,
+      hasSession: authState.hasSession,
+      hasUser: authState.hasUser,
+      errorCode: authState.errorCode,
+      message: authState.message,
+    };
+
+    if (!authState.hasSession) {
+      return {
+        users: [],
+        roles: [],
+        currentUserId: null,
+        createCapabilities: getAdminUserCreateCapabilities(),
+        stats: {
+          totalUsers: 0,
+          activeUsers: 0,
+          inactiveUsers: 0,
+          totalRoles: 0,
+        },
+        loadState,
+      };
+    }
+
+    if (!authState.hasUser) {
+      return {
+        users: [],
+        roles: [],
+        currentUserId: null,
+        createCapabilities: getAdminUserCreateCapabilities(),
+        stats: {
+          totalUsers: 0,
+          activeUsers: 0,
+          inactiveUsers: 0,
+          totalRoles: 0,
+        },
+        loadState: {
+          ...loadState,
+          status: "auth-error",
+          message:
+            authState.message ||
+            "Session vorhanden, aber Benutzer konnte nicht geladen werden.",
+        },
+      };
+    }
+
+    currentUserId = authState.user?.id || null;
   }
 
   const [
@@ -128,8 +180,27 @@ export async function getAdminUsersPageData() {
     loadAdminPermissions(),
   ]);
 
-  if (profilesError) throw toAdminError("admin_profiles", profilesError);
-  if (roleLinksError) throw toAdminError("admin_user_roles", roleLinksError);
+  if (profilesError) {
+    const message = formatSupabaseError(
+      profilesError,
+      "admin_profiles konnten nicht geladen werden.",
+    );
+    if (isLikelyRlsError(message)) {
+      throw buildRlsHint("admin-users", ["admin_profiles"]);
+    }
+    throw toAdminError("admin_profiles", profilesError);
+  }
+
+  if (roleLinksError) {
+    const message = formatSupabaseError(
+      roleLinksError,
+      "admin_user_roles konnten nicht geladen werden.",
+    );
+    if (isLikelyRlsError(message)) {
+      throw buildRlsHint("admin-users", ["admin_user_roles"]);
+    }
+    throw toAdminError("admin_user_roles", roleLinksError);
+  }
 
   const roleById = new Map((roles || []).map((role) => [role.id, role]));
   const permissionById = new Map(
@@ -140,20 +211,14 @@ export async function getAdminUsersPageData() {
   const { data: rolePermissions, error: rolePermissionsError } =
     await fetchRolePermissionsByRoleIds(roleIds);
   if (rolePermissionsError) {
+    const message = formatSupabaseError(
+      rolePermissionsError,
+      "admin_role_permissions konnten nicht geladen werden.",
+    );
+    if (isLikelyRlsError(message)) {
+      throw buildRlsHint("admin-users", ["admin_role_permissions"]);
+    }
     throw toAdminError("admin_role_permissions", rolePermissionsError);
-  }
-
-  if (
-    isBrowserRuntime() &&
-    !profiles?.length &&
-    !roles?.length &&
-    !permissions?.length
-  ) {
-    throw buildRlsHint("admin-users", [
-      "admin_profiles",
-      "admin_roles",
-      "admin_permissions",
-    ]);
   }
 
   const permissionIdsByRole = buildPermissionIdsByRole(rolePermissions || []);
@@ -182,6 +247,7 @@ export async function getAdminUsersPageData() {
     roles: roles || [],
     currentUserId,
     createCapabilities,
+    loadState,
     stats: {
       totalUsers: users.length,
       activeUsers: users.filter((user) => user.is_active).length,

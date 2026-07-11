@@ -13,11 +13,12 @@ export default function ProfileMenu() {
   const ref = useRef(null);
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [loadingContext, setLoadingContext] = useState(true);
   const [userState, setUserState] = useState({
     isLoggedIn: false,
     name: "Admin",
-    roleLabel: "Keine Rolle",
-    statusLabel: "Nicht angemeldet",
+    roleLabel: "Laedt...",
+    statusLabel: "Laedt...",
     email: "",
   });
 
@@ -33,22 +34,30 @@ export default function ProfileMenu() {
   }, []);
 
   async function loadAuthContext() {
+    setLoadingContext(true);
     const context = await getCurrentAdminContext();
     if (context?.debugError) {
       logAdminDebugError("profile-menu", context.debugError);
     }
-    const primaryRoleName =
-      context?.primaryRole?.name ||
-      context?.roles?.find((role) => role?.is_primary)?.name ||
-      context?.roles?.[0]?.name ||
-      "Keine Rolle";
+    const hasLoadedRoles = Array.isArray(context?.roles);
+    const primaryRoleName = !context?.user?.id
+      ? "-"
+      : !hasLoadedRoles
+        ? "Fehler"
+        : context?.primaryRole?.name ||
+          context?.roles?.find((role) => role?.is_primary)?.name ||
+          context?.roles?.[0]?.name ||
+          "Keine Rolle";
+
+    const hasProfile = Boolean(context?.hasAdminProfile);
+    const profileActive = context?.profile?.is_active ?? context?.profile?.isActive;
     const statusLabel = !context?.user?.id
       ? "Nicht angemeldet"
-      : !context?.hasAdminProfile
+      : !hasProfile
         ? "Kein Profil"
-        : context?.isActive
-          ? "Aktiv"
-          : "Inaktiv";
+        : profileActive === false
+          ? "Inaktiv"
+          : "Aktiv";
     const profileName =
       context?.fullName ||
       context?.profile?.full_name ||
@@ -66,6 +75,7 @@ export default function ProfileMenu() {
       statusLabel,
       email: context?.user?.email || "",
     });
+    setLoadingContext(false);
   }
 
   useEffect(() => {

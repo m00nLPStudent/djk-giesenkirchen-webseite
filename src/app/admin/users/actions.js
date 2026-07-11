@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import {
   createAdminProfile,
+  fetchAdminProfileById,
   updateAdminProfileById,
   updateAdminProfileStatus,
 } from "@/lib/admin-auth/adminProfiles.repository";
@@ -15,12 +16,15 @@ import {
 } from "@/lib/admin-auth/adminDiagnostics";
 import { createServerActionSupabaseClient } from "@/lib/supabase.server";
 import {
-  buildCreateFailureMessage,
   getActorContext,
   replaceUserRoleLinks,
-  rollbackCreatedUserState,
+  validateSelfSuperadminRoleChange,
   withRlsHint,
 } from "@/components/admin/users/services/usersActionWriteHelpers";
+import {
+  buildCreateFailureMessage,
+  rollbackCreatedUserState,
+} from "@/components/admin/users/services/usersActionCreateHelpers";
 
 export async function saveAdminUserAction({ userId, values, currentUserId }) {
   const supabaseServer = await createServerActionSupabaseClient();
@@ -138,6 +142,62 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
     };
   }
 
+  const selfSuperadminValidation = await validateSelfSuperadminRoleChange({
+    userId,
+    currentUserId,
+    payload,
+    supabaseServer,
+  });
+
+  if (!selfSuperadminValidation.ok) {
+    return {
+      ok: false,
+      reason: selfSuperadminValidation.reason,
+      message: selfSuperadminValidation.message,
+      errors: selfSuperadminValidation.errors,
+    };
+  }
+
+  const roleResult = await replaceUserRoleLinks(userId, payload, supabaseServer);
+  if (!roleResult.ok) {
+    return roleResult;
+  }
+
+  const { data: existingProfile, error: profileReadError } =
+    await fetchAdminProfileById(userId, supabaseServer);
+
+  if (profileReadError) {
+    return {
+      ok: false,
+      reason: isLikelyRlsError(profileReadError.message || "")
+        ? "rls-blocked"
+        : "write-failed",
+      message: withRlsHint(
+        formatSupabaseError(
+          profileReadError,
+          "Profil konnte nicht gelesen werden.",
+        ),
+      ),
+      needsRlsWritePolicy: isLikelyRlsError(profileReadError.message || ""),
+    };
+  }
+
+  const profileNeedsUpdate = Boolean(
+    !existingProfile ||
+      (existingProfile.full_name || "") !== payload.full_name ||
+      Boolean(existingProfile.is_active !== false) !== payload.is_active,
+  );
+
+  if (!profileNeedsUpdate) {
+    revalidatePath("/admin/users");
+    return {
+      ok: true,
+      message: roleResult.changed
+        ? "Benutzerrollen wurden aktualisiert."
+        : "Keine Aenderungen erkannt.",
+    };
+  }
+
   const { error: profileUpdateError } = await updateAdminProfileById(
     userId,
     {
@@ -164,17 +224,13 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
     };
   }
 
-  const roleResult = await replaceUserRoleLinks(
-    userId,
-    payload,
-    supabaseServer,
-  );
-  if (!roleResult.ok) {
-    return roleResult;
-  }
-
   revalidatePath("/admin/users");
-  return { ok: true, message: "Benutzer wurde aktualisiert." };
+  return {
+    ok: true,
+    message: roleResult.changed
+      ? "Benutzer und Rollen wurden aktualisiert."
+      : "Benutzer wurde aktualisiert.",
+  };
 }
 
 export async function updateAdminUserStatusAction({

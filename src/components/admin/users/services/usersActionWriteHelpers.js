@@ -1,9 +1,8 @@
-import { deleteAdminProfileById } from "@/lib/admin-auth/adminProfiles.repository";
 import {
-  deleteUserRoleLinksByUserId,
-  insertUserRoleLinks,
+  deleteUserRoleLinksByRoleIds,
+  fetchUserRoleLinksByUserId,
+  upsertUserRoleLinks,
 } from "@/lib/admin-auth/userRoles.repository";
-import { deleteAdminAuthUserById } from "@/lib/admin-auth/adminUserInvite.service";
 import { buildRoleLinksPayload } from "@/components/admin/users/helpers/users.payload";
 import {
   formatSupabaseError,
@@ -17,6 +16,111 @@ function uniqueValues(values = []) {
 export function withRlsHint(message) {
   if (!isLikelyRlsError(message || "")) return message;
   return `${message} Zum Schreiben fehlen noch die RLS-Write-Policies. Bitte admin-users-rls-write.sql ausfuehren.`;
+}
+
+function linksByRoleId(roleLinks = []) {
+  return (roleLinks || []).reduce((acc, row) => {
+    if (!row?.role_id) return acc;
+    acc[row.role_id] = Boolean(row.is_primary);
+    return acc;
+  }, {});
+}
+
+function roleIdsFromLinks(roleLinks = []) {
+  return uniqueValues((roleLinks || []).map((row) => row.role_id));
+}
+
+function areRoleLinksEqual(existingLinks = [], desiredLinks = []) {
+  const existingMap = linksByRoleId(existingLinks);
+  const desiredMap = linksByRoleId(desiredLinks);
+  const allRoleIds = uniqueValues([
+    ...Object.keys(existingMap),
+    ...Object.keys(desiredMap),
+  ]);
+
+  return allRoleIds.every((roleId) => {
+    const existsInCurrent = Object.prototype.hasOwnProperty.call(
+      existingMap,
+      roleId,
+    );
+    const existsInDesired = Object.prototype.hasOwnProperty.call(
+      desiredMap,
+      roleId,
+    );
+
+    if (existsInCurrent !== existsInDesired) return false;
+    return Boolean(existingMap[roleId]) === Boolean(desiredMap[roleId]);
+  });
+}
+
+async function getSuperadminRoleId(supabaseServer) {
+  const { data, error } = await supabaseServer
+    .from("admin_roles")
+    .select("id")
+    .eq("key", "superadmin")
+    .maybeSingle();
+
+  if (error) {
+    return {
+      ok: false,
+      message: formatSupabaseError(
+        error,
+        "Superadmin-Rolle konnte nicht geladen werden.",
+      ),
+    };
+  }
+
+  return { ok: true, roleId: data?.id || null };
+}
+
+async function enforceSelfSuperadminProtection({
+  userId,
+  currentUserId,
+  existingLinks,
+  desiredLinks,
+  supabaseServer,
+}) {
+  if (!userId || !currentUserId || userId !== currentUserId) {
+    return { ok: true };
+  }
+
+  const superadminRole = await getSuperadminRoleId(supabaseServer);
+  if (!superadminRole.ok) {
+    return {
+      ok: false,
+      reason: "actor-check-failed",
+      message: superadminRole.message,
+    };
+  }
+
+  if (!superadminRole.roleId) {
+    return { ok: true };
+  }
+
+  const existingRoleIds = roleIdsFromLinks(existingLinks);
+  const currentlySuperadmin = existingRoleIds.includes(superadminRole.roleId);
+  if (!currentlySuperadmin) {
+    return { ok: true };
+  }
+
+  const desiredMap = linksByRoleId(desiredLinks);
+  const hasSuperadmin = superadminRole.roleId in desiredMap;
+  const superadminIsPrimary = Boolean(desiredMap[superadminRole.roleId]);
+
+  if (!hasSuperadmin || !superadminIsPrimary) {
+    return {
+      ok: false,
+      reason: "self-superadmin-protected",
+      message:
+        "Eigene Superadmin-Rolle kann hier nicht entfernt oder als primaere Rolle abgesetzt werden.",
+      errors: {
+        primary_role_id:
+          "Beim eigenen Superadmin-Benutzer muss Superadmin primaere Rolle bleiben.",
+      },
+    };
+  }
+
+  return { ok: true };
 }
 
 export async function getActorContext(supabaseServer) {
@@ -94,103 +198,114 @@ export async function getActorContext(supabaseServer) {
 }
 
 export async function replaceUserRoleLinks(userId, payload, supabaseServer) {
-  const roleLinksPayload = buildRoleLinksPayload(userId, payload);
+  const { data: existingLinks, error: existingError } =
+    await fetchUserRoleLinksByUserId(userId, supabaseServer);
 
-  const { error: deleteError } = await deleteUserRoleLinksByUserId(
-    userId,
-    supabaseServer,
-  );
-  if (deleteError) {
+  if (existingError) {
     return {
       ok: false,
-      reason: isLikelyRlsError(deleteError.message || "")
+      reason: isLikelyRlsError(existingError.message || "")
         ? "rls-blocked"
         : "write-failed",
       message: withRlsHint(
         formatSupabaseError(
-          deleteError,
-          "Rollen konnten nicht aktualisiert werden.",
+          existingError,
+          "Aktuelle Rollen konnten nicht geladen werden.",
         ),
       ),
-      needsRlsWritePolicy: isLikelyRlsError(deleteError.message || ""),
+      needsRlsWritePolicy: isLikelyRlsError(existingError.message || ""),
     };
   }
 
-  const { error: insertError } = await insertUserRoleLinks(
-    roleLinksPayload,
+  const desiredLinks = buildRoleLinksPayload(userId, payload);
+  const hasRoleChanges = !areRoleLinksEqual(existingLinks || [], desiredLinks);
+  if (!hasRoleChanges) {
+    return { ok: true, changed: false, needsRlsWritePolicy: false };
+  }
+
+  const { error: upsertError } = await upsertUserRoleLinks(
+    desiredLinks,
     supabaseServer,
   );
-  if (insertError) {
+  if (upsertError) {
     return {
       ok: false,
-      reason: isLikelyRlsError(insertError.message || "")
+      reason: isLikelyRlsError(upsertError.message || "")
         ? "rls-blocked"
         : "write-failed",
       message: withRlsHint(
         formatSupabaseError(
-          insertError,
+          upsertError,
           "Rollen konnten nicht gespeichert werden.",
         ),
       ),
-      needsRlsWritePolicy: isLikelyRlsError(insertError.message || ""),
+      needsRlsWritePolicy: isLikelyRlsError(upsertError.message || ""),
     };
   }
 
-  return { ok: true, needsRlsWritePolicy: false };
-}
+  const existingRoleIds = roleIdsFromLinks(existingLinks || []);
+  const desiredRoleIds = roleIdsFromLinks(desiredLinks);
+  const roleIdsToDelete = existingRoleIds.filter(
+    (roleId) => !desiredRoleIds.includes(roleId),
+  );
 
-export async function rollbackCreatedUserState(
-  userId,
-  supabaseServer,
-  { removeProfile = false } = {},
-) {
-  const cleanup = {
-    profileDeleted: false,
-    authUserDeleted: false,
-    errors: [],
-  };
-
-  if (removeProfile) {
-    const { error: profileDeleteError } = await deleteAdminProfileById(
-      userId,
-      supabaseServer,
-    );
-    if (profileDeleteError) {
-      cleanup.errors.push(
-        withRlsHint(
-          formatSupabaseError(
-            profileDeleteError,
-            "Rollback: admin_profiles konnte nicht bereinigt werden.",
-          ),
+  const { error: deleteRemovedError } = await deleteUserRoleLinksByRoleIds(
+    userId,
+    roleIdsToDelete,
+    supabaseServer,
+  );
+  if (deleteRemovedError) {
+    return {
+      ok: false,
+      reason: isLikelyRlsError(deleteRemovedError.message || "")
+        ? "rls-blocked"
+        : "write-failed",
+      message: withRlsHint(
+        formatSupabaseError(
+          deleteRemovedError,
+          "Rollen konnten nicht vollstaendig aktualisiert werden. Bestehende Rollen wurden nicht geloescht, bevor neue Rollen gespeichert waren.",
         ),
-      );
-    } else {
-      cleanup.profileDeleted = true;
-    }
+      ),
+      needsRlsWritePolicy: isLikelyRlsError(deleteRemovedError.message || ""),
+    };
   }
 
-  const authCleanupResult = await deleteAdminAuthUserById(userId);
-  if (!authCleanupResult.ok) {
-    cleanup.errors.push(
-      authCleanupResult.message ||
-        "Rollback: Auth-Benutzer konnte nicht bereinigt werden.",
-    );
-  } else {
-    cleanup.authUserDeleted = true;
-  }
-
-  return cleanup;
+  return {
+    ok: true,
+    changed: true,
+    needsRlsWritePolicy: false,
+  };
 }
 
-export function buildCreateFailureMessage(baseMessage, cleanup) {
-  if (!cleanup.errors.length) {
-    return `${baseMessage} Rollback erfolgreich: unvollstaendiger Benutzer wurde automatisch bereinigt.`;
+export async function validateSelfSuperadminRoleChange({
+  userId,
+  currentUserId,
+  payload,
+  supabaseServer,
+}) {
+  const { data: existingLinks, error } = await fetchUserRoleLinksByUserId(
+    userId,
+    supabaseServer,
+  );
+
+  if (error) {
+    return {
+      ok: false,
+      reason: isLikelyRlsError(error.message || "")
+        ? "rls-blocked"
+        : "write-failed",
+      message: withRlsHint(
+        formatSupabaseError(error, "Aktuelle Rollen konnten nicht geladen werden."),
+      ),
+    };
   }
 
-  return [
-    baseMessage,
-    "Teilzustand erkannt. Automatischer Cleanup war nicht vollstaendig.",
-    "Manueller Cleanup erforderlich (Auth-Benutzer/Admin-Profil/Rollenzuordnungen pruefen).",
-    `Details: ${cleanup.errors.join(" | ")}`,
-  ].join(" ");
+  const desiredLinks = buildRoleLinksPayload(userId, payload);
+  return await enforceSelfSuperadminProtection({
+    userId,
+    currentUserId,
+    existingLinks: existingLinks || [],
+    desiredLinks,
+    supabaseServer,
+  });
 }

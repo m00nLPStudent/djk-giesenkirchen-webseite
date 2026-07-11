@@ -1,29 +1,22 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { loadAdminAuthContext } from "./adminAuth.service";
 import {
+  getBrowserAuthState,
   formatSupabaseError,
   logAdminDebugError,
   toAdminError,
 } from "./adminDiagnostics";
 
 export async function getCurrentSession() {
-  const supabaseBrowser = getSupabaseBrowserClient();
-  const { data, error } = await supabaseBrowser.auth.getSession();
-  if (error) {
-    throw toAdminError("auth.getSession", error);
-  }
-
-  return data?.session || null;
+  const authState = await getBrowserAuthState("admin-session");
+  if (!authState.hasSession) return null;
+  return authState.session || null;
 }
 
 export async function getCurrentUser() {
-  const supabaseBrowser = getSupabaseBrowserClient();
-  const { data, error } = await supabaseBrowser.auth.getUser();
-  if (error) {
-    throw toAdminError("auth.getUser", error);
-  }
-
-  return data?.user || null;
+  const authState = await getBrowserAuthState("admin-session");
+  if (!authState.hasSession || !authState.hasUser) return null;
+  return authState.user || null;
 }
 
 export async function getCurrentAdminProfile() {
@@ -103,6 +96,47 @@ export async function getCurrentAdminContext() {
         .join(" ") ||
       user?.email ||
       "Admin";
+    const profileActive =
+      resolvedProfile?.is_active ?? resolvedProfile?.isActive ?? false;
+    const normalizedIsActive = Boolean(profileActive);
+
+    if (process.env.NODE_ENV === "development") {
+      console.info("[admin-context] auth", {
+        userId: user?.id || null,
+        email: user?.email || null,
+      });
+      console.info("[admin-context] profile", {
+        id: resolvedProfile?.id || null,
+        full_name: resolvedProfile?.full_name || null,
+        is_active: resolvedProfile?.is_active,
+      });
+      console.info(
+        "[admin-context] roles.links",
+        (resolvedRoles || []).map((role) => ({
+          user_id: user?.id || null,
+          role_id: role?.id || role?.role_id || null,
+          is_primary: Boolean(role?.is_primary),
+        })),
+      );
+      console.info(
+        "[admin-context] roles.resolved",
+        (resolvedRoles || []).map((role) => ({
+          key: role?.key || null,
+          name: role?.name || null,
+          is_primary: Boolean(role?.is_primary),
+        })),
+      );
+      console.info("[admin-context] primary-role", {
+        key: primaryRole?.key || null,
+        name: primaryRole?.name || null,
+      });
+      console.info("[admin-context] normalized", {
+        hasAdminProfile: Boolean(resolvedProfile?.id),
+        isActive: normalizedIsActive,
+        roles: (resolvedRoles || []).length,
+        primaryRole: primaryRole?.key || null,
+      });
+    }
 
     return {
       session,
@@ -114,7 +148,7 @@ export async function getCurrentAdminContext() {
       primaryRole,
       permissions: authContext?.permissions || [],
       permissionSet: authContext?.permissionSet || new Set(),
-      isActive: Boolean(authContext?.isActive),
+      isActive: normalizedIsActive,
       hasAdminProfile: Boolean(resolvedProfile?.id),
       isSuperAdmin: Boolean(
         resolvedRoles.some((role) => role?.key === "superadmin"),

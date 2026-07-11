@@ -29,6 +29,7 @@ export default function UserEditorForm({
   initialValues,
   loading,
   currentUserId,
+  selfSuperadminRoleId,
   onSubmit,
   message,
   formErrors,
@@ -77,6 +78,19 @@ export default function UserEditorForm({
 
   const isEditingSelf =
     mode === "edit" && values?.id && currentUserId === values.id;
+  const lockOwnSuperadmin = Boolean(isEditingSelf && selfSuperadminRoleId);
+
+  useEffect(() => {
+    if (!lockOwnSuperadmin) return;
+
+    setValues((current) => ({
+      ...current,
+      primary_role_id: selfSuperadminRoleId,
+      additional_role_ids: uniqueRoleIds(current.additional_role_ids).filter(
+        (roleId) => roleId !== selfSuperadminRoleId,
+      ),
+    }));
+  }, [lockOwnSuperadmin, selfSuperadminRoleId]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -128,6 +142,12 @@ export default function UserEditorForm({
         </p>
       ) : null}
 
+      {lockOwnSuperadmin ? (
+        <p className="rounded-xl border border-amber-300/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+          Eigene Superadmin-Rolle kann hier nicht entfernt werden.
+        </p>
+      ) : null}
+
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2">
           <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
@@ -135,6 +155,7 @@ export default function UserEditorForm({
           </span>
           <select
             value={values.primary_role_id}
+            disabled={lockOwnSuperadmin}
             onChange={(event) => handlePrimaryRoleChange(event.target.value)}
             className="h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-sm text-white"
           >

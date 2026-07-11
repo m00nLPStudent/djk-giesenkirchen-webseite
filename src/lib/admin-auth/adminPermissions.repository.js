@@ -1,4 +1,10 @@
 import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
+
+function getReadClient() {
+  if (typeof window === "undefined") return supabase;
+  return getSupabaseBrowserClient() || supabase;
+}
 
 export async function fetchAdminPermissionByKey(key) {
   return await supabase
@@ -26,7 +32,9 @@ export async function updateAdminPermission(permissionId, payload) {
 }
 
 export async function fetchAllRolePermissionLinks() {
-  return await supabase
+  const client = getReadClient();
+
+  return await client
     .from("admin_role_permissions")
     .select("role_id, permission_id, created_at")
     .order("created_at", { ascending: true });

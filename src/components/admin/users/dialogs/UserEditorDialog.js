@@ -31,6 +31,10 @@ export default function UserEditorDialog({
   const [formErrors, setFormErrors] = useState({});
   const initialValues = useMemo(() => mapInitialValues(user), [user]);
   const isCreateFlowEnabled = Boolean(createCapabilities?.createFlowEnabled);
+  const selfSuperadminRoleId = useMemo(() => {
+    if (!user?.id || user.id !== currentUserId) return null;
+    return (user.roles || []).find((role) => role?.key === "superadmin")?.id || null;
+  }, [user, currentUserId]);
 
   if (!open) return null;
 
@@ -93,6 +97,7 @@ export default function UserEditorDialog({
             initialValues={initialValues}
             loading={loading}
             currentUserId={currentUserId}
+            selfSuperadminRoleId={selfSuperadminRoleId}
             onSubmit={handleSubmit}
             message={message}
             formErrors={formErrors}

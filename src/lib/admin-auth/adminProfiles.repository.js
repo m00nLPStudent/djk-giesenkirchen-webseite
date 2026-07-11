@@ -1,10 +1,29 @@
 import { supabase } from "@/lib/supabase";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
+
+function getReadClient() {
+  if (typeof window === "undefined") return supabase;
+  return getSupabaseBrowserClient() || supabase;
+}
 
 export async function fetchAdminProfiles() {
-  return await supabase
+  const client = getReadClient();
+
+  return await client
     .from("admin_profiles")
     .select("*")
     .order("created_at", { ascending: false });
+}
+
+export async function fetchAdminProfileById(
+  profileId,
+  client = getReadClient(),
+) {
+  return await client
+    .from("admin_profiles")
+    .select("id, full_name, is_active")
+    .eq("id", profileId)
+    .maybeSingle();
 }
 
 export async function createAdminProfile(payload, client = supabase) {

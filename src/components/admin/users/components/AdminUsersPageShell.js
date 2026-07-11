@@ -22,6 +22,8 @@ import {
 export default function AdminUsersPageShell({ initialData }) {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [authRetryCount, setAuthRetryCount] = useState(0);
   const [runtimeData, setRuntimeData] = useState(initialData);
 
   useEffect(() => {
@@ -32,9 +34,32 @@ export default function AdminUsersPageShell({ initialData }) {
         const nextData = await getAdminUsersPageData();
         if (!active) return;
         setRuntimeData(nextData);
+
+        const loadState = nextData?.loadState;
+        if (loadState?.status === "no-session") {
+          setNotice("Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.");
+          setError("");
+
+          if (authRetryCount < 2) {
+            window.setTimeout(() => {
+              setAuthRetryCount((count) => count + 1);
+            }, 700);
+          }
+          return;
+        }
+
+        if (loadState?.status === "auth-error") {
+          setNotice("");
+          setError(loadState.message || "Benutzer konnte nicht geladen werden.");
+          return;
+        }
+
+        setNotice("");
+        setError("");
       } catch (loadError) {
         if (!active) return;
         logAdminDebugError("admin-users", loadError);
+        setNotice("");
         setError(
           `Daten konnten nicht geladen werden: ${getReadableErrorMessage(
             loadError,
@@ -49,7 +74,7 @@ export default function AdminUsersPageShell({ initialData }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [authRetryCount]);
 
   const vm = useAdminUsersViewModel(runtimeData);
 
@@ -118,6 +143,12 @@ export default function AdminUsersPageShell({ initialData }) {
       {error && (
         <p className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
           {error}
+        </p>
+      )}
+
+      {!error && notice && (
+        <p className="rounded-xl border border-amber-300/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          {notice}
         </p>
       )}
 
