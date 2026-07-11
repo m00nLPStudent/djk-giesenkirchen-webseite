@@ -42,12 +42,18 @@ export default function AdminRouteGuard({ children, route, userContext }) {
     return children;
   }
 
-  if (!AUTH_ENFORCEMENT_ENABLED) {
+  const isPublicAuthRoute =
+    pathname === "/admin/login" ||
+    pathname === "/admin/forgot-password" ||
+    pathname === "/admin/set-password" ||
+    pathname === "/admin/unauthorized";
+
+  if (isPublicAuthRoute) {
     return children;
   }
 
   if (!resolved) {
-    return children;
+    return null;
   }
 
   if (result.allow) {

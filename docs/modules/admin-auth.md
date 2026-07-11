@@ -258,6 +258,36 @@ Neue Auth-Services und Helpers:
 Neue Auth-Routen:
 
 - /admin/login
+
+## B11.1 Login ist verpflichtend, Enforcement bleibt aus
+
+Zentraler Status:
+
+- `AUTH_REQUIRED_FOR_ADMIN = true`
+- `AUTH_ENFORCEMENT_ENABLED = false`
+
+Wirkung von B11.1:
+
+- Der gesamte Adminbereich verlangt nun eine Login-Session.
+- `/admin/login`, `/admin/forgot-password`, `/admin/set-password` und `/admin/unauthorized` bleiben ohne Session erreichbar.
+- Fehlende Session wird nach `/admin/login?redirect=/admin/...` umgeleitet.
+- Session vorhanden, aber kein `admin_profiles`-Datensatz: Weiterleitung nach `/admin/unauthorized?reason=missing-admin-profile`.
+- Inaktive Admin-Profile: Weiterleitung nach `/admin/unauthorized?reason=inactive-user`.
+- Rollenrechte werden noch nicht erzwungen; aktive Admins ohne Enforcement können weiterhin alle Adminseiten technisch öffnen.
+
+## B11.1.1 Zentrale Schutzschicht fuer den gesamten Adminbereich
+
+Umgesetzt ueber eine zentrale Proxy-Schicht:
+
+- alle `/admin/:path*`-Routen werden vor dem Rendern geprueft
+- fehlende Session fuehrt direkt zu `/admin/login?redirect=/admin/...`
+- fehlendes Profil oder inaktiver Account fuehrt direkt zu `/admin/unauthorized`
+- `AUTH_ENFORCEMENT_ENABLED = false` bleibt unveraendert und betrifft weiter nur Permissions, nicht die Login-Pflicht
+- aktive Datei: [`src/proxy.js`](../../src/proxy.js)
+
+Nächste Phase:
+
+- B11.2: Permission-Enforcement aktivieren (Sidebar, Buttons, Route-Pruefungen)
 - /admin/forgot-password (vorbereiteter Reset-Flow)
 - /admin/unauthorized (bereits vorhanden)
 

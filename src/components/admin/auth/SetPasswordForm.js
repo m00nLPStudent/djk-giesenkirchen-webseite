@@ -21,7 +21,8 @@ async function resolveRecoverySession(supabaseBrowser) {
     if (error) {
       return {
         ok: false,
-        message: error.message || "Einladungslink konnte nicht verarbeitet werden.",
+        message:
+          error.message || "Einladungslink konnte nicht verarbeitet werden.",
       };
     }
   }
@@ -40,7 +41,8 @@ async function resolveRecoverySession(supabaseBrowser) {
     if (error) {
       return {
         ok: false,
-        message: error.message || "Recovery-Session konnte nicht hergestellt werden.",
+        message:
+          error.message || "Recovery-Session konnte nicht hergestellt werden.",
       };
     }
   }
@@ -144,7 +146,9 @@ export default function SetPasswordForm() {
 
     await supabaseBrowser.auth.signOut();
     setSaving(false);
-    setSuccess("Passwort wurde erfolgreich gesetzt. Weiterleitung zum Login...");
+    setSuccess(
+      "Passwort wurde erfolgreich gesetzt. Weiterleitung zum Login...",
+    );
     window.setTimeout(() => {
       router.push("/admin/login");
     }, 700);
@@ -219,14 +223,19 @@ export default function SetPasswordForm() {
 
       <button
         type="submit"
-        disabled={!hasRecoverySession || loading || saving || !validation.isValid}
+        disabled={
+          !hasRecoverySession || loading || saving || !validation.isValid
+        }
         className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-60"
       >
         {saving ? "Speichern..." : "Passwort speichern"}
       </button>
 
       <div className="text-center">
-        <Link href="/admin/login" className="text-sm text-white/60 hover:text-white">
+        <Link
+          href="/admin/login"
+          className="text-sm text-white/60 hover:text-white"
+        >
           Zum Login
         </Link>
       </div>

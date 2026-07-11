@@ -78,7 +78,10 @@ export async function createAdminUserWithInvite(payload, supabaseServer) {
     };
   }
 
-  const emailCheck = await ensureEmailIsAvailable(payload.email, supabaseServer);
+  const emailCheck = await ensureEmailIsAvailable(
+    payload.email,
+    supabaseServer,
+  );
   if (!emailCheck.ok) {
     return {
       ok: false,
@@ -94,7 +97,8 @@ export async function createAdminUserWithInvite(payload, supabaseServer) {
     return {
       ok: false,
       reason: "invite-failed",
-      message: inviteResult.message || "Benutzer konnte nicht eingeladen werden.",
+      message:
+        inviteResult.message || "Benutzer konnte nicht eingeladen werden.",
       requiresServiceRole: Boolean(inviteResult.requiresServiceRole),
     };
   }
@@ -121,7 +125,10 @@ export async function createAdminUserWithInvite(payload, supabaseServer) {
         : "write-failed",
       message: buildCreateFailureMessage(
         withRlsHint(
-          formatSupabaseError(profileError, "Profil konnte nicht erstellt werden."),
+          formatSupabaseError(
+            profileError,
+            "Profil konnte nicht erstellt werden.",
+          ),
         ),
         cleanup,
       ),
@@ -130,7 +137,11 @@ export async function createAdminUserWithInvite(payload, supabaseServer) {
     };
   }
 
-  const roleResult = await replaceUserRoleLinks(userId, payload, supabaseServer);
+  const roleResult = await replaceUserRoleLinks(
+    userId,
+    payload,
+    supabaseServer,
+  );
   if (!roleResult.ok) {
     const cleanup = await rollbackCreatedUserState(userId, supabaseServer, {
       removeProfile: true,
@@ -143,10 +154,8 @@ export async function createAdminUserWithInvite(payload, supabaseServer) {
     };
   }
 
-  const { data: savedProfile, error: profileReadError } = await fetchAdminProfileById(
-    userId,
-    supabaseServer,
-  );
+  const { data: savedProfile, error: profileReadError } =
+    await fetchAdminProfileById(userId, supabaseServer);
 
   if (profileReadError || !savedProfile?.id) {
     const cleanup = await rollbackCreatedUserState(userId, supabaseServer, {

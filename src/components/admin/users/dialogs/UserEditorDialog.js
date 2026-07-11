@@ -32,7 +32,9 @@ export default function UserEditorDialog({
   const initialValues = useMemo(() => mapInitialValues(user), [user]);
   const isCreateFlowEnabled = Boolean(createCapabilities?.createFlowEnabled);
   const missingConfig = createCapabilities?.missingConfig || [];
-  const isMissingServiceRole = missingConfig.includes("SUPABASE_SERVICE_ROLE_KEY");
+  const isMissingServiceRole = missingConfig.includes(
+    "SUPABASE_SERVICE_ROLE_KEY",
+  );
   const selfSuperadminRoleId = useMemo(() => {
     if (!user?.id || user.id !== currentUserId) return null;
     return (

@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-11
+
+### Phase B11.1.1 Zentrale Auth-Pflicht fuer den Adminbereich
+
+- zentrale Middleware schirmt nun den gesamten Adminbereich vor dem Rendern ab
+- ausgeloggte Besucher werden sicher nach `/admin/login?redirect=/admin/...` umgeleitet
+- Admin-Profile und Aktivstatus werden serverseitig vor dem Rendern geprueft
+- `AUTH_REQUIRED_FOR_ADMIN = true` bleibt aktiv, `AUTH_ENFORCEMENT_ENABLED = false` bleibt unveraendert
+
+### Phase B11.1 Admin-Login verpflichtend aktiviert
+
+- `AUTH_REQUIRED_FOR_ADMIN = true` gesetzt
+- `AUTH_ENFORCEMENT_ENABLED = false` beibehalten
+- `/admin` und Unterseiten verlangen jetzt eine Login-Session
+- Fehlende Session wird sicher nach `/admin/login?redirect=/admin/...` umgeleitet
+- Inaktive oder profillose Admin-Accounts werden nach `/admin/unauthorized` geleitet
+- `/admin/login`, `/admin/forgot-password`, `/admin/set-password` und `/admin/unauthorized` bleiben erreichbar
+- Permission-Enforcement bleibt bewusst aus; B11.2 folgt separat
+
 ## 2026-07-06
 
 ### Phase B6 Login/Logout/Auth-Flow vorbereitet (nicht verpflichtend)

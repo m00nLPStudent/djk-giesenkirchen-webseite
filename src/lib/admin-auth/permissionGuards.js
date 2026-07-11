@@ -5,6 +5,10 @@ import {
 import { AUTH_ENFORCEMENT_ENABLED } from "./adminPermissionConfig";
 import { canAccessAdminRoute } from "./permissionEngine";
 import { normalizeUserContext } from "./permissionFallbacks";
+import {
+  buildLoginRedirectTarget,
+  normalizeAdminRedirectPath,
+} from "./adminAuthRedirects";
 
 function isPublicAuthRoute(route = "") {
   return ADMIN_AUTH_PUBLIC_ROUTES.some((entry) => route.startsWith(entry));
@@ -25,7 +29,9 @@ export function resolveAdminRouteGuardResult({ userContext, route }) {
     return {
       allow: false,
       reason: "missing-session",
-      redirectTo: "/admin/login",
+      redirectTo: `/admin/login?redirect=${encodeURIComponent(
+        buildLoginRedirectTarget(normalizeAdminRedirectPath(route || "/admin")),
+      )}`,
     };
   }
 
@@ -33,7 +39,7 @@ export function resolveAdminRouteGuardResult({ userContext, route }) {
     return {
       allow: false,
       reason: "missing-admin-profile",
-      redirectTo: "/admin/unauthorized",
+      redirectTo: "/admin/unauthorized?reason=missing-admin-profile",
     };
   }
 
@@ -41,7 +47,7 @@ export function resolveAdminRouteGuardResult({ userContext, route }) {
     return {
       allow: false,
       reason: "inactive-user",
-      redirectTo: "/admin/unauthorized",
+      redirectTo: "/admin/unauthorized?reason=inactive-user",
     };
   }
 
@@ -53,7 +59,7 @@ export function resolveAdminRouteGuardResult({ userContext, route }) {
     return {
       allow: false,
       reason: "missing-permission",
-      redirectTo: "/admin/unauthorized",
+      redirectTo: "/admin/unauthorized?reason=missing-permission",
     };
   }
 

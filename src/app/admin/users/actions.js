@@ -19,9 +19,7 @@ import {
   validateSelfSuperadminRoleChange,
   withRlsHint,
 } from "@/components/admin/users/services/usersActionWriteHelpers";
-import {
-  createAdminUserWithInvite,
-} from "@/lib/admin-auth/adminUserCreate.service";
+import { createAdminUserWithInvite } from "@/lib/admin-auth/adminUserCreate.service";
 
 export async function saveAdminUserAction({ userId, values, currentUserId }) {
   const supabaseServer = await createServerActionSupabaseClient();
@@ -60,7 +58,10 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
   }
 
   if (!userId) {
-    const createResult = await createAdminUserWithInvite(payload, supabaseServer);
+    const createResult = await createAdminUserWithInvite(
+      payload,
+      supabaseServer,
+    );
 
     if (!createResult.ok) {
       return createResult;

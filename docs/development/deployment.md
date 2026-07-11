@@ -22,6 +22,6 @@ Hinweise:
 - `SUPABASE_SERVICE_ROLE_KEY` niemals als `NEXT_PUBLIC_` definieren.
 - `SUPABASE_SERVICE_ROLE_KEY` nur serverseitig verwenden.
 - Bei neuem Quick Tunnel ändert sich die URL. Danach müssen aktualisiert werden:
-	- `NEXT_PUBLIC_SITE_URL`
-	- Supabase Redirect URL Allowlist
-	- laufender Dev-Server (neu starten)
+  - `NEXT_PUBLIC_SITE_URL`
+  - Supabase Redirect URL Allowlist
+  - laufender Dev-Server (neu starten)

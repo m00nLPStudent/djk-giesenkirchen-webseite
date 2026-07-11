@@ -37,3 +37,28 @@ export function buildAdminRedirectUrl(pathname, options = {}) {
   if (!base) return "";
   return `${base}${path}`;
 }
+
+export function normalizeAdminRedirectPath(value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+
+  if (!raw.startsWith("/admin")) return "";
+  if (raw.startsWith("//")) return "";
+
+  try {
+    const url = new URL(raw, "http://localhost");
+    const pathname = `${url.pathname}${url.search}${url.hash}`;
+    return pathname.startsWith("/admin") ? pathname : "";
+  } catch {
+    return raw.startsWith("/admin") ? raw : "";
+  }
+}
+
+export function buildLoginRedirectTarget(redirectPath = "") {
+  const safePath = normalizeAdminRedirectPath(redirectPath);
+  if (!safePath || safePath === "/admin/login") {
+    return "/admin";
+  }
+
+  return safePath;
+}
