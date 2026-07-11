@@ -159,7 +159,9 @@ export async function getPermissionMatrixPageData() {
       "admin_role_permissions konnten nicht geladen werden.",
     );
     if (isLikelyRlsError(message)) {
-      throw buildRlsHint("admin-permissions-matrix", ["admin_role_permissions"]);
+      throw buildRlsHint("admin-permissions-matrix", [
+        "admin_role_permissions",
+      ]);
     }
     throw toAdminError("admin_role_permissions", linksError);
   }

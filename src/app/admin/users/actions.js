@@ -158,7 +158,11 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
     };
   }
 
-  const roleResult = await replaceUserRoleLinks(userId, payload, supabaseServer);
+  const roleResult = await replaceUserRoleLinks(
+    userId,
+    payload,
+    supabaseServer,
+  );
   if (!roleResult.ok) {
     return roleResult;
   }
@@ -184,8 +188,8 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
 
   const profileNeedsUpdate = Boolean(
     !existingProfile ||
-      (existingProfile.full_name || "") !== payload.full_name ||
-      Boolean(existingProfile.is_active !== false) !== payload.is_active,
+    (existingProfile.full_name || "") !== payload.full_name ||
+    Boolean(existingProfile.is_active !== false) !== payload.is_active,
   );
 
   if (!profileNeedsUpdate) {

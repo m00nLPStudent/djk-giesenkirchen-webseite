@@ -37,7 +37,9 @@ export default function AdminUsersPageShell({ initialData }) {
 
         const loadState = nextData?.loadState;
         if (loadState?.status === "no-session") {
-          setNotice("Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.");
+          setNotice(
+            "Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.",
+          );
           setError("");
 
           if (authRetryCount < 2) {
@@ -50,7 +52,9 @@ export default function AdminUsersPageShell({ initialData }) {
 
         if (loadState?.status === "auth-error") {
           setNotice("");
-          setError(loadState.message || "Benutzer konnte nicht geladen werden.");
+          setError(
+            loadState.message || "Benutzer konnte nicht geladen werden.",
+          );
           return;
         }
 

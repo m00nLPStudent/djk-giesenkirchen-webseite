@@ -33,7 +33,9 @@ export default function UserEditorDialog({
   const isCreateFlowEnabled = Boolean(createCapabilities?.createFlowEnabled);
   const selfSuperadminRoleId = useMemo(() => {
     if (!user?.id || user.id !== currentUserId) return null;
-    return (user.roles || []).find((role) => role?.key === "superadmin")?.id || null;
+    return (
+      (user.roles || []).find((role) => role?.key === "superadmin")?.id || null
+    );
   }, [user, currentUserId]);
 
   if (!open) return null;

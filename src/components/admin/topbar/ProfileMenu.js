@@ -50,7 +50,8 @@ export default function ProfileMenu() {
           "Keine Rolle";
 
     const hasProfile = Boolean(context?.hasAdminProfile);
-    const profileActive = context?.profile?.is_active ?? context?.profile?.isActive;
+    const profileActive =
+      context?.profile?.is_active ?? context?.profile?.isActive;
     const statusLabel = !context?.user?.id
       ? "Nicht angemeldet"
       : !hasProfile

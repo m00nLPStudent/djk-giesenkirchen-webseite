@@ -295,7 +295,10 @@ export async function validateSelfSuperadminRoleChange({
         ? "rls-blocked"
         : "write-failed",
       message: withRlsHint(
-        formatSupabaseError(error, "Aktuelle Rollen konnten nicht geladen werden."),
+        formatSupabaseError(
+          error,
+          "Aktuelle Rollen konnten nicht geladen werden.",
+        ),
       ),
     };
   }

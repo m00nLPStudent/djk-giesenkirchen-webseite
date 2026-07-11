@@ -79,7 +79,10 @@ export async function waitForBrowserAuthInitialization(scope = "admin-auth") {
         return makeAuthState({
           authInitDone: true,
           errorCode: "auth-get-session-failed",
-          message: formatSupabaseError(error, "Session konnte nicht gelesen werden."),
+          message: formatSupabaseError(
+            error,
+            "Session konnte nicht gelesen werden.",
+          ),
           error,
         });
       }
@@ -119,24 +122,32 @@ export async function waitForBrowserAuthInitialization(scope = "admin-auth") {
           );
         }, timeoutMs);
 
-        const listener = supabaseBrowser.auth.onAuthStateChange((event, session) => {
-          if (event !== "INITIAL_SESSION" && event !== "SIGNED_IN" && event !== "SIGNED_OUT") {
-            return;
-          }
+        const listener = supabaseBrowser.auth.onAuthStateChange(
+          (event, session) => {
+            if (
+              event !== "INITIAL_SESSION" &&
+              event !== "SIGNED_IN" &&
+              event !== "SIGNED_OUT"
+            ) {
+              return;
+            }
 
-          window.clearTimeout(timer);
-          finalize(
-            makeAuthState({
-              authInitDone: true,
-              hasSession: Boolean(session),
-              hasUser: Boolean(session?.user?.id),
-              session: session || null,
-              user: session?.user || null,
-              errorCode: session ? null : "no-browser-session",
-              message: session ? "" : "Keine aktive Browser-Session vorhanden.",
-            }),
-          );
-        });
+            window.clearTimeout(timer);
+            finalize(
+              makeAuthState({
+                authInitDone: true,
+                hasSession: Boolean(session),
+                hasUser: Boolean(session?.user?.id),
+                session: session || null,
+                user: session?.user || null,
+                errorCode: session ? null : "no-browser-session",
+                message: session
+                  ? ""
+                  : "Keine aktive Browser-Session vorhanden.",
+              }),
+            );
+          },
+        );
 
         subscription = listener?.data?.subscription || null;
       });
@@ -175,7 +186,10 @@ export async function getBrowserAuthState(scope = "admin-auth") {
       hasUser: false,
       session: initState.session,
       errorCode: "auth-get-user-failed",
-      message: formatSupabaseError(error, "Benutzer konnte nicht gelesen werden."),
+      message: formatSupabaseError(
+        error,
+        "Benutzer konnte nicht gelesen werden.",
+      ),
       error,
     });
   }
@@ -187,7 +201,9 @@ export async function getBrowserAuthState(scope = "admin-auth") {
     session: initState.session,
     user: data?.user || null,
     errorCode: data?.user?.id ? null : "auth-user-missing",
-    message: data?.user?.id ? "" : "Session vorhanden, aber kein Benutzer geladen.",
+    message: data?.user?.id
+      ? ""
+      : "Session vorhanden, aber kein Benutzer geladen.",
   });
 }
 
@@ -199,7 +215,9 @@ export async function assertBrowserSession(scope) {
     throw new Error(`[${scope}] Keine Session gefunden.`);
   }
   if (!authState.hasUser) {
-    throw new Error(`[${scope}] Session vorhanden, aber kein Benutzer gefunden.`);
+    throw new Error(
+      `[${scope}] Session vorhanden, aber kein Benutzer gefunden.`,
+    );
   }
 }
 

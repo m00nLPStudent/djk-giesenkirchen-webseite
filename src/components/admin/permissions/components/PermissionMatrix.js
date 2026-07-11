@@ -33,7 +33,9 @@ export default function PermissionMatrix({ initialData }) {
         setRuntimeData(nextData);
 
         if (nextData?.loadState?.status === "no-session") {
-          setNotice("Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.");
+          setNotice(
+            "Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.",
+          );
           setError("");
           if (authRetryCount < 2) {
             window.setTimeout(() => {
