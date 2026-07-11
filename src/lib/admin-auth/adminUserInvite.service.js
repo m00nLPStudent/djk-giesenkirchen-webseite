@@ -1,32 +1,36 @@
-import { createClient } from "@supabase/supabase-js";
+import "server-only";
 
-export function hasServiceRoleSupport() {
-  return Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-}
-
-export function getAdminUserCreateCapabilities() {
-  const serviceRoleEnabled = hasServiceRoleSupport();
-
-  return {
-    serviceRoleEnabled,
-    createFlowEnabled: serviceRoleEnabled,
-  };
-}
+import { buildAdminRedirectUrl } from "@/lib/admin-auth/adminAuthRedirects";
+import {
+  createSupabaseAdminClient,
+  getSupabaseAdminEnvStatus,
+} from "@/lib/supabase.admin";
 
 function createServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceRole) {
-    return null;
-  }
-
-  return createClient(url, serviceRole, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  return createSupabaseAdminClient();
 }
 
 export async function inviteAdminAuthUser(email) {
+  const env = getSupabaseAdminEnvStatus();
+
+  if (!env.hasServiceRoleKey) {
+    return {
+      ok: false,
+      message:
+        "Benutzeranlage ist noch nicht aktiviert. SUPABASE_SERVICE_ROLE_KEY fehlt.",
+      requiresServiceRole: true,
+    };
+  }
+
+  if (!env.hasUrl || !env.hasAnonKey) {
+    return {
+      ok: false,
+      message:
+        "Supabase-Konfiguration unvollstaendig. NEXT_PUBLIC_SUPABASE_URL oder NEXT_PUBLIC_SUPABASE_ANON_KEY fehlt.",
+      requiresServiceRole: false,
+    };
+  }
+
   const client = createServiceClient();
 
   if (!client) {
@@ -38,16 +42,33 @@ export async function inviteAdminAuthUser(email) {
     };
   }
 
-  const redirectTo = `${process.env.NEXT_PUBLIC_SITE_URL || ""}/admin/login`;
+  const redirectTo = buildAdminRedirectUrl("/admin/set-password");
+
+  if (!redirectTo) {
+    return {
+      ok: false,
+      message:
+        "Redirect-URL fehlt. Bitte NEXT_PUBLIC_SITE_URL oder ADMIN_AUTH_REDIRECT_URL konfigurieren.",
+      requiresServiceRole: false,
+    };
+  }
 
   const { data, error } = await client.auth.admin.inviteUserByEmail(email, {
     redirectTo,
   });
 
   if (error) {
+    const text = (error.message || "").toLowerCase();
+    const alreadyExists =
+      text.includes("already") ||
+      text.includes("exists") ||
+      text.includes("registered");
+
     return {
       ok: false,
-      message: error.message || "Einladung konnte nicht gesendet werden.",
+      message: alreadyExists
+        ? "E-Mail ist bereits in Auth registriert. Bitte bestehenden Benutzer verwenden oder Passwort-Reset senden."
+        : error.message || "Einladung konnte nicht gesendet werden.",
       requiresServiceRole: false,
     };
   }
@@ -61,6 +82,16 @@ export async function inviteAdminAuthUser(email) {
 }
 
 export async function deleteAdminAuthUserById(userId) {
+  const env = getSupabaseAdminEnvStatus();
+  if (!env.hasServiceRoleKey || !env.hasUrl) {
+    return {
+      ok: false,
+      message:
+        "Auth-Cleanup nicht moeglich: Service-Role-Server-Action ist nicht aktiv.",
+      requiresServiceRole: true,
+    };
+  }
+
   const client = createServiceClient();
 
   if (!client) {

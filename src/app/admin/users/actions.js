@@ -2,12 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import {
-  createAdminProfile,
   fetchAdminProfileById,
   updateAdminProfileById,
   updateAdminProfileStatus,
 } from "@/lib/admin-auth/adminProfiles.repository";
-import { inviteAdminAuthUser } from "@/lib/admin-auth/adminUserInvite.service";
 import { buildUserEditorPayload } from "@/components/admin/users/helpers/users.payload";
 import { validateUserEditorValues } from "@/components/admin/users/helpers/users.validation";
 import {
@@ -22,9 +20,8 @@ import {
   withRlsHint,
 } from "@/components/admin/users/services/usersActionWriteHelpers";
 import {
-  buildCreateFailureMessage,
-  rollbackCreatedUserState,
-} from "@/components/admin/users/services/usersActionCreateHelpers";
+  createAdminUserWithInvite,
+} from "@/lib/admin-auth/adminUserCreate.service";
 
 export async function saveAdminUserAction({ userId, values, currentUserId }) {
   const supabaseServer = await createServerActionSupabaseClient();
@@ -63,81 +60,16 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
   }
 
   if (!userId) {
-    const inviteResult = await inviteAdminAuthUser(payload.email);
+    const createResult = await createAdminUserWithInvite(payload, supabaseServer);
 
-    if (!inviteResult.ok || !inviteResult.userId) {
-      return {
-        ok: false,
-        message:
-          inviteResult.message || "Benutzer konnte nicht eingeladen werden.",
-        requiresServiceRole: Boolean(inviteResult.requiresServiceRole),
-      };
-    }
-
-    const { error: profileError } = await createAdminProfile(
-      {
-        id: inviteResult.userId,
-        full_name: payload.full_name,
-        email: payload.email,
-        is_active: payload.is_active,
-        updated_at: new Date().toISOString(),
-      },
-      supabaseServer,
-    );
-
-    if (profileError) {
-      const cleanup = await rollbackCreatedUserState(
-        inviteResult.userId,
-        supabaseServer,
-        {
-          removeProfile: false,
-        },
-      );
-
-      return {
-        ok: false,
-        reason: isLikelyRlsError(profileError.message || "")
-          ? "rls-blocked"
-          : "write-failed",
-        message: buildCreateFailureMessage(
-          withRlsHint(
-            formatSupabaseError(
-              profileError,
-              "Profil konnte nicht erstellt werden.",
-            ),
-          ),
-          cleanup,
-        ),
-        needsRlsWritePolicy: isLikelyRlsError(profileError.message || ""),
-        requiresManualCleanup: cleanup.errors.length > 0,
-      };
-    }
-
-    const roleResult = await replaceUserRoleLinks(
-      inviteResult.userId,
-      payload,
-      supabaseServer,
-    );
-    if (!roleResult.ok) {
-      const cleanup = await rollbackCreatedUserState(
-        inviteResult.userId,
-        supabaseServer,
-        {
-          removeProfile: true,
-        },
-      );
-
-      return {
-        ...roleResult,
-        message: buildCreateFailureMessage(roleResult.message, cleanup),
-        requiresManualCleanup: cleanup.errors.length > 0,
-      };
+    if (!createResult.ok) {
+      return createResult;
     }
 
     revalidatePath("/admin/users");
     return {
       ok: true,
-      message: "Benutzer wurde eingeladen und angelegt.",
+      message: createResult.message,
       requiresServiceRole: false,
     };
   }

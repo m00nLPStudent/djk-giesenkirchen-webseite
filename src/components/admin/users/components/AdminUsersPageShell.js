@@ -9,6 +9,7 @@ import UsersToolbar from "./UsersToolbar";
 import UsersTable from "./UsersTable";
 import UserDetailsDialog from "../dialogs/UserDetailsDialog";
 import UserEditorDialog from "../dialogs/UserEditorDialog";
+import AdminLoginRequiredNotice from "@/components/admin/common/AdminLoginRequiredNotice";
 import {
   saveAdminUserAction,
   updateAdminUserStatusAction,
@@ -23,8 +24,14 @@ export default function AdminUsersPageShell({ initialData }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [authRetryCount, setAuthRetryCount] = useState(0);
   const [runtimeData, setRuntimeData] = useState(initialData);
+  const [createCapabilities] = useState(
+    initialData?.createCapabilities || {
+      serviceRoleEnabled: true,
+      createFlowEnabled: true,
+      missingConfig: [],
+    },
+  );
 
   useEffect(() => {
     let active = true;
@@ -36,17 +43,15 @@ export default function AdminUsersPageShell({ initialData }) {
         setRuntimeData(nextData);
 
         const loadState = nextData?.loadState;
-        if (loadState?.status === "no-session") {
-          setNotice(
-            "Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.",
-          );
+        if (loadState?.status === "auth-pending") {
+          setNotice("Authentifizierung wird initialisiert ...");
           setError("");
+          return;
+        }
 
-          if (authRetryCount < 2) {
-            window.setTimeout(() => {
-              setAuthRetryCount((count) => count + 1);
-            }, 700);
-          }
+        if (loadState?.status === "no-session") {
+          setNotice("");
+          setError("");
           return;
         }
 
@@ -78,7 +83,7 @@ export default function AdminUsersPageShell({ initialData }) {
     return () => {
       active = false;
     };
-  }, [authRetryCount]);
+  }, []);
 
   const vm = useAdminUsersViewModel(runtimeData);
 
@@ -117,9 +122,23 @@ export default function AdminUsersPageShell({ initialData }) {
 
     if (result?.ok) {
       await refreshUsersData();
+      setNotice(result?.message || "Benutzer wurde gespeichert.");
     }
 
     return result;
+  }
+
+  if (runtimeData?.loadState?.status === "no-session") {
+    return (
+      <div className="space-y-8">
+        <AdminPageHeader
+          eyebrow="Benutzer"
+          title="Benutzerverwaltung"
+          description="Admin-Profile, Rollen und Aktivstatus zentral verwalten."
+        />
+        <AdminLoginRequiredNotice />
+      </div>
+    );
   }
 
   return (
@@ -178,7 +197,7 @@ export default function AdminUsersPageShell({ initialData }) {
         user={vm.editingUser}
         roles={vm.roles || []}
         currentUserId={vm.currentUserId}
-        createCapabilities={vm.createCapabilities}
+        createCapabilities={createCapabilities}
         onSubmit={handleSubmitUserEditor}
         onClose={vm.closeEditor}
       />

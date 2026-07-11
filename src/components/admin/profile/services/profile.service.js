@@ -6,6 +6,7 @@ import {
   toAdminError,
 } from "@/lib/admin-auth/adminDiagnostics";
 import { validateAdminPassword } from "@/lib/admin-auth/passwordPolicy";
+import { buildAdminRedirectUrl } from "@/lib/admin-auth/adminAuthRedirects";
 import {
   formatPermissionCount,
   formatRoleList,
@@ -140,7 +141,17 @@ export async function sendOwnPasswordResetEmail() {
     throw toAdminError("profile.security", null, "Browser-Kontext fehlt.");
   }
 
-  const redirectTo = `${window.location.origin}/admin/login`;
+  const redirectTo = buildAdminRedirectUrl("/admin/set-password", {
+    browserOrigin: window.location.origin,
+  });
+  if (!redirectTo) {
+    return {
+      ok: false,
+      message:
+        "Redirect-URL fehlt. Bitte NEXT_PUBLIC_SITE_URL oder ADMIN_AUTH_REDIRECT_URL konfigurieren.",
+    };
+  }
+
   const { error } = await supabaseBrowser.auth.resetPasswordForEmail(email, {
     redirectTo,
   });

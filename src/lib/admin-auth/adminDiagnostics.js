@@ -97,59 +97,15 @@ export async function waitForBrowserAuthInitialization(scope = "admin-auth") {
         });
       }
 
-      const timeoutMs = 1200;
-      return await new Promise((resolve) => {
-        let resolved = false;
-        let subscription = null;
-
-        const finalize = (state) => {
-          if (resolved) return;
-          resolved = true;
-          if (subscription?.unsubscribe) {
-            subscription.unsubscribe();
-          }
-          resolve(state);
-        };
-
-        const timer = window.setTimeout(() => {
-          finalize(
-            makeAuthState({
-              authInitDone: true,
-              hasSession: false,
-              errorCode: "no-browser-session",
-              message: "Keine aktive Browser-Session vorhanden.",
-            }),
-          );
-        }, timeoutMs);
-
-        const listener = supabaseBrowser.auth.onAuthStateChange(
-          (event, session) => {
-            if (
-              event !== "INITIAL_SESSION" &&
-              event !== "SIGNED_IN" &&
-              event !== "SIGNED_OUT"
-            ) {
-              return;
-            }
-
-            window.clearTimeout(timer);
-            finalize(
-              makeAuthState({
-                authInitDone: true,
-                hasSession: Boolean(session),
-                hasUser: Boolean(session?.user?.id),
-                session: session || null,
-                user: session?.user || null,
-                errorCode: session ? null : "no-browser-session",
-                message: session
-                  ? ""
-                  : "Keine aktive Browser-Session vorhanden.",
-              }),
-            );
-          },
-        );
-
-        subscription = listener?.data?.subscription || null;
+      // A missing session is a final, expected state in signed-out mode.
+      return makeAuthState({
+        authInitDone: true,
+        hasSession: false,
+        hasUser: false,
+        session: null,
+        user: null,
+        errorCode: "no-browser-session",
+        message: "Keine aktive Browser-Session vorhanden.",
       });
     })();
   }
@@ -237,5 +193,16 @@ export function getReadableErrorMessage(error, fallbackText) {
 export function logAdminDebugError(scope, error) {
   if (process.env.NODE_ENV !== "development") return;
   const message = getReadableErrorMessage(error, "Unbekannter Fehler");
+  const signedOutState =
+    message.includes("Keine Session") ||
+    message.includes("Keine aktive Browser-Session") ||
+    message.includes("SIGNED_OUT") ||
+    message.includes("no-browser-session");
+
+  if (signedOutState) {
+    console.info(`[admin-debug:${scope}] ${message}`);
+    return;
+  }
+
   console.error(`[admin-debug:${scope}] ${message}`);
 }

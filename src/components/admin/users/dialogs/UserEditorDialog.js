@@ -31,6 +31,8 @@ export default function UserEditorDialog({
   const [formErrors, setFormErrors] = useState({});
   const initialValues = useMemo(() => mapInitialValues(user), [user]);
   const isCreateFlowEnabled = Boolean(createCapabilities?.createFlowEnabled);
+  const missingConfig = createCapabilities?.missingConfig || [];
+  const isMissingServiceRole = missingConfig.includes("SUPABASE_SERVICE_ROLE_KEY");
   const selfSuperadminRoleId = useMemo(() => {
     if (!user?.id || user.id !== currentUserId) return null;
     return (
@@ -87,24 +89,27 @@ export default function UserEditorDialog({
 
         {mode === "create" && !isCreateFlowEnabled ? (
           <div className="mt-4 rounded-xl border border-amber-300/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-            Benutzeranlage ist vorbereitet. Zum Erstellen von Auth-Benutzern
-            muss die Service-Role-Server-Action aktiviert sein.
+            {isMissingServiceRole
+              ? "Benutzeranlage ist noch nicht aktiviert. SUPABASE_SERVICE_ROLE_KEY fehlt."
+              : "Benutzeranlage ist vorbereitet. Bitte fehlende Supabase-Konfiguration ergaenzen."}
           </div>
         ) : null}
 
-        <div className="mt-5">
-          <UserEditorForm
-            mode={mode}
-            roles={roles || []}
-            initialValues={initialValues}
-            loading={loading}
-            currentUserId={currentUserId}
-            selfSuperadminRoleId={selfSuperadminRoleId}
-            onSubmit={handleSubmit}
-            message={message}
-            formErrors={formErrors}
-          />
-        </div>
+        {mode === "create" && !isCreateFlowEnabled ? null : (
+          <div className="mt-5">
+            <UserEditorForm
+              mode={mode}
+              roles={roles || []}
+              initialValues={initialValues}
+              loading={loading}
+              currentUserId={currentUserId}
+              selfSuperadminRoleId={selfSuperadminRoleId}
+              onSubmit={handleSubmit}
+              message={message}
+              formErrors={formErrors}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

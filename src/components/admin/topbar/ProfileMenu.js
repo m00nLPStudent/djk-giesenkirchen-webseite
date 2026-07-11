@@ -14,11 +14,12 @@ export default function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [loadingContext, setLoadingContext] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [userState, setUserState] = useState({
     isLoggedIn: false,
-    name: "Admin",
-    roleLabel: "Laedt...",
-    statusLabel: "Laedt...",
+    name: "Laedt ...",
+    roleLabel: "Laedt ...",
+    statusLabel: "",
     email: "",
   });
 
@@ -35,48 +36,80 @@ export default function ProfileMenu() {
 
   async function loadAuthContext() {
     setLoadingContext(true);
-    const context = await getCurrentAdminContext();
-    if (context?.debugError) {
-      logAdminDebugError("profile-menu", context.debugError);
-    }
-    const hasLoadedRoles = Array.isArray(context?.roles);
-    const primaryRoleName = !context?.user?.id
-      ? "-"
-      : !hasLoadedRoles
+    setLoadError("");
+
+    try {
+      const context = await getCurrentAdminContext();
+      if (context?.debugError) {
+        logAdminDebugError("profile-menu", context.debugError);
+        setLoadError(context.debugError);
+        setUserState({
+          isLoggedIn: false,
+          name: "Authentifizierung",
+          roleLabel: "Fehler",
+          statusLabel: "Bitte erneut versuchen",
+          email: "",
+        });
+        return;
+      }
+
+      if (!context?.user?.id) {
+        setUserState({
+          isLoggedIn: false,
+          name: "Nicht angemeldet",
+          roleLabel: "Keine aktive Sitzung",
+          statusLabel: "",
+          email: "",
+        });
+        return;
+      }
+
+      const hasLoadedRoles = Array.isArray(context?.roles);
+      const primaryRoleName = !hasLoadedRoles
         ? "Fehler"
         : context?.primaryRole?.name ||
           context?.roles?.find((role) => role?.is_primary)?.name ||
           context?.roles?.[0]?.name ||
           "Keine Rolle";
 
-    const hasProfile = Boolean(context?.hasAdminProfile);
-    const profileActive =
-      context?.profile?.is_active ?? context?.profile?.isActive;
-    const statusLabel = !context?.user?.id
-      ? "Nicht angemeldet"
-      : !hasProfile
-        ? "Kein Profil"
+      const hasProfile = Boolean(context?.hasAdminProfile);
+      const profileActive =
+        context?.profile?.is_active ?? context?.profile?.isActive;
+      const statusLabel = !hasProfile
+        ? "Kein Admin-Profil"
         : profileActive === false
           ? "Inaktiv"
           : "Aktiv";
-    const profileName =
-      context?.fullName ||
-      context?.profile?.full_name ||
-      context?.profile?.name ||
-      [context?.profile?.first_name, context?.profile?.last_name]
-        .filter(Boolean)
-        .join(" ") ||
-      context?.user?.email ||
-      "Admin";
+      const profileName =
+        context?.fullName ||
+        context?.profile?.full_name ||
+        context?.profile?.name ||
+        [context?.profile?.first_name, context?.profile?.last_name]
+          .filter(Boolean)
+          .join(" ") ||
+        context?.user?.email ||
+        "Admin";
 
-    setUserState({
-      isLoggedIn: Boolean(context?.user?.id),
-      name: profileName,
-      roleLabel: primaryRoleName,
-      statusLabel,
-      email: context?.user?.email || "",
-    });
-    setLoadingContext(false);
+      setUserState({
+        isLoggedIn: true,
+        name: profileName,
+        roleLabel: primaryRoleName,
+        statusLabel,
+        email: context?.user?.email || "",
+      });
+    } catch (error) {
+      logAdminDebugError("profile-menu", error);
+      setLoadError("Profilstatus konnte nicht geladen werden.");
+      setUserState({
+        isLoggedIn: false,
+        name: "Authentifizierung",
+        roleLabel: "Fehler",
+        statusLabel: "Bitte erneut versuchen",
+        email: "",
+      });
+    } finally {
+      setLoadingContext(false);
+    }
   }
 
   useEffect(() => {
@@ -121,7 +154,11 @@ export default function ProfileMenu() {
         <div className="hidden leading-tight lg:block">
           <p className="text-sm font-black text-white">{userState.name}</p>
           <p className="text-xs text-white/40">
-            {userState.roleLabel} · {userState.statusLabel}
+            {loadingContext
+              ? "Laedt ..."
+              : userState.statusLabel
+                ? `${userState.roleLabel} · ${userState.statusLabel}`
+                : userState.roleLabel}
           </p>
         </div>
         <ChevronDown
@@ -138,8 +175,17 @@ export default function ProfileMenu() {
               {userState.email || "-"}
             </p>
             <p className="mt-1 text-xs text-white/45">
-              {userState.roleLabel} · {userState.statusLabel}
+              {loadingContext
+                ? "Laedt ..."
+                : userState.statusLabel
+                  ? `${userState.roleLabel} · ${userState.statusLabel}`
+                  : userState.roleLabel}
             </p>
+            {loadError && (
+              <p className="mt-2 rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2 text-xs text-red-100">
+                {loadError}
+              </p>
+            )}
           </div>
 
           <button
@@ -169,7 +215,17 @@ export default function ProfileMenu() {
               className="flex w-full items-center gap-3 border-t border-white/10 px-5 py-4 text-left text-sm font-bold text-red-300 transition hover:bg-red-600/10 hover:text-red-200"
             >
               <LogOut size={18} />
-              Zum Login
+              Anmelden
+            </button>
+          )}
+
+          {!userState.isLoggedIn && loadError && (
+            <button
+              type="button"
+              onClick={loadAuthContext}
+              className="flex w-full items-center gap-3 border-t border-white/10 px-5 py-4 text-left text-sm font-bold text-white/80 transition hover:bg-white/5 hover:text-white"
+            >
+              Erneut versuchen
             </button>
           )}
         </div>

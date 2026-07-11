@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import AdminLoginRequiredNotice from "@/components/admin/common/AdminLoginRequiredNotice";
 import { toggleRolePermissionAction } from "@/app/admin/permissions/actions";
 import usePermissionMatrixViewModel from "../hooks/usePermissionMatrixViewModel";
 import PermissionMatrixCategory from "./PermissionMatrixCategory";
@@ -21,7 +22,6 @@ export default function PermissionMatrix({ initialData }) {
   const [busyKey, setBusyKey] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [authRetryCount, setAuthRetryCount] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -32,16 +32,15 @@ export default function PermissionMatrix({ initialData }) {
         if (!active) return;
         setRuntimeData(nextData);
 
-        if (nextData?.loadState?.status === "no-session") {
-          setNotice(
-            "Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.",
-          );
+        if (nextData?.loadState?.status === "auth-pending") {
+          setNotice("Authentifizierung wird initialisiert ...");
           setError("");
-          if (authRetryCount < 2) {
-            window.setTimeout(() => {
-              setAuthRetryCount((count) => count + 1);
-            }, 700);
-          }
+          return;
+        }
+
+        if (nextData?.loadState?.status === "no-session") {
+          setNotice("");
+          setError("");
           return;
         }
 
@@ -65,7 +64,7 @@ export default function PermissionMatrix({ initialData }) {
     return () => {
       active = false;
     };
-  }, [authRetryCount]);
+  }, []);
 
   async function handleToggle({ roleId, permissionId, checked }) {
     setError("");
@@ -92,6 +91,19 @@ export default function PermissionMatrix({ initialData }) {
   const categories = Object.keys(vm.groupedPermissions).sort((a, b) =>
     a.localeCompare(b, "de-DE"),
   );
+
+  if (runtimeData?.loadState?.status === "no-session") {
+    return (
+      <div className="space-y-8 overflow-x-hidden">
+        <AdminPageHeader
+          eyebrow="Permissions"
+          title="Rollen-Permission-Matrix"
+          description="Zuordnungen zwischen Rollen und Permissions verwalten."
+        />
+        <AdminLoginRequiredNotice />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 overflow-x-hidden">

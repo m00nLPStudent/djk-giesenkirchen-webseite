@@ -2,7 +2,7 @@ import {
   loadAdminPermissions,
   loadAdminRoles,
 } from "@/lib/admin-auth/adminAuth.service";
-import { getAdminUserCreateCapabilities } from "@/lib/admin-auth/adminUserInvite.service";
+import { getAdminUserCreateCapabilities } from "@/lib/admin-auth/adminUserCreateCapabilities";
 import {
   buildRlsHint,
   formatSupabaseError,
@@ -107,66 +107,88 @@ function enrichUser(
 
 export async function getAdminUsersPageData() {
   let currentUserId = null;
+
+  if (!isBrowserRuntime()) {
+    return {
+      users: [],
+      roles: [],
+      currentUserId: null,
+      createCapabilities: getAdminUserCreateCapabilities(),
+      stats: {
+        totalUsers: 0,
+        activeUsers: 0,
+        inactiveUsers: 0,
+        totalRoles: 0,
+      },
+      loadState: {
+        status: "auth-pending",
+        authInitDone: false,
+        hasSession: false,
+        hasUser: false,
+        errorCode: null,
+        message: "Authentifizierung wird initialisiert.",
+      },
+    };
+  }
+
   let loadState = {
     status: "ready",
-    authInitDone: !isBrowserRuntime(),
+    authInitDone: true,
     hasSession: true,
     hasUser: true,
     errorCode: null,
     message: "",
   };
 
-  if (isBrowserRuntime()) {
-    const authState = await getBrowserAuthState("admin-users");
-    loadState = {
-      status: authState.hasSession ? "ready" : "no-session",
-      authInitDone: authState.authInitDone,
-      hasSession: authState.hasSession,
-      hasUser: authState.hasUser,
-      errorCode: authState.errorCode,
-      message: authState.message,
+  const authState = await getBrowserAuthState("admin-users");
+  loadState = {
+    status: authState.hasSession ? "ready" : "no-session",
+    authInitDone: authState.authInitDone,
+    hasSession: authState.hasSession,
+    hasUser: authState.hasUser,
+    errorCode: authState.errorCode,
+    message: authState.message,
+  };
+
+  if (!authState.hasSession) {
+    return {
+      users: [],
+      roles: [],
+      currentUserId: null,
+      createCapabilities: getAdminUserCreateCapabilities(),
+      stats: {
+        totalUsers: 0,
+        activeUsers: 0,
+        inactiveUsers: 0,
+        totalRoles: 0,
+      },
+      loadState,
     };
-
-    if (!authState.hasSession) {
-      return {
-        users: [],
-        roles: [],
-        currentUserId: null,
-        createCapabilities: getAdminUserCreateCapabilities(),
-        stats: {
-          totalUsers: 0,
-          activeUsers: 0,
-          inactiveUsers: 0,
-          totalRoles: 0,
-        },
-        loadState,
-      };
-    }
-
-    if (!authState.hasUser) {
-      return {
-        users: [],
-        roles: [],
-        currentUserId: null,
-        createCapabilities: getAdminUserCreateCapabilities(),
-        stats: {
-          totalUsers: 0,
-          activeUsers: 0,
-          inactiveUsers: 0,
-          totalRoles: 0,
-        },
-        loadState: {
-          ...loadState,
-          status: "auth-error",
-          message:
-            authState.message ||
-            "Session vorhanden, aber Benutzer konnte nicht geladen werden.",
-        },
-      };
-    }
-
-    currentUserId = authState.user?.id || null;
   }
+
+  if (!authState.hasUser) {
+    return {
+      users: [],
+      roles: [],
+      currentUserId: null,
+      createCapabilities: getAdminUserCreateCapabilities(),
+      stats: {
+        totalUsers: 0,
+        activeUsers: 0,
+        inactiveUsers: 0,
+        totalRoles: 0,
+      },
+      loadState: {
+        ...loadState,
+        status: "auth-error",
+        message:
+          authState.message ||
+          "Session vorhanden, aber Benutzer konnte nicht geladen werden.",
+      },
+    };
+  }
+
+  currentUserId = authState.user?.id || null;
 
   const [
     { data: profiles, error: profilesError },

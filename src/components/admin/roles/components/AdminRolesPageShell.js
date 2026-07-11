@@ -9,6 +9,7 @@ import RolesToolbar from "./RolesToolbar";
 import RolesTable from "./RolesTable";
 import RoleDetailsDialog from "./RoleDetailsDialog";
 import RoleEditorDialog from "../forms/RoleEditorDialog";
+import AdminLoginRequiredNotice from "@/components/admin/common/AdminLoginRequiredNotice";
 import {
   saveAdminRoleAction,
   updateAdminRoleStatusAction,
@@ -26,7 +27,6 @@ export default function AdminRolesPageShell({ initialData }) {
 
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [authRetryCount, setAuthRetryCount] = useState(0);
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
@@ -39,16 +39,15 @@ export default function AdminRolesPageShell({ initialData }) {
         if (!active) return;
         setRuntimeData(nextData);
 
-        if (nextData?.loadState?.status === "no-session") {
-          setNotice(
-            "Keine aktive Session gefunden. Daten werden geladen, sobald die Anmeldung initialisiert ist.",
-          );
+        if (nextData?.loadState?.status === "auth-pending") {
+          setNotice("Authentifizierung wird initialisiert ...");
           setError("");
-          if (authRetryCount < 2) {
-            window.setTimeout(() => {
-              setAuthRetryCount((count) => count + 1);
-            }, 700);
-          }
+          return;
+        }
+
+        if (nextData?.loadState?.status === "no-session") {
+          setNotice("");
+          setError("");
           return;
         }
 
@@ -72,7 +71,7 @@ export default function AdminRolesPageShell({ initialData }) {
     return () => {
       active = false;
     };
-  }, [authRetryCount]);
+  }, []);
 
   async function handleSave(values) {
     setError("");
@@ -115,6 +114,19 @@ export default function AdminRolesPageShell({ initialData }) {
 
     vm.setUpdatingRoleId(null);
     router.refresh();
+  }
+
+  if (runtimeData?.loadState?.status === "no-session") {
+    return (
+      <div className="space-y-8">
+        <AdminPageHeader
+          eyebrow="Rollen"
+          title="Rollenverwaltung"
+          description="Rollen zentral pflegen."
+        />
+        <AdminLoginRequiredNotice />
+      </div>
+    );
   }
 
   return (

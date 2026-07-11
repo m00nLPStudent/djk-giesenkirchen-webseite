@@ -26,29 +26,49 @@ function buildCategoryGroups(permissions = []) {
 }
 
 export async function getAdminPermissionsPageData() {
-  if (isBrowserRuntime()) {
-    const authState = await getBrowserAuthState("admin-permissions");
-    if (!authState.hasSession) {
-      return {
-        permissions: [],
-        roles: [],
-        categories: [],
-        loadState: {
-          status: "no-session",
-          authInitDone: authState.authInitDone,
-          hasSession: authState.hasSession,
-          hasUser: authState.hasUser,
-          errorCode: authState.errorCode,
-          message: authState.message,
-        },
-        stats: {
-          totalPermissions: 0,
-          totalCategories: 0,
-          assignedRolePermissions: 0,
-          unassignedPermissions: 0,
-        },
-      };
-    }
+  if (!isBrowserRuntime()) {
+    return {
+      permissions: [],
+      roles: [],
+      categories: [],
+      loadState: {
+        status: "auth-pending",
+        authInitDone: false,
+        hasSession: false,
+        hasUser: false,
+        errorCode: null,
+        message: "Authentifizierung wird initialisiert.",
+      },
+      stats: {
+        totalPermissions: 0,
+        totalCategories: 0,
+        assignedRolePermissions: 0,
+        unassignedPermissions: 0,
+      },
+    };
+  }
+
+  const authState = await getBrowserAuthState("admin-permissions");
+  if (!authState.hasSession) {
+    return {
+      permissions: [],
+      roles: [],
+      categories: [],
+      loadState: {
+        status: "no-session",
+        authInitDone: authState.authInitDone,
+        hasSession: authState.hasSession,
+        hasUser: authState.hasUser,
+        errorCode: authState.errorCode,
+        message: authState.message,
+      },
+      stats: {
+        totalPermissions: 0,
+        totalCategories: 0,
+        assignedRolePermissions: 0,
+        unassignedPermissions: 0,
+      },
+    };
   }
 
   const [permissions, roles, { data: links, error: linksError }] =
@@ -125,25 +145,41 @@ export async function getAdminPermissionsPageData() {
 }
 
 export async function getPermissionMatrixPageData() {
-  if (isBrowserRuntime()) {
-    const authState = await getBrowserAuthState("admin-permissions-matrix");
-    if (!authState.hasSession) {
-      return {
-        roles: [],
-        permissions: [],
-        groupedPermissions: {},
-        linkSet: [],
-        linkCount: 0,
-        loadState: {
-          status: "no-session",
-          authInitDone: authState.authInitDone,
-          hasSession: authState.hasSession,
-          hasUser: authState.hasUser,
-          errorCode: authState.errorCode,
-          message: authState.message,
-        },
-      };
-    }
+  if (!isBrowserRuntime()) {
+    return {
+      roles: [],
+      permissions: [],
+      groupedPermissions: {},
+      linkSet: [],
+      linkCount: 0,
+      loadState: {
+        status: "auth-pending",
+        authInitDone: false,
+        hasSession: false,
+        hasUser: false,
+        errorCode: null,
+        message: "Authentifizierung wird initialisiert.",
+      },
+    };
+  }
+
+  const authState = await getBrowserAuthState("admin-permissions-matrix");
+  if (!authState.hasSession) {
+    return {
+      roles: [],
+      permissions: [],
+      groupedPermissions: {},
+      linkSet: [],
+      linkCount: 0,
+      loadState: {
+        status: "no-session",
+        authInitDone: authState.authInitDone,
+        hasSession: authState.hasSession,
+        hasUser: authState.hasUser,
+        errorCode: authState.errorCode,
+        message: authState.message,
+      },
+    };
   }
 
   const [permissions, roles, { data: links, error: linksError }] =

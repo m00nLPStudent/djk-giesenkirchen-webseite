@@ -19,8 +19,8 @@ export async function getCurrentUser() {
   return authState.user || null;
 }
 
-export async function getCurrentAdminProfile() {
-  const user = await getCurrentUser();
+export async function getCurrentAdminProfile(userOverride = null) {
+  const user = userOverride || (await getCurrentUser());
   if (!user?.id) return null;
 
   const supabaseBrowser = getSupabaseBrowserClient();
@@ -58,9 +58,48 @@ export async function getCurrentAdminProfile() {
 
 export async function getCurrentAdminContext() {
   try {
-    const session = await getCurrentSession();
-    const user = await getCurrentUser();
-    const profile = await getCurrentAdminProfile();
+    const authState = await getBrowserAuthState("admin-session");
+    const session = authState?.hasSession ? authState.session || null : null;
+    const user = authState?.hasUser ? authState.user || null : null;
+    const profile = user?.id ? await getCurrentAdminProfile(user) : null;
+
+    if (authState?.authInitDone && !authState?.hasSession) {
+      return {
+        session: null,
+        user: null,
+        userId: null,
+        profile: null,
+        fullName: "Admin",
+        roles: [],
+        primaryRole: null,
+        permissions: [],
+        permissionSet: new Set(),
+        isActive: false,
+        hasAdminProfile: false,
+        isSuperAdmin: false,
+        debugError: null,
+      };
+    }
+
+    if (authState?.hasSession && !authState?.hasUser) {
+      return {
+        session,
+        user: null,
+        userId: null,
+        profile: null,
+        fullName: "Admin",
+        roles: [],
+        primaryRole: null,
+        permissions: [],
+        permissionSet: new Set(),
+        isActive: false,
+        hasAdminProfile: false,
+        isSuperAdmin: false,
+        debugError:
+          authState.message ||
+          "Session vorhanden, aber Benutzer konnte nicht geladen werden.",
+      };
+    }
 
     if (!user?.id) {
       return {

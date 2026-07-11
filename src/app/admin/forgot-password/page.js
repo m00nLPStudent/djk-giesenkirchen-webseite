@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
+import { buildAdminRedirectUrl } from "@/lib/admin-auth/adminAuthRedirects";
 
 export default function AdminForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -23,7 +24,17 @@ export default function AdminForgotPasswordPage() {
       return;
     }
 
-    const redirectTo = `${window.location.origin}/admin/login`;
+    const redirectTo = buildAdminRedirectUrl("/admin/set-password", {
+      browserOrigin: window.location.origin,
+    });
+
+    if (!redirectTo) {
+      setLoading(false);
+      setError(
+        "Redirect-URL fehlt. Bitte NEXT_PUBLIC_SITE_URL oder ADMIN_AUTH_REDIRECT_URL konfigurieren.",
+      );
+      return;
+    }
 
     const { error: resetError } =
       await supabaseBrowser.auth.resetPasswordForEmail(email, { redirectTo });

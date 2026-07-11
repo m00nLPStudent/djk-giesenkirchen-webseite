@@ -60,28 +60,47 @@ function groupByRoleId(links = [], valueMapper) {
 }
 
 export async function getAdminRolesPageData() {
-  if (isBrowserRuntime()) {
-    const authState = await getBrowserAuthState("admin-roles");
-    if (!authState.hasSession) {
-      return {
-        roles: [],
-        loadState: {
-          status: "no-session",
-          authInitDone: authState.authInitDone,
-          hasSession: authState.hasSession,
-          hasUser: authState.hasUser,
-          errorCode: authState.errorCode,
-          message: authState.message,
-        },
-        stats: {
-          totalRoles: 0,
-          activeRoles: 0,
-          inactiveRoles: 0,
-          assignedUserRoles: 0,
-          totalPermissions: 0,
-        },
-      };
-    }
+  if (!isBrowserRuntime()) {
+    return {
+      roles: [],
+      loadState: {
+        status: "auth-pending",
+        authInitDone: false,
+        hasSession: false,
+        hasUser: false,
+        errorCode: null,
+        message: "Authentifizierung wird initialisiert.",
+      },
+      stats: {
+        totalRoles: 0,
+        activeRoles: 0,
+        inactiveRoles: 0,
+        assignedUserRoles: 0,
+        totalPermissions: 0,
+      },
+    };
+  }
+
+  const authState = await getBrowserAuthState("admin-roles");
+  if (!authState.hasSession) {
+    return {
+      roles: [],
+      loadState: {
+        status: "no-session",
+        authInitDone: authState.authInitDone,
+        hasSession: authState.hasSession,
+        hasUser: authState.hasUser,
+        errorCode: authState.errorCode,
+        message: authState.message,
+      },
+      stats: {
+        totalRoles: 0,
+        activeRoles: 0,
+        inactiveRoles: 0,
+        assignedUserRoles: 0,
+        totalPermissions: 0,
+      },
+    };
   }
 
   const [
