@@ -285,18 +285,7 @@ Umgesetzt ueber eine zentrale Proxy-Schicht:
 - `AUTH_ENFORCEMENT_ENABLED = false` bleibt unveraendert und betrifft weiter nur Permissions, nicht die Login-Pflicht
 - aktive Datei: [`src/proxy.js`](../../src/proxy.js)
 
-Nächste Phase:
-
-- B11.2: Permission-Enforcement aktivieren (Sidebar, Buttons, Route-Pruefungen)
-- /admin/forgot-password (vorbereiteter Reset-Flow)
-- /admin/unauthorized (bereits vorhanden)
-
 ## B11.2a Route-/Permission-Mapping und Audit abgesichert (ohne Enforcement)
-
-Zentraler Status:
-
-- `AUTH_REQUIRED_FOR_ADMIN = true`
-- `AUTH_ENFORCEMENT_ENABLED = false`
 
 Wirkung von B11.2a:
 
@@ -312,10 +301,7 @@ Wichtig in B11.2a:
 - Keine Sidebar-Filterung und keine Dashboard-Filterung.
 - Keine Aenderung an SQL oder Datenbankstruktur.
 
-Superadmin-Verhalten:
-
-- Superadmin wird weiterhin zentral als globaler Bypass behandelt.
-- Erkennung basiert auf `role.key === "superadmin"` und beruecksichtigt Mehrfachrollen.
+- Superadmin wird weiterhin zentral als globaler Bypass behandelt (`role.key === "superadmin"`, inkl. Mehrfachrollen).
 
 Regression und Stabilisierung:
 
@@ -325,8 +311,6 @@ Regression und Stabilisierung:
   - `AUTH_ENFORCEMENT_ENABLED = false`
   - vollstaendigen Clean-Rebuild mit geloeschtem `.next`-Verzeichnis
   - Neustart von Next.js
-  - Neustart des Cloudflare Tunnels
-  - Aktualisierung der Tunnel-URLs in Supabase
 - Beobachtet wurden zwischenzeitlich `ChunkLoadError`-Meldungen und fehlgeschlagene `/_next/static`-Requests. Diese werden nur als Symptom der Regression dokumentiert, nicht als eindeutig bewiesene alleinige Hauptursache.
 
 Status B11.2a:
@@ -406,3 +390,34 @@ Hinweis: Die Datei wird nicht automatisch ausgefuehrt.
 - B3: Rollen- und Permission-Pflegeoberflaeche
 - B4: Rechte in Sidebar und UI sichtbar machen
 - B5: Route-Guards und serverseitiger Zugriffsschutz
+
+## B12.2 Vorbereitung: Rollen-Scopes und Beitragsverwaltung (Analyse, ohne Enforcement)
+
+Ziel von B12.2:
+
+- Technische Grundlagen fuer feinere Rollen-Scopes vorbereiten.
+- Datenmodellvorschlag fuer Mitgliedsbeitraege (Spieler/Trainer) dokumentieren.
+- Ohne Aktivierung neuer Guards, ohne Durchsetzung im Proxy, ohne SQL-Ausfuehrung.
+
+Status (Ist-Stand):
+
+- Auth-Grundmodell vorhanden: `admin_profiles`, `admin_roles`, `admin_permissions`, `admin_role_permissions`, `admin_user_roles`.
+- Teambezogene Scope-Zuordnungen fehlen aktuell als eigene Relation.
+- Feste Profil-Verknuepfungen von `board_members` und `coaches` zu `admin_profiles` fehlen aktuell.
+- Beitragsverwaltung ist noch nicht als eigene Tabelle umgesetzt.
+
+Vorbereitete Artefakte in B12.2 (nur Vorschlaege/Skeletons):
+
+- Scope-Skeleton (nicht aktiviert): `src/lib/admin-auth/scopes/`
+- SQL-Vorschlag Profil-Links: `docs/sql/b12-profile-links-proposal.sql`
+- SQL-Vorschlag Team-Scopes: `docs/sql/b12-team-scopes-proposal.sql`
+- SQL-Vorschlag Beitraege: `docs/sql/b12-membership-contributions-proposal.sql`
+- SQL-Vorschlag Zahlungshistorie: `docs/sql/b12-membership-contribution-payments-proposal.sql`
+- SQL-Vorschlag Content-Workflow (optional): `docs/sql/b12-content-workflow-proposal.sql`
+- Analysematrix: `docs/planning/b12-role-scope-matrix.md`
+
+Wichtig:
+
+- `AUTH_REQUIRED_FOR_ADMIN = true` bleibt unveraendert.
+- `AUTH_ENFORCEMENT_ENABLED = false` bleibt unveraendert.
+- Keine Migration wurde in dieser Phase ausgefuehrt.

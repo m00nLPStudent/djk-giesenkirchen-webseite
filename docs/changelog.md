@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-07-12
+
+### Phase B12.2 Technische Grundlagen fuer Rollen-Scopes und Beitragsverwaltung vorbereitet (Analysephase)
+
+- `AUTH_REQUIRED_FOR_ADMIN = true` bleibt aktiv
+- `AUTH_ENFORCEMENT_ENABLED = false` bleibt aktiv
+- Ist-Stand fuer Rollen, Permissions, Membership-Workflows und Content-Statusfelder analysiert
+- Scope-Skeleton unter `src/lib/admin-auth/scopes/` vorbereitet (ohne Aktivierung im Runtime-Flow)
+- SQL-Vorschlaege dokumentiert, aber nicht ausgefuehrt:
+  - `docs/sql/b12-profile-links-proposal.sql`
+  - `docs/sql/b12-team-scopes-proposal.sql`
+  - `docs/sql/b12-membership-contributions-proposal.sql`
+  - `docs/sql/b12-membership-contribution-payments-proposal.sql`
+  - `docs/sql/b12-content-workflow-proposal.sql`
+- Planungsdokument mit vorhanden/teilweise/fehlt-Matrix erstellt:
+  - `docs/planning/b12-role-scope-matrix.md`
+- keine Änderungen an Proxy-Enforcement, Login/Logout-Flow, SQL-Runtime oder Public-Seiten
+
 ## 2026-07-11
 
 ### Phase B11.2b-1 UI-Sichtbarkeit nach Permissions aktiviert (Enforcement bleibt aus)

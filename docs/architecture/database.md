@@ -58,3 +58,29 @@ Virtuelle Trainings werden zur Laufzeit erzeugt und nicht als persistente Event-
 
 - Keine UI- oder Service-Änderung ohne Schema-Abgleich
 - Keine Doku-Aussage ohne tatsächliche Tabellennutzung im Code
+
+## B12.2 Vorschlagsstand (noch nicht produktiv)
+
+In Phase B12.2 wurden nur SQL-Vorschlaege dokumentiert. Es wurden keine Migrationen ausgefuehrt.
+
+Geplante Erweiterungen:
+
+- Profil-Links fuer Personenkarten:
+  - `board_members.admin_profile_id -> admin_profiles.id`
+  - `coaches.admin_profile_id -> admin_profiles.id`
+- Teambezogene Admin-Scopes:
+  - neue Tabelle `admin_user_team_scopes`
+- Beitragsverwaltung:
+  - neue Tabelle `membership_contributions`
+- Optionale Zahlungshistorie:
+  - neue Tabelle `membership_contribution_payments`
+- Optionaler redaktioneller Workflow auf Content:
+  - Zusatzfelder in `news` und `events` (z. B. `workflow_status`)
+
+Referenzen:
+
+- `docs/sql/b12-profile-links-proposal.sql`
+- `docs/sql/b12-team-scopes-proposal.sql`
+- `docs/sql/b12-membership-contributions-proposal.sql`
+- `docs/sql/b12-membership-contribution-payments-proposal.sql`
+- `docs/sql/b12-content-workflow-proposal.sql`

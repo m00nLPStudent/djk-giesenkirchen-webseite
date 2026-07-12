@@ -21,6 +21,7 @@ Diese Dokumentation beschreibt den finalen Stand der öffentlichen Website (Resp
 - `modules/`
   - [modules/website.md](modules/website.md)
   - [modules/membership.md](modules/membership.md)
+  - [modules/membership-contributions.md](modules/membership-contributions.md)
   - [modules/admin-auth.md](modules/admin-auth.md)
   - [modules/news.md](modules/news.md)
   - [modules/events.md](modules/events.md)
@@ -37,6 +38,8 @@ Diese Dokumentation beschreibt den finalen Stand der öffentlichen Website (Resp
   - [development/project-health.md](development/project-health.md)
 - `decisions/`
   - [decisions/architecture-decisions.md](decisions/architecture-decisions.md)
+- `planning/`
+  - [planning/b12-role-scope-matrix.md](planning/b12-role-scope-matrix.md)
 - Historie
   - [changelog.md](changelog.md)
 
