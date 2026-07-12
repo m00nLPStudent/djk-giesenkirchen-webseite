@@ -11,6 +11,10 @@ import {
   formatPermissionCount,
   formatRoleList,
 } from "../helpers/profile.formatters";
+import {
+  getBoardMemberLinkForProfile,
+  getCoachLinkForProfile,
+} from "@/lib/admin-auth/profileCardLinks.repository";
 
 export function isSuperAdmin(userContext) {
   return Boolean(
@@ -22,7 +26,7 @@ export function canSeeTechnicalProfileDetails(userContext) {
   return isSuperAdmin(userContext);
 }
 
-function mapProfileData(context) {
+function mapProfileData(context, links = {}) {
   const roles = context?.roles || [];
   const primaryRole =
     context?.primaryRole ||
@@ -47,6 +51,8 @@ function mapProfileData(context) {
     roleLabels: formatRoleList(roles),
     lastLoginAt: context?.profile?.last_login_at || null,
     createdAt: context?.profile?.created_at || null,
+    linkedBoardMember: links?.linkedBoardMember || null,
+    linkedCoach: links?.linkedCoach || null,
   };
 }
 
@@ -61,7 +67,18 @@ export async function getOwnAdminProfileData() {
     throw new Error("Keine aktive Session gefunden.");
   }
 
-  return mapProfileData(context);
+  const profileId = context?.profile?.id || null;
+  const supabaseBrowser = getSupabaseBrowserClient();
+
+  const [boardResult, coachResult] = await Promise.all([
+    getBoardMemberLinkForProfile(profileId, supabaseBrowser),
+    getCoachLinkForProfile(profileId, supabaseBrowser),
+  ]);
+
+  return mapProfileData(context, {
+    linkedBoardMember: boardResult?.data || null,
+    linkedCoach: coachResult?.data || null,
+  });
 }
 
 export async function updateOwnProfileFullName(fullName) {

@@ -6,6 +6,8 @@ export {
 
 export {
   buildScopeContext,
+  getBoardMemberOwnerProfileId,
+  getCoachOwnerProfileId,
   getAssignedTeamIds,
   loadAdminProfileTeamAssignments,
   mapTeamAssignmentRows,

@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UserEditorForm from "../forms/UserEditorForm";
+import { previewProfileCardEmailMatchesAction } from "@/app/admin/users/actions";
 
-function mapInitialValues(user) {
-  return {
+function mapInitialValues(user, includeCardLinks) {
+  const base = {
     id: user?.id || null,
     full_name: user?.name || "",
     email: user?.email || "",
@@ -14,6 +15,16 @@ function mapInitialValues(user) {
       .filter((role) => !role.is_primary)
       .map((role) => role.id),
   };
+
+  if (!includeCardLinks) {
+    return base;
+  }
+
+  return {
+    ...base,
+    linked_board_member_id: user?.linkedBoardMember?.id || null,
+    linked_coach_id: user?.linkedCoach?.id || null,
+  };
 }
 
 export default function UserEditorDialog({
@@ -21,7 +32,10 @@ export default function UserEditorDialog({
   mode,
   user,
   roles,
+  boardMembers,
+  coaches,
   currentUserId,
+  currentUserIsSuperAdmin,
   createCapabilities,
   onSubmit,
   onClose,
@@ -29,7 +43,13 @@ export default function UserEditorDialog({
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [formErrors, setFormErrors] = useState({});
-  const initialValues = useMemo(() => mapInitialValues(user), [user]);
+  const [matchPreview, setMatchPreview] = useState(null);
+  const canManageCardLinks =
+    mode === "edit" && Boolean(currentUserIsSuperAdmin);
+  const initialValues = useMemo(
+    () => mapInitialValues(user, canManageCardLinks),
+    [user, canManageCardLinks],
+  );
   const isCreateFlowEnabled = Boolean(createCapabilities?.createFlowEnabled);
   const missingConfig = createCapabilities?.missingConfig || [];
   const isMissingServiceRole = missingConfig.includes(
@@ -42,7 +62,23 @@ export default function UserEditorDialog({
     );
   }, [user, currentUserId]);
 
-  if (!open) return null;
+  async function handleLoadPreview() {
+    if (!canManageCardLinks || !user?.id) {
+      setMatchPreview(null);
+      return;
+    }
+
+    const result = await previewProfileCardEmailMatchesAction({
+      adminProfileId: user.id,
+    });
+
+    if (!result?.ok) {
+      setMatchPreview(null);
+      return;
+    }
+
+    setMatchPreview(result);
+  }
 
   async function handleSubmit(values) {
     setMessage("");
@@ -61,6 +97,13 @@ export default function UserEditorDialog({
     setMessage(result?.message || "Gespeichert.");
     onClose();
   }
+
+  useEffect(() => {
+    if (!open) return;
+    handleLoadPreview();
+  }, [open, canManageCardLinks, user?.id]);
+
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[80] overflow-y-auto bg-black/70 p-3 backdrop-blur-sm md:grid md:place-items-center md:p-4">
@@ -102,10 +145,14 @@ export default function UserEditorDialog({
             <UserEditorForm
               mode={mode}
               roles={roles || []}
+              boardMembers={boardMembers || []}
+              coaches={coaches || []}
               initialValues={initialValues}
               loading={loading}
               currentUserId={currentUserId}
+              canManageCardLinks={canManageCardLinks}
               selfSuperadminRoleId={selfSuperadminRoleId}
+              matchPreview={matchPreview}
               onSubmit={handleSubmit}
               message={message}
               formErrors={formErrors}

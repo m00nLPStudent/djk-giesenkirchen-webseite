@@ -6,9 +6,7 @@ function getReadClient() {
   return getSupabaseBrowserClient() || supabase;
 }
 
-export async function fetchAdminProfiles() {
-  const client = getReadClient();
-
+export async function fetchAdminProfiles(client = getReadClient()) {
   return await client
     .from("admin_profiles")
     .select("*")
@@ -21,7 +19,7 @@ export async function fetchAdminProfileById(
 ) {
   return await client
     .from("admin_profiles")
-    .select("id, full_name, is_active")
+    .select("id, full_name, email, is_active")
     .eq("id", profileId)
     .maybeSingle();
 }

@@ -203,6 +203,14 @@ Priorisierte Datenquelle fuer Teamzuordnung:
 - Contribution-Payments: docs/sql/b12-membership-contribution-payments-proposal.sql
 - Scope-Skeleton: src/lib/admin-auth/scopes/
 
+## B12.2a Zusatz: feste Kachelverknuepfung
+
+- Vorstands- und Trainer-/Betreuerkacheln werden dauerhaft ueber `admin_profile_id` verknuepft.
+- E-Mail/Name dienen nur als einmalige Match-Hilfe fuer Superadmin-UI.
+- Autorisierung fuer own-card-Faelle basiert spaeter ausschliesslich auf `admin_profile_id`.
+- Kein vollstaendiges Scope-Enforcement in dieser Teilphase.
+- Keine automatische E-Mail-Synchronisierung zwischen Auth-User, `admin_profiles` und oeffentlichen Kacheln.
+
 ## Nicht-Ziele dieser Phase
 
 - keine Migration ausfuehren

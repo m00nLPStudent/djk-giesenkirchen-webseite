@@ -69,7 +69,7 @@ Geplante Erweiterungen:
   - `board_members.admin_profile_id -> admin_profiles.id`
   - `coaches.admin_profile_id -> admin_profiles.id`
 - Teambezogene Admin-Scopes:
-  - neue Tabelle `admin_user_team_scopes`
+  - neue Tabelle `admin_profile_team_assignments`
 - Beitragsverwaltung:
   - neue Tabelle `membership_contributions`
 - Optionale Zahlungshistorie:
@@ -84,3 +84,9 @@ Referenzen:
 - `docs/sql/b12-membership-contributions-proposal.sql`
 - `docs/sql/b12-membership-contribution-payments-proposal.sql`
 - `docs/sql/b12-content-workflow-proposal.sql`
+
+## B12.2a Migrationsvorbereitung (nicht ausgefuehrt)
+
+- Migrationsdatei vorbereitet: `supabase/migrations/20260712_add_admin_profile_links_to_board_and_coaches.sql`
+- Enthalten: nullable UUID-Felder, Foreign Keys auf `admin_profiles(id)` mit `on delete set null`, Indexe und partielle Unique-Indexe
+- Keine automatische Ausfuehrung, kein Backfill, keine RLS-Aenderung in dieser Migration

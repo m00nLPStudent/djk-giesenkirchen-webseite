@@ -18,7 +18,10 @@ export default function useAdminUsersViewModel(initialData) {
 
   const users = initialData?.users || [];
   const roles = initialData?.roles || [];
+  const boardMembers = initialData?.boardMembers || [];
+  const coaches = initialData?.coaches || [];
   const currentUserId = initialData?.currentUserId || null;
+  const currentUserIsSuperAdmin = Boolean(initialData?.currentUserIsSuperAdmin);
   const createCapabilities = initialData?.createCapabilities || {
     serviceRoleEnabled: false,
     createFlowEnabled: false,
@@ -75,7 +78,10 @@ export default function useAdminUsersViewModel(initialData) {
     users,
     filteredUsers,
     roles,
+    boardMembers,
+    coaches,
     currentUserId,
+    currentUserIsSuperAdmin,
     createCapabilities,
     stats: initialData?.stats,
     filters: {

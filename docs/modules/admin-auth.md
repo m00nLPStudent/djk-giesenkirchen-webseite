@@ -391,33 +391,28 @@ Hinweis: Die Datei wird nicht automatisch ausgefuehrt.
 - B4: Rechte in Sidebar und UI sichtbar machen
 - B5: Route-Guards und serverseitiger Zugriffsschutz
 
-## B12.2 Vorbereitung: Rollen-Scopes und Beitragsverwaltung (Analyse, ohne Enforcement)
+## B12.2 / B12.2a Vorbereitung (ohne Enforcement)
 
-Ziel von B12.2:
+Zielbild und Status:
 
-- Technische Grundlagen fuer feinere Rollen-Scopes vorbereiten.
-- Datenmodellvorschlag fuer Mitgliedsbeitraege (Spieler/Trainer) dokumentieren.
-- Ohne Aktivierung neuer Guards, ohne Durchsetzung im Proxy, ohne SQL-Ausfuehrung.
+- Scope-Architektur und Beitragsmodell sind als Vorschlag dokumentiert.
+- Feste Profil-/Kachel-Verknuepfung ist technisch vorbereitet:
+  - `board_members.admin_profile_id -> admin_profiles.id`
+  - `coaches.admin_profile_id -> admin_profiles.id`
+- Superadmin-gestuetzte Link-Verwaltung in der Benutzerpflege ist vorbereitet.
+- E-Mail/Name dienen nur als einmalige Match-Hilfe, nicht als Autorisierungsgrundlage.
 
-Status (Ist-Stand):
+Artefakte:
 
-- Auth-Grundmodell vorhanden: `admin_profiles`, `admin_roles`, `admin_permissions`, `admin_role_permissions`, `admin_user_roles`.
-- Teambezogene Scope-Zuordnungen fehlen aktuell als eigene Relation.
-- Feste Profil-Verknuepfungen von `board_members` und `coaches` zu `admin_profiles` fehlen aktuell.
-- Beitragsverwaltung ist noch nicht als eigene Tabelle umgesetzt.
+- Scope-Skeleton: `src/lib/admin-auth/scopes/`
+- Planung: `docs/planning/b12-role-scope-matrix.md`
+- Profil-Linking-Modul: `docs/modules/profile-card-linking.md`
+- SQL-Vorschlaege: `docs/sql/b12-*.sql`
+- Migration vorbereitet (nicht ausgefuehrt):
+  - `supabase/migrations/20260712_add_admin_profile_links_to_board_and_coaches.sql`
 
-Vorbereitete Artefakte in B12.2 (nur Vorschlaege/Skeletons):
+Rahmen bleibt unveraendert:
 
-- Scope-Skeleton (nicht aktiviert): `src/lib/admin-auth/scopes/`
-- SQL-Vorschlag Profil-Links: `docs/sql/b12-profile-links-proposal.sql`
-- SQL-Vorschlag Team-Scopes: `docs/sql/b12-team-scopes-proposal.sql`
-- SQL-Vorschlag Beitraege: `docs/sql/b12-membership-contributions-proposal.sql`
-- SQL-Vorschlag Zahlungshistorie: `docs/sql/b12-membership-contribution-payments-proposal.sql`
-- SQL-Vorschlag Content-Workflow (optional): `docs/sql/b12-content-workflow-proposal.sql`
-- Analysematrix: `docs/planning/b12-role-scope-matrix.md`
-
-Wichtig:
-
-- `AUTH_REQUIRED_FOR_ADMIN = true` bleibt unveraendert.
-- `AUTH_ENFORCEMENT_ENABLED = false` bleibt unveraendert.
-- Keine Migration wurde in dieser Phase ausgefuehrt.
+- `AUTH_REQUIRED_FOR_ADMIN = true`
+- `AUTH_ENFORCEMENT_ENABLED = false`
+- Keine automatische SQL-Ausfuehrung in dieser Phase.

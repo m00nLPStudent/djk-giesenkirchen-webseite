@@ -2,6 +2,10 @@ import {
   loadAdminPermissions,
   loadAdminRoles,
 } from "@/lib/admin-auth/adminAuth.service";
+import {
+  listBoardMembersForLinking,
+  listCoachesForLinking,
+} from "@/lib/admin-auth/profileCardLinks.repository";
 import { getAdminUserCreateCapabilities } from "@/lib/admin-auth/adminUserCreateCapabilities";
 import {
   buildRlsHint,
@@ -62,6 +66,8 @@ function enrichUser(
   roleById,
   permissionsById,
   permissionIdsByRole,
+  linkedBoardByProfileId,
+  linkedCoachByProfileId,
 ) {
   const mappedRoles = (links || [])
     .map((link) => mapUserRole(roleById.get(link.role_id), link))
@@ -102,7 +108,14 @@ function enrichUser(
     primaryRole,
     roles: mappedRoles,
     permissions,
+    linkedBoardMember: linkedBoardByProfileId.get(profile.id) || null,
+    linkedCoach: linkedCoachByProfileId.get(profile.id) || null,
   };
+}
+
+function isSuperadminForUser(userId, linksByUser, roleById) {
+  const links = linksByUser[userId] || [];
+  return links.some((link) => roleById.get(link.role_id)?.key === "superadmin");
 }
 
 export async function getAdminUsersPageData() {
@@ -195,11 +208,15 @@ export async function getAdminUsersPageData() {
     { data: roleLinks, error: roleLinksError },
     roles,
     permissions,
+    { data: boardMembers, error: boardMembersError },
+    { data: coaches, error: coachesError },
   ] = await Promise.all([
     fetchAdminProfiles(),
     fetchAllUserRoleLinks(),
     loadAdminRoles({ onlyActive: false }),
     loadAdminPermissions(),
+    listBoardMembersForLinking(),
+    listCoachesForLinking(),
   ]);
 
   if (profilesError) {
@@ -222,6 +239,14 @@ export async function getAdminUsersPageData() {
       throw buildRlsHint("admin-users", ["admin_user_roles"]);
     }
     throw toAdminError("admin_user_roles", roleLinksError);
+  }
+
+  if (boardMembersError) {
+    throw toAdminError("board_members", boardMembersError);
+  }
+
+  if (coachesError) {
+    throw toAdminError("coaches", coachesError);
   }
 
   const roleById = new Map((roles || []).map((role) => [role.id, role]));
@@ -252,6 +277,22 @@ export async function getAdminUsersPageData() {
     return acc;
   }, {});
 
+  const linkedBoardByProfileId = new Map(
+    (boardMembers || [])
+      .filter((entry) => entry?.admin_profile_id)
+      .map((entry) => [entry.admin_profile_id, entry]),
+  );
+
+  const linkedCoachByProfileId = new Map(
+    (coaches || [])
+      .filter((entry) => entry?.admin_profile_id)
+      .map((entry) => [entry.admin_profile_id, entry]),
+  );
+
+  const currentUserIsSuperAdmin = currentUserId
+    ? isSuperadminForUser(currentUserId, linksByUser, roleById)
+    : false;
+
   const users = (profiles || []).map((profile) =>
     enrichUser(
       profile,
@@ -259,6 +300,8 @@ export async function getAdminUsersPageData() {
       roleById,
       permissionById,
       permissionIdsByRole,
+      linkedBoardByProfileId,
+      linkedCoachByProfileId,
     ),
   );
 
@@ -267,7 +310,10 @@ export async function getAdminUsersPageData() {
   return {
     users,
     roles: roles || [],
+    boardMembers: boardMembers || [],
+    coaches: coaches || [],
     currentUserId,
+    currentUserIsSuperAdmin,
     createCapabilities,
     loadState,
     stats: {

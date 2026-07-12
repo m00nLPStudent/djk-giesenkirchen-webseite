@@ -196,7 +196,10 @@ export default function AdminUsersPageShell({ initialData }) {
         mode={vm.editingUser ? "edit" : "create"}
         user={vm.editingUser}
         roles={vm.roles || []}
+        boardMembers={vm.boardMembers || []}
+        coaches={vm.coaches || []}
         currentUserId={vm.currentUserId}
+        currentUserIsSuperAdmin={vm.currentUserIsSuperAdmin}
         createCapabilities={createCapabilities}
         onSubmit={handleSubmitUserEditor}
         onClose={vm.closeEditor}

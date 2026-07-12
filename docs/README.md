@@ -22,6 +22,7 @@ Diese Dokumentation beschreibt den finalen Stand der öffentlichen Website (Resp
   - [modules/website.md](modules/website.md)
   - [modules/membership.md](modules/membership.md)
   - [modules/membership-contributions.md](modules/membership-contributions.md)
+  - [modules/profile-card-linking.md](modules/profile-card-linking.md)
   - [modules/admin-auth.md](modules/admin-auth.md)
   - [modules/news.md](modules/news.md)
   - [modules/events.md](modules/events.md)

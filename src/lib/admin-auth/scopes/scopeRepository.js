@@ -76,3 +76,47 @@ export function buildScopeContext({
     assignedTeamIds,
   };
 }
+
+export async function getBoardMemberOwnerProfileId(boardMemberId, supabase) {
+  if (!boardMemberId || !supabase) {
+    return { data: null, error: null };
+  }
+
+  const { data, error } = await supabase
+    .from("board_members")
+    .select("id, admin_profile_id")
+    .eq("id", boardMemberId)
+    .maybeSingle();
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  if (!data?.id || !data?.admin_profile_id) {
+    return { data: null, error: null };
+  }
+
+  return { data: data.admin_profile_id, error: null };
+}
+
+export async function getCoachOwnerProfileId(coachId, supabase) {
+  if (!coachId || !supabase) {
+    return { data: null, error: null };
+  }
+
+  const { data, error } = await supabase
+    .from("coaches")
+    .select("id, admin_profile_id")
+    .eq("id", coachId)
+    .maybeSingle();
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  if (!data?.id || !data?.admin_profile_id) {
+    return { data: null, error: null };
+  }
+
+  return { data: data.admin_profile_id, error: null };
+}

@@ -20,6 +20,8 @@ import {
 } from "@/components/admin/users/services/usersActionWriteHelpers";
 import { createAdminUserWithInvite } from "@/lib/admin-auth/adminUserCreate.service";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { previewProfileCardEmailMatches } from "@/lib/admin-auth/profileCardLinkMatching.service";
+import { applyCardLinkChanges } from "./actions.cardLinks";
 
 export async function saveAdminUserAction({ userId, values, currentUserId }) {
   const supabaseServer = await createServerActionSupabaseClient();
@@ -48,6 +50,15 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
   }
 
   const payload = buildUserEditorPayload(values);
+  const hasBoardIntent = Object.prototype.hasOwnProperty.call(
+    payload,
+    "linked_board_member_id",
+  );
+  const hasCoachIntent = Object.prototype.hasOwnProperty.call(
+    payload,
+    "linked_coach_id",
+  );
+  const managesCardLinks = hasBoardIntent || hasCoachIntent;
 
   if (
     userId &&
@@ -130,12 +141,27 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
   );
 
   if (!profileNeedsUpdate) {
+    const linkResult = await applyCardLinkChanges({
+      branch: "profile-unchanged",
+      userId,
+      payload,
+      hasBoardIntent,
+      hasCoachIntent,
+      managesCardLinks,
+      supabaseServer,
+    });
+
+    if (!linkResult.ok) {
+      return linkResult;
+    }
+
     revalidatePath("/admin/users");
     return {
       ok: true,
-      message: roleResult.changed
-        ? "Benutzerrollen wurden aktualisiert."
-        : "Keine Aenderungen erkannt.",
+      message:
+        roleResult.changed || managesCardLinks
+          ? "Benutzerdaten wurden aktualisiert."
+          : "Keine Aenderungen erkannt.",
     };
   }
 
@@ -165,12 +191,70 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
     };
   }
 
+  const linkResult = await applyCardLinkChanges({
+    branch: "profile-updated",
+    userId,
+    payload,
+    hasBoardIntent,
+    hasCoachIntent,
+    managesCardLinks,
+    supabaseServer,
+  });
+
+  if (!linkResult.ok) {
+    return linkResult;
+  }
+
   revalidatePath("/admin/users");
   return {
     ok: true,
     message: roleResult.changed
       ? "Benutzer und Rollen wurden aktualisiert."
       : "Benutzer wurde aktualisiert.",
+  };
+}
+
+export async function previewProfileCardEmailMatchesAction({ adminProfileId }) {
+  const supabaseServer = await createServerActionSupabaseClient();
+  const actorContext = await assertAdminActionPermission({
+    requiredPermission: "users.edit",
+    supabaseServer,
+  });
+
+  if (!actorContext.ok) {
+    return {
+      ok: false,
+      reason: actorContext.reason,
+      message: actorContext.message,
+    };
+  }
+
+  const superadminActor = await getActorContext(supabaseServer);
+  if (!superadminActor.ok) {
+    return {
+      ok: false,
+      reason: superadminActor.reason,
+      message:
+        superadminActor.message ||
+        "Nur Superadmin darf Zuordnungsvorschlaege abrufen.",
+    };
+  }
+
+  const preview = await previewProfileCardEmailMatches(
+    adminProfileId,
+    supabaseServer,
+  );
+
+  if (!preview.ok) {
+    return preview;
+  }
+
+  return {
+    ok: true,
+    profileEmailMasked: preview.profileEmailMasked,
+    duplicateProfileWarning: preview.duplicateProfileWarning,
+    board: preview.board,
+    coach: preview.coach,
   };
 }
 

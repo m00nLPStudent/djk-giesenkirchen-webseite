@@ -40,6 +40,14 @@ export default function ProfileSummaryCard({ profileData }) {
           label="Erstellt am"
           value={formatProfileDateTime(profileData?.createdAt)}
         />
+        <Row
+          label="Verknuepfte Vorstandskachel"
+          value={profileData?.linkedBoardMember?.label || "Keine Zuordnung"}
+        />
+        <Row
+          label="Verknuepfte Trainer-/Betreuerkachel"
+          value={profileData?.linkedCoach?.label || "Keine Zuordnung"}
+        />
         {canSeeTechnical ? (
           <Row label="User-ID" value={profileData?.userId} />
         ) : null}

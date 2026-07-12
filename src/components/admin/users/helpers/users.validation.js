@@ -2,6 +2,12 @@ function isEmail(value = "") {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
+function isLikelyUuid(value = "") {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(value || "").trim(),
+  );
+}
+
 function normalizeRoleIds(values = []) {
   return (values || [])
     .map((value) => String(value || "").trim())
@@ -41,6 +47,28 @@ export function validateUserEditorValues(values, { isCreate = false } = {}) {
 
   if (isCreate && !values.email?.trim()) {
     errors.email = "E-Mail ist fuer die Einladung erforderlich.";
+  }
+
+  if (
+    Object.prototype.hasOwnProperty.call(values, "linked_board_member_id") &&
+    values.linked_board_member_id !== null &&
+    values.linked_board_member_id !== undefined
+  ) {
+    const normalized = String(values.linked_board_member_id).trim();
+    if (normalized && !isLikelyUuid(normalized)) {
+      errors.linked_board_member_id = "Ungueltige Vorstandskachel-ID.";
+    }
+  }
+
+  if (
+    Object.prototype.hasOwnProperty.call(values, "linked_coach_id") &&
+    values.linked_coach_id !== null &&
+    values.linked_coach_id !== undefined
+  ) {
+    const normalized = String(values.linked_coach_id).trim();
+    if (normalized && !isLikelyUuid(normalized)) {
+      errors.linked_coach_id = "Ungueltige Trainerkachel-ID.";
+    }
   }
 
   return {

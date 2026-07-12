@@ -1,6 +1,32 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import UserEditorCardLinkFields from "./UserEditorCardLinkFields";
+
+function normalizeLinkValue(value) {
+  if (value === undefined) return undefined;
+  if (value === null) return null;
+  const normalized = String(value).trim();
+  return normalized || null;
+}
+
+function classifyLinkValue(value) {
+  if (value === undefined) return "undefined";
+  if (value === null) return "null";
+  if (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      String(value),
+    )
+  ) {
+    return "uuid";
+  }
+  return "other";
+}
+
+function logPreSubmit(stage) {
+  if (process.env.NODE_ENV !== "development") return;
+  console.log("[B12.2a-1.1][CardLink][PreSubmit]", stage);
+}
 
 function toRoleOptions(roles = []) {
   const active = (roles || []).filter((role) => role?.is_active);
@@ -26,21 +52,32 @@ function uniqueRoleIds(roleIds = []) {
 export default function UserEditorForm({
   mode,
   roles,
+  boardMembers,
+  coaches,
   initialValues,
   loading,
   currentUserId,
+  canManageCardLinks,
   selfSuperadminRoleId,
+  matchPreview,
   onSubmit,
   message,
   formErrors,
 }) {
   const [values, setValues] = useState(initialValues);
   const roleOptions = useMemo(() => toRoleOptions(roles), [roles]);
+  const initialBoardMemberId = useMemo(
+    () => normalizeLinkValue(initialValues.linked_board_member_id),
+    [initialValues.linked_board_member_id],
+  );
+  const initialCoachId = useMemo(
+    () => normalizeLinkValue(initialValues.linked_coach_id),
+    [initialValues.linked_coach_id],
+  );
   const availableAdditionalOptions = useMemo(
     () => roleOptions.filter((role) => role.id !== values.primary_role_id),
     [roleOptions, values.primary_role_id],
   );
-
   useEffect(() => {
     setValues(initialValues);
   }, [initialValues]);
@@ -73,7 +110,53 @@ export default function UserEditorForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
-    await onSubmit(values);
+    const submitValues = { ...values };
+
+    if (canManageCardLinks) {
+      const currentBoardMemberId = normalizeLinkValue(
+        values.linked_board_member_id,
+      );
+      const currentCoachId = normalizeLinkValue(values.linked_coach_id);
+      const boardChanged = currentBoardMemberId !== initialBoardMemberId;
+      const coachChanged = currentCoachId !== initialCoachId;
+
+      logPreSubmit({
+        board: {
+          current: classifyLinkValue(currentBoardMemberId),
+          initial: classifyLinkValue(initialBoardMemberId),
+          changed: boardChanged,
+          includedInPayload: boardChanged,
+        },
+        coach: {
+          current: classifyLinkValue(currentCoachId),
+          initial: classifyLinkValue(initialCoachId),
+          changed: coachChanged,
+          includedInPayload: coachChanged,
+        },
+      });
+
+      if (boardChanged) {
+        submitValues.linked_board_member_id = currentBoardMemberId;
+      } else {
+        delete submitValues.linked_board_member_id;
+      }
+
+      if (coachChanged) {
+        submitValues.linked_coach_id = currentCoachId;
+      } else {
+        delete submitValues.linked_coach_id;
+      }
+    }
+
+    await onSubmit(submitValues);
+  }
+
+  function handleBoardLinkChange(normalizedValue) {
+    handleChange("linked_board_member_id", normalizeLinkValue(normalizedValue));
+  }
+
+  function handleCoachLinkChange(normalizedValue) {
+    handleChange("linked_coach_id", normalizeLinkValue(normalizedValue));
   }
 
   const isEditingSelf =
@@ -200,6 +283,17 @@ export default function UserEditorForm({
           ) : null}
         </label>
       </div>
+
+      {canManageCardLinks ? (
+        <UserEditorCardLinkFields
+          values={values}
+          boardMembers={boardMembers}
+          coaches={coaches}
+          matchPreview={matchPreview}
+          onBoardChange={handleBoardLinkChange}
+          onCoachChange={handleCoachLinkChange}
+        />
+      ) : null}
 
       {message ? (
         <p className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white/75">

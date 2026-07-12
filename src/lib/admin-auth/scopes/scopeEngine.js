@@ -1,3 +1,8 @@
+import {
+  getBoardMemberOwnerProfileId,
+  getCoachOwnerProfileId,
+} from "./scopeRepository";
+
 function hasPermission(scopeContext, permissionKey) {
   if (!permissionKey) return true;
   return scopeContext?.permissionKeys?.has(permissionKey) || false;
@@ -53,17 +58,34 @@ export function canAccessAssignedTeam(
   return new Set(assignedTeamIds || []).has(teamId);
 }
 
-export function canEditOwnBoardCard(
+export async function canEditOwnBoardCard(
   adminProfileId,
-  boardMemberOwnerAdminProfileId,
+  boardMemberId,
+  { supabase } = {},
 ) {
-  if (!adminProfileId || !boardMemberOwnerAdminProfileId) return false;
-  return adminProfileId === boardMemberOwnerAdminProfileId;
+  if (!adminProfileId || !boardMemberId || !supabase) return false;
+
+  const { data: ownerAdminProfileId, error } =
+    await getBoardMemberOwnerProfileId(boardMemberId, supabase);
+  if (error || !ownerAdminProfileId) return false;
+
+  return adminProfileId === ownerAdminProfileId;
 }
 
-export function canEditOwnStaffCard(adminProfileId, coachOwnerAdminProfileId) {
-  if (!adminProfileId || !coachOwnerAdminProfileId) return false;
-  return adminProfileId === coachOwnerAdminProfileId;
+export async function canEditOwnStaffCard(
+  adminProfileId,
+  coachId,
+  { supabase } = {},
+) {
+  if (!adminProfileId || !coachId || !supabase) return false;
+
+  const { data: ownerAdminProfileId, error } = await getCoachOwnerProfileId(
+    coachId,
+    supabase,
+  );
+  if (error || !ownerAdminProfileId) return false;
+
+  return adminProfileId === ownerAdminProfileId;
 }
 
 export function canEditOwnContent(adminProfileId, createdByAdminProfileId) {

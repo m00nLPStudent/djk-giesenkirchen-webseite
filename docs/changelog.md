@@ -2,6 +2,16 @@
 
 ## 2026-07-12
 
+### Phase B12.2a Feste Profil-/Kachel-Verknuepfung fuer Vorstand und Trainer produktiv vorbereitet
+
+- Migration vorbereitet (nicht ausgefuehrt): `supabase/migrations/20260712_add_admin_profile_links_to_board_and_coaches.sql`
+- Verknuepfungsmodell auf `board_members.admin_profile_id` und `coaches.admin_profile_id` konkretisiert
+- Superadmin-Editor in der Benutzerverwaltung um fixe Kachelzuordnung erweitert
+- Serverseitige Repository- und Action-Helfer fuer Link/Unlink und Konfliktpruefung ergänzt
+- E-Mail-Match-Preview als einmalige Zuordnungshilfe vorbereitet (`exact_match`, `no_match`, `ambiguous_match`, `already_linked`)
+- Eigene verknuepfte Kachel im Profil read only sichtbar gemacht
+- Keine SQL-Ausfuehrung, keine RLS-Aktivierung, kein Enforcement-Umbau
+
 ### Phase B12.2 Technische Grundlagen fuer Rollen-Scopes und Beitragsverwaltung vorbereitet (Analysephase)
 
 - `AUTH_REQUIRED_FOR_ADMIN = true` bleibt aktiv
