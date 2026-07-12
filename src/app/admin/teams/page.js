@@ -3,6 +3,9 @@ import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminTeamsList, TeamStats } from "@/components/admin/teams";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
+
+export const dynamic = "force-dynamic";
 
 function mergeTeamSeason(team, teamSeason, season) {
   if (!teamSeason) {
@@ -103,12 +106,14 @@ export default async function AdminTeamsPage() {
         title="Mannschaften verwalten"
         description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
         actions={
-          <Link
-            href="/admin/teams/new"
-            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-          >
-            Neue Mannschaft
-          </Link>
+          <Can permission="teams.create" uiOnly>
+            <Link
+              href="/admin/teams/new"
+              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+            >
+              Neue Mannschaft
+            </Link>
+          </Can>
         }
       />
 

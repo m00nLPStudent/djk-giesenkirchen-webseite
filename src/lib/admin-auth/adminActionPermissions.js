@@ -1,4 +1,5 @@
 import { createServerActionSupabaseClient } from "@/lib/supabase.server";
+import { resolveAdminProfileForAuthUser } from "./adminProfileLookup";
 import { hasPermission } from "./permissionEngine";
 
 function buildMissingPermissionResult(requiredPermission) {
@@ -11,27 +12,16 @@ function buildMissingPermissionResult(requiredPermission) {
 }
 
 async function loadAdminProfile(supabaseServer, user) {
-  const byId = await supabaseServer
-    .from("admin_profiles")
-    .select("id, email, is_active")
-    .eq("id", user.id)
-    .maybeSingle();
+  const result = await resolveAdminProfileForAuthUser(supabaseServer, user, {
+    fields: "id, email, is_active",
+  });
 
-  if (byId?.error || byId?.data) {
-    return { profile: byId?.data || null, error: byId?.error || null };
-  }
-
-  if (!user?.email) {
-    return { profile: null, error: null };
-  }
-
-  const byEmail = await supabaseServer
-    .from("admin_profiles")
-    .select("id, email, is_active")
-    .eq("email", user.email)
-    .maybeSingle();
-
-  return { profile: byEmail?.data || null, error: byEmail?.error || null };
+  return {
+    profile: result?.profile || null,
+    error: result?.queryError || null,
+    lookupType: result?.lookupType || null,
+    fallbackUsed: Boolean(result?.fallbackUsed),
+  };
 }
 
 async function loadPermissionContext(supabaseServer, user, profile) {
@@ -154,12 +144,31 @@ export async function assertAdminActionPermission({
     };
   }
 
-  const { profile, error: profileError } = await loadAdminProfile(
+  const { profile, error: profileError, lookupType } = await loadAdminProfile(
     supabaseServer,
     user,
   );
 
-  if (profileError || !profile?.id) {
+  if (process.env.NODE_ENV === "development") {
+    console.info("[admin-action-permission:profile]", {
+      hasAuthUser: Boolean(user?.id),
+      profileFound: Boolean(profile?.id),
+      lookupType: lookupType || null,
+      hasQueryError: Boolean(profileError),
+      queryErrorCode: profileError?.code || null,
+      queryErrorMessage: profileError?.message || null,
+    });
+  }
+
+  if (profileError) {
+    return {
+      ok: false,
+      reason: "profile-lookup-failed",
+      message: "Admin-Profil konnte nicht geladen werden.",
+    };
+  }
+
+  if (!profile?.id) {
     return {
       ok: false,
       reason: "missing-admin-profile",

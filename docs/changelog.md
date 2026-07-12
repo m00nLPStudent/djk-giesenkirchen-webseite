@@ -2,6 +2,18 @@
 
 ## 2026-07-11
 
+### Phase B11.2b-1 UI-Sichtbarkeit nach Permissions aktiviert (Enforcement bleibt aus)
+
+- `AUTH_REQUIRED_FOR_ADMIN = true` bleibt aktiv
+- `AUTH_ENFORCEMENT_ENABLED = false` bleibt aktiv
+- Sidebar-Eintraege werden nun rein UI-seitig nach vorhandenen View-Permissions gefiltert
+- Dashboard-Quick-Actions werden nun rein UI-seitig nach `requiredPermission` gefiltert
+- Dashboard-Statistikkarten mit `requiredPermission` werden nun rein UI-seitig gefiltert
+- sichtbare Neu-/Bearbeiten-/Löschen-/Matrix-/Speichern-Aktionen in den Adminmodulen werden nun nach bestehenden Permissions ausgeblendet
+- noch kein Route-Enforcement und keine neuen Redirects
+- Proxy, Middleware, Server Actions, Datenservices, SQL und RLS bleiben in dieser Phase unverändert
+- nächste Phase: B11.2b-2 mit kontrollierter Absicherung einzelner Routen
+
 ### Phase B11.2a Route-/Permission-Mapping vollstaendig und auditierbar (Enforcement aus)
 
 - `AUTH_REQUIRED_FOR_ADMIN = true` bleibt aktiv

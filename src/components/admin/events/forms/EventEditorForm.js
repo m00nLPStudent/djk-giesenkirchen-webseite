@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { createSlug } from "@/lib/slug";
 import { EVENT_FORM_TABS } from "./eventEditor.constants";
 import {
@@ -105,6 +107,12 @@ export default function EventEditorForm({ event = null, teams = [] }) {
 
   async function handleSubmit(submitEvent) {
     submitEvent.preventDefault();
+    logAdminSaveEvent({
+      module: "events",
+      mode: isEdit ? "edit" : "create",
+      step: "form.submit-triggered",
+      success: true,
+    });
 
     if (!form.title_de.trim()) {
       alert("Bitte einen Titel eintragen.");
@@ -128,9 +136,27 @@ export default function EventEditorForm({ event = null, teams = [] }) {
     setLoading(false);
 
     if (error) {
+      logAdminSaveEvent({
+        module: "events",
+        mode: isEdit ? "edit" : "create",
+        step: "form.submit-failed",
+        success: false,
+        error,
+        navigationTriggered: false,
+      });
       alert("Fehler beim Speichern: " + error.message);
       return;
     }
+
+    logAdminSaveEvent({
+      module: "events",
+      mode: isEdit ? "edit" : "create",
+      step: "form.submit-success",
+      success: true,
+      navigationTriggered: true,
+    });
+
+    await revalidatePublicContentAction("events");
 
     router.push("/admin/events");
     router.refresh();

@@ -1,4 +1,5 @@
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import Can from "@/components/admin/auth/Can";
 import UserAvatar from "./UserAvatar";
 import UserStatusBadge from "./UserStatusBadge";
 import { formatDateTime } from "../helpers/users.formatters";
@@ -41,17 +42,19 @@ function ActionButtons({
 
   return (
     <div className="grid gap-2">
-      <button
-        type="button"
-        disabled={!onEditUser}
-        title={
-          onEditUser ? "Benutzer bearbeiten" : "Bearbeiten nicht verfuegbar."
-        }
-        onClick={() => onEditUser?.(user.id)}
-        className="h-9 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white disabled:opacity-45"
-      >
-        Bearbeiten
-      </button>
+      <Can permission="users.edit" uiOnly>
+        <button
+          type="button"
+          disabled={!onEditUser}
+          title={
+            onEditUser ? "Benutzer bearbeiten" : "Bearbeiten nicht verfuegbar."
+          }
+          onClick={() => onEditUser?.(user.id)}
+          className="h-9 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white disabled:opacity-45"
+        >
+          Bearbeiten
+        </button>
+      </Can>
 
       <button
         type="button"
@@ -61,19 +64,21 @@ function ActionButtons({
         Details
       </button>
 
-      <button
-        type="button"
-        disabled={isUpdating || isSelfDeactivate}
-        onClick={() => onToggleStatus(user.id, !user.is_active)}
-        title={
-          isSelfDeactivate
-            ? "Eigener Benutzer kann nicht deaktiviert werden."
-            : undefined
-        }
-        className="h-9 w-full rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {user.is_active ? "Deaktivieren" : "Aktivieren"}
-      </button>
+      <Can permission="users.edit" uiOnly>
+        <button
+          type="button"
+          disabled={isUpdating || isSelfDeactivate}
+          onClick={() => onToggleStatus(user.id, !user.is_active)}
+          title={
+            isSelfDeactivate
+              ? "Eigener Benutzer kann nicht deaktiviert werden."
+              : undefined
+          }
+          className="h-9 w-full rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {user.is_active ? "Deaktivieren" : "Aktivieren"}
+        </button>
+      </Can>
     </div>
   );
 }
@@ -97,13 +102,15 @@ export default function UsersTable({
           <p className="mx-auto mt-2 max-w-xl text-sm text-white/60">
             Benutzer werden spaeter ueber die Auth-Verwaltung angelegt.
           </p>
-          <button
-            type="button"
-            onClick={onCreate}
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
-          >
-            Neuer Benutzer
-          </button>
+          <Can permission="users.create" uiOnly>
+            <button
+              type="button"
+              onClick={onCreate}
+              className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+            >
+              Neuer Benutzer
+            </button>
+          </Can>
         </div>
       </AdminPanel>
     );

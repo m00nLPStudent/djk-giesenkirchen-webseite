@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { uploadMediaFile, deleteMediaFile } from "@/lib/storage";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 
 export const SPONSOR_PLACEHOLDER_IMAGE = "";
 
@@ -13,7 +14,9 @@ export async function uploadSponsorImage(file, sponsor = {}) {
 }
 
 export async function deleteSponsorImage(imageUrl) {
-  return await deleteMediaFile(imageUrl, { ignoredUrls: [SPONSOR_PLACEHOLDER_IMAGE] });
+  return await deleteMediaFile(imageUrl, {
+    ignoredUrls: [SPONSOR_PLACEHOLDER_IMAGE],
+  });
 }
 
 export async function saveSponsor(sponsor, id = null) {
@@ -32,8 +35,36 @@ export async function saveSponsor(sponsor, id = null) {
   };
 
   if (id) {
-    return await supabase.from("sponsors").update(payload).eq("id", id).select("*");
+    const result = await supabase
+      .from("sponsors")
+      .update(payload)
+      .eq("id", id)
+      .select("*");
+
+    logAdminSaveEvent({
+      module: "sponsors",
+      mode: "edit",
+      step: "service.saveSponsor",
+      operation: "update",
+      success: !result.error,
+      error: result.error,
+      data: result.data,
+    });
+
+    return result;
   }
 
-  return await supabase.from("sponsors").insert(payload).select("*");
+  const result = await supabase.from("sponsors").insert(payload).select("*");
+
+  logAdminSaveEvent({
+    module: "sponsors",
+    mode: "create",
+    step: "service.saveSponsor",
+    operation: "insert",
+    success: !result.error,
+    error: result.error,
+    data: result.data,
+  });
+
+  return result;
 }

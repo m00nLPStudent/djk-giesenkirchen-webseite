@@ -2,6 +2,7 @@ import { deletePage, savePage } from "../settings.service";
 import { createInitialPageForm, sortedByOrder } from "./settingsInitialState";
 import { createPreparedPageForm, normalizeSlug } from "./settingsPayload";
 import { createFieldUpdater } from "./fieldUpdater";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 
 export function createPageHandlers({
   router,
@@ -69,6 +70,8 @@ export function createPageHandlers({
       return sortedByOrder(next);
     });
 
+    await revalidatePublicContentAction("pages/settings");
+
     selectPage(saved);
     alert("Seite gespeichert.");
     router.refresh();
@@ -91,6 +94,7 @@ export function createPageHandlers({
     setPages((current) =>
       current.filter((item) => item.id !== selectedPage.id),
     );
+    await revalidatePublicContentAction("pages/settings");
     resetPageForm();
     alert("Seite gelöscht.");
     router.refresh();

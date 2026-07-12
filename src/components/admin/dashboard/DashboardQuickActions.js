@@ -1,38 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { getVisibleDashboardQuickActions } from "./dashboard.options";
+import { DASHBOARD_QUICK_ACTIONS } from "./dashboard.options";
 import AdminPanel from "@/components/admin/common/AdminPanel";
-import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
-import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
+import { useAdminUiContext } from "@/components/admin/auth/AdminUiContext";
+import { filterVisibleAdminUiItems } from "@/lib/admin-auth/adminUiVisibility";
 
 export default function DashboardQuickActions() {
-  const [userContext, setUserContext] = useState(getAdminFallbackUserContext());
+  const { isReady, userContext } = useAdminUiContext();
 
-  useEffect(() => {
-    let active = true;
-
-    async function loadContext() {
-      try {
-        const context = await getCurrentAdminContext();
-        if (!active) return;
-        setUserContext(context || getAdminFallbackUserContext());
-      } catch {
-        if (!active) return;
-        setUserContext(getAdminFallbackUserContext());
-      }
-    }
-
-    loadContext();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const visibleActions = getVisibleDashboardQuickActions(userContext);
+  const visibleActions = isReady
+    ? filterVisibleAdminUiItems(userContext, DASHBOARD_QUICK_ACTIONS)
+    : [];
 
   return (
     <AdminPanel>

@@ -1,4 +1,5 @@
 import { FormGrid, FormSection, InputField } from "@/components/admin/forms";
+import Can from "@/components/admin/auth/Can";
 import AdminRichTextEditor from "@/components/admin/richtext/AdminRichTextEditor";
 
 export default function PageForm({
@@ -87,31 +88,33 @@ export default function PageForm({
         </div>
       </FormSection>
 
-      <div className="flex flex-wrap justify-end gap-3">
-        <button
-          type="button"
-          onClick={onReset}
-          className="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-        >
-          Neue Seite
-        </button>
-        {selectedPage && (
+      <Can permission="settings.edit" uiOnly>
+        <div className="flex flex-wrap justify-end gap-3">
           <button
             type="button"
-            onClick={onDelete}
-            className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-600 hover:text-white"
+            onClick={onReset}
+            className="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
           >
-            Seite löschen
+            Neue Seite
           </button>
-        )}
-        <button
-          type="submit"
-          disabled={pageLoading}
-          className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-        >
-          {pageLoading ? "Speichert..." : "Seite speichern"}
-        </button>
-      </div>
+          {selectedPage && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-600 hover:text-white"
+            >
+              Seite löschen
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={pageLoading}
+            className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
+          >
+            {pageLoading ? "Speichert..." : "Seite speichern"}
+          </button>
+        </div>
+      </Can>
     </form>
   );
 }

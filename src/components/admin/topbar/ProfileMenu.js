@@ -1,15 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, UserCog, UserCircle } from "lucide-react";
 import { AUTH_REQUIRED_FOR_ADMIN } from "@/lib/admin-auth/adminAuthConfig";
 import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import { logAdminDebugError } from "@/lib/admin-auth/adminDiagnostics";
 import { adminLogoutAction } from "@/app/admin/logout/actions";
+import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 
 export default function ProfileMenu() {
-  const router = useRouter();
   const ref = useRef(null);
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -123,24 +122,75 @@ export default function ProfileMenu() {
   }, [open]);
 
   async function handleLogout() {
-    setLoggingOut(true);
-    await adminLogoutAction();
-    setOpen(false);
-    setLoggingOut(false);
+    if (loggingOut) return;
 
-    router.push(AUTH_REQUIRED_FOR_ADMIN ? "/admin/login" : "/admin");
-    router.refresh();
+    setLoadError("");
+    setLoggingOut(true);
+
+    let clientSignOutSuccess = false;
+
+    try {
+      const supabaseBrowser = getSupabaseBrowserClient();
+
+      if (supabaseBrowser) {
+        const { error: localError } = await supabaseBrowser.auth.signOut({
+          scope: "local",
+        });
+        clientSignOutSuccess = !localError;
+      } else {
+        clientSignOutSuccess = true;
+      }
+
+      if (process.env.NODE_ENV === "development") {
+        console.info("[admin-logout]", {
+          step: "client-signout",
+          success: clientSignOutSuccess,
+        });
+      }
+
+      const logoutResult = await adminLogoutAction();
+      const loginTarget = AUTH_REQUIRED_FOR_ADMIN ? "/admin/login" : "/admin";
+
+      if (process.env.NODE_ENV === "development") {
+        console.info("[admin-logout]", {
+          step: "server-logout",
+          success: Boolean(logoutResult?.ok),
+          reason: logoutResult?.reason || null,
+        });
+        console.info("[admin-logout]", {
+          step: "redirect-started",
+          destination: loginTarget,
+        });
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.info("[admin-logout]", {
+          step: "server-logout-error",
+          clientSignOutSuccess,
+          message: error?.message || String(error),
+        });
+      }
+    } finally {
+      const loginTarget = AUTH_REQUIRED_FOR_ADMIN ? "/admin/login" : "/admin";
+      if (process.env.NODE_ENV === "development") {
+        console.info("[admin-logout]", {
+          step: "redirect-started",
+          destination: loginTarget,
+        });
+      }
+      setOpen(false);
+      window.location.replace(loginTarget);
+    }
   }
 
   function handleGoToLogin() {
     setOpen(false);
-    router.push("/admin/login");
+    window.location.assign("/admin/login");
   }
 
   function handleGoToProfile() {
     setOpen(false);
-    router.push("/admin/profile");
-    router.refresh();
+    window.location.assign("/admin/profile");
   }
 
   return (
@@ -206,7 +256,7 @@ export default function ProfileMenu() {
               className="flex w-full items-center gap-3 border-t border-white/10 px-5 py-4 text-left text-sm font-bold text-red-300 transition hover:bg-red-600/10 hover:text-red-200 disabled:opacity-60"
             >
               <LogOut size={18} />
-              {loggingOut ? "Ausloggen..." : "Ausloggen"}
+              {loggingOut ? "Wird abgemeldet ..." : "Ausloggen"}
             </button>
           ) : (
             <button

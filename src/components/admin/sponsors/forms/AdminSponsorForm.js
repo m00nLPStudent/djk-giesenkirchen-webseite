@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import {
   ActiveStatusField,
   FormGrid,
@@ -50,14 +52,38 @@ export default function AdminSponsorForm({ sponsor, categories = [] }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    logAdminSaveEvent({
+      module: "sponsors",
+      mode: sponsor?.id ? "edit" : "create",
+      step: "form.submit-triggered",
+      success: true,
+    });
     setLoading(true);
     const { error } = await saveSponsor(form, sponsor?.id || null);
     setLoading(false);
 
     if (error) {
+      logAdminSaveEvent({
+        module: "sponsors",
+        mode: sponsor?.id ? "edit" : "create",
+        step: "form.submit-failed",
+        success: false,
+        error,
+        navigationTriggered: false,
+      });
       alert("Fehler beim Speichern: " + error.message);
       return;
     }
+
+    logAdminSaveEvent({
+      module: "sponsors",
+      mode: sponsor?.id ? "edit" : "create",
+      step: "form.submit-success",
+      success: true,
+      navigationTriggered: true,
+    });
+
+    await revalidatePublicContentAction("sponsors");
 
     router.push("/admin/sponsors");
     router.refresh();

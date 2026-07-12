@@ -1,5 +1,6 @@
 import { UserRound } from "lucide-react";
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
 
 export default function CoachEmptyState() {
   return (
@@ -14,12 +15,14 @@ export default function CoachEmptyState() {
         Lege einen neuen Trainer an oder ändere deinen Filter.
       </p>
 
-      <Link
-        href="/admin/coaches/new"
-        className="mt-8 inline-flex items-center rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-      >
-        Neuen Trainer erstellen
-      </Link>
+      <Can permission="coaches.create" uiOnly>
+        <Link
+          href="/admin/coaches/new"
+          className="mt-8 inline-flex items-center rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+        >
+          Neuen Trainer erstellen
+        </Link>
+      </Can>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import {
   InputField,
   SelectField,
 } from "@/components/admin/forms";
+import Can from "@/components/admin/auth/Can";
 import { AdminImageUpload } from "@/components/admin/media";
 
 export default function ContactForm({
@@ -137,31 +138,33 @@ export default function ContactForm({
         </div>
       </FormSection>
 
-      <div className="flex flex-wrap justify-end gap-3">
-        <button
-          type="button"
-          onClick={onReset}
-          className="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-        >
-          Neuer Kontakt
-        </button>
-        {selectedContact && (
+      <Can permission="settings.edit" uiOnly>
+        <div className="flex flex-wrap justify-end gap-3">
           <button
             type="button"
-            onClick={onDelete}
-            className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-600 hover:text-white"
+            onClick={onReset}
+            className="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
           >
-            Kontakt löschen
+            Neuer Kontakt
           </button>
-        )}
-        <button
-          type="submit"
-          disabled={contactLoading}
-          className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-        >
-          {contactLoading ? "Speichert..." : "Kontakt speichern"}
-        </button>
-      </div>
+          {selectedContact && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-600 hover:text-white"
+            >
+              Kontakt löschen
+            </button>
+          )}
+          <button
+            type="submit"
+            disabled={contactLoading}
+            className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
+          >
+            {contactLoading ? "Speichert..." : "Kontakt speichern"}
+          </button>
+        </div>
+      </Can>
     </form>
   );
 }

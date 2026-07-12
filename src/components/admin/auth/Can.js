@@ -1,6 +1,7 @@
 "use client";
 
 import { AUTH_ENFORCEMENT_ENABLED } from "@/lib/admin-auth/adminPermissionConfig";
+import { useAdminUiContext } from "./AdminUiContext";
 import usePermissions from "./usePermissions";
 
 export default function Can({
@@ -8,12 +9,20 @@ export default function Can({
   any,
   all,
   userContext,
+  uiOnly = false,
   fallback = null,
+  loadingFallback = null,
   children,
 }) {
-  const permissionApi = usePermissions(userContext);
+  const runtimeContext = useAdminUiContext();
+  const resolvedContext = userContext || runtimeContext.userContext;
+  const permissionApi = usePermissions(resolvedContext);
 
-  if (!AUTH_ENFORCEMENT_ENABLED) {
+  if (!userContext && !runtimeContext.isReady) {
+    return loadingFallback;
+  }
+
+  if (!AUTH_ENFORCEMENT_ENABLED && !uiOnly) {
     return children;
   }
 

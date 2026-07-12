@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import {
   getStoragePublicUrl,
   removeStorageFiles,
@@ -265,17 +266,42 @@ export async function deleteEventDocument(documentItem) {
 export async function createEvent(event) {
   const payload = { ...event };
   payload.slug = await buildUniqueSlug(event.slug);
-  return await supabase.from("events").insert(payload).select("*").single();
+  const result = await supabase
+    .from("events")
+    .insert(payload)
+    .select("*")
+    .single();
+  logAdminSaveEvent({
+    module: "events",
+    mode: "create",
+    step: "service.createEvent",
+    operation: "insert",
+    success: !result.error,
+    error: result.error,
+    data: result.data,
+  });
+
+  return result;
 }
 
 export async function updateEvent(id, event) {
   const payload = { ...event };
   payload.slug = await buildUniqueSlug(event.slug, id);
-
-  return await supabase
+  const result = await supabase
     .from("events")
     .update(payload)
     .eq("id", id)
     .select("*")
     .single();
+  logAdminSaveEvent({
+    module: "events",
+    mode: "edit",
+    step: "service.updateEvent",
+    operation: "update",
+    success: !result.error,
+    error: result.error,
+    data: result.data,
+  });
+
+  return result;
 }

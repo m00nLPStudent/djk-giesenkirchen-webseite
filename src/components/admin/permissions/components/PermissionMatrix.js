@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAdminUiContext } from "@/components/admin/auth/AdminUiContext";
+import { canRenderAdminUiItem } from "@/lib/admin-auth/adminUiVisibility";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import AdminPanel from "@/components/admin/common/AdminPanel";
 import AdminLoginRequiredNotice from "@/components/admin/common/AdminLoginRequiredNotice";
@@ -19,6 +21,7 @@ export default function PermissionMatrix({ initialData }) {
   const [runtimeData, setRuntimeData] = useState(initialData);
   const vm = usePermissionMatrixViewModel(runtimeData);
   const router = useRouter();
+  const { userContext } = useAdminUiContext();
   const [busyKey, setBusyKey] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -91,6 +94,7 @@ export default function PermissionMatrix({ initialData }) {
   const categories = Object.keys(vm.groupedPermissions).sort((a, b) =>
     a.localeCompare(b, "de-DE"),
   );
+  const canEditMatrix = canRenderAdminUiItem(userContext, "permissions.edit");
 
   if (runtimeData?.loadState?.status === "no-session") {
     return (
@@ -156,6 +160,7 @@ export default function PermissionMatrix({ initialData }) {
             permissions={vm.groupedPermissions[category] || []}
             roles={vm.roles}
             assignments={vm.assignments}
+            canEdit={canEditMatrix}
             onToggle={handleToggle}
             busyKey={busyKey}
           />

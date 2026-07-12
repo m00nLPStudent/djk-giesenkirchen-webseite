@@ -1,9 +1,12 @@
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import AdminPageSection from "@/components/admin/layout/AdminPageSection";
 import { AdminBoardList } from "@/components/admin/board";
 import { supabase } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminDepartmentPage() {
   const { data: members } = await supabase
@@ -18,12 +21,14 @@ export default async function AdminDepartmentPage() {
         title="Abteilung"
         description="Vorstand und organisatorische Strukturen für die öffentliche Darstellung pflegen."
         actions={
-          <Link
-            href="/admin/department/board/new"
-            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-          >
-            Neues Vorstandsmitglied
-          </Link>
+          <Can permission="settings.edit" uiOnly>
+            <Link
+              href="/admin/department/board/new"
+              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+            >
+              Neues Vorstandsmitglied
+            </Link>
+          </Can>
         }
       />
 

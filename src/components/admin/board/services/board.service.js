@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { uploadMediaFile, deleteMediaFile } from "@/lib/storage";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 
 export const BOARD_PLACEHOLDER_IMAGE = COACH_PLACEHOLDER_IMAGE;
 
@@ -14,7 +15,9 @@ export async function uploadBoardImage(file, member = {}) {
 }
 
 export async function deleteBoardImage(imageUrl) {
-  return await deleteMediaFile(imageUrl, { ignoredUrls: [BOARD_PLACEHOLDER_IMAGE] });
+  return await deleteMediaFile(imageUrl, {
+    ignoredUrls: [BOARD_PLACEHOLDER_IMAGE],
+  });
 }
 
 export async function saveBoardMember(member, id = null) {
@@ -32,8 +35,39 @@ export async function saveBoardMember(member, id = null) {
   };
 
   if (id) {
-    return await supabase.from("board_members").update(payload).eq("id", id).select("*");
+    const result = await supabase
+      .from("board_members")
+      .update(payload)
+      .eq("id", id)
+      .select("*");
+
+    logAdminSaveEvent({
+      module: "board_members",
+      mode: "edit",
+      step: "service.saveBoardMember",
+      operation: "update",
+      success: !result.error,
+      error: result.error,
+      data: result.data,
+    });
+
+    return result;
   }
 
-  return await supabase.from("board_members").insert(payload).select("*");
+  const result = await supabase
+    .from("board_members")
+    .insert(payload)
+    .select("*");
+
+  logAdminSaveEvent({
+    module: "board_members",
+    mode: "create",
+    step: "service.saveBoardMember",
+    operation: "insert",
+    success: !result.error,
+    error: result.error,
+    data: result.data,
+  });
+
+  return result;
 }

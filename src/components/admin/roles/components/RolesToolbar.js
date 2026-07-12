@@ -1,5 +1,6 @@
 import { Search, Plus } from "lucide-react";
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import Can from "@/components/admin/auth/Can";
 
 export default function RolesToolbar({
   filters,
@@ -60,14 +61,16 @@ export default function RolesToolbar({
           ))}
         </select>
 
-        <button
-          type="button"
-          onClick={onCreate}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
-        >
-          <Plus size={16} />
-          Neue Rolle
-        </button>
+        <Can permission="roles.edit" uiOnly>
+          <button
+            type="button"
+            onClick={onCreate}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+          >
+            <Plus size={16} />
+            Neue Rolle
+          </button>
+        </Can>
       </div>
     </AdminPanel>
   );

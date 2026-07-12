@@ -14,10 +14,17 @@ export default async function FootballSponsorsPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
+  const activeCategoryIds = new Set((categories || []).map((item) => item.id));
+
   const sponsorsByCategory = (sponsors || []).reduce((groups, sponsor) => {
     const key = sponsor.category_id || "none";
     return { ...groups, [key]: [...(groups[key] || []), sponsor] };
   }, {});
+
+  const uncategorizedSponsors = (sponsors || []).filter(
+    (sponsor) =>
+      !sponsor.category_id || !activeCategoryIds.has(sponsor.category_id),
+  );
 
   return (
     <main className="min-h-screen bg-[#101014] overflow-x-hidden px-4 pt-32 pb-20 text-white sm:px-6 md:pt-56 md:pb-24">
@@ -42,6 +49,17 @@ export default async function FootballSponsorsPage() {
               sponsors={sponsorsByCategory[category.id] || []}
             />
           ))}
+
+          {uncategorizedSponsors.length > 0 && (
+            <SponsorSection
+              category={{
+                id: "uncategorized",
+                slug: "weitere-sponsoren",
+                name_de: "Weitere Sponsoren",
+              }}
+              sponsors={uncategorizedSponsors}
+            />
+          )}
         </div>
       </section>
     </main>

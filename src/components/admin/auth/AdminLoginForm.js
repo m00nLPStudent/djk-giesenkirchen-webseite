@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { AUTH_REQUIRED_FOR_ADMIN } from "@/lib/admin-auth/adminAuthConfig";
@@ -10,9 +9,35 @@ import {
   updateLastLoginAt,
 } from "@/lib/admin-auth/adminSession.service";
 
-export default function AdminLoginForm({ redirectTarget = "/admin" }) {
-  const router = useRouter();
+function getBrowserSupabaseCookieNames() {
+  if (typeof document === "undefined") return [];
 
+  return document.cookie
+    .split(";")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => entry.split("=")[0])
+    .filter((name) => name.startsWith("sb-"));
+}
+
+function hasSupabaseAuthLocalStorageState() {
+  if (typeof window === "undefined" || !window.localStorage) return false;
+
+  for (let index = 0; index < window.localStorage.length; index += 1) {
+    const key = window.localStorage.key(index) || "";
+    if (key.startsWith("sb-") && key.includes("auth-token")) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export default function AdminLoginForm({
+  redirectTarget = "/admin",
+  hasRedirectQuery = false,
+  sessionExpiredNotice = false,
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +53,7 @@ export default function AdminLoginForm({ redirectTarget = "/admin" }) {
       if (!active) return;
 
       if (context?.user?.id && context?.hasAdminProfile && context?.isActive) {
-        router.replace(redirectTarget || "/admin");
+        window.location.replace(redirectTarget || "/admin");
       }
     }
 
@@ -37,60 +62,103 @@ export default function AdminLoginForm({ redirectTarget = "/admin" }) {
     return () => {
       active = false;
     };
-  }, [redirectTarget, router]);
+  }, [redirectTarget]);
+
+  useEffect(() => {
+    async function clearExpiredLocalAuthState() {
+      if (!sessionExpiredNotice) return;
+
+      const supabaseBrowser = getSupabaseBrowserClient();
+      if (!supabaseBrowser) return;
+
+      await supabaseBrowser.auth.signOut({ scope: "local" });
+    }
+
+    clearExpiredLocalAuthState();
+  }, [sessionExpiredNotice]);
 
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
     setLoading(true);
 
-    const supabaseBrowser = getSupabaseBrowserClient();
-    if (!supabaseBrowser) {
+    try {
+      const supabaseBrowser = getSupabaseBrowserClient();
+      if (!supabaseBrowser) {
+        setError("Browser-Kontext fehlt. Bitte Seite neu laden.");
+        return;
+      }
+
+      const { data, error: signInError } =
+        await supabaseBrowser.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+      if (signInError) {
+        console.error("[admin-login] sign-in failed", {
+          code: signInError.code || null,
+          message: signInError.message || null,
+        });
+        setError("Login fehlgeschlagen. Bitte Zugangsdaten pruefen.");
+        return;
+      }
+
+      const hasSessionFromSignIn = Boolean(data?.session);
+      const hasUserFromSignIn = Boolean(data?.user?.id);
+
+      if (process.env.NODE_ENV === "development") {
+        const cookieNames = getBrowserSupabaseCookieNames();
+        const finalTarget = redirectTarget || "/admin";
+
+        console.info("[admin-login:session-sync]", {
+          loginSuccess: true,
+          hasSessionFromSignIn,
+          hasUserFromSignIn,
+          hasRedirectQuery,
+          normalizedRedirectTarget: redirectTarget || "/admin",
+          finalTarget,
+          hasAuthCookies: cookieNames.length > 0,
+          authCookieNames: cookieNames,
+          hasAuthStateInLocalStorage: hasSupabaseAuthLocalStorageState(),
+        });
+      }
+
+      if (!hasSessionFromSignIn || !hasUserFromSignIn) {
+        setError(
+          "Sitzung konnte nicht stabil gespeichert werden. Bitte erneut versuchen.",
+        );
+        return;
+      }
+
+      const finalTarget = redirectTarget || "/admin";
+
+      if (data?.user?.id) {
+        await updateLastLoginAt(data.user.id);
+      }
+
+      if (!data?.user?.id) {
+        setError("Login fehlgeschlagen. Bitte Seite neu laden.");
+        return;
+      }
+
+      if (!AUTH_REQUIRED_FOR_ADMIN) {
+        window.location.replace("/admin");
+        return;
+      }
+
+      window.location.replace(finalTarget);
+    } catch (error) {
+      console.error("[admin-login] unexpected error", {
+        message: error?.message || String(error),
+        code: error?.code || null,
+      });
+      setError(
+        "Login konnte nicht abgeschlossen werden. Bitte erneut versuchen.",
+      );
+    } finally {
       setLoading(false);
-      setError("Browser-Kontext fehlt. Bitte Seite neu laden.");
-      return;
     }
-
-    const { data, error: signInError } = await supabaseBrowser.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      setLoading(false);
-      setError("Login fehlgeschlagen. Bitte Zugangsdaten pruefen.");
-      return;
-    }
-
-    if (data?.user?.id) {
-      await updateLastLoginAt(data.user.id);
-    }
-
-    if (!AUTH_REQUIRED_FOR_ADMIN) {
-      setLoading(false);
-      router.push("/admin");
-      return;
-    }
-
-    const adminContext = await getCurrentAdminContext();
-    setLoading(false);
-
-    if (!adminContext?.user?.id) {
-      router.push("/admin/login");
-      return;
-    }
-
-    if (!adminContext?.hasAdminProfile) {
-      router.push("/admin/unauthorized?reason=missing-admin-profile");
-      return;
-    }
-
-    if (!adminContext?.isActive) {
-      router.push("/admin/unauthorized?reason=inactive-user");
-      return;
-    }
-
-    router.push(redirectTarget || "/admin");
   }
 
   return (
@@ -104,6 +172,13 @@ export default function AdminLoginForm({ redirectTarget = "/admin" }) {
           <p className="mt-3 text-sm leading-7 text-white/60">
             Zugriff ist nur fuer freigegebene Admin-Benutzer vorgesehen.
           </p>
+
+          {sessionExpiredNotice ? (
+            <p className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              Deine Sitzung ist abgelaufen oder nicht mehr gueltig. Bitte melde
+              dich erneut an.
+            </p>
+          ) : null}
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <label className="block space-y-2">

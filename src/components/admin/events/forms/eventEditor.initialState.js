@@ -26,7 +26,7 @@ export function createInitialEventForm(event) {
     recurrence_interval: event?.recurrence_interval ?? 1,
     recurrence_until: formatDateLocalInput(event?.recurrence_until),
     recurrence_count: event?.recurrence_count ?? "",
-    is_published: event?.is_published ?? false,
+    is_published: event?.is_published ?? true,
     is_featured: event?.is_featured ?? false,
     sort_order: event?.sort_order ?? 0,
   };

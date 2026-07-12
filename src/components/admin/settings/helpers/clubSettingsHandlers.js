@@ -1,6 +1,7 @@
 import { saveClubSettings } from "../settings.service";
 import { createClubSettingsForm } from "./settingsInitialState";
 import { createFieldUpdater } from "./fieldUpdater";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 
 export function createClubSettingsHandlers({
   router,
@@ -29,6 +30,7 @@ export function createClubSettingsHandlers({
     const nextSettings = data || clubSettings || null;
     setClubSettings(nextSettings);
     if (nextSettings) setClubForm(createClubSettingsForm(nextSettings));
+    await revalidatePublicContentAction("settings");
     alert("Vereinsdaten gespeichert.");
     router.refresh();
   }

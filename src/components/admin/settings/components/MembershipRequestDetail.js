@@ -5,6 +5,7 @@ import {
   InputField,
   SelectField,
 } from "@/components/admin/forms";
+import Can from "@/components/admin/auth/Can";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import SectionHeader from "./SectionHeader";
 
@@ -177,18 +178,20 @@ export default function MembershipRequestDetail({
                 </div>
               )}
 
-              <div className="mt-5 flex justify-end">
-                <button
-                  type="button"
-                  onClick={onForward}
-                  disabled={membershipRequestLoading}
-                  className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-200 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
-                >
-                  {membershipRequestLoading
-                    ? "Leitet weiter..."
-                    : "Weiterleiten"}
-                </button>
-              </div>
+              <Can permission="membership_requests.forward" uiOnly>
+                <div className="mt-5 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={onForward}
+                    disabled={membershipRequestLoading}
+                    className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-200 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
+                  >
+                    {membershipRequestLoading
+                      ? "Leitet weiter..."
+                      : "Weiterleiten"}
+                  </button>
+                </div>
+              </Can>
             </div>
 
             <div className="mt-5">
@@ -231,23 +234,25 @@ export default function MembershipRequestDetail({
       </FormSection>
 
       {selectedMembershipRequest && (
-        <div className="flex flex-wrap justify-end gap-3">
-          <button
-            type="button"
-            onClick={onMarkDone}
-            disabled={membershipRequestLoading}
-            className="rounded-full border border-green-500/60 px-6 py-3 text-sm font-bold text-green-300 transition hover:bg-green-600 hover:text-white disabled:opacity-50"
-          >
-            Als erledigt markieren
-          </button>
-          <button
-            type="submit"
-            disabled={membershipRequestLoading}
-            className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-          >
-            {membershipRequestLoading ? "Speichert..." : "Anfrage speichern"}
-          </button>
-        </div>
+        <Can permission="membership_requests.edit" uiOnly>
+          <div className="flex flex-wrap justify-end gap-3">
+            <button
+              type="button"
+              onClick={onMarkDone}
+              disabled={membershipRequestLoading}
+              className="rounded-full border border-green-500/60 px-6 py-3 text-sm font-bold text-green-300 transition hover:bg-green-600 hover:text-white disabled:opacity-50"
+            >
+              Als erledigt markieren
+            </button>
+            <button
+              type="submit"
+              disabled={membershipRequestLoading}
+              className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
+            >
+              {membershipRequestLoading ? "Speichert..." : "Anfrage speichern"}
+            </button>
+          </div>
+        </Can>
       )}
     </form>
   );

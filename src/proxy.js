@@ -5,7 +5,13 @@ import {
   buildLoginRedirectTarget,
   normalizeAdminRedirectPath,
 } from "./lib/admin-auth/adminAuthRedirects";
+import { resolveAdminProfileForAuthUser } from "./lib/admin-auth/adminProfileLookup";
 import { hasPermission } from "./lib/admin-auth/permissionEngine";
+import {
+  expireSupabaseAuthCookies,
+  getSupabaseAuthCookieNames,
+  isInvalidRefreshTokenError,
+} from "./lib/supabase.auth";
 import { createSupabaseProxyClient } from "./lib/supabase.proxy";
 
 const PUBLIC_ADMIN_ROUTES = new Set([
@@ -35,7 +41,7 @@ function buildRedirectUrl(request, pathname, searchParams = null) {
   return url;
 }
 
-function redirectToLogin(request) {
+function redirectToLogin(request, { reason = null } = {}) {
   const redirectTarget = buildLoginRedirectTarget(
     normalizeAdminRedirectPath(
       `${request.nextUrl.pathname}${request.nextUrl.search}`,
@@ -44,9 +50,39 @@ function redirectToLogin(request) {
 
   return NextResponse.redirect(
     buildRedirectUrl(request, "/admin/login", {
+      reason,
       redirect: redirectTarget || "/admin",
     }),
   );
+}
+
+function clearSupabaseAuthCookies(request, response) {
+  const cookieNames = getSupabaseAuthCookieNames(
+    request.cookies.getAll(),
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+  );
+
+  cookieNames.forEach((cookieName) => {
+    try {
+      request.cookies.delete(cookieName);
+    } catch {
+      // Ignore request-cookie mutation errors in runtimes where it is read-only.
+    }
+  });
+
+  expireSupabaseAuthCookies(cookieNames, (name, value, options) => {
+    response.cookies.set(name, value, options);
+  });
+
+  return cookieNames;
+}
+
+function redirectToExpiredSessionLogin(request) {
+  const response = redirectToLogin(request, {
+    reason: "session-expired",
+  });
+  const clearedCookieNames = clearSupabaseAuthCookies(request, response);
+  return { response, clearedCookieNames };
 }
 
 function redirectToUnauthorized(request, reason, permission = null) {
@@ -167,12 +203,25 @@ export async function proxy(request) {
     return NextResponse.next();
   }
 
-  const response = NextResponse.next();
-  const supabase = createSupabaseProxyClient(request, response);
+  const proxyClient = createSupabaseProxyClient(request);
+  const requestCookieNames = getSupabaseAuthCookieNames(
+    request.cookies.getAll(),
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+  );
 
-  if (!supabase) {
+  if (process.env.NODE_ENV === "development") {
+    console.info("[admin-proxy:cookies:request]", {
+      pathname,
+      hasAuthCookies: requestCookieNames.length > 0,
+      authCookieNames: requestCookieNames,
+    });
+  }
+
+  if (!proxyClient) {
     return redirectToLogin(request);
   }
+
+  const { supabase, getResponse, didSyncCookies } = proxyClient;
 
   const {
     data: { user },
@@ -180,41 +229,78 @@ export async function proxy(request) {
   } = await supabase.auth.getUser();
 
   if (process.env.NODE_ENV === "development") {
+    const responseCookieNames = getSupabaseAuthCookieNames(
+      getResponse().cookies.getAll(),
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+    );
+
     console.info("[admin-proxy]", {
       pathname,
       hasUser: Boolean(user?.id),
       hasError: Boolean(userError),
+      hasAuthCookiesInRequest: requestCookieNames.length > 0,
+      responseHasAuthCookies: responseCookieNames.length > 0,
+      responseAuthCookieNames: responseCookieNames,
+      userErrorCode: userError?.code || null,
+      userErrorStatus: userError?.status || null,
+      userErrorMessage: userError?.message || null,
+      cookieSyncTriggered: didSyncCookies(),
     });
+  }
+
+  if (isInvalidRefreshTokenError(userError)) {
+    const { response, clearedCookieNames } =
+      redirectToExpiredSessionLogin(request);
+
+    if (process.env.NODE_ENV === "development") {
+      console.info("[admin-proxy] invalid refresh token detected", {
+        pathname,
+        code: userError?.code || null,
+        status: userError?.status || null,
+        cookiesCleared: clearedCookieNames.length > 0,
+        clearedCookieNames,
+      });
+    }
+
+    return response;
   }
 
   if (userError || !user?.id) {
     return redirectToLogin(request);
   }
 
-  const profileById = await supabase
-    .from("admin_profiles")
-    .select("id, email, is_active")
-    .eq("id", user.id)
-    .maybeSingle();
+  const profileResolution = await resolveAdminProfileForAuthUser(
+    supabase,
+    user,
+    { fields: "id, email, is_active" },
+  );
 
-  if (profileById?.error) {
-    return redirectToUnauthorized(request, "missing-admin-profile");
+  if (process.env.NODE_ENV === "development") {
+    console.info("[admin-proxy:profile]", {
+      pathname,
+      hasAuthUser: Boolean(user?.id),
+      profileFound: Boolean(profileResolution?.profile?.id),
+      lookupType: profileResolution?.lookupType || null,
+      fallbackUsed: Boolean(profileResolution?.fallbackUsed),
+      hasQueryError: Boolean(profileResolution?.queryError),
+      queryErrorCode: profileResolution?.queryError?.code || null,
+      queryErrorMessage: profileResolution?.queryError?.message || null,
+    });
   }
 
-  const profileByEmail =
-    !profileById?.data && user?.email
-      ? await supabase
-          .from("admin_profiles")
-          .select("id, email, is_active")
-          .eq("email", user.email)
-          .maybeSingle()
-      : { data: null, error: null };
+  if (profileResolution?.queryError) {
+    if (process.env.NODE_ENV === "development") {
+      console.error("[admin-proxy] profile lookup failed", {
+        lookupType: profileResolution.lookupType || null,
+        code: profileResolution.queryError.code || null,
+        message: profileResolution.queryError.message || null,
+      });
+    }
 
-  if (profileByEmail?.error) {
-    return redirectToUnauthorized(request, "missing-admin-profile");
+    return redirectToLogin(request);
   }
 
-  const profile = profileById?.data || profileByEmail?.data || null;
+  const profile = profileResolution?.profile || null;
 
   if (!profile?.id) {
     return redirectToUnauthorized(request, "missing-admin-profile");
@@ -225,7 +311,7 @@ export async function proxy(request) {
   }
 
   if (!AUTH_ENFORCEMENT_ENABLED) {
-    return response;
+    return getResponse();
   }
 
   const { resolveAdminRoutePermission } =
@@ -262,7 +348,7 @@ export async function proxy(request) {
     );
   }
 
-  return response;
+  return getResponse();
 }
 
 export const config = {

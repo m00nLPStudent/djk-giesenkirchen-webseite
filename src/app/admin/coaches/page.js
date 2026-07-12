@@ -1,8 +1,11 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import Can from "@/components/admin/auth/Can";
 import { AdminCoachesOverview } from "@/components/admin/coaches";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminCoachesPage() {
   const { data: coaches } = await supabase
@@ -23,12 +26,14 @@ export default async function AdminCoachesPage() {
         title="Trainer verwalten"
         description="Trainer- und Betreuerprofile pflegen und Zuordnungen zu Mannschaften prüfen."
         actions={
-          <Link
-            href="/admin/coaches/new"
-            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-          >
-            Neuer Trainer
-          </Link>
+          <Can permission="coaches.create" uiOnly>
+            <Link
+              href="/admin/coaches/new"
+              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+            >
+              Neuer Trainer
+            </Link>
+          </Can>
         }
       />
 

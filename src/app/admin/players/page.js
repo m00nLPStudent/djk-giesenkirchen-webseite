@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminPlayersList, PlayerStats } from "@/components/admin/players";
@@ -36,12 +37,14 @@ export default async function AdminPlayersPage({ searchParams }) {
         title="Spieler verwalten"
         description="Spielerprofile, Positionen und Nationalitäten mit schnellen Filtern organisieren."
         actions={
-          <Link
-            href="/admin/players/new"
-            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-          >
-            Neuer Spieler
-          </Link>
+          <Can permission="players.create" uiOnly>
+            <Link
+              href="/admin/players/new"
+              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+            >
+              Neuer Spieler
+            </Link>
+          </Can>
         }
       />
 

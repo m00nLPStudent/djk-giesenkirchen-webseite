@@ -7,6 +7,8 @@ import {
 } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 async function getCount(table, applyFilters) {
   let query = supabase.from(table).select("*", { count: "exact", head: true });
 

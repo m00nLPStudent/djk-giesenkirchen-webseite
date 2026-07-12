@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { canSeeAdminNavItem } from "@/lib/admin-auth/permissionEngine";
-import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
-import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
+import { useAdminUiContext } from "@/components/admin/auth/AdminUiContext";
+import { filterVisibleAdminUiItems } from "@/lib/admin-auth/adminUiVisibility";
 import {
   LayoutDashboard,
   Newspaper,
@@ -118,32 +116,11 @@ const navItems = [
 
 export default function AdminSidebar({ mobile = false, onNavigate }) {
   const pathname = usePathname();
-  const [userContext, setUserContext] = useState(getAdminFallbackUserContext());
+  const { isReady, userContext } = useAdminUiContext();
 
-  useEffect(() => {
-    let active = true;
-
-    async function loadContext() {
-      try {
-        const context = await getCurrentAdminContext();
-        if (!active) return;
-        setUserContext(context || getAdminFallbackUserContext());
-      } catch {
-        if (!active) return;
-        setUserContext(getAdminFallbackUserContext());
-      }
-    }
-
-    loadContext();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const visibleNavItems = navItems.filter((item) =>
-    canSeeAdminNavItem(userContext, item),
-  );
+  const visibleNavItems = isReady
+    ? filterVisibleAdminUiItems(userContext, navItems)
+    : [];
 
   const navSections = [
     {
@@ -184,18 +161,23 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
       <nav
         className={`grid gap-4 ${mobile ? "max-h-[calc(100vh-14rem)] overflow-y-auto pr-1 admin-sidebar-scrollbar" : "lg:flex-1 lg:min-h-0 lg:overflow-y-auto lg:pr-1 admin-sidebar-scrollbar"}`}
       >
-        {navSections.map((section) => (
-          <div key={section.label} className="space-y-2">
-            <p className="px-2 text-[0.6rem] font-black uppercase tracking-[0.4em] text-white/35">
-              {section.label}
-            </p>
+        {navSections.map((section) => {
+          const sectionItems = visibleNavItems.filter((item) =>
+            section.hrefs.some((href) => item.href === href),
+          );
 
-            <div className="space-y-2">
-              {visibleNavItems
-                .filter((item) =>
-                  section.hrefs.some((href) => item.href === href),
-                )
-                .map((item) => {
+          if (!sectionItems.length) {
+            return null;
+          }
+
+          return (
+            <div key={section.label} className="space-y-2">
+              <p className="px-2 text-[0.6rem] font-black uppercase tracking-[0.4em] text-white/35">
+                {section.label}
+              </p>
+
+              <div className="space-y-2">
+                {sectionItems.map((item) => {
                   const Icon = item.icon;
                   const active =
                     item.href === "/admin"
@@ -224,9 +206,10 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
                     </Link>
                   );
                 })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
 
       <div

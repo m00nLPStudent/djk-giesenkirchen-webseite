@@ -1,4 +1,5 @@
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import Can from "@/components/admin/auth/Can";
 import PermissionCategoryBadge from "./PermissionCategoryBadge";
 import { formatPermissionDateTime } from "../helpers/permissions.formatters";
 
@@ -12,13 +13,15 @@ function ActionButtons({ permission, onOpenDetails, onEdit }) {
       >
         Details
       </button>
-      <button
-        type="button"
-        onClick={() => onEdit(permission.id)}
-        className="h-9 w-full min-w-0 rounded-xl border border-white/15 bg-white/[0.06] px-2.5 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
-      >
-        Bearbeiten
-      </button>
+      <Can permission="permissions.edit" uiOnly>
+        <button
+          type="button"
+          onClick={() => onEdit(permission.id)}
+          className="h-9 w-full min-w-0 rounded-xl border border-white/15 bg-white/[0.06] px-2.5 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
+        >
+          Bearbeiten
+        </button>
+      </Can>
     </div>
   );
 }
@@ -39,13 +42,15 @@ export default function PermissionsTable({
           <p className="mx-auto mt-2 max-w-xl text-sm text-white/60">
             Lege die erste Permission an und erweitere danach die Rollen-Matrix.
           </p>
-          <button
-            type="button"
-            onClick={onCreate}
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
-          >
-            Neue Permission
-          </button>
+          <Can permission="permissions.edit" uiOnly>
+            <button
+              type="button"
+              onClick={onCreate}
+              className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+            >
+              Neue Permission
+            </button>
+          </Can>
         </div>
       </AdminPanel>
     );

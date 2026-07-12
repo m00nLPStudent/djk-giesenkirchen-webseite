@@ -1,8 +1,11 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import Can from "@/components/admin/auth/Can";
 import { AdminNewsList, NewsStats } from "@/components/admin/news";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 function getNewsStatus(item) {
   const now = new Date();
@@ -49,12 +52,14 @@ export default async function AdminNewsPage() {
         title="News verwalten"
         description="Neuigkeiten anlegen, veröffentlichen und schnell im Überblick filtern."
         actions={
-          <Link
-            href="/admin/news/new"
-            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-          >
-            Neue News
-          </Link>
+          <Can permission="news.create" uiOnly>
+            <Link
+              href="/admin/news/new"
+              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+            >
+              Neue News
+            </Link>
+          </Can>
         }
       />
 

@@ -7,6 +7,8 @@ import {
   uploadNewsImage,
 } from "../services/news.service";
 import { createNewsPayload } from "./newsPayload";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 
 export function createNewsHandlers({
   news,
@@ -70,6 +72,7 @@ export function createNewsHandlers({
 
     if (data) {
       setDocuments((current) => [...current, data]);
+      await revalidatePublicContentAction("news");
     }
   }
 
@@ -86,10 +89,18 @@ export function createNewsHandlers({
     setDocuments((current) =>
       current.filter((item) => item.id !== documentItem.id),
     );
+
+    await revalidatePublicContentAction("news");
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+    logAdminSaveEvent({
+      module: "news",
+      mode: isEdit ? "edit" : "create",
+      step: "form.submit-triggered",
+      success: true,
+    });
 
     if (!form.title_de.trim()) {
       alert("Bitte mindestens einen deutschen Titel eintragen.");
@@ -108,6 +119,14 @@ export function createNewsHandlers({
     setLoading(false);
 
     if (error) {
+      logAdminSaveEvent({
+        module: "news",
+        mode: isEdit ? "edit" : "create",
+        step: "form.submit-failed",
+        success: false,
+        error,
+        navigationTriggered: false,
+      });
       alert("Fehler beim Speichern: " + error.message);
       return;
     }
@@ -115,6 +134,17 @@ export function createNewsHandlers({
     if (!isEdit && savedNews?.id) {
       setDocuments([]);
     }
+
+    await revalidatePublicContentAction("news");
+
+    logAdminSaveEvent({
+      module: "news",
+      mode: isEdit ? "edit" : "create",
+      step: "form.submit-success",
+      success: true,
+      data: savedNews,
+      navigationTriggered: true,
+    });
 
     router.push("/admin/news");
     router.refresh();

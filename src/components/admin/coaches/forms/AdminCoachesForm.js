@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { FormAlert, FormSection } from "@/components/admin/forms";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
@@ -9,6 +10,7 @@ import useEntityForm from "@/components/admin/hooks/useEntityForm";
 import useImageUpload from "@/components/admin/hooks/useImageUpload";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import CoachImageUpload from "../components/CoachImageUpload";
 import {
   deleteCoachImage,
@@ -65,6 +67,12 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    logAdminSaveEvent({
+      module: "coaches",
+      mode: coach?.id ? "edit" : "create",
+      step: "form.submit-triggered",
+      success: true,
+    });
 
     const nextErrors = validateForm();
 
@@ -83,9 +91,27 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     setLoading(false);
 
     if (error) {
+      logAdminSaveEvent({
+        module: "coaches",
+        mode: coach?.id ? "edit" : "create",
+        step: "form.submit-failed",
+        success: false,
+        error,
+        navigationTriggered: false,
+      });
       alert("Fehler beim Speichern: " + error.message);
       return;
     }
+
+    logAdminSaveEvent({
+      module: "coaches",
+      mode: coach?.id ? "edit" : "create",
+      step: "form.submit-success",
+      success: true,
+      navigationTriggered: true,
+    });
+
+    await revalidatePublicContentAction("coaches");
 
     router.push("/admin/coaches");
     router.refresh();

@@ -340,6 +340,33 @@ Status B11.2a:
 - ✓ `AUTH_REQUIRED_FOR_ADMIN = true`
 - ✓ `AUTH_ENFORCEMENT_ENABLED = false`
 
+## B11.2b-1 UI-Sichtbarkeit nach Permissions gefiltert (ohne Route-Enforcement)
+
+Zentraler Status:
+
+- `AUTH_REQUIRED_FOR_ADMIN = true`
+- `AUTH_ENFORCEMENT_ENABLED = false`
+
+Wirkung von B11.2b-1:
+
+- Sidebar blendet Admin-Eintraege rein UI-seitig nach vorhandenen View-Permissions aus.
+- Dashboard-Quick-Actions werden rein UI-seitig nach `requiredPermission` gefiltert.
+- Dashboard-Statistikkarten mit `requiredPermission` werden rein UI-seitig gefiltert.
+- Sichtbare Neu-/Bearbeiten-/Löschen-/Matrix-/Speichern-Aktionen in den bestehenden Adminmodulen werden nach den vorhandenen Permissions ausgeblendet.
+- Superadmin sieht weiterhin alle UI-Elemente.
+
+Wichtig in B11.2b-1:
+
+- Es gibt noch kein Route-Enforcement.
+- Es gibt noch keine zusätzliche Server-Action-Durchsetzung über den bisherigen Stand hinaus.
+- Direkte URL-Aufrufe bleiben weiterhin möglich, solange die Login-Pflicht erfüllt ist.
+- Proxy, Middleware, Redirects, Datenservices und SQL/RLS bleiben unverändert.
+
+Naechste Phase:
+
+- B11.2b-2: einzelne Routen kontrolliert absichern
+- ✓ `AUTH_ENFORCEMENT_ENABLED = false`
+
 Audit-Helper:
 
 - Script: `npm.cmd run audit:admin-routes`

@@ -1,5 +1,6 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { loadAdminAuthContext } from "./adminAuth.service";
+import { resolveAdminProfileForAuthUser } from "./adminProfileLookup";
 import {
   getBrowserAuthState,
   formatSupabaseError,
@@ -24,36 +25,30 @@ export async function getCurrentAdminProfile(userOverride = null) {
   if (!user?.id) return null;
 
   const supabaseBrowser = getSupabaseBrowserClient();
+  const result = await resolveAdminProfileForAuthUser(supabaseBrowser, user, {
+    fields: "*",
+  });
 
-  const byId = await supabaseBrowser
-    .from("admin_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (byId?.error) {
-    throw toAdminError("admin_profiles.by-id", byId.error);
+  if (process.env.NODE_ENV === "development") {
+    console.info("[admin-context:profile]", {
+      hasAuthUser: Boolean(user?.id),
+      profileFound: Boolean(result?.profile?.id),
+      lookupType: result?.lookupType || null,
+      fallbackUsed: Boolean(result?.fallbackUsed),
+      hasQueryError: Boolean(result?.queryError),
+      queryErrorCode: result?.queryError?.code || null,
+      queryErrorMessage: result?.queryError?.message || null,
+    });
   }
 
-  if (byId?.data) {
-    return byId.data;
+  if (result?.queryError) {
+    throw toAdminError(
+      `admin_profiles.by-${result.lookupType || "unknown"}`,
+      result.queryError,
+    );
   }
 
-  if (!user?.email) {
-    return null;
-  }
-
-  const byEmail = await supabaseBrowser
-    .from("admin_profiles")
-    .select("*")
-    .eq("email", user.email)
-    .maybeSingle();
-
-  if (byEmail?.error) {
-    throw toAdminError("admin_profiles.by-email", byEmail.error);
-  }
-
-  return byEmail?.data || null;
+  return result?.profile || null;
 }
 
 export async function getCurrentAdminContext() {

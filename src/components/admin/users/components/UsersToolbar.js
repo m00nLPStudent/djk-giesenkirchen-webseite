@@ -1,5 +1,6 @@
 import { Search, UserPlus2 } from "lucide-react";
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import Can from "@/components/admin/auth/Can";
 
 export default function UsersToolbar({
   filters,
@@ -78,14 +79,16 @@ export default function UsersToolbar({
           ))}
         </select>
 
-        <button
-          type="button"
-          onClick={onOpenNewUser}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
-        >
-          <UserPlus2 size={16} />
-          Neuer Benutzer
-        </button>
+        <Can permission="users.create" uiOnly>
+          <button
+            type="button"
+            onClick={onOpenNewUser}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+          >
+            <UserPlus2 size={16} />
+            Neuer Benutzer
+          </button>
+        </Can>
       </div>
     </AdminPanel>
   );

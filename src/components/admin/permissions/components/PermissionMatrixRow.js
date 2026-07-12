@@ -4,6 +4,7 @@ export default function PermissionMatrixRow({
   permission,
   roles,
   assignments,
+  canEdit,
   onToggle,
   busyKey,
 }) {
@@ -24,21 +25,23 @@ export default function PermissionMatrixRow({
 
         return (
           <td key={role.id} className="px-2 py-3 text-center align-middle">
-            <label className="inline-flex items-center justify-center">
-              <input
-                type="checkbox"
-                checked={checked}
-                disabled={busy}
-                onChange={(event) =>
-                  onToggle({
-                    roleId: role.id,
-                    permissionId: permission.id,
-                    checked: event.target.checked,
-                  })
-                }
-                className="h-4 w-4 rounded border-white/20 bg-black/30"
-              />
-            </label>
+            {canEdit ? (
+              <label className="inline-flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  disabled={busy}
+                  onChange={(event) =>
+                    onToggle({
+                      roleId: role.id,
+                      permissionId: permission.id,
+                      checked: event.target.checked,
+                    })
+                  }
+                  className="h-4 w-4 rounded border-white/20 bg-black/30"
+                />
+              </label>
+            ) : null}
           </td>
         );
       })}

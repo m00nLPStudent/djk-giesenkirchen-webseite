@@ -1,5 +1,6 @@
 "use client";
 
+import Can from "@/components/admin/auth/Can";
 import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
 import { removeTeamRecord } from "@/components/admin/delete/removeActions";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
@@ -24,7 +25,10 @@ function TeamInfoGrid({ team }) {
   return (
     <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
       {items.map(([label, value]) => (
-        <div key={label} className="rounded-2xl border border-white/10 bg-black/20 p-4">
+        <div
+          key={label}
+          className="rounded-2xl border border-white/10 bg-black/20 p-4"
+        >
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-400">
             {label}
           </p>
@@ -41,44 +45,64 @@ export default function TeamCard({ team }) {
   );
 
   return (
-    <EntityCard image={team.team_image_url} imageAlt={team.name_de} imageSize="md">
+    <EntityCard
+      image={team.team_image_url}
+      imageAlt={team.name_de}
+      imageSize="md"
+    >
       <EntityCardBadges>
-        <EntityBadge variant="red">{team.age_group || "Mannschaft"}</EntityBadge>
+        <EntityBadge variant="red">
+          {team.age_group || "Mannschaft"}
+        </EntityBadge>
         <TeamStatusBadge active={team.is_active} />
         <EntityBadge>Saison {team.season || "—"}</EntityBadge>
-        <EntityBadge>{hasFootballDe ? "fussball.de aktiv" : "fussball.de fehlt"}</EntityBadge>
+        <EntityBadge>
+          {hasFootballDe ? "fussball.de aktiv" : "fussball.de fehlt"}
+        </EntityBadge>
         <EntityBadge>Reihenfolge {team.sort_order ?? 0}</EntityBadge>
       </EntityCardBadges>
 
       <EntityCardTitle>{team.name_de}</EntityCardTitle>
-      <EntityCardMeta>{team.description_de || "Keine Beschreibung vorhanden."}</EntityCardMeta>
+      <EntityCardMeta>
+        {team.description_de || "Keine Beschreibung vorhanden."}
+      </EntityCardMeta>
 
       <TeamInfoGrid team={team} />
 
       <EntityCardActions>
-        <EntityActionLink href={`/admin/teams/edit/${team.id}`}>Bearbeiten</EntityActionLink>
-        <EntityActionLink href={`/fussball/${team.slug}`} target="_blank" variant="primary">
+        <Can permission="teams.edit" uiOnly>
+          <EntityActionLink href={`/admin/teams/edit/${team.id}`}>
+            Bearbeiten
+          </EntityActionLink>
+        </Can>
+        <EntityActionLink
+          href={`/fussball/${team.slug}`}
+          target="_blank"
+          variant="primary"
+        >
           Ansehen
         </EntityActionLink>
-        <AdminRemoveButton
-          label="Mannschaft"
-          name={team.name_de || "Unbekannte Mannschaft"}
-          action={() => removeTeamRecord(team)}
-          affected={[
-            "Mannschaft",
-            "alle Saisondaten dieser Mannschaft",
-            "Kader-Zuordnungen dieser Mannschaft",
-            "Trainer-Zuordnungen dieser Mannschaft",
-            "Mannschaftsbilder, sofern vorhanden",
-          ]}
-          preserved={[
-            "Spielerprofile",
-            "Trainerprofile",
-            "News-Beiträge",
-            "Saisons",
-            "Abteilungen",
-          ]}
-        />
+        <Can permission="teams.delete" uiOnly>
+          <AdminRemoveButton
+            label="Mannschaft"
+            name={team.name_de || "Unbekannte Mannschaft"}
+            action={() => removeTeamRecord(team)}
+            affected={[
+              "Mannschaft",
+              "alle Saisondaten dieser Mannschaft",
+              "Kader-Zuordnungen dieser Mannschaft",
+              "Trainer-Zuordnungen dieser Mannschaft",
+              "Mannschaftsbilder, sofern vorhanden",
+            ]}
+            preserved={[
+              "Spielerprofile",
+              "Trainerprofile",
+              "News-Beiträge",
+              "Saisons",
+              "Abteilungen",
+            ]}
+          />
+        </Can>
       </EntityCardActions>
     </EntityCard>
   );

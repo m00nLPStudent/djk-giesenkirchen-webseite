@@ -3,6 +3,7 @@ import {
   deleteClubContact,
   updateClubContact,
 } from "../settings.service";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
   createInitialContactForm,
   sortedByOrder,
@@ -84,6 +85,8 @@ export function createContactHandlers({
       return sortedByOrder(next);
     });
 
+    await revalidatePublicContentAction("contacts");
+
     selectContact(saved);
     alert("Kontakt gespeichert.");
     router.refresh();
@@ -106,6 +109,7 @@ export function createContactHandlers({
     setContacts((current) =>
       current.filter((item) => item.id !== selectedContact.id),
     );
+    await revalidatePublicContentAction("contacts");
     resetContactForm();
     alert("Kontakt gelöscht.");
     router.refresh();

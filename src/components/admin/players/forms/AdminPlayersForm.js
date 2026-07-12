@@ -8,6 +8,7 @@ import useEntityForm from "@/components/admin/hooks/useEntityForm";
 import useImageUpload from "@/components/admin/hooks/useImageUpload";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import PlayerImageUpload from "../components/PlayerImageUpload";
 import {
   deletePlayerImage,
@@ -94,6 +95,12 @@ export default function AdminPlayersForm({ player, teams = [] }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    logAdminSaveEvent({
+      module: "players",
+      mode: player?.id ? "edit" : "create",
+      step: "form.submit-triggered",
+      success: true,
+    });
 
     const nextErrors = validateForm();
 
@@ -110,9 +117,25 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     setLoading(false);
 
     if (error) {
+      logAdminSaveEvent({
+        module: "players",
+        mode: player?.id ? "edit" : "create",
+        step: "form.submit-failed",
+        success: false,
+        error,
+        navigationTriggered: false,
+      });
       alert("Fehler beim Speichern: " + error.message);
       return;
     }
+
+    logAdminSaveEvent({
+      module: "players",
+      mode: player?.id ? "edit" : "create",
+      step: "form.submit-success",
+      success: true,
+      navigationTriggered: true,
+    });
 
     router.push("/admin/players");
     router.refresh();

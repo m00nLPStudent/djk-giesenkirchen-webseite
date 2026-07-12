@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
   ActiveStatusField,
   EmailField,
@@ -13,6 +14,7 @@ import {
   SortOrderField,
 } from "@/components/admin/forms";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import BoardMemberImageUpload from "../components/BoardMemberImageUpload";
 import {
   BOARD_PLACEHOLDER_IMAGE,
@@ -64,14 +66,38 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    logAdminSaveEvent({
+      module: "board_members",
+      mode: member?.id ? "edit" : "create",
+      step: "form.submit-triggered",
+      success: true,
+    });
     setLoading(true);
     const { error } = await saveBoardMember(form, member?.id || null);
     setLoading(false);
 
     if (error) {
+      logAdminSaveEvent({
+        module: "board_members",
+        mode: member?.id ? "edit" : "create",
+        step: "form.submit-failed",
+        success: false,
+        error,
+        navigationTriggered: false,
+      });
       alert("Fehler beim Speichern: " + error.message);
       return;
     }
+
+    logAdminSaveEvent({
+      module: "board_members",
+      mode: member?.id ? "edit" : "create",
+      step: "form.submit-success",
+      success: true,
+      navigationTriggered: true,
+    });
+
+    await revalidatePublicContentAction("board");
 
     router.push("/admin/department");
     router.refresh();

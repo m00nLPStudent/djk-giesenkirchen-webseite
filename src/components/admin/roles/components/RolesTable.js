@@ -1,4 +1,5 @@
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import Can from "@/components/admin/auth/Can";
 import RoleStatusBadge from "./RoleStatusBadge";
 import { formatRoleDateTime } from "../helpers/roles.formatters";
 
@@ -19,22 +20,26 @@ function ActionButtons({
         Details
       </button>
 
-      <button
-        type="button"
-        onClick={() => onEdit(role.id)}
-        className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
-      >
-        Bearbeiten
-      </button>
+      <Can permission="roles.edit" uiOnly>
+        <button
+          type="button"
+          onClick={() => onEdit(role.id)}
+          className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
+        >
+          Bearbeiten
+        </button>
+      </Can>
 
-      <button
-        type="button"
-        disabled={isUpdating}
-        onClick={() => onToggleStatus(role.id, role.key, !role.is_active)}
-        className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {role.is_active ? "Deaktivieren" : "Aktivieren"}
-      </button>
+      <Can permission="roles.edit" uiOnly>
+        <button
+          type="button"
+          disabled={isUpdating}
+          onClick={() => onToggleStatus(role.id, role.key, !role.is_active)}
+          className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {role.is_active ? "Deaktivieren" : "Aktivieren"}
+        </button>
+      </Can>
     </div>
   );
 }
@@ -58,13 +63,15 @@ export default function RolesTable({
             Lege die erste Rolle an, um den Adminbereich sauber zu
             strukturieren.
           </p>
-          <button
-            type="button"
-            onClick={onCreate}
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
-          >
-            Neue Rolle
-          </button>
+          <Can permission="roles.edit" uiOnly>
+            <button
+              type="button"
+              onClick={onCreate}
+              className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+            >
+              Neue Rolle
+            </button>
+          </Can>
         </div>
       </AdminPanel>
     );

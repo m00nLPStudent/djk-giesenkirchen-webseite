@@ -1,40 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import DashboardStatCard from "./DashboardStatCard";
 import { DASHBOARD_STAT_ITEMS } from "./dashboard.options";
-import { canSeeDashboardAction } from "@/lib/admin-auth/permissionEngine";
-import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
-import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
+import { useAdminUiContext } from "@/components/admin/auth/AdminUiContext";
+import { filterVisibleAdminUiItems } from "@/lib/admin-auth/adminUiVisibility";
 
 export default function DashboardStatGrid({ stats }) {
-  const [userContext, setUserContext] = useState(getAdminFallbackUserContext());
+  const { isReady, userContext } = useAdminUiContext();
 
-  useEffect(() => {
-    let active = true;
-
-    async function loadContext() {
-      try {
-        const context = await getCurrentAdminContext();
-        if (!active) return;
-        setUserContext(context || getAdminFallbackUserContext());
-      } catch {
-        if (!active) return;
-        setUserContext(getAdminFallbackUserContext());
-      }
-    }
-
-    loadContext();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const visibleItems = DASHBOARD_STAT_ITEMS.filter(
-    (item) =>
-      !item.requiredPermission || canSeeDashboardAction(userContext, item),
-  );
+  const visibleItems = isReady
+    ? filterVisibleAdminUiItems(userContext, DASHBOARD_STAT_ITEMS)
+    : DASHBOARD_STAT_ITEMS.filter((item) => !item.requiredPermission);
 
   return (
     <section className="mt-8">

@@ -1,6 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import Can from "@/components/admin/auth/Can";
+import { useAdminUiContext } from "@/components/admin/auth/AdminUiContext";
+import { canRenderAdminUiItem } from "@/lib/admin-auth/adminUiVisibility";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import {
@@ -59,12 +63,14 @@ export default function ClubHistoryEditorForm({
   initialImages = [],
   initialMilestones = [],
 }) {
+  const { userContext } = useAdminUiContext();
   const [activeTab, setActiveTab] = useState("basic");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(() => createInitialForm(page));
   const [pageId, setPageId] = useState(page?.id || null);
   const [images, setImages] = useState(initialImages);
   const [milestones, setMilestones] = useState(initialMilestones);
+  const canManage = canRenderAdminUiItem(userContext, "club_history.edit");
 
   const publishHint = useMemo(() => {
     if (!form.is_published) return "Nicht veröffentlicht";
@@ -118,6 +124,7 @@ export default function ClubHistoryEditorForm({
 
     if (data?.id) {
       setPageId(data.id);
+      await revalidatePublicContentAction("club-history");
       alert("Vereinsgeschichte gespeichert.");
     }
   }
@@ -193,6 +200,7 @@ export default function ClubHistoryEditorForm({
             pageId={pageId}
             items={images}
             setItems={setImages}
+            canManage={canManage}
           />
         </FormSection>
       )}
@@ -207,6 +215,7 @@ export default function ClubHistoryEditorForm({
             pageId={pageId}
             items={milestones}
             setItems={setMilestones}
+            canManage={canManage}
           />
         </FormSection>
       )}
@@ -265,11 +274,13 @@ export default function ClubHistoryEditorForm({
         </FormSection>
       )}
 
-      <AdminSaveBar
-        loading={loading}
-        submitLabel="Vereinsgeschichte speichern"
-        cancelHref="/admin"
-      />
+      <Can permission="club_history.edit" uiOnly>
+        <AdminSaveBar
+          loading={loading}
+          submitLabel="Vereinsgeschichte speichern"
+          cancelHref="/admin"
+        />
+      </Can>
     </form>
   );
 }

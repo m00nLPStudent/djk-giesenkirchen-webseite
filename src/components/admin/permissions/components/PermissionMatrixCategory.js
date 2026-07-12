@@ -7,6 +7,7 @@ export default function PermissionMatrixCategory({
   permissions,
   roles,
   assignments,
+  canEdit,
   onToggle,
   busyKey,
 }) {
@@ -49,6 +50,7 @@ export default function PermissionMatrixCategory({
                 permission={permission}
                 roles={roles}
                 assignments={assignments}
+                canEdit={canEdit}
                 onToggle={onToggle}
                 busyKey={busyKey}
               />
@@ -76,19 +78,21 @@ export default function PermissionMatrixCategory({
                     className="flex items-center justify-between rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/80"
                   >
                     <span className="mr-3 truncate">{role.name}</span>
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      disabled={busy}
-                      onChange={(event) =>
-                        onToggle({
-                          roleId: role.id,
-                          permissionId: permission.id,
-                          checked: event.target.checked,
-                        })
-                      }
-                      className="h-4 w-4 rounded border-white/20 bg-black/30"
-                    />
+                    {canEdit ? (
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        disabled={busy}
+                        onChange={(event) =>
+                          onToggle({
+                            roleId: role.id,
+                            permissionId: permission.id,
+                            checked: event.target.checked,
+                          })
+                        }
+                        className="h-4 w-4 rounded border-white/20 bg-black/30"
+                      />
+                    ) : null}
                   </label>
                 );
               })}

@@ -1,6 +1,7 @@
 import { uploadMediaFile, deleteMediaFile } from "@/lib/storage";
 import { supabase } from "@/lib/supabase";
 import { createEntityRepository } from "@/components/admin/services/entity.repository";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 
 export const TEAM_PLACEHOLDER_IMAGE = "";
 export const TEAM_CONTACT_PLACEHOLDER_IMAGE = "";
@@ -150,7 +151,18 @@ export async function saveTeam(team, id = null) {
 }
 
 export async function saveTeamWithSeason(team, id = null) {
-  const currentSeasonResult = await setCurrentPublicSeason(team.public_season_id);
+  const currentSeasonResult = await setCurrentPublicSeason(
+    team.public_season_id,
+  );
+
+  logAdminSaveEvent({
+    module: "teams",
+    mode: id ? "edit" : "create",
+    step: "service.setCurrentPublicSeason",
+    operation: "update",
+    success: !currentSeasonResult.error,
+    error: currentSeasonResult.error,
+  });
 
   if (currentSeasonResult.error) return currentSeasonResult;
 
@@ -158,7 +170,9 @@ export async function saveTeamWithSeason(team, id = null) {
 
   if (teamResult.error) return teamResult;
 
-  const savedTeam = Array.isArray(teamResult.data) ? teamResult.data[0] : teamResult.data;
+  const savedTeam = Array.isArray(teamResult.data)
+    ? teamResult.data[0]
+    : teamResult.data;
   const teamId = savedTeam?.id || id;
 
   if (!teamId || !team.season_id) {
@@ -172,6 +186,16 @@ export async function saveTeamWithSeason(team, id = null) {
     })
     .select("*");
 
+  logAdminSaveEvent({
+    module: "team_seasons",
+    mode: id ? "edit" : "create",
+    step: "service.saveTeamWithSeason.teamSeason",
+    operation: "upsert",
+    success: !seasonResult.error,
+    error: seasonResult.error,
+    data: seasonResult.data,
+  });
+
   if (seasonResult.error) return seasonResult;
 
   const savedTeamSeason = Array.isArray(seasonResult.data)
@@ -184,12 +208,30 @@ export async function saveTeamWithSeason(team, id = null) {
       team.selected_player_ids || [],
     );
 
+    logAdminSaveEvent({
+      module: "player_team_seasons",
+      mode: id ? "edit" : "create",
+      step: "service.saveTeamWithSeason.players",
+      operation: "replace",
+      success: !playerResult.error,
+      error: playerResult.error,
+    });
+
     if (playerResult.error) return playerResult;
 
     const coachResult = await replaceCoachAssignments(
       savedTeamSeason.id,
       team.selected_coach_ids || [],
     );
+
+    logAdminSaveEvent({
+      module: "coach_team_seasons",
+      mode: id ? "edit" : "create",
+      step: "service.saveTeamWithSeason.coaches",
+      operation: "replace",
+      success: !coachResult.error,
+      error: coachResult.error,
+    });
 
     if (coachResult.error) return coachResult;
   }
@@ -204,7 +246,9 @@ export async function removeTeam(team) {
   }
 
   if (team?.contact_image_url) {
-    const contactImageResult = await deleteTeamContactImage(team.contact_image_url);
+    const contactImageResult = await deleteTeamContactImage(
+      team.contact_image_url,
+    );
     if (contactImageResult?.error) return contactImageResult;
   }
 

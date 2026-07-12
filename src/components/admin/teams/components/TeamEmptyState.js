@@ -1,5 +1,6 @@
 import { Shield } from "lucide-react";
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
 
 export default function TeamEmptyState() {
   return (
@@ -14,12 +15,14 @@ export default function TeamEmptyState() {
         Lege eine neue Mannschaft an oder ändere deinen Filter.
       </p>
 
-      <Link
-        href="/admin/teams/new"
-        className="mt-8 inline-flex items-center rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-      >
-        Neue Mannschaft erstellen
-      </Link>
+      <Can permission="teams.create" uiOnly>
+        <Link
+          href="/admin/teams/new"
+          className="mt-8 inline-flex items-center rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+        >
+          Neue Mannschaft erstellen
+        </Link>
+      </Can>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search, Plus } from "lucide-react";
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import Can from "@/components/admin/auth/Can";
 
 export default function PermissionsToolbar({
   filters,
@@ -61,21 +62,25 @@ export default function PermissionsToolbar({
           ))}
         </select>
 
-        <Link
-          href="/admin/permissions/matrix"
-          className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/15 bg-white/[0.06] px-4 text-sm font-black text-white/80 transition hover:border-red-500/40 hover:text-white"
-        >
-          Matrix
-        </Link>
+        <Can permission="permissions.edit" uiOnly>
+          <Link
+            href="/admin/permissions/matrix"
+            className="inline-flex h-12 items-center justify-center rounded-2xl border border-white/15 bg-white/[0.06] px-4 text-sm font-black text-white/80 transition hover:border-red-500/40 hover:text-white"
+          >
+            Matrix
+          </Link>
+        </Can>
 
-        <button
-          type="button"
-          onClick={onCreate}
-          className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
-        >
-          <Plus size={16} />
-          Neue Permission
-        </button>
+        <Can permission="permissions.edit" uiOnly>
+          <button
+            type="button"
+            onClick={onCreate}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+          >
+            <Plus size={16} />
+            Neue Permission
+          </button>
+        </Can>
       </div>
     </AdminPanel>
   );

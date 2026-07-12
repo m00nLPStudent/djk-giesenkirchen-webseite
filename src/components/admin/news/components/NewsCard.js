@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
 import NewsStatusBadge from "./NewsStatusBadge";
 import DeleteNewsButton from "@/components/admin/ui/DeleteNewsButton";
 import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
@@ -43,14 +44,18 @@ export default function NewsCard({ item }) {
         <p className="mt-3 max-w-3xl text-white/60">{item.teaser_de}</p>
 
         <div className="mt-5 flex gap-3">
-          <Link
-            href={`/admin/news/edit/${item.id}`}
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-          >
-            Bearbeiten
-          </Link>
+          <Can permission="news.edit" uiOnly>
+            <Link
+              href={`/admin/news/edit/${item.id}`}
+              className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
+            >
+              Bearbeiten
+            </Link>
+          </Can>
 
-          <DeleteNewsButton id={item.id} title={item.title_de} />
+          <Can permission="news.delete" uiOnly>
+            <DeleteNewsButton id={item.id} title={item.title_de} />
+          </Can>
         </div>
       </div>
     </div>

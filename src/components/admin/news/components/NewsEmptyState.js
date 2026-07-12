@@ -1,5 +1,6 @@
 import { Newspaper } from "lucide-react";
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
 
 export default function NewsEmptyState() {
   return (
@@ -15,12 +16,14 @@ export default function NewsEmptyState() {
         Besucher über Neuigkeiten im Verein.
       </p>
 
-      <Link
-        href="/admin/news/new"
-        className="mt-8 inline-flex items-center rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-      >
-        Erste News erstellen
-      </Link>
+      <Can permission="news.create" uiOnly>
+        <Link
+          href="/admin/news/new"
+          className="mt-8 inline-flex items-center rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+        >
+          Erste News erstellen
+        </Link>
+      </Can>
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { saveTeamWithSeason, uploadTeamImage } from "../services/teams.service";
 import TeamFormTabs from "./components/TeamFormTabs";
 import TeamSubmitBar from "./components/TeamSubmitBar";
@@ -127,6 +129,12 @@ export default function AdminTeamsForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
+    logAdminSaveEvent({
+      module: "teams",
+      mode: team?.id ? "edit" : "create",
+      step: "form.submit-triggered",
+      success: true,
+    });
 
     if (!form.season_id) {
       alert("Bitte zuerst eine Saison auswählen.");
@@ -148,9 +156,27 @@ export default function AdminTeamsForm({
     setLoading(false);
 
     if (error) {
+      logAdminSaveEvent({
+        module: "teams",
+        mode: team?.id ? "edit" : "create",
+        step: "form.submit-failed",
+        success: false,
+        error,
+        navigationTriggered: false,
+      });
       alert("Fehler beim Speichern: " + error.message);
       return;
     }
+
+    logAdminSaveEvent({
+      module: "teams",
+      mode: team?.id ? "edit" : "create",
+      step: "form.submit-success",
+      success: true,
+      navigationTriggered: true,
+    });
+
+    await revalidatePublicContentAction("teams");
 
     router.push("/admin/teams");
     router.refresh();

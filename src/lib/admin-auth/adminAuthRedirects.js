@@ -56,7 +56,30 @@ export function normalizeAdminRedirectPath(value = "") {
 
 export function buildLoginRedirectTarget(redirectPath = "") {
   const safePath = normalizeAdminRedirectPath(redirectPath);
-  if (!safePath || safePath === "/admin/login") {
+  if (!safePath) {
+    return "/admin";
+  }
+
+  const restrictedTargets = new Set([
+    "/admin/login",
+    "/admin/logout",
+    "/admin/unauthorized",
+    "/admin/forgot-password",
+    "/admin/set-password",
+  ]);
+
+  try {
+    const parsed = new URL(safePath, "http://localhost");
+    if (restrictedTargets.has(parsed.pathname)) {
+      return "/admin";
+    }
+  } catch {
+    if (restrictedTargets.has(safePath.split("?")[0].split("#")[0])) {
+      return "/admin";
+    }
+  }
+
+  if (safePath === "/admin/login") {
     return "/admin";
   }
 

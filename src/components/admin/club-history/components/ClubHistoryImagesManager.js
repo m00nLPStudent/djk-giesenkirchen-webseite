@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { InputField, TextareaField } from "@/components/admin/forms";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
   createClubHistoryImage,
   deleteClubHistoryImage,
@@ -20,7 +21,12 @@ function sortByOrder(items) {
   });
 }
 
-export default function ClubHistoryImagesManager({ pageId, items, setItems }) {
+export default function ClubHistoryImagesManager({
+  pageId,
+  items,
+  setItems,
+  canManage = false,
+}) {
   const [uploading, setUploading] = useState(false);
   const [savingIds, setSavingIds] = useState([]);
   const [deletingIds, setDeletingIds] = useState([]);
@@ -57,6 +63,7 @@ export default function ClubHistoryImagesManager({ pageId, items, setItems }) {
 
     if (data) {
       setItems((current) => sortByOrder([...current, data]));
+      await revalidatePublicContentAction("club-history");
     }
   }
 
@@ -83,6 +90,7 @@ export default function ClubHistoryImagesManager({ pageId, items, setItems }) {
           current.map((entry) => (entry.id === data.id ? data : entry)),
         ),
       );
+      await revalidatePublicContentAction("club-history");
     }
   }
 
@@ -100,6 +108,7 @@ export default function ClubHistoryImagesManager({ pageId, items, setItems }) {
     }
 
     setItems((current) => current.filter((entry) => entry.id !== item.id));
+    await revalidatePublicContentAction("club-history");
   }
 
   return (
@@ -116,22 +125,24 @@ export default function ClubHistoryImagesManager({ pageId, items, setItems }) {
           Bild hochladen
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <label className="inline-flex cursor-pointer rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-red-700">
-            {uploading ? "Upload läuft..." : "Bild auswählen"}
-            <input
-              type="file"
-              accept="image/*"
-              disabled={!pageId || uploading}
-              className="hidden"
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) {
-                  void handleUpload(file);
-                }
-                event.target.value = "";
-              }}
-            />
-          </label>
+          {canManage ? (
+            <label className="inline-flex cursor-pointer rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-red-700">
+              {uploading ? "Upload läuft..." : "Bild auswählen"}
+              <input
+                type="file"
+                accept="image/*"
+                disabled={!pageId || uploading}
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) {
+                    void handleUpload(file);
+                  }
+                  event.target.value = "";
+                }}
+              />
+            </label>
+          ) : null}
         </div>
       </div>
 
@@ -242,25 +253,27 @@ export default function ClubHistoryImagesManager({ pageId, items, setItems }) {
                       </label>
                     </div>
 
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        onClick={() => void handleSave(item)}
-                        disabled={saving || deleting}
-                        className="rounded-full bg-red-600 px-6 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-                      >
-                        {saving ? "Speichert..." : "Bild speichern"}
-                      </button>
+                    {canManage ? (
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          type="button"
+                          onClick={() => void handleSave(item)}
+                          disabled={saving || deleting}
+                          className="rounded-full bg-red-600 px-6 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
+                        >
+                          {saving ? "Speichert..." : "Bild speichern"}
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={() => void handleDelete(item)}
-                        disabled={saving || deleting}
-                        className="rounded-full border border-red-500/35 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
-                      >
-                        {deleting ? "Löscht..." : "Bild löschen"}
-                      </button>
-                    </div>
+                        <button
+                          type="button"
+                          onClick={() => void handleDelete(item)}
+                          disabled={saving || deleting}
+                          className="rounded-full border border-red-500/35 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
+                        >
+                          {deleting ? "Löscht..." : "Bild löschen"}
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </article>

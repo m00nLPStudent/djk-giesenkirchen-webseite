@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { InputField, TextareaField } from "@/components/admin/forms";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
   createClubHistoryMilestone,
   deleteClubHistoryMilestone,
@@ -36,6 +37,7 @@ export default function ClubHistoryMilestonesManager({
   pageId,
   items,
   setItems,
+  canManage = false,
 }) {
   const [creating, setCreating] = useState(false);
   const [savingIds, setSavingIds] = useState([]);
@@ -75,6 +77,7 @@ export default function ClubHistoryMilestonesManager({
     if (data) {
       setItems((current) => sortMilestones([...current, data]));
       setOpenId(data.id);
+      await revalidatePublicContentAction("club-history");
     }
   }
 
@@ -101,6 +104,7 @@ export default function ClubHistoryMilestonesManager({
           current.map((entry) => (entry.id === data.id ? data : entry)),
         ),
       );
+      await revalidatePublicContentAction("club-history");
     }
   }
 
@@ -118,6 +122,7 @@ export default function ClubHistoryMilestonesManager({
     }
 
     setItems((current) => current.filter((entry) => entry.id !== item.id));
+    await revalidatePublicContentAction("club-history");
   }
 
   return (
@@ -139,14 +144,16 @@ export default function ClubHistoryMilestonesManager({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => void handleCreate()}
-          disabled={!pageId || creating}
-          className="rounded-full bg-red-600 px-6 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-        >
-          {creating ? "Legt an..." : "Meilenstein hinzufügen"}
-        </button>
+        {canManage ? (
+          <button
+            type="button"
+            onClick={() => void handleCreate()}
+            disabled={!pageId || creating}
+            className="rounded-full bg-red-600 px-6 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
+          >
+            {creating ? "Legt an..." : "Meilenstein hinzufügen"}
+          </button>
+        ) : null}
       </div>
 
       {items.length === 0 ? (
@@ -279,23 +286,27 @@ export default function ClubHistoryMilestonesManager({
                         Aktiv
                       </label>
 
-                      <button
-                        type="button"
-                        onClick={() => void handleSave(item)}
-                        disabled={saving || deleting}
-                        className="rounded-full bg-red-600 px-6 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-                      >
-                        {saving ? "Speichert..." : "Meilenstein speichern"}
-                      </button>
+                      {canManage ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => void handleSave(item)}
+                            disabled={saving || deleting}
+                            className="rounded-full bg-red-600 px-6 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
+                          >
+                            {saving ? "Speichert..." : "Meilenstein speichern"}
+                          </button>
 
-                      <button
-                        type="button"
-                        onClick={() => void handleDelete(item)}
-                        disabled={saving || deleting}
-                        className="rounded-full border border-red-500/35 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
-                      >
-                        {deleting ? "Löscht..." : "Meilenstein löschen"}
-                      </button>
+                          <button
+                            type="button"
+                            onClick={() => void handleDelete(item)}
+                            disabled={saving || deleting}
+                            className="rounded-full border border-red-500/35 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
+                          >
+                            {deleting ? "Löscht..." : "Meilenstein löschen"}
+                          </button>
+                        </>
+                      ) : null}
                     </div>
                   </div>
                 )}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Can from "@/components/admin/auth/Can";
 import { getEventTypeLabel } from "@/lib/events";
 
 function getEventStatus(item) {
@@ -73,12 +74,14 @@ export default function EventCard({ item }) {
         </p>
 
         <div className="mt-5 flex gap-3">
-          <Link
-            href={`/admin/events/edit/${item.id}`}
-            className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-          >
-            Bearbeiten
-          </Link>
+          <Can permission="events.edit" uiOnly>
+            <Link
+              href={`/admin/events/edit/${item.id}`}
+              className="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
+            >
+              Bearbeiten
+            </Link>
+          </Can>
 
           {item.slug && (
             <Link
