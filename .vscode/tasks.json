@@ -1,0 +1,102 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "inspect-chunk-500",
+			"type": "shell",
+			"command": "curl.exe",
+			"args": [
+				"-i",
+				"http://localhost:3000/_next/static/chunks/3o7rf80wu-hhk.js"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "find-missing-chunk",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Get-ChildItem -Path .next\\static\\chunks -Recurse -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -like '*3o7rf80wu-hhk*' } | Select-Object FullName,Name | Format-Table -AutoSize | Out-String"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "find-missing-chunk-cmd",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"dir /s /b .next\\static\\chunks\\*3o7rf80wu-hhk*"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "clean-next-cache",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"if exist .next rmdir /s /q .next && echo cleaned || echo no-next"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "start-dev-server",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"run",
+				"dev"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "kill-next-ports",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$ports=3000,3001; foreach($p in $ports){ $cons=Get-NetTCPConnection -LocalPort $p -State Listen -ErrorAction SilentlyContinue; foreach($c in $cons){ try { Stop-Process -Id $c.OwningProcess -Force -ErrorAction Stop; Write-Output (\"killed pid \" + $c.OwningProcess + \" on \" + $p) } catch { Write-Output (\"failed pid \" + $c.OwningProcess + \" on \" + $p + \": \" + $_.Exception.Message) } } }; 'done'"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "kill-next-ports-cmd",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/c",
+				"for /f \"tokens=5\" %a in ('netstat -ano ^| findstr :3000 ^| findstr LISTENING') do taskkill /PID %a /F & for /f \"tokens=5\" %a in ('netstat -ano ^| findstr :3001 ^| findstr LISTENING') do taskkill /PID %a /F"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "kill-next-ports-ps",
+			"type": "shell",
+			"command": "$ports = 3000,3001; foreach ($p in $ports) { $cons = Get-NetTCPConnection -LocalPort $p -State Listen -ErrorAction SilentlyContinue; foreach ($c in $cons) { Stop-Process -Id $c.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Output (\"killed pid $($c.OwningProcess) on port $p\") } }",
+			"isBackground": false
+		},
+		{
+			"label": "check-listeners-300x",
+			"type": "shell",
+			"command": "Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue | Where-Object { $_.LocalPort -in 3000,3001 } | Select-Object LocalAddress,LocalPort,OwningProcess | Format-Table -AutoSize | Out-String",
+			"isBackground": false
+		},
+		{
+			"label": "start-dev-3000",
+			"type": "shell",
+			"command": "npm.cmd",
+			"args": [
+				"run",
+				"dev",
+				"--",
+				"--port",
+				"3000"
+			],
+			"isBackground": true
+		}
+	]
+}

@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 
 async function removeEntity(entityType, entityId) {
   return await supabase.rpc("remove_entity", {
@@ -28,5 +29,28 @@ export async function removeBoardMemberRecord(member) {
 }
 
 export async function removeSponsorRecord(sponsor) {
-  return await removeEntity("sponsor", sponsor?.id);
+  console.info("[DeleteTrace] removeSponsorRecord:start", {
+    sponsorId: sponsor?.id,
+    sponsorName: sponsor?.name,
+  });
+
+  const result = await removeEntity("sponsor", sponsor?.id);
+
+  console.info("[DeleteTrace] removeSponsorRecord:rpc-result", {
+    sponsorId: sponsor?.id,
+    hasError: Boolean(result?.error),
+    errorMessage: result?.error?.message || null,
+  });
+
+  if (!result?.error) {
+    console.info("[DeleteTrace] removeSponsorRecord:before-revalidate", {
+      scope: "sponsors",
+    });
+    await revalidatePublicContentAction("sponsors");
+    console.info("[DeleteTrace] removeSponsorRecord:after-revalidate", {
+      scope: "sponsors",
+    });
+  }
+
+  return result;
 }

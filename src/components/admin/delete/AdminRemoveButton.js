@@ -16,14 +16,22 @@ export default function AdminRemoveButton({
 
   async function run() {
     if (!action || busy) return;
+    console.info("[DeleteTrace] AdminRemoveButton.run:start", { label, name });
     setBusy(true);
     const { error } = await action();
     setBusy(false);
 
     if (error) {
+      console.error("[DeleteTrace] AdminRemoveButton.run:error", {
+        label,
+        name,
+        message: error?.message,
+      });
       alert("Fehler: " + error.message);
       return;
     }
+
+    console.info("[DeleteTrace] AdminRemoveButton.run:success", { label, name });
 
     setOpen(false);
     router.refresh();

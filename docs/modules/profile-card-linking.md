@@ -77,3 +77,7 @@ Noch nicht Teil dieser Phase:
 Folgephase erforderlich:
 
 - E-Mail-Synchronisierung mit Bestaetigungs- und Rollback-Strategie, ohne die stabile `admin_profile_id`-Verknuepfung zu gefaehrden
+
+Bekannte Einschränkung:
+Vorstands- und Trainerkacheln können neu zugeordnet werden.
+Das explizite Entfernen einer bestehenden Zuordnung auf NULL ist derzeit noch nicht zuverlässig und wird in einer späteren Korrekturphase behandelt.
