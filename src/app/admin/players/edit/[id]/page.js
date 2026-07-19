@@ -5,7 +5,11 @@ import { supabase } from "@/lib/supabase";
 
 export default async function EditPlayerPage({ params }) {
   const { id } = await params;
-  const { data: player } = await supabase.from("players").select("*").eq("id", id).single();
+  const { data: player } = await supabase
+    .from("players")
+    .select("*")
+    .eq("id", id)
+    .single();
   const { data: teams } = await supabase
     .from("teams")
     .select("id, name_de")

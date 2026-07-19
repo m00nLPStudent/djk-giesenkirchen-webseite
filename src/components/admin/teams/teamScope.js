@@ -5,7 +5,9 @@ import {
 } from "@/lib/admin-auth/scopes/scopeEngine";
 
 function normalizeText(value = "") {
-  return String(value || "").trim().toLowerCase();
+  return String(value || "")
+    .trim()
+    .toLowerCase();
 }
 
 export function isYouthTeam(team = {}) {
@@ -41,7 +43,9 @@ export function canAccessTeamInScope(scopeContext, team = {}) {
 }
 
 export function filterTeamsByScope(scopeContext, teams = []) {
-  return (teams || []).filter((team) => canAccessTeamInScope(scopeContext, team));
+  return (teams || []).filter((team) =>
+    canAccessTeamInScope(scopeContext, team),
+  );
 }
 
 export function canCreateTeamInScope(scopeContext, draftTeam = {}) {

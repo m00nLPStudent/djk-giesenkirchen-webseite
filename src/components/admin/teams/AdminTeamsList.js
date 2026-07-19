@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { matchesActiveStatus, matchesSearch } from "@/components/admin/utils/list";
+import {
+  matchesActiveStatus,
+  matchesSearch,
+} from "@/components/admin/utils/list";
 import TeamFilters from "./components/TeamFilters";
 import TeamCard from "./components/TeamCard";
 import TeamEmptyState from "./components/TeamEmptyState";
@@ -20,7 +23,9 @@ function getTeamGroup(team) {
 function matchesFilter(team, filter) {
   if (filter === "alle") return true;
   if (filter === "fussball-de") {
-    return Boolean(team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id);
+    return Boolean(
+      team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
+    );
   }
   if (filter === "jugend" || filter === "senioren" || filter === "damen") {
     return getTeamGroup(team) === filter;

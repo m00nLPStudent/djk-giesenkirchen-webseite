@@ -144,10 +144,11 @@ export async function assertAdminActionPermission({
     };
   }
 
-  const { profile, error: profileError, lookupType } = await loadAdminProfile(
-    supabaseServer,
-    user,
-  );
+  const {
+    profile,
+    error: profileError,
+    lookupType,
+  } = await loadAdminProfile(supabaseServer, user);
 
   if (process.env.NODE_ENV === "development") {
     console.info("[admin-action-permission:profile]", {

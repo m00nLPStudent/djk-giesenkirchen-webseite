@@ -30,11 +30,8 @@ function isOptionalSchemaError(error) {
 
   const message = String(error?.message || "").toLowerCase();
   return (
-    message.includes("relation") &&
-    message.includes("does not exist")
-  ) || (
-    message.includes("column") &&
-    message.includes("does not exist")
+    (message.includes("relation") && message.includes("does not exist")) ||
+    (message.includes("column") && message.includes("does not exist"))
   );
 }
 

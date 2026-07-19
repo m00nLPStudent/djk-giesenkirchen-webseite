@@ -28,7 +28,10 @@ export default async function NewTeamPage() {
   const { data: scopedTeamsRaw } = await supabaseServer
     .from("teams")
     .select("id, age_group, name_de");
-  const scopedTeams = filterScopedTeamsOnServer(scopeContext, scopedTeamsRaw || []);
+  const scopedTeams = filterScopedTeamsOnServer(
+    scopeContext,
+    scopedTeamsRaw || [],
+  );
   const scopedTeamIds = scopedTeams.map((team) => team.id);
 
   const { data: seasons } = await supabaseServer

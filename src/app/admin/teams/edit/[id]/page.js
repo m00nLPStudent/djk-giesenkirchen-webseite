@@ -23,7 +23,11 @@ export default async function EditTeamPage({ params }) {
   const scopeContext = await loadServerTeamScopeContext(permissionResult);
   const supabaseServer = permissionResult.supabaseServer;
 
-  const { data: team } = await supabaseServer.from("teams").select("*").eq("id", id).single();
+  const { data: team } = await supabaseServer
+    .from("teams")
+    .select("*")
+    .eq("id", id)
+    .single();
 
   if (!team || !canAccessTeamOnServer(scopeContext, team)) {
     redirect("/admin/unauthorized?reason=missing-team-scope");
@@ -43,11 +47,17 @@ export default async function EditTeamPage({ params }) {
   const ids = (teamSeasons || []).map((item) => item.id);
 
   const { data: playerAssignments } = ids.length
-    ? await supabaseServer.from("player_team_seasons").select("*").in("team_season_id", ids)
+    ? await supabaseServer
+        .from("player_team_seasons")
+        .select("*")
+        .in("team_season_id", ids)
     : { data: [] };
 
   const { data: coachAssignments } = ids.length
-    ? await supabaseServer.from("coach_team_seasons").select("*").in("team_season_id", ids)
+    ? await supabaseServer
+        .from("coach_team_seasons")
+        .select("*")
+        .in("team_season_id", ids)
     : { data: [] };
 
   const { data: players } = await supabaseServer

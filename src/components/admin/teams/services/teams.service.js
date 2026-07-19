@@ -94,7 +94,11 @@ function createTeamSeasonPayload(team, teamId, seasonId) {
   };
 }
 
-async function replacePlayerAssignments(teamSeasonId, playerIds = [], client = null) {
+async function replacePlayerAssignments(
+  teamSeasonId,
+  playerIds = [],
+  client = null,
+) {
   const db = resolveClient(client);
   const deleteResult = await db
     .from("player_team_seasons")
@@ -115,7 +119,11 @@ async function replacePlayerAssignments(teamSeasonId, playerIds = [], client = n
   );
 }
 
-async function replaceCoachAssignments(teamSeasonId, coachIds = [], client = null) {
+async function replaceCoachAssignments(
+  teamSeasonId,
+  coachIds = [],
+  client = null,
+) {
   const db = resolveClient(client);
   const deleteResult = await db
     .from("coach_team_seasons")
@@ -263,4 +271,3 @@ export async function saveTeamWithSeason(
 
   return teamResult;
 }
-

@@ -24,8 +24,7 @@ function isForeignKeyBlockError(error) {
 
   const message = String(error?.message || "").toLowerCase();
   return (
-    message.includes("foreign key") ||
-    message.includes("violates foreign key")
+    message.includes("foreign key") || message.includes("violates foreign key")
   );
 }
 
@@ -60,10 +59,7 @@ async function countIn(db, table, key, values = []) {
 }
 
 async function loadIdsByEq(db, table, idColumn, key, value) {
-  const { data, error } = await db
-    .from(table)
-    .select(idColumn)
-    .eq(key, value);
+  const { data, error } = await db.from(table).select(idColumn).eq(key, value);
 
   if (error) {
     return { ids: [], error };
@@ -80,10 +76,7 @@ async function loadIdsByIn(db, table, idColumn, key, values = []) {
     return { ids: [], error: null };
   }
 
-  const { data, error } = await db
-    .from(table)
-    .select(idColumn)
-    .in(key, values);
+  const { data, error } = await db.from(table).select(idColumn).in(key, values);
 
   if (error) {
     return { ids: [], error };
@@ -135,13 +128,17 @@ async function loadTeamDependencySummary(db, teamId) {
   }
 
   const teamSeasonIds = teamSeasonIdsResult.ids;
-  const [playerTeamSeasons, coachTeamSeasons, teamTrainingTimes, clubClosurePeriods] =
-    await Promise.all([
-      countIn(db, "player_team_seasons", "team_season_id", teamSeasonIds),
-      countIn(db, "coach_team_seasons", "team_season_id", teamSeasonIds),
-      countIn(db, "team_training_times", "team_season_id", teamSeasonIds),
-      countIn(db, "club_closure_periods", "team_season_id", teamSeasonIds),
-    ]);
+  const [
+    playerTeamSeasons,
+    coachTeamSeasons,
+    teamTrainingTimes,
+    clubClosurePeriods,
+  ] = await Promise.all([
+    countIn(db, "player_team_seasons", "team_season_id", teamSeasonIds),
+    countIn(db, "coach_team_seasons", "team_season_id", teamSeasonIds),
+    countIn(db, "team_training_times", "team_season_id", teamSeasonIds),
+    countIn(db, "club_closure_periods", "team_season_id", teamSeasonIds),
+  ]);
 
   const nestedError = [
     playerTeamSeasons,
@@ -259,7 +256,9 @@ export async function executeSafeTeamDeleteOrArchive(db, team) {
     if (isForeignKeyBlockError(deleteResult.error)) {
       const archiveResult = await archiveTeam(db, team?.id);
       if (archiveResult.error) {
-        return buildError("Die Mannschaft konnte weder geloescht noch archiviert werden.");
+        return buildError(
+          "Die Mannschaft konnte weder geloescht noch archiviert werden.",
+        );
       }
 
       return buildSuccess(
@@ -269,7 +268,9 @@ export async function executeSafeTeamDeleteOrArchive(db, team) {
       );
     }
 
-    return buildError("Die Mannschaft konnte nicht endgueltig geloescht werden.");
+    return buildError(
+      "Die Mannschaft konnte nicht endgueltig geloescht werden.",
+    );
   }
 
   return buildSuccess("deleted", "Mannschaft wurde endgueltig geloescht.");

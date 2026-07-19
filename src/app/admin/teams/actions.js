@@ -36,9 +36,7 @@ async function loadAuthorizedTeamMutationContext(requiredPermission) {
   if (!permissionResult.ok) {
     return {
       ok: false,
-      result: buildError(
-        permissionResult.message || "Berechtigung fehlt.",
-      ),
+      result: buildError(permissionResult.message || "Berechtigung fehlt."),
     };
   }
 
@@ -53,7 +51,8 @@ async function loadAuthorizedTeamMutationContext(requiredPermission) {
 
 export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   const requiredPermission = teamId ? "teams.edit" : "teams.create";
-  const authContext = await loadAuthorizedTeamMutationContext(requiredPermission);
+  const authContext =
+    await loadAuthorizedTeamMutationContext(requiredPermission);
 
   if (!authContext.ok) {
     return authContext.result;
