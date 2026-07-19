@@ -12,6 +12,10 @@ const teamRepository = createEntityRepository({
   imageFields: ["team_image_url", "contact_image_url"],
 });
 
+function resolveClient(client = null) {
+  return client || supabase;
+}
+
 export async function uploadTeamImage(file, team = {}) {
   return await uploadMediaFile(file, {
     folder: "teams",
@@ -90,8 +94,9 @@ function createTeamSeasonPayload(team, teamId, seasonId) {
   };
 }
 
-async function replacePlayerAssignments(teamSeasonId, playerIds = []) {
-  const deleteResult = await supabase
+async function replacePlayerAssignments(teamSeasonId, playerIds = [], client = null) {
+  const db = resolveClient(client);
+  const deleteResult = await db
     .from("player_team_seasons")
     .delete()
     .eq("team_season_id", teamSeasonId);
@@ -100,7 +105,7 @@ async function replacePlayerAssignments(teamSeasonId, playerIds = []) {
 
   if (!playerIds.length) return { error: null };
 
-  return await supabase.from("player_team_seasons").insert(
+  return await db.from("player_team_seasons").insert(
     playerIds.map((playerId, index) => ({
       player_id: playerId,
       team_season_id: teamSeasonId,
@@ -110,8 +115,9 @@ async function replacePlayerAssignments(teamSeasonId, playerIds = []) {
   );
 }
 
-async function replaceCoachAssignments(teamSeasonId, coachIds = []) {
-  const deleteResult = await supabase
+async function replaceCoachAssignments(teamSeasonId, coachIds = [], client = null) {
+  const db = resolveClient(client);
+  const deleteResult = await db
     .from("coach_team_seasons")
     .delete()
     .eq("team_season_id", teamSeasonId);
@@ -120,7 +126,7 @@ async function replaceCoachAssignments(teamSeasonId, coachIds = []) {
 
   if (!coachIds.length) return { error: null };
 
-  return await supabase.from("coach_team_seasons").insert(
+  return await db.from("coach_team_seasons").insert(
     coachIds.map((coachId, index) => ({
       coach_id: coachId,
       team_season_id: teamSeasonId,
@@ -130,29 +136,46 @@ async function replaceCoachAssignments(teamSeasonId, coachIds = []) {
   );
 }
 
-async function setCurrentPublicSeason(seasonId) {
+async function setCurrentPublicSeason(seasonId, client = null) {
   if (!seasonId) return { error: null };
 
-  const resetResult = await supabase
+  const db = resolveClient(client);
+
+  const resetResult = await db
     .from("seasons")
     .update({ is_current: false })
     .neq("id", seasonId);
 
   if (resetResult.error) return resetResult;
 
-  return await supabase
+  return await db
     .from("seasons")
     .update({ is_current: true })
     .eq("id", seasonId);
 }
 
-export async function saveTeam(team, id = null) {
-  return await teamRepository.upsert(createTeamPayload(team), id);
+export async function saveTeam(team, id = null, { client = null } = {}) {
+  if (!client) {
+    return await teamRepository.upsert(createTeamPayload(team), id);
+  }
+
+  const payload = createTeamPayload(team);
+  if (id) {
+    return await client.from("teams").update(payload).eq("id", id).select("*");
+  }
+
+  return await client.from("teams").insert(payload).select("*");
 }
 
-export async function saveTeamWithSeason(team, id = null) {
+export async function saveTeamWithSeason(
+  team,
+  id = null,
+  { client = null } = {},
+) {
+  const db = resolveClient(client);
   const currentSeasonResult = await setCurrentPublicSeason(
     team.public_season_id,
+    db,
   );
 
   logAdminSaveEvent({
@@ -166,7 +189,7 @@ export async function saveTeamWithSeason(team, id = null) {
 
   if (currentSeasonResult.error) return currentSeasonResult;
 
-  const teamResult = await saveTeam(team, id);
+  const teamResult = await saveTeam(team, id, { client: db });
 
   if (teamResult.error) return teamResult;
 
@@ -179,7 +202,7 @@ export async function saveTeamWithSeason(team, id = null) {
     return teamResult;
   }
 
-  const seasonResult = await supabase
+  const seasonResult = await db
     .from("team_seasons")
     .upsert(createTeamSeasonPayload(team, teamId, team.season_id), {
       onConflict: "team_id,season_id",
@@ -206,6 +229,7 @@ export async function saveTeamWithSeason(team, id = null) {
     const playerResult = await replacePlayerAssignments(
       savedTeamSeason.id,
       team.selected_player_ids || [],
+      db,
     );
 
     logAdminSaveEvent({
@@ -222,6 +246,7 @@ export async function saveTeamWithSeason(team, id = null) {
     const coachResult = await replaceCoachAssignments(
       savedTeamSeason.id,
       team.selected_coach_ids || [],
+      db,
     );
 
     logAdminSaveEvent({
@@ -239,18 +264,3 @@ export async function saveTeamWithSeason(team, id = null) {
   return teamResult;
 }
 
-export async function removeTeam(team) {
-  if (team?.team_image_url) {
-    const imageResult = await deleteTeamImage(team.team_image_url);
-    if (imageResult?.error) return imageResult;
-  }
-
-  if (team?.contact_image_url) {
-    const contactImageResult = await deleteTeamContactImage(
-      team.contact_image_url,
-    );
-    if (contactImageResult?.error) return contactImageResult;
-  }
-
-  return await supabase.rpc("remove_team_cascade", { team_uuid: team?.id });
-}

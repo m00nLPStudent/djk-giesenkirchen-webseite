@@ -1,11 +1,22 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminSettingsEditor } from "@/components/admin/settings";
-import { supabase } from "@/lib/supabase";
+import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
+  const permissionResult = await assertAdminActionPermission({
+    requiredPermission: "settings.view",
+  });
+
+  if (!permissionResult.ok) {
+    redirect("/admin/unauthorized?reason=missing-settings-permission");
+  }
+
+  const db = permissionResult.supabaseServer;
+
   const [
     settingsResult,
     contactsResult,
@@ -15,34 +26,34 @@ export default async function AdminSettingsPage() {
     coachesResult,
     boardMembersResult,
   ] = await Promise.all([
-    supabase.from("club_settings").select("*").maybeSingle(),
-    supabase
+    db.from("club_settings").select("*").maybeSingle(),
+    db
       .from("club_contacts")
       .select("*")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true }),
-    supabase
+    db
       .from("pages")
       .select("*")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true }),
-    supabase
+    db
       .from("membership_request_recipients")
       .select("*")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true }),
-    supabase
+    db
       .from("membership_requests")
       .select("*, teams(name_de)")
       .order("created_at", { ascending: false }),
-    supabase
+    db
       .from("coaches")
       .select(
         "id, first_name, last_name, name, email, role, role_de, teams(name_de)",
       )
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true }),
-    supabase
+    db
       .from("board_members")
       .select("id, first_name, last_name, email, role_de")
       .order("sort_order", { ascending: true })

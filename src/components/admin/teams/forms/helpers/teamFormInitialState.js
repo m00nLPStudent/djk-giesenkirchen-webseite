@@ -46,7 +46,7 @@ export function createInitialTeamForm({
       source.training_times_en || team?.training_times_en || "",
     team_image_url: source.team_image_url || team?.team_image_url || "",
     sort_order: source.sort_order ?? team?.sort_order ?? 0,
-    is_active: source.is_active ?? team?.is_active ?? true,
+    is_active: team?.is_active ?? true,
     contact_name: source.contact_name || team?.contact_name || "",
     contact_email: source.contact_email || team?.contact_email || "",
     contact_phone: source.contact_phone || team?.contact_phone || "",

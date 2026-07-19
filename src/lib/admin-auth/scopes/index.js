@@ -6,17 +6,23 @@ export {
 
 export {
   buildScopeContext,
+  loadAdminProfileScopeContext,
   getBoardMemberOwnerProfileId,
   getCoachOwnerProfileId,
   getAssignedTeamIds,
+  loadAdminProfileManualTeamAssignments,
   loadAdminProfileTeamAssignments,
+  loadCoachTeamSeasonAssignments,
+  loadTeamIdsForTeamSeasonIds,
   mapTeamAssignmentRows,
+  resolveRoleScopeTypes,
 } from "./scopeRepository";
 
 export {
   canAccessYouthTeam,
   canAccessAll,
   canAccessAssignedTeam,
+  canAccessTeam,
   canAccessYouth,
   canEditContribution,
   canEditOwnBoardCard,

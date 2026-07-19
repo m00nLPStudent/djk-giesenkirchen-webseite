@@ -5,6 +5,8 @@ import { matchesActiveStatus, matchesSearch } from "@/components/admin/utils/lis
 import TeamFilters from "./components/TeamFilters";
 import TeamCard from "./components/TeamCard";
 import TeamEmptyState from "./components/TeamEmptyState";
+import TeamStats from "./components/TeamStats";
+import useTeamScope from "./useTeamScope";
 
 function getTeamGroup(team) {
   const value = `${team.age_group || ""} ${team.name_de || ""}`.toLowerCase();
@@ -28,10 +30,11 @@ function matchesFilter(team, filter) {
 }
 
 export default function AdminTeamsList({ teams = [] }) {
+  const { scopedTeams, hasTeamManagementScope } = useTeamScope(teams);
   const [filter, setFilter] = useState("alle");
   const [search, setSearch] = useState("");
 
-  const filteredTeams = teams.filter((team) => {
+  const filteredTeams = scopedTeams.filter((team) => {
     return (
       matchesFilter(team, filter) &&
       matchesSearch(
@@ -48,8 +51,22 @@ export default function AdminTeamsList({ teams = [] }) {
     );
   });
 
+  const active = scopedTeams.filter((team) => team.is_active).length;
+  const inactive = scopedTeams.filter((team) => !team.is_active).length;
+  const footballDeReady = scopedTeams.filter(
+    (team) =>
+      team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
+  ).length;
+
   return (
     <>
+      <TeamStats
+        total={scopedTeams.length}
+        active={active}
+        inactive={inactive}
+        footballDeReady={footballDeReady}
+      />
+
       <TeamFilters
         filter={filter}
         setFilter={setFilter}
@@ -58,7 +75,7 @@ export default function AdminTeamsList({ teams = [] }) {
       />
 
       {filteredTeams.length === 0 ? (
-        <TeamEmptyState />
+        <TeamEmptyState hasTeamManagementScope={hasTeamManagementScope} />
       ) : (
         <div className="space-y-5">
           {filteredTeams.map((team) => (

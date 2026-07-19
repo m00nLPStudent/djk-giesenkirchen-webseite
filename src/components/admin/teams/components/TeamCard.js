@@ -1,9 +1,10 @@
 "use client";
 
 import Can from "@/components/admin/auth/Can";
+import { removeTeamWithScopeAction } from "@/app/admin/teams/actions";
 import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
-import { removeTeamRecord } from "@/components/admin/delete/removeActions";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
+import useTeamScope from "../useTeamScope";
 import {
   EntityActionLink,
   EntityCard,
@@ -40,9 +41,11 @@ function TeamInfoGrid({ team }) {
 }
 
 export default function TeamCard({ team }) {
+  const { canAccessTeamInScope } = useTeamScope();
   const hasFootballDe = Boolean(
     team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
   );
+  const canManageTeam = canAccessTeamInScope(team);
 
   return (
     <EntityCard
@@ -70,11 +73,13 @@ export default function TeamCard({ team }) {
       <TeamInfoGrid team={team} />
 
       <EntityCardActions>
-        <Can permission="teams.edit" uiOnly>
-          <EntityActionLink href={`/admin/teams/edit/${team.id}`}>
-            Bearbeiten
-          </EntityActionLink>
-        </Can>
+        {canManageTeam ? (
+          <Can permission="teams.edit" uiOnly>
+            <EntityActionLink href={`/admin/teams/edit/${team.id}`}>
+              Bearbeiten
+            </EntityActionLink>
+          </Can>
+        ) : null}
         <EntityActionLink
           href={`/fussball/${team.slug}`}
           target="_blank"
@@ -82,27 +87,30 @@ export default function TeamCard({ team }) {
         >
           Ansehen
         </EntityActionLink>
-        <Can permission="teams.delete" uiOnly>
-          <AdminRemoveButton
-            label="Mannschaft"
-            name={team.name_de || "Unbekannte Mannschaft"}
-            action={() => removeTeamRecord(team)}
-            affected={[
-              "Mannschaft",
-              "alle Saisondaten dieser Mannschaft",
-              "Kader-Zuordnungen dieser Mannschaft",
-              "Trainer-Zuordnungen dieser Mannschaft",
-              "Mannschaftsbilder, sofern vorhanden",
-            ]}
-            preserved={[
-              "Spielerprofile",
-              "Trainerprofile",
-              "News-Beiträge",
-              "Saisons",
-              "Abteilungen",
-            ]}
-          />
-        </Can>
+        {canManageTeam ? (
+          <Can permission="teams.delete" uiOnly>
+            <AdminRemoveButton
+              label="Mannschaft"
+              name={team.name_de || "Unbekannte Mannschaft"}
+              action={() => removeTeamWithScopeAction(team.id)}
+              inlineError
+              hint="Teams mit bestehenden Zuordnungen werden nicht endgueltig geloescht, sondern archiviert (is_active = false)."
+              affected={[
+                "Bei unbenutzten Teams: Teamdatensatz und Teambilder",
+                "Bei Teams mit Zuordnungen: Status wird auf inaktiv gesetzt",
+              ]}
+              preserved={[
+                "Spielerprofile",
+                "Trainerprofile",
+                "News-Beiträge",
+                "Saisons",
+                "Termine",
+                "Mitgliedsanfragen",
+                "Abteilungen",
+              ]}
+            />
+          </Can>
+        ) : null}
       </EntityCardActions>
     </EntityCard>
   );

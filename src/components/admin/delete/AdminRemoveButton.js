@@ -9,32 +9,42 @@ export default function AdminRemoveButton({
   action,
   affected = [],
   preserved = [],
+  hint = "",
+  inlineError = false,
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   async function run() {
     if (!action || busy) return;
-    console.info("[DeleteTrace] AdminRemoveButton.run:start", { label, name });
+    setErrorMessage("");
+    setSuccessMessage("");
     setBusy(true);
-    const { error } = await action();
+    const result = await action();
+    const { error } = result || {};
     setBusy(false);
 
     if (error) {
-      console.error("[DeleteTrace] AdminRemoveButton.run:error", {
-        label,
-        name,
-        message: error?.message,
-      });
-      alert("Fehler: " + error.message);
+      if (inlineError) {
+        setErrorMessage(error?.message || "Loeschen fehlgeschlagen.");
+      } else {
+        alert("Fehler: " + error.message);
+      }
       return;
     }
 
-    console.info("[DeleteTrace] AdminRemoveButton.run:success", { label, name });
+    if (result?.message) {
+      setSuccessMessage(result.message);
+    }
 
-    setOpen(false);
     router.refresh();
+
+    if (!result?.message) {
+      setOpen(false);
+    }
   }
 
   return (
@@ -76,13 +86,33 @@ export default function AdminRemoveButton({
               Diese Aktion kann nicht rückgängig gemacht werden.
             </div>
 
+            {hint ? (
+              <div className="mt-4 rounded-2xl border border-blue-500/30 bg-blue-500/15 p-4 text-sm leading-6 text-blue-100">
+                {hint}
+              </div>
+            ) : null}
+
+            {errorMessage ? (
+              <div className="mt-4 rounded-2xl border border-red-500/30 bg-red-500/15 p-4 text-sm leading-6 text-red-100">
+                {errorMessage}
+              </div>
+            ) : null}
+
+            {successMessage ? (
+              <div className="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/15 p-4 text-sm leading-6 text-emerald-100">
+                {successMessage}
+              </div>
+            ) : null}
+
             <div className="mt-6 flex justify-end gap-3">
               <button type="button" onClick={() => setOpen(false)} className="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-white/70">
-                Abbrechen
+                {successMessage ? "Schliessen" : "Abbrechen"}
               </button>
-              <button type="button" onClick={run} disabled={busy} className="rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white disabled:opacity-50">
-                {busy ? "Bitte warten..." : "Bestätigen"}
-              </button>
+              {!successMessage ? (
+                <button type="button" onClick={run} disabled={busy} className="rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white disabled:opacity-50">
+                  {busy ? "Bitte warten..." : "Bestätigen"}
+                </button>
+              ) : null}
             </div>
           </div>
         </div>

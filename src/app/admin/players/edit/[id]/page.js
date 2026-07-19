@@ -6,7 +6,11 @@ import { supabase } from "@/lib/supabase";
 export default async function EditPlayerPage({ params }) {
   const { id } = await params;
   const { data: player } = await supabase.from("players").select("*").eq("id", id).single();
-  const { data: teams } = await supabase.from("teams").select("id, name_de").order("sort_order", { ascending: true });
+  const { data: teams } = await supabase
+    .from("teams")
+    .select("id, name_de")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
 
   return (
     <AdminLayout title="Spieler bearbeiten" subtitle="Spieler">

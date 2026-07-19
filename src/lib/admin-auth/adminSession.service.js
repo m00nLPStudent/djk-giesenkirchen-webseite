@@ -7,6 +7,8 @@ import {
   logAdminDebugError,
   toAdminError,
 } from "./adminDiagnostics";
+import { createEmptyScopeContext } from "./scopes/scopeContext";
+import { loadAdminProfileScopeContext } from "./scopes/scopeRepository";
 
 export async function getCurrentSession() {
   const authState = await getBrowserAuthState("admin-session");
@@ -57,6 +59,7 @@ export async function getCurrentAdminContext() {
     const session = authState?.hasSession ? authState.session || null : null;
     const user = authState?.hasUser ? authState.user || null : null;
     const profile = user?.id ? await getCurrentAdminProfile(user) : null;
+    const emptyScopeContext = createEmptyScopeContext();
 
     if (authState?.authInitDone && !authState?.hasSession) {
       return {
@@ -72,6 +75,7 @@ export async function getCurrentAdminContext() {
         isActive: false,
         hasAdminProfile: false,
         isSuperAdmin: false,
+        scopeContext: emptyScopeContext,
         debugError: null,
       };
     }
@@ -90,6 +94,7 @@ export async function getCurrentAdminContext() {
         isActive: false,
         hasAdminProfile: false,
         isSuperAdmin: false,
+        scopeContext: emptyScopeContext,
         debugError:
           authState.message ||
           "Session vorhanden, aber Benutzer konnte nicht geladen werden.",
@@ -110,6 +115,7 @@ export async function getCurrentAdminContext() {
         isActive: false,
         hasAdminProfile: false,
         isSuperAdmin: false,
+        scopeContext: emptyScopeContext,
         debugError: null,
       };
     }
@@ -133,6 +139,24 @@ export async function getCurrentAdminContext() {
     const profileActive =
       resolvedProfile?.is_active ?? resolvedProfile?.isActive ?? false;
     const normalizedIsActive = Boolean(profileActive);
+    let scopeContext = emptyScopeContext;
+
+    try {
+      const scopeResult = await loadAdminProfileScopeContext({
+        adminProfileId: resolvedProfile?.id || null,
+        userId: user.id,
+        roleKeys: (resolvedRoles || [])
+          .map((role) => role?.key)
+          .filter(Boolean),
+        permissionKeys: (authContext?.permissions || [])
+          .map((permission) => permission?.key || permission)
+          .filter(Boolean),
+      });
+
+      scopeContext = scopeResult?.context || emptyScopeContext;
+    } catch (scopeError) {
+      logAdminDebugError("admin-context-scope", scopeError);
+    }
 
     if (process.env.NODE_ENV === "development") {
       console.info("[admin-context] auth", {
@@ -187,6 +211,7 @@ export async function getCurrentAdminContext() {
       isSuperAdmin: Boolean(
         resolvedRoles.some((role) => role?.key === "superadmin"),
       ),
+      scopeContext,
       debugError: null,
     };
   } catch (error) {
@@ -209,6 +234,7 @@ export async function getCurrentAdminContext() {
       isActive: false,
       hasAdminProfile: false,
       isSuperAdmin: false,
+      scopeContext: createEmptyScopeContext(),
       debugError,
     };
   }

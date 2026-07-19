@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { AlertTriangle, CircleCheck, Info } from "lucide-react";
 import DashboardEmptyState from "./DashboardEmptyState";
 import AdminPanel from "@/components/admin/common/AdminPanel";
 import AdminSectionHeader from "@/components/admin/common/AdminSectionHeader";
+import Can from "@/components/admin/auth/Can";
 import { buildSystemStatusItems } from "./dashboard.helpers";
 
 function StatusItem({ item }) {
@@ -32,8 +35,6 @@ export default function DashboardSystemStatus({ statusSignals }) {
         eyebrow="System"
         title="Systemstatus"
         description="Hinweise aus vorhandenen Datenquellen zur Pflege von Inhalten."
-        actionLabel="Einstellungen pruefen"
-        actionHref="/admin/settings"
       />
 
       {items.length === 0 ? (
@@ -48,14 +49,16 @@ export default function DashboardSystemStatus({ statusSignals }) {
         </ul>
       )}
 
-      <div className="mt-5 flex justify-end">
-        <Link
-          href="/admin/settings"
-          className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-white/70 transition hover:border-red-500/50 hover:text-white"
-        >
-          Einstellungen pruefen
-        </Link>
-      </div>
+      <Can permission="settings.view" uiOnly>
+        <div className="mt-5 flex justify-end">
+          <Link
+            href="/admin/settings"
+            className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-white/70 transition hover:border-red-500/50 hover:text-white"
+          >
+            Einstellungen pruefen
+          </Link>
+        </div>
+      </Can>
     </AdminPanel>
   );
 }

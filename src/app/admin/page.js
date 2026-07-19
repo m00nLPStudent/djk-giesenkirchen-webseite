@@ -1,5 +1,11 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
+import {
+  filterScopedTeamsOnServer,
+  loadServerTeamScopeContext,
+  resolveTeamScopeType,
+} from "@/components/admin/teams/serverTeamScope";
 import DashboardPageShell from "@/components/admin/dashboard/DashboardPageShell";
+import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
   expandRecurringEvents,
   getVirtualTrainingEvents,
@@ -18,6 +24,43 @@ async function getCount(table, applyFilters) {
 
   const { count } = await query;
   return count || 0;
+}
+
+async function getScopedTeamsTotal() {
+  const permissionResult = await assertAdminActionPermission({
+    requiredPermission: "teams.view",
+  });
+  if (!permissionResult.ok) {
+    return 0;
+  }
+
+  const scopeContext = await loadServerTeamScopeContext(permissionResult);
+  const scopeType = resolveTeamScopeType(scopeContext);
+  const db = permissionResult.supabaseServer;
+
+  if (scopeType === "none") {
+    return 0;
+  }
+
+  let teamsQuery = db
+    .from("teams")
+    .select("id, age_group, name_de")
+    .eq("is_active", true);
+
+  if (scopeType === "assigned_teams") {
+    const assignedTeamIds = scopeContext?.assignedTeamIds || [];
+    if (!assignedTeamIds.length) {
+      return 0;
+    }
+    teamsQuery = teamsQuery.in("id", assignedTeamIds);
+  }
+
+  const { data: teams, error } = await teamsQuery;
+  if (error) {
+    return 0;
+  }
+
+  return filterScopedTeamsOnServer(scopeContext, teams || []).length;
 }
 
 export default async function AdminPage() {
@@ -48,7 +91,7 @@ export default async function AdminPage() {
       query.eq("is_published", true).gt("published_at", nowIso),
     ),
     getCount("news", (query) => query.eq("is_published", false)),
-    getCount("teams"),
+    getScopedTeamsTotal(),
     getCount("coaches"),
     getCount("sponsors"),
     getCount("events"),

@@ -1,3 +1,5 @@
+import { createEmptyScopeContext } from "./scopes/scopeContext";
+
 export function getAdminFallbackUserContext() {
   return {
     userId: null,
@@ -7,6 +9,7 @@ export function getAdminFallbackUserContext() {
     permissions: [],
     permissionSet: new Set(),
     isSuperAdmin: false,
+    scopeContext: createEmptyScopeContext(),
     source: "fallback",
   };
 }
@@ -56,6 +59,7 @@ export function normalizeUserContext(userContext) {
       userContext.isSuperAdmin ||
       roles.some((role) => role?.key === "superadmin"),
     ),
+    scopeContext: userContext.scopeContext || createEmptyScopeContext(),
     source: userContext.source || "runtime",
   };
 }

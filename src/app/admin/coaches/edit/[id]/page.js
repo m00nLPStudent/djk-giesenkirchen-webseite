@@ -15,6 +15,7 @@ export default async function EditCoachPage({ params }) {
   const { data: teams } = await supabase
     .from("teams")
     .select("id, name_de")
+    .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
   return (

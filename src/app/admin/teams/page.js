@@ -1,9 +1,14 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
-import { AdminTeamsList, TeamStats } from "@/components/admin/teams";
-import { supabase } from "@/lib/supabase";
-import Link from "next/link";
-import Can from "@/components/admin/auth/Can";
+import { AdminTeamsList } from "@/components/admin/teams";
+import TeamCreateButton from "@/components/admin/teams/components/TeamCreateButton";
+import {
+  filterScopedTeamsOnServer,
+  loadServerTeamScopeContext,
+  resolveTeamScopeType,
+} from "@/components/admin/teams/serverTeamScope";
+import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +25,8 @@ function mergeTeamSeason(team, teamSeason, season) {
     ...team,
     ...teamSeason,
     id: team.id,
+    is_active: team.is_active,
+    team_season_is_active: teamSeason.is_active,
     base_slug: team.slug,
     season: season?.name || team.season,
     public_season_name: season?.name || team.season,
@@ -27,12 +34,59 @@ function mergeTeamSeason(team, teamSeason, season) {
 }
 
 export default async function AdminTeamsPage() {
-  const { data: teams } = await supabase
+  const permissionResult = await assertAdminActionPermission({
+    requiredPermission: "teams.view",
+  });
+
+  if (!permissionResult.ok) {
+    redirect("/admin/unauthorized?reason=missing-team-permission");
+  }
+
+  const scopeContext = await loadServerTeamScopeContext(permissionResult);
+  const scopeType = resolveTeamScopeType(scopeContext);
+  const supabaseServer = permissionResult.supabaseServer;
+
+  if (scopeType === "none") {
+    return (
+      <AdminLayout
+        title="Mannschaften verwalten"
+        subtitle="Adminbereich"
+        showHeader={false}
+      >
+        <AdminPageHeader
+          eyebrow="Mannschaften"
+          title="Mannschaften verwalten"
+          description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
+          actions={
+            <TeamCreateButton
+              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+              label="Neue Mannschaft"
+            />
+          }
+        />
+
+        <AdminTeamsList teams={[]} />
+      </AdminLayout>
+    );
+  }
+
+  let teamsQuery = supabaseServer
     .from("teams")
     .select("*")
     .order("sort_order", { ascending: true });
 
-  const { data: seasons } = await supabase
+  if (scopeType === "assigned_teams") {
+    const assignedTeamIds = scopeContext?.assignedTeamIds || [];
+    if (!assignedTeamIds.length) {
+      teamsQuery = null;
+    } else {
+      teamsQuery = teamsQuery.in("id", assignedTeamIds);
+    }
+  }
+
+  const { data: teams } = teamsQuery ? await teamsQuery : { data: [] };
+
+  const { data: seasons } = await supabaseServer
     .from("seasons")
     .select("*")
     .eq("is_active", true)
@@ -41,10 +95,11 @@ export default async function AdminTeamsPage() {
   const publicSeason =
     (seasons || []).find((season) => season.is_current) || seasons?.[0] || null;
 
-  const teamIds = (teams || []).map((team) => team.id);
+  const scopedTeams = filterScopedTeamsOnServer(scopeContext, teams || []);
+  const teamIds = scopedTeams.map((team) => team.id);
 
   const { data: teamSeasons } = teamIds.length
-    ? await supabase
+    ? await supabaseServer
         .from("team_seasons")
         .select("*")
         .in("team_id", teamIds)
@@ -54,20 +109,20 @@ export default async function AdminTeamsPage() {
   const teamSeasonIds = (teamSeasons || []).map((teamSeason) => teamSeason.id);
 
   const { data: playerAssignments } = teamSeasonIds.length
-    ? await supabase
+    ? await supabaseServer
         .from("player_team_seasons")
         .select("id, team_season_id, is_active")
         .in("team_season_id", teamSeasonIds)
     : { data: [] };
 
   const { data: coachAssignments } = teamSeasonIds.length
-    ? await supabase
+    ? await supabaseServer
         .from("coach_team_seasons")
         .select("id, team_season_id, is_active")
         .in("team_season_id", teamSeasonIds)
     : { data: [] };
 
-  const teamList = teams || [];
+  const teamList = scopedTeams;
   const teamSeasonList = teamSeasons || [];
   const playerList = playerAssignments || [];
   const coachList = coachAssignments || [];
@@ -88,13 +143,6 @@ export default async function AdminTeamsPage() {
     };
   });
 
-  const active = teamList.filter((team) => team.is_active).length;
-  const inactive = teamList.filter((team) => !team.is_active).length;
-  const footballDeReady = teamsWithCounts.filter(
-    (team) =>
-      team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
-  ).length;
-
   return (
     <AdminLayout
       title="Mannschaften verwalten"
@@ -106,22 +154,11 @@ export default async function AdminTeamsPage() {
         title="Mannschaften verwalten"
         description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
         actions={
-          <Can permission="teams.create" uiOnly>
-            <Link
-              href="/admin/teams/new"
-              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-            >
-              Neue Mannschaft
-            </Link>
-          </Can>
+          <TeamCreateButton
+            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
+            label="Neue Mannschaft"
+          />
         }
-      />
-
-      <TeamStats
-        total={teamList.length}
-        active={active}
-        inactive={inactive}
-        footballDeReady={footballDeReady}
       />
 
       <AdminTeamsList teams={teamsWithCounts} />

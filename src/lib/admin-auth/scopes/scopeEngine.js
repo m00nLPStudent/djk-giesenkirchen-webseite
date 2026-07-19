@@ -1,28 +1,31 @@
-import {
-  getBoardMemberOwnerProfileId,
-  getCoachOwnerProfileId,
-} from "./scopeRepository";
+function toUniqueValues(values = []) {
+  return Array.from(new Set((values || []).filter(Boolean)));
+}
 
 function hasPermission(scopeContext, permissionKey) {
   if (!permissionKey) return true;
-  return scopeContext?.permissionKeys?.has(permissionKey) || false;
+  return toUniqueValues(scopeContext?.permissionKeys).includes(permissionKey);
 }
 
 function hasScopeType(scopeContext, scopeType) {
   if (!scopeType) return false;
-  return scopeContext?.roleScopeTypes?.has(scopeType) || false;
+  return toUniqueValues(scopeContext?.roleScopeTypes).includes(scopeType);
 }
 
 export function canAccessAll(scopeContext) {
-  return (
+  return Boolean(
+    scopeContext?.isGlobal ||
     hasScopeType(scopeContext, "global") ||
-    scopeContext?.roleKeys?.has("superadmin") ||
-    false
+    toUniqueValues(scopeContext?.roleKeys).includes("superadmin"),
   );
 }
 
 export function canAccessYouth(scopeContext) {
-  return canAccessAll(scopeContext) || hasScopeType(scopeContext, "youth_all");
+  return Boolean(
+    canAccessAll(scopeContext) ||
+    scopeContext?.canAccessYouthAll ||
+    hasScopeType(scopeContext, "youth_all"),
+  );
 }
 
 export function resolveRoleScope(scopeContext, resource = "") {
@@ -31,7 +34,23 @@ export function resolveRoleScope(scopeContext, resource = "") {
 
   if (resource === "profile") return "own_profile";
 
-  if (scopeContext?.assignedTeamIds?.size > 0) {
+  if (resource === "teams") {
+    if (toUniqueValues(scopeContext?.assignedTeamIds).length > 0) {
+      return "assigned_teams";
+    }
+
+    return "none";
+  }
+
+  if (hasScopeType(scopeContext, "own_board_card")) {
+    return "own_board_card";
+  }
+
+  if (hasScopeType(scopeContext, "own_staff_card")) {
+    return "own_staff_card";
+  }
+
+  if (toUniqueValues(scopeContext?.assignedTeamIds).length > 0) {
     return "assigned_teams";
   }
 
@@ -42,50 +61,41 @@ export function canAccessYouthTeam(team) {
   return Boolean(team?.is_youth_team);
 }
 
-function canAccessAssignedTeamFromContext(scopeContext, teamId) {
+export function canAccessAssignedTeam(scopeContext, teamId) {
   if (!teamId) return false;
   if (canAccessAll(scopeContext)) return true;
 
-  return scopeContext?.assignedTeamIds?.has(teamId) || false;
+  return toUniqueValues(scopeContext?.assignedTeamIds).includes(teamId);
 }
 
-export function canAccessAssignedTeam(
-  adminProfileId,
-  teamId,
-  assignedTeamIds = [],
-) {
-  if (!adminProfileId || !teamId) return false;
-  return new Set(assignedTeamIds || []).has(teamId);
+export function canAccessTeam(scopeContext, teamId) {
+  return canAccessAssignedTeam(scopeContext, teamId);
 }
 
-export async function canEditOwnBoardCard(
-  adminProfileId,
-  boardMemberId,
-  { supabase } = {},
-) {
-  if (!adminProfileId || !boardMemberId || !supabase) return false;
+export function canEditOwnBoardCard(scopeContext, boardMember = {}) {
+  if (!scopeContext || !boardMember) return false;
+  if (canAccessAll(scopeContext)) return true;
 
-  const { data: ownerAdminProfileId, error } =
-    await getBoardMemberOwnerProfileId(boardMemberId, supabase);
-  if (error || !ownerAdminProfileId) return false;
-
-  return adminProfileId === ownerAdminProfileId;
-}
-
-export async function canEditOwnStaffCard(
-  adminProfileId,
-  coachId,
-  { supabase } = {},
-) {
-  if (!adminProfileId || !coachId || !supabase) return false;
-
-  const { data: ownerAdminProfileId, error } = await getCoachOwnerProfileId(
-    coachId,
-    supabase,
+  return Boolean(
+    (scopeContext.boardMemberId &&
+      boardMember.id &&
+      scopeContext.boardMemberId === boardMember.id) ||
+    (scopeContext.adminProfileId &&
+      boardMember.admin_profile_id &&
+      scopeContext.adminProfileId === boardMember.admin_profile_id),
   );
-  if (error || !ownerAdminProfileId) return false;
+}
 
-  return adminProfileId === ownerAdminProfileId;
+export function canEditOwnStaffCard(scopeContext, coach = {}) {
+  if (!scopeContext || !coach) return false;
+  if (canAccessAll(scopeContext)) return true;
+
+  return Boolean(
+    (scopeContext.coachId && coach.id && scopeContext.coachId === coach.id) ||
+    (scopeContext.adminProfileId &&
+      coach.admin_profile_id &&
+      scopeContext.adminProfileId === coach.admin_profile_id),
+  );
 }
 
 export function canEditOwnContent(adminProfileId, createdByAdminProfileId) {
@@ -110,7 +120,7 @@ export function canViewContribution(scopeContext, contribution) {
     return true;
   }
 
-  return canAccessAssignedTeamFromContext(scopeContext, contribution?.team_id);
+  return canAccessAssignedTeam(scopeContext, contribution?.team_id);
 }
 
 export function canEditContribution(scopeContext, contribution) {
@@ -122,5 +132,5 @@ export function canEditContribution(scopeContext, contribution) {
 
   if (canAccessAll(scopeContext)) return true;
 
-  return canAccessAssignedTeamFromContext(scopeContext, contribution?.team_id);
+  return canAccessAssignedTeam(scopeContext, contribution?.team_id);
 }

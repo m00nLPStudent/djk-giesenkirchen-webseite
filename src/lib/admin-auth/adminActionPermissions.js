@@ -185,7 +185,28 @@ export async function assertAdminActionPermission({
   }
 
   if (!requiredPermission) {
-    return { ok: true, userId: user.id, supabaseServer };
+    const permissionContext = await loadPermissionContext(
+      supabaseServer,
+      user,
+      profile,
+    );
+
+    if (!permissionContext.ok) {
+      return {
+        ok: false,
+        reason: "permission-check-failed",
+        message: "Berechtigungen konnten nicht geprueft werden.",
+      };
+    }
+
+    return {
+      ok: true,
+      userId: user.id,
+      supabaseServer,
+      profile,
+      roles: permissionContext.context.roles || [],
+      permissions: permissionContext.context.permissions || [],
+    };
   }
 
   const permissionContext = await loadPermissionContext(
@@ -210,5 +231,8 @@ export async function assertAdminActionPermission({
     ok: true,
     userId: user.id,
     supabaseServer,
+    profile,
+    roles: permissionContext.context.roles || [],
+    permissions: permissionContext.context.permissions || [],
   };
 }

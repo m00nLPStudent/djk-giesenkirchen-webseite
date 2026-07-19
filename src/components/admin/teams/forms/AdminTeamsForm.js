@@ -2,9 +2,10 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { saveTeamWithScopeAction } from "@/app/admin/teams/actions";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
-import { saveTeamWithSeason, uploadTeamImage } from "../services/teams.service";
+import { uploadTeamImage } from "../services/teams.service";
 import TeamFormTabs from "./components/TeamFormTabs";
 import TeamSubmitBar from "./components/TeamSubmitBar";
 import { createInitialTeamForm } from "./helpers/teamFormInitialState";
@@ -24,6 +25,8 @@ import TeamSeasonTab from "./tabs/TeamSeasonTab";
 import TeamSettingsTab from "./tabs/TeamSettingsTab";
 import TeamStaffTab from "./tabs/TeamStaffTab";
 import TeamTrainingTab from "./tabs/TeamTrainingTab";
+import useTeamScope from "../useTeamScope";
+import { isYouthTeam } from "../teamScope";
 
 export default function AdminTeamsForm({
   team,
@@ -50,6 +53,8 @@ export default function AdminTeamsForm({
   );
   const [loading, setLoading] = useState(false);
   const isEditMode = Boolean(team?.id);
+  const { scopeContext, canAccessTeamInScope, canCreateTeamInScope } =
+    useTeamScope();
 
   const filteredPlayers = useMemo(
     () => players.filter((player) => belongsToTeam(player, team?.id)),
@@ -129,6 +134,28 @@ export default function AdminTeamsForm({
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (isEditMode && !canAccessTeamInScope(team || {})) {
+      alert("Du hast keinen Zugriff auf diese Mannschaft.");
+      router.push("/admin/teams");
+      return;
+    }
+
+    if (!isEditMode && !canCreateTeamInScope(form)) {
+      alert("Du darfst diese Mannschaft nicht erstellen.");
+      router.push("/admin/teams");
+      return;
+    }
+
+    if (
+      scopeContext?.canAccessYouthAll &&
+      !scopeContext?.isGlobal &&
+      !isYouthTeam(form)
+    ) {
+      alert("Mit deinem Scope kannst du nur Jugendmannschaften speichern.");
+      return;
+    }
+
     logAdminSaveEvent({
       module: "teams",
       mode: team?.id ? "edit" : "create",
@@ -152,7 +179,7 @@ export default function AdminTeamsForm({
 
     const payload = createTeamFormPayload(form);
 
-    const { error } = await saveTeamWithSeason(payload, team?.id ?? null);
+    const { error } = await saveTeamWithScopeAction(payload, team?.id ?? null);
     setLoading(false);
 
     if (error) {

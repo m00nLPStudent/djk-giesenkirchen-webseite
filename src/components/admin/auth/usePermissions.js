@@ -8,6 +8,7 @@ import {
   getUserPermissionKeys,
 } from "@/lib/admin-auth/permissionEngine";
 import { normalizeUserContext } from "@/lib/admin-auth/permissionFallbacks";
+import { createEmptyScopeContext } from "@/lib/admin-auth/scopes/scopeContext";
 
 export default function usePermissions(userContext) {
   const context = useMemo(
@@ -24,6 +25,7 @@ export default function usePermissions(userContext) {
     isActive: context.isActive,
     hasAdminProfile: context.hasAdminProfile,
     isSuperAdmin: context.isSuperAdmin,
+    scopeContext: context.scopeContext || createEmptyScopeContext(),
     can: (permission) => hasPermission(context, permission),
     canAny: (requiredPermissions) =>
       hasAnyPermission(context, requiredPermissions),

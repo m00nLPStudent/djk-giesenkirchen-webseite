@@ -3,9 +3,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
+import { createEmptyScopeContext } from "@/lib/admin-auth/scopes/scopeContext";
 
 const AdminUiContext = createContext({
   userContext: getAdminFallbackUserContext(),
+  scopeContext: createEmptyScopeContext(),
   isReady: false,
 });
 
@@ -39,7 +41,11 @@ export function AdminUiContextProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ userContext, isReady }),
+    () => ({
+      userContext,
+      scopeContext: userContext.scopeContext || createEmptyScopeContext(),
+      isReady,
+    }),
     [isReady, userContext],
   );
 
