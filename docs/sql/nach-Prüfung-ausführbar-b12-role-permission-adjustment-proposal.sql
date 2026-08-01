@@ -1,3 +1,8 @@
+-- STATUS:
+-- STILL REQUIRED
+-- MANUAL EXECUTION AFTER REVIEW
+-- Reason: closes remaining role-permission gaps for the agreed B12 final role model.
+
 -- B12.2c Abschlusskorrektur
 -- Idempotenter SQL-Entwurf fuer fehlende Rollen-Permission-Verknuepfungen.
 -- Nicht automatisch ausfuehren.

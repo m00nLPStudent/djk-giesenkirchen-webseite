@@ -1,8 +1,13 @@
 # B12.2 Rollen-Scopes und Beitragsverwaltung: Fachmatrix und Zielarchitektur
 
+## Status
+
+- B12 fachlich abgeschlossen
+- Offene Restthemen nach B13 verschoben
+
 ## Rahmenbedingungen
 
-- Analysephase ohne SQL-Ausfuehrung und ohne Enforcement-Aktivierung
+- Abschlussdokumentation ohne SQL-Ausfuehrung und ohne Enforcement-Aktivierung
 - AUTH_REQUIRED_FOR_ADMIN bleibt true
 - AUTH_ENFORCEMENT_ENABLED bleibt false
 - keine Aenderung an Login, Logout, Proxy, Public-Website
@@ -178,7 +183,8 @@ Legende: yes | no | draft_only
 
 ## Scope-Ableitung und Teamzuordnungen
 
-- Jugendkoordinator verwendet fuer Mannschaften, Trainer und Spieler den Scope `youth_all` mit bestehenden Permission-Keys `*.view/create/edit/delete`.
+- Jugendkoordinator verwendet fuer Mannschaften, Trainer und Spieler den Scope `youth_all`.
+- Jugendkoordinator darf Mannschaften sehen und bearbeiten, aber keine neuen Mannschaften erstellen.
 - Vorstand und Fussballvorstand erhalten globalen Modulscope ausschliesslich fuer Mannschaften, Trainer und Spieler.
 - Vorstandsrechte fuer Abteilung/Vorstand bleiben getrennt: eigene Kachel ueber `own_board_card`, globale Bearbeitung nur mit bestehender Board-Permission.
 
@@ -199,13 +205,22 @@ Priorisierte Datenquelle fuer Teamzuordnung:
 - Trainer: contributions.view mit scope assigned_teams
 - alle uebrigen Rollen: none
 
-## Zielbild SQL-/Skeleton-Artefakte
+## SQL-/Artefakt-Stand nach B12
 
-- Profil-Links: docs/sql/b12-profile-links-proposal.sql
-- Teamassignments: docs/sql/b12-team-scopes-proposal.sql
-- Contributions: docs/sql/b12-membership-contributions-proposal.sql
-- Contribution-Payments: docs/sql/b12-membership-contribution-payments-proposal.sql
+- Profil-Links: docs/sql/bereits-umgesetzt-b12-profile-links-proposal.sql
+- Teamassignments: docs/sql/aktuell-nicht-erforderlich–b12-team-scopes-proposal.sql
+- Contributions: docs/sql/noch-nicht-ausfuehren-b12-membership-contributions-proposal.sql
+- Contribution-Payments: docs/sql/noch-nicht-ausfuehren-b12-membership-contribution-payments-proposal.sql
+- Content-Workflow: docs/sql/noch-nicht-ausfuehren-b12-content-workflow-proposal.sql
+- Rollen-Permissions: docs/sql/nach-Pruefung-ausfuehrbar-b12-role-permission-adjustment-proposal.sql
 - Scope-Skeleton: src/lib/admin-auth/scopes/
+
+## Nach B13 verschoben
+
+- Membership
+- Payments
+- Workflow
+- Datenbankkonsolidierung
 
 ## B12.2a Zusatz: feste Kachelverknuepfung
 

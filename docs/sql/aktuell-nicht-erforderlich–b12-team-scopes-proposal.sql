@@ -1,3 +1,8 @@
+-- STATUS:
+-- SUPERSEDED
+-- DO NOT EXECUTE
+-- Reason: current scope rollout uses role-derived scope + coach/team-season relations; this table is not required now.
+
 -- Phase B12.2b proposal: explicit team assignments only.
 -- Do not execute automatically.
 

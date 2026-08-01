@@ -1,3 +1,8 @@
+-- STATUS:
+-- SUPERSEDED
+-- DO NOT EXECUTE
+-- Reason: current product workflow remains based on existing publish model without additional workflow columns.
+
 -- Phase B12.2e proposal: optional editorial workflow fields for news/events.
 -- Do not execute automatically.
 

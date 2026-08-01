@@ -1,3 +1,8 @@
+-- STATUS:
+-- IMPLEMENTED
+-- DO NOT EXECUTE AGAIN
+-- Reason: admin_profile_id linking for board/coaches is already in productive application flows.
+
 -- Phase B12.2a proposal: fixed profile links for board and coach cards.
 -- Do not execute automatically.
 -- Strategy:

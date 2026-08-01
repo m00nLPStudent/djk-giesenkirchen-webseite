@@ -1,3 +1,7 @@
+-- STATUS:
+-- OPTIONAL (NOT CURRENTLY REQUIRED)
+-- Reason: payment-history layer depends on the optional membership_contributions rollout.
+
 -- Phase B12.2d proposal: optional payment history for contributions.
 -- Do not execute automatically.
 

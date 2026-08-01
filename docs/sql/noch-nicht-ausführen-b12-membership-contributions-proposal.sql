@@ -1,3 +1,7 @@
+-- STATUS:
+-- OPTIONAL (NOT CURRENTLY REQUIRED)
+-- Reason: no active module implementation depends on this ledger table yet.
+
 -- Phase B12.2c proposal: contribution ledger for players and coaches.
 -- Do not execute automatically.
 
