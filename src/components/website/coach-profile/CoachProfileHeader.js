@@ -1,6 +1,8 @@
 import CoachProfileContactActions from "./CoachProfileContactActions";
 
 export default function CoachProfileHeader({ coach, fullName, contact }) {
+  const isActive = coach.isActive ?? coach.is_active ?? true;
+
   return (
     <div>
       <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
@@ -15,7 +17,7 @@ export default function CoachProfileHeader({ coach, fullName, contact }) {
         <CoachProfileContactActions contact={contact} email={coach.email} />
       </div>
 
-      {!coach.is_active && (
+      {!isActive && (
         <div className="mt-6 rounded-3xl border border-yellow-500/30 bg-yellow-500/10 p-5 text-yellow-200">
           Dieser Trainer ist aktuell im Adminbereich deaktiviert.
         </div>

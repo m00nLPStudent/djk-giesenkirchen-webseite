@@ -9,9 +9,16 @@ export const COACH_COUNTRY_OPTIONS = germany
 export const REQUIRED_COACH_FIELDS = {
   first_name: "Vorname",
   last_name: "Nachname",
-  nationality: "Nationalität",
-  role: "Funktion",
+  nationality: "Nationalitaet",
   email: "E-Mail",
   phone: "Telefonnummer",
   whatsapp: "WhatsApp-Nummer",
+};
+
+export const COACH_ROLE_EN = {
+  Trainer: "Coach",
+  "Co-Trainer": "Assistant Coach",
+  Betreuer: "Supervisor",
+  Torwarttrainer: "Goalkeeper Coach",
+  Cheftrainer: "Head Coach",
 };

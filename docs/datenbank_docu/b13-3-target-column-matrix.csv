@@ -1,0 +1,440 @@
+current_table,current_column,target_table,target_column,decision,canonical_source,backfill_source,compatibility_required,migration_order,risk,notes
+admin_permissions,id,admin_permissions,id,KEEP,admin_permissions.id,admin_permissions.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_permissions,key,admin_permissions,key,KEEP,admin_permissions.key,admin_permissions.key,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_permissions,name,admin_permissions,name,KEEP,admin_permissions.name,admin_permissions.name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_permissions,description,admin_permissions,description,KEEP,admin_permissions.description,admin_permissions.description,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_permissions,category,admin_permissions,category,KEEP,admin_permissions.category,admin_permissions.category,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_permissions,created_at,admin_permissions,created_at,KEEP,admin_permissions.created_at,admin_permissions.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_permissions,updated_at,admin_permissions,updated_at,KEEP,admin_permissions.updated_at,admin_permissions.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_profiles,id,admin_profiles,id,KEEP,admin_profiles.id,admin_profiles.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_profiles,full_name,admin_profiles,full_name,KEEP,admin_profiles.full_name,admin_profiles.full_name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_profiles,email,admin_profiles,email,KEEP,admin_profiles.email,admin_profiles.email,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_profiles,is_active,admin_profiles,is_active,KEEP,admin_profiles.is_active,admin_profiles.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_profiles,last_login_at,admin_profiles,last_login_at,KEEP,admin_profiles.last_login_at,admin_profiles.last_login_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_profiles,created_at,admin_profiles,created_at,KEEP,admin_profiles.created_at,admin_profiles.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_profiles,updated_at,admin_profiles,updated_at,KEEP,admin_profiles.updated_at,admin_profiles.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_role_permissions,role_id,admin_role_permissions,role_id,KEEP,admin_role_permissions.role_id,admin_role_permissions.role_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_role_permissions,permission_id,admin_role_permissions,permission_id,KEEP,admin_role_permissions.permission_id,admin_role_permissions.permission_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_role_permissions,created_at,admin_role_permissions,created_at,KEEP,admin_role_permissions.created_at,admin_role_permissions.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,id,admin_roles,id,KEEP,admin_roles.id,admin_roles.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,key,admin_roles,key,KEEP,admin_roles.key,admin_roles.key,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,name,admin_roles,name,KEEP,admin_roles.name,admin_roles.name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,description,admin_roles,description,KEEP,admin_roles.description,admin_roles.description,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,sort_order,admin_roles,sort_order,KEEP,admin_roles.sort_order,admin_roles.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,is_active,admin_roles,is_active,KEEP,admin_roles.is_active,admin_roles.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,created_at,admin_roles,created_at,KEEP,admin_roles.created_at,admin_roles.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_roles,updated_at,admin_roles,updated_at,KEEP,admin_roles.updated_at,admin_roles.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_user_roles,user_id,admin_user_roles,user_id,KEEP,admin_user_roles.user_id,admin_user_roles.user_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_user_roles,role_id,admin_user_roles,role_id,KEEP,admin_user_roles.role_id,admin_user_roles.role_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_user_roles,is_primary,admin_user_roles,is_primary,KEEP,admin_user_roles.is_primary,admin_user_roles.is_primary,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+admin_user_roles,created_at,admin_user_roles,created_at,KEEP,admin_user_roles.created_at,admin_user_roles.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+board_members,id,board_members,id,KEEP,board_members.id,board_members.id,no,CURRENT,LOW,Board member master record remains here.
+board_members,first_name,board_members,first_name,KEEP,board_members.first_name,board_members.first_name,no,CURRENT,LOW,Board member master record remains here.
+board_members,last_name,board_members,last_name,KEEP,board_members.last_name,board_members.last_name,no,CURRENT,LOW,Board member master record remains here.
+board_members,role_de,board_members,role_id,REMOVE_AFTER_MIGRATION,board_roles.id,board_members.role_de,yes,P4,MEDIUM,Role label is derived from board_roles and should not remain duplicated.
+board_members,role_en,board_members,role_id,REMOVE_AFTER_MIGRATION,board_roles.id,board_members.role_en,yes,P4,MEDIUM,Role label is derived from board_roles and should not remain duplicated.
+board_members,email,board_members,email,KEEP,board_members.email,board_members.email,no,CURRENT,LOW,Board member master record remains here.
+board_members,phone,board_members,phone,KEEP,board_members.phone,board_members.phone,no,CURRENT,LOW,Board member master record remains here.
+board_members,image_url,board_members,image_url,KEEP,board_members.image_url,board_members.image_url,no,CURRENT,LOW,Board member master record remains here.
+board_members,is_active,board_members,is_active,KEEP,board_members.is_active,board_members.is_active,no,CURRENT,LOW,Board member master record remains here.
+board_members,sort_order,board_members,sort_order,KEEP,board_members.sort_order,board_members.sort_order,no,CURRENT,LOW,Board member master record remains here.
+board_members,created_at,board_members,created_at,KEEP,board_members.created_at,board_members.created_at,no,CURRENT,LOW,Board member master record remains here.
+board_members,role_id,board_members,role_id,KEEP,board_members.role_id,board_members.role_id,no,CURRENT,LOW,Board member master record remains here.
+board_members,admin_profile_id,board_members,admin_profile_id,KEEP,board_members.admin_profile_id,board_members.admin_profile_id,no,CURRENT,LOW,Board member master record remains here.
+board_roles,id,board_roles,id,KEEP,board_roles.id,board_roles.id,no,CURRENT,LOW,Board role lookup remains canonical.
+board_roles,name_de,board_roles,name_de,KEEP,board_roles.name_de,board_roles.name_de,no,CURRENT,LOW,Board role lookup remains canonical.
+board_roles,name_en,board_roles,name_en,KEEP,board_roles.name_en,board_roles.name_en,no,CURRENT,LOW,Board role lookup remains canonical.
+board_roles,slug,board_roles,slug,KEEP,board_roles.slug,board_roles.slug,no,CURRENT,LOW,Board role lookup remains canonical.
+board_roles,is_active,board_roles,is_active,KEEP,board_roles.is_active,board_roles.is_active,no,CURRENT,LOW,Board role lookup remains canonical.
+board_roles,sort_order,board_roles,sort_order,KEEP,board_roles.sort_order,board_roles.sort_order,no,CURRENT,LOW,Board role lookup remains canonical.
+board_roles,created_at,board_roles,created_at,KEEP,board_roles.created_at,board_roles.created_at,no,CURRENT,LOW,Board role lookup remains canonical.
+club_closure_periods,id,club_closure_periods,id,KEEP,club_closure_periods.id,club_closure_periods.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,title,club_closure_periods,title,KEEP,club_closure_periods.title,club_closure_periods.title,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,reason,club_closure_periods,reason,KEEP,club_closure_periods.reason,club_closure_periods.reason,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,starts_on,club_closure_periods,starts_on,KEEP,club_closure_periods.starts_on,club_closure_periods.starts_on,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,ends_on,club_closure_periods,ends_on,KEEP,club_closure_periods.ends_on,club_closure_periods.ends_on,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,applies_to_all,club_closure_periods,applies_to_all,KEEP,club_closure_periods.applies_to_all,club_closure_periods.applies_to_all,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,team_season_id,club_closure_periods,team_season_id,KEEP,club_closure_periods.team_season_id,club_closure_periods.team_season_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,is_active,club_closure_periods,is_active,KEEP,club_closure_periods.is_active,club_closure_periods.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,created_at,club_closure_periods,created_at,KEEP,club_closure_periods.created_at,club_closure_periods.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_closure_periods,updated_at,club_closure_periods,updated_at,KEEP,club_closure_periods.updated_at,club_closure_periods.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,id,club_contacts,id,KEEP,club_contacts.id,club_contacts.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,category,club_contacts,category,KEEP,club_contacts.category,club_contacts.category,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,role_key,club_contacts,role_key,KEEP,club_contacts.role_key,club_contacts.role_key,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,role_de,club_contacts,role_de,KEEP,club_contacts.role_de,club_contacts.role_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,role_en,club_contacts,role_en,KEEP,club_contacts.role_en,club_contacts.role_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,contact_name,club_contacts,contact_name,KEEP,club_contacts.contact_name,club_contacts.contact_name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,email,club_contacts,email,KEEP,club_contacts.email,club_contacts.email,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,phone,club_contacts,phone,KEEP,club_contacts.phone,club_contacts.phone,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,image_url,club_contacts,image_url,KEEP,club_contacts.image_url,club_contacts.image_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,is_public,club_contacts,is_public,KEEP,club_contacts.is_public,club_contacts.is_public,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,is_active,club_contacts,is_active,KEEP,club_contacts.is_active,club_contacts.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,sort_order,club_contacts,sort_order,KEEP,club_contacts.sort_order,club_contacts.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,created_at,club_contacts,created_at,KEEP,club_contacts.created_at,club_contacts.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_contacts,updated_at,club_contacts,updated_at,KEEP,club_contacts.updated_at,club_contacts.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,id,club_history_images,id,KEEP,club_history_images.id,club_history_images.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,club_history_page_id,club_history_images,club_history_page_id,KEEP,club_history_images.club_history_page_id,club_history_images.club_history_page_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,image_url,club_history_images,image_url,KEEP,club_history_images.image_url,club_history_images.image_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,image_path,club_history_images,image_path,KEEP,club_history_images.image_path,club_history_images.image_path,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,alt_text_de,club_history_images,alt_text_de,KEEP,club_history_images.alt_text_de,club_history_images.alt_text_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,caption_de,club_history_images,caption_de,KEEP,club_history_images.caption_de,club_history_images.caption_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,sort_order,club_history_images,sort_order,KEEP,club_history_images.sort_order,club_history_images.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,is_active,club_history_images,is_active,KEEP,club_history_images.is_active,club_history_images.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,created_at,club_history_images,created_at,KEEP,club_history_images.created_at,club_history_images.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,updated_at,club_history_images,updated_at,KEEP,club_history_images.updated_at,club_history_images.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,alt_text_en,club_history_images,alt_text_en,KEEP,club_history_images.alt_text_en,club_history_images.alt_text_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_images,caption_en,club_history_images,caption_en,KEEP,club_history_images.caption_en,club_history_images.caption_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,id,club_history_milestones,id,KEEP,club_history_milestones.id,club_history_milestones.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,club_history_page_id,club_history_milestones,club_history_page_id,KEEP,club_history_milestones.club_history_page_id,club_history_milestones.club_history_page_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,milestone_year,club_history_milestones,milestone_year,KEEP,club_history_milestones.milestone_year,club_history_milestones.milestone_year,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,title_de,club_history_milestones,title_de,KEEP,club_history_milestones.title_de,club_history_milestones.title_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,description_de,club_history_milestones,description_de,KEEP,club_history_milestones.description_de,club_history_milestones.description_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,sort_order,club_history_milestones,sort_order,KEEP,club_history_milestones.sort_order,club_history_milestones.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,is_active,club_history_milestones,is_active,KEEP,club_history_milestones.is_active,club_history_milestones.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,created_at,club_history_milestones,created_at,KEEP,club_history_milestones.created_at,club_history_milestones.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,updated_at,club_history_milestones,updated_at,KEEP,club_history_milestones.updated_at,club_history_milestones.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,title_en,club_history_milestones,title_en,KEEP,club_history_milestones.title_en,club_history_milestones.title_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,description_en,club_history_milestones,description_en,KEEP,club_history_milestones.description_en,club_history_milestones.description_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,milestone_year_to,club_history_milestones,milestone_year_to,KEEP,club_history_milestones.milestone_year_to,club_history_milestones.milestone_year_to,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_milestones,milestone_year_until,club_history_milestones,milestone_year_until,KEEP,club_history_milestones.milestone_year_until,club_history_milestones.milestone_year_until,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,id,club_history_pages,id,KEEP,club_history_pages.id,club_history_pages.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,page_key,club_history_pages,page_key,KEEP,club_history_pages.page_key,club_history_pages.page_key,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,title_de,club_history_pages,title_de,KEEP,club_history_pages.title_de,club_history_pages.title_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,teaser_de,club_history_pages,teaser_de,KEEP,club_history_pages.teaser_de,club_history_pages.teaser_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,content_de,club_history_pages,content_de,KEEP,club_history_pages.content_de,club_history_pages.content_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,is_published,club_history_pages,is_published,KEEP,club_history_pages.is_published,club_history_pages.is_published,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,published_at,club_history_pages,published_at,KEEP,club_history_pages.published_at,club_history_pages.published_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,sort_order,club_history_pages,sort_order,KEEP,club_history_pages.sort_order,club_history_pages.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,is_active,club_history_pages,is_active,KEEP,club_history_pages.is_active,club_history_pages.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,created_at,club_history_pages,created_at,KEEP,club_history_pages.created_at,club_history_pages.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,updated_at,club_history_pages,updated_at,KEEP,club_history_pages.updated_at,club_history_pages.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,title_en,club_history_pages,title_en,KEEP,club_history_pages.title_en,club_history_pages.title_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,teaser_en,club_history_pages,teaser_en,KEEP,club_history_pages.teaser_en,club_history_pages.teaser_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_history_pages,content_en,club_history_pages,content_en,KEEP,club_history_pages.content_en,club_history_pages.content_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,id,club_settings,id,KEEP,club_settings.id,club_settings.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,singleton,club_settings,singleton,KEEP,club_settings.singleton,club_settings.singleton,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,club_name,club_settings,club_name,KEEP,club_settings.club_name,club_settings.club_name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,short_name,club_settings,short_name,KEEP,club_settings.short_name,club_settings.short_name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,street,club_settings,street,KEEP,club_settings.street,club_settings.street,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,house_number,club_settings,house_number,KEEP,club_settings.house_number,club_settings.house_number,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,postal_code,club_settings,postal_code,KEEP,club_settings.postal_code,club_settings.postal_code,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,city,club_settings,city,KEEP,club_settings.city,club_settings.city,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,phone,club_settings,phone,KEEP,club_settings.phone,club_settings.phone,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,email,club_settings,email,KEEP,club_settings.email,club_settings.email,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,website_url,club_settings,website_url,KEEP,club_settings.website_url,club_settings.website_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,club_colors,club_settings,club_colors,KEEP,club_settings.club_colors,club_settings.club_colors,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,registry_info,club_settings,registry_info,KEEP,club_settings.registry_info,club_settings.registry_info,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,copyright_text,club_settings,copyright_text,KEEP,club_settings.copyright_text,club_settings.copyright_text,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,google_maps_url,club_settings,google_maps_url,KEEP,club_settings.google_maps_url,club_settings.google_maps_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,social_links,club_settings,social_links,KEEP,club_settings.social_links,club_settings.social_links,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,created_at,club_settings,created_at,KEEP,club_settings.created_at,club_settings.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+club_settings,updated_at,club_settings,updated_at,KEEP,club_settings.updated_at,club_settings.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+coach_team_seasons,id,coach_team_seasons,id,KEEP,coach_team_seasons.id,coach_team_seasons.id,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coach_team_seasons,coach_id,coach_team_seasons,coach_id,KEEP,coach_team_seasons.coach_id,coach_team_seasons.coach_id,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coach_team_seasons,team_season_id,coach_team_seasons,team_season_id,KEEP,coach_team_seasons.team_season_id,coach_team_seasons.team_season_id,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coach_team_seasons,role_de,coach_team_seasons,role_de,KEEP,coach_team_seasons.role_de,coach_team_seasons.role_de,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coach_team_seasons,role_en,coach_team_seasons,role_en,KEEP,coach_team_seasons.role_en,coach_team_seasons.role_en,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coach_team_seasons,is_active,coach_team_seasons,is_active,KEEP,coach_team_seasons.is_active,coach_team_seasons.is_active,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coach_team_seasons,sort_order,coach_team_seasons,sort_order,KEEP,coach_team_seasons.sort_order,coach_team_seasons.sort_order,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coach_team_seasons,created_at,coach_team_seasons,created_at,KEEP,coach_team_seasons.created_at,coach_team_seasons.created_at,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+coaches,id,coaches,id,KEEP,coaches.id,coaches.id,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,team_id,coach_team_seasons,team_season_id,MOVE,coach_team_seasons.team_season_id,coaches.team_id,yes,P2,HIGH,Canonical coach assignment belongs in the seasonal relation table.
+coaches,name,coaches,name,LEGACY_TEMPORARY,coaches.first_name + coaches.last_name,coaches.name,yes,P3,MEDIUM,Derived display label kept during migration to avoid UI churn.
+coaches,role_de,coach_team_seasons,role_de,MOVE,coach_team_seasons.role_de,coaches.role_de,yes,P2,HIGH,German role label belongs to the seasonal assignment.
+coaches,role_en,coach_team_seasons,role_en,MOVE,coach_team_seasons.role_en,coaches.role_en,yes,P2,HIGH,English role label belongs to the seasonal assignment.
+coaches,email,coaches,email,KEEP,coaches.email,coaches.email,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+coaches,phone,coaches,phone,KEEP,coaches.phone,coaches.phone,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+coaches,image_url,coaches,image_url,KEEP,coaches.image_url,coaches.image_url,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,is_active,coaches,is_active,KEEP,coaches.is_active,coaches.is_active,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,sort_order,coach_team_seasons,sort_order,MOVE,coach_team_seasons.sort_order,coaches.sort_order,yes,P2,MEDIUM,Public ordering follows the seasonal assignment view.
+coaches,created_at,coaches,created_at,KEEP,coaches.created_at,coaches.created_at,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,team_slug,coaches,team_slug,LEGACY_TEMPORARY,team_seasons.slug,coaches.team_slug,yes,P3,MEDIUM,Legacy display snapshot; source of truth is the seasonal relation.
+coaches,photo_url,coaches,image_url,MERGE,coaches.image_url,coaches.photo_url,yes,P3,MEDIUM,Compatibility alias to the canonical image field.
+coaches,license,coaches,license,KEEP,coaches.license,coaches.license,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,slug,coaches,slug,KEEP,coaches.slug,coaches.slug,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+coaches,role,coach_team_seasons,role_de,MOVE,coach_team_seasons.role_de,coaches.role,yes,P2,HIGH,Role is seasonal assignment data rather than person master data.
+coaches,team_name,coaches,team_name,LEGACY_TEMPORARY,team_seasons.name_de,coaches.team_name,yes,P3,MEDIUM,Legacy display snapshot; source of truth is the seasonal relation.
+coaches,whatsapp,coaches,whatsapp,KEEP,coaches.whatsapp,coaches.whatsapp,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,nationality,coaches,nationality,KEEP,coaches.nationality,coaches.nationality,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,first_name,coaches,first_name,KEEP,coaches.first_name,coaches.first_name,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,last_name,coaches,last_name,KEEP,coaches.last_name,coaches.last_name,no,CURRENT,LOW,Coach/staff person master data remains here.
+coaches,admin_profile_id,coaches,admin_profile_id,KEEP,coaches.admin_profile_id,coaches.admin_profile_id,no,CURRENT,LOW,Coach/staff person master data remains here.
+departments,id,departments,id,KEEP,departments.id,departments.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+departments,name_de,departments,name_de,KEEP,departments.name_de,departments.name_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+departments,name_en,departments,name_en,KEEP,departments.name_en,departments.name_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+departments,slug,departments,slug,KEEP,departments.slug,departments.slug,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+departments,is_active,departments,is_active,KEEP,departments.is_active,departments.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+departments,sort_order,departments,sort_order,KEEP,departments.sort_order,departments.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+departments,created_at,departments,created_at,KEEP,departments.created_at,departments.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+event_documents,id,event_documents,id,KEEP,event_documents.id,event_documents.id,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,event_id,event_documents,event_id,KEEP,event_documents.event_id,event_documents.event_id,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,display_name_de,event_documents,display_name_de,KEEP,event_documents.display_name_de,event_documents.display_name_de,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,display_name_en,event_documents,display_name_en,KEEP,event_documents.display_name_en,event_documents.display_name_en,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,description_de,event_documents,description_de,KEEP,event_documents.description_de,event_documents.description_de,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,description_en,event_documents,description_en,KEEP,event_documents.description_en,event_documents.description_en,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,file_name,event_documents,file_name,KEEP,event_documents.file_name,event_documents.file_name,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,file_path,event_documents,file_path,KEEP,event_documents.file_path,event_documents.file_path,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,file_url,event_documents,file_url,KEEP,event_documents.file_url,event_documents.file_url,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,mime_type,event_documents,mime_type,KEEP,event_documents.mime_type,event_documents.mime_type,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,file_size,event_documents,file_size,KEEP,event_documents.file_size,event_documents.file_size,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,sort_order,event_documents,sort_order,KEEP,event_documents.sort_order,event_documents.sort_order,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,is_public,event_documents,is_public,KEEP,event_documents.is_public,event_documents.is_public,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,created_at,event_documents,created_at,KEEP,event_documents.created_at,event_documents.created_at,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+event_documents,updated_at,event_documents,updated_at,KEEP,event_documents.updated_at,event_documents.updated_at,no,CURRENT,LOW,Event attachment table stays intact for public downloads.
+events,id,events,id,KEEP,events.id,events.id,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,title_de,events,title_de,KEEP,events.title_de,events.title_de,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,title_en,events,title_en,KEEP,events.title_en,events.title_en,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,teaser_de,events,teaser_de,KEEP,events.teaser_de,events.teaser_de,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,teaser_en,events,teaser_en,KEEP,events.teaser_en,events.teaser_en,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,description_de,events,description_de,KEEP,events.description_de,events.description_de,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,description_en,events,description_en,KEEP,events.description_en,events.description_en,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,event_type,events,event_type,KEEP,events.event_type,events.event_type,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,is_all_day,events,is_all_day,KEEP,events.is_all_day,events.is_all_day,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,starts_at,events,starts_at,KEEP,events.starts_at,events.starts_at,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,ends_at,events,ends_at,KEEP,events.ends_at,events.ends_at,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,location_name,events,location_name,KEEP,events.location_name,events.location_name,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,location_address,events,location_address,KEEP,events.location_address,events.location_address,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,location_city,events,location_city,KEEP,events.location_city,events.location_city,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,team_id,events,team_id,KEEP,events.team_id,events.team_id,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,external_url,events,external_url,KEEP,events.external_url,events.external_url,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,image_url,events,image_url,KEEP,events.image_url,events.image_url,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,is_published,events,is_published,KEEP,events.is_published,events.is_published,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,is_featured,events,is_featured,KEEP,events.is_featured,events.is_featured,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,sort_order,events,sort_order,KEEP,events.sort_order,events.sort_order,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,created_at,events,created_at,KEEP,events.created_at,events.created_at,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,updated_at,events,updated_at,KEEP,events.updated_at,events.updated_at,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,slug,events,slug,KEEP,events.slug,events.slug,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,recurrence_type,events,recurrence_type,KEEP,events.recurrence_type,events.recurrence_type,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,recurrence_interval,events,recurrence_interval,KEEP,events.recurrence_interval,events.recurrence_interval,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,recurrence_until,events,recurrence_until,KEEP,events.recurrence_until,events.recurrence_until,no,CURRENT,LOW,Event and recurrence data remain canonical.
+events,recurrence_count,events,recurrence_count,KEEP,events.recurrence_count,events.recurrence_count,no,CURRENT,LOW,Event and recurrence data remain canonical.
+membership_request_recipients,id,membership_request_recipients,id,KEEP,membership_request_recipients.id,membership_request_recipients.id,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_request_recipients,email,membership_request_recipients,email,KEEP,membership_request_recipients.email,membership_request_recipients.email,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_request_recipients,label,membership_request_recipients,label,KEEP,membership_request_recipients.label,membership_request_recipients.label,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_request_recipients,request_type,membership_request_recipients,request_type,KEEP,membership_request_recipients.request_type,membership_request_recipients.request_type,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_request_recipients,is_active,membership_request_recipients,is_active,KEEP,membership_request_recipients.is_active,membership_request_recipients.is_active,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_request_recipients,sort_order,membership_request_recipients,sort_order,KEEP,membership_request_recipients.sort_order,membership_request_recipients.sort_order,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_request_recipients,created_at,membership_request_recipients,created_at,KEEP,membership_request_recipients.created_at,membership_request_recipients.created_at,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_request_recipients,updated_at,membership_request_recipients,updated_at,KEEP,membership_request_recipients.updated_at,membership_request_recipients.updated_at,no,CURRENT,LOW,Recipient routing remains separate from request data.
+membership_requests,id,membership_requests,id,KEEP,membership_requests.id,membership_requests.id,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,first_name,membership_requests,first_name,KEEP,membership_requests.first_name,membership_requests.first_name,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,last_name,membership_requests,last_name,KEEP,membership_requests.last_name,membership_requests.last_name,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,phone,membership_requests,phone,KEEP,membership_requests.phone,membership_requests.phone,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,birthdate,membership_requests,birthdate,KEEP,membership_requests.birthdate,membership_requests.birthdate,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,email,membership_requests,email,KEEP,membership_requests.email,membership_requests.email,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,request_type,membership_requests,request_type,KEEP,membership_requests.request_type,membership_requests.request_type,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,year_group,membership_requests,year_group,KEEP,membership_requests.year_group,membership_requests.year_group,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,desired_team_id,membership_requests,desired_team_id,KEEP,membership_requests.desired_team_id,membership_requests.desired_team_id,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,message,membership_requests,message,KEEP,membership_requests.message,membership_requests.message,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,status,membership_requests,status,KEEP,membership_requests.status,membership_requests.status,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,created_at,membership_requests,created_at,KEEP,membership_requests.created_at,membership_requests.created_at,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,processed_at,membership_requests,processed_at,KEEP,membership_requests.processed_at,membership_requests.processed_at,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,processed_by,membership_requests,processed_by,LEGACY_TEMPORARY,membership_requests.processed_by,membership_requests.processed_by,yes,P3,MEDIUM,Keep as snapshot until the audit-link strategy is formally chosen.
+membership_requests,mail_sent_at,membership_requests,mail_sent_at,KEEP,membership_requests.mail_sent_at,membership_requests.mail_sent_at,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,internal_note,membership_requests,internal_note,KEEP,membership_requests.internal_note,membership_requests.internal_note,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,forwarded_to_type,membership_requests,forwarded_to_type,LEGACY_TEMPORARY,membership_requests.forwarded_to_type,membership_requests.forwarded_to_type,yes,P3,MEDIUM,Workflow snapshot field retained for historical traceability.
+membership_requests,forwarded_to_id,membership_requests,forwarded_to_id,LEGACY_TEMPORARY,membership_requests.forwarded_to_id,membership_requests.forwarded_to_id,yes,P3,MEDIUM,Workflow snapshot field retained for historical traceability.
+membership_requests,forwarded_to_name,membership_requests,forwarded_to_name,LEGACY_TEMPORARY,membership_requests.forwarded_to_name,membership_requests.forwarded_to_name,yes,P3,MEDIUM,Workflow snapshot field retained for historical traceability.
+membership_requests,forwarded_to_email,membership_requests,forwarded_to_email,LEGACY_TEMPORARY,membership_requests.forwarded_to_email,membership_requests.forwarded_to_email,yes,P3,MEDIUM,Workflow snapshot field retained for historical traceability.
+membership_requests,forwarded_at,membership_requests,forwarded_at,KEEP,membership_requests.forwarded_at,membership_requests.forwarded_at,no,CURRENT,LOW,Membership request data remains canonical.
+membership_requests,forwarded_note,membership_requests,forwarded_note,KEEP,membership_requests.forwarded_note,membership_requests.forwarded_note,no,CURRENT,LOW,Membership request data remains canonical.
+news,id,news,id,KEEP,news.id,news.id,no,CURRENT,LOW,News article data remains canonical.
+news,title_de,news,title_de,KEEP,news.title_de,news.title_de,no,CURRENT,LOW,News article data remains canonical.
+news,title_en,news,title_en,KEEP,news.title_en,news.title_en,no,CURRENT,LOW,News article data remains canonical.
+news,slug,news,slug,KEEP,news.slug,news.slug,no,CURRENT,LOW,News article data remains canonical.
+news,teaser_de,news,teaser_de,KEEP,news.teaser_de,news.teaser_de,no,CURRENT,LOW,News article data remains canonical.
+news,teaser_en,news,teaser_en,KEEP,news.teaser_en,news.teaser_en,no,CURRENT,LOW,News article data remains canonical.
+news,content_de,news,content_de,KEEP,news.content_de,news.content_de,no,CURRENT,LOW,News article data remains canonical.
+news,content_en,news,content_en,KEEP,news.content_en,news.content_en,no,CURRENT,LOW,News article data remains canonical.
+news,image_url,news,image_url,KEEP,news.image_url,news.image_url,no,CURRENT,LOW,News article data remains canonical.
+news,is_published,news,is_published,KEEP,news.is_published,news.is_published,no,CURRENT,LOW,News article data remains canonical.
+news,published_at,news,published_at,KEEP,news.published_at,news.published_at,no,CURRENT,LOW,News article data remains canonical.
+news,created_at,news,created_at,KEEP,news.created_at,news.created_at,no,CURRENT,LOW,News article data remains canonical.
+news,author,news,author,KEEP,news.author,news.author,no,CURRENT,LOW,News article data remains canonical.
+news,category,news,category_key,MERGE,news.category_key,news.category,yes,P3,MEDIUM,Human label should be derived from the key; the key remains canonical.
+news,scheduled_at,news,published_at,REMOVE_AFTER_MIGRATION,news.published_at,news.scheduled_at,yes,P4,MEDIUM,Workflow scheduling is deferred; published_at remains the current operational timestamp.
+news,category_key,news,category_key,KEEP,news.category_key,news.category_key,no,CURRENT,LOW,News article data remains canonical.
+news,football_team_id,news,football_team_id,KEEP,news.football_team_id,news.football_team_id,no,CURRENT,LOW,News article data remains canonical.
+news_documents,id,news_documents,id,KEEP,news_documents.id,news_documents.id,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,news_id,news_documents,news_id,KEEP,news_documents.news_id,news_documents.news_id,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,display_name_de,news_documents,display_name_de,KEEP,news_documents.display_name_de,news_documents.display_name_de,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,display_name_en,news_documents,display_name_en,KEEP,news_documents.display_name_en,news_documents.display_name_en,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,description_de,news_documents,description_de,KEEP,news_documents.description_de,news_documents.description_de,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,description_en,news_documents,description_en,KEEP,news_documents.description_en,news_documents.description_en,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,file_name,news_documents,file_name,KEEP,news_documents.file_name,news_documents.file_name,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,file_path,news_documents,file_path,KEEP,news_documents.file_path,news_documents.file_path,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,file_url,news_documents,file_url,KEEP,news_documents.file_url,news_documents.file_url,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,mime_type,news_documents,mime_type,KEEP,news_documents.mime_type,news_documents.mime_type,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,file_size,news_documents,file_size,KEEP,news_documents.file_size,news_documents.file_size,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,sort_order,news_documents,sort_order,KEEP,news_documents.sort_order,news_documents.sort_order,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,is_public,news_documents,is_public,KEEP,news_documents.is_public,news_documents.is_public,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,created_at,news_documents,created_at,KEEP,news_documents.created_at,news_documents.created_at,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+news_documents,updated_at,news_documents,updated_at,KEEP,news_documents.updated_at,news_documents.updated_at,no,CURRENT,LOW,News attachment table stays intact for public downloads.
+pages,id,pages,id,KEEP,pages.id,pages.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,slug,pages,slug,KEEP,pages.slug,pages.slug,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,title_de,pages,title_de,KEEP,pages.title_de,pages.title_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,title_en,pages,title_en,KEEP,pages.title_en,pages.title_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,content_de,pages,content_de,KEEP,pages.content_de,pages.content_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,content_en,pages,content_en,KEEP,pages.content_en,pages.content_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,is_published,pages,is_published,KEEP,pages.is_published,pages.is_published,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,show_in_footer,pages,show_in_footer,KEEP,pages.show_in_footer,pages.show_in_footer,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,sort_order,pages,sort_order,KEEP,pages.sort_order,pages.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,created_at,pages,created_at,KEEP,pages.created_at,pages.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+pages,updated_at,pages,updated_at,KEEP,pages.updated_at,pages.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+player_team_seasons,id,player_team_seasons,id,KEEP,player_team_seasons.id,player_team_seasons.id,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,player_id,player_team_seasons,player_id,KEEP,player_team_seasons.player_id,player_team_seasons.player_id,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,team_season_id,player_team_seasons,team_season_id,KEEP,player_team_seasons.team_season_id,player_team_seasons.team_season_id,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,shirt_number,player_team_seasons,shirt_number,KEEP,player_team_seasons.shirt_number,player_team_seasons.shirt_number,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,position_de,player_team_seasons,position_de,KEEP,player_team_seasons.position_de,player_team_seasons.position_de,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,position_en,player_team_seasons,position_en,KEEP,player_team_seasons.position_en,player_team_seasons.position_en,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,is_captain,player_team_seasons,is_captain,KEEP,player_team_seasons.is_captain,player_team_seasons.is_captain,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,is_active,player_team_seasons,is_active,KEEP,player_team_seasons.is_active,player_team_seasons.is_active,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,sort_order,player_team_seasons,sort_order,KEEP,player_team_seasons.sort_order,player_team_seasons.sort_order,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+player_team_seasons,created_at,player_team_seasons,created_at,KEEP,player_team_seasons.created_at,player_team_seasons.created_at,no,CURRENT,LOW,Seasonal relation table is the canonical assignment store.
+players,id,players,id,KEEP,players.id,players.id,no,CURRENT,LOW,Player person master data remains here.
+players,team_id,player_team_seasons,team_season_id,MOVE,player_team_seasons.team_season_id,players.team_id,yes,P2,HIGH,Canonical team assignment belongs in the seasonal relation table.
+players,first_name,players,first_name,KEEP,players.first_name,players.first_name,no,CURRENT,LOW,Player person master data remains here.
+players,last_name,players,last_name,KEEP,players.last_name,players.last_name,no,CURRENT,LOW,Player person master data remains here.
+players,shirt_number,player_team_seasons,shirt_number,MOVE,player_team_seasons.shirt_number,players.shirt_number,yes,P2,HIGH,Seasonal shirt number belongs in the assignment table.
+players,position_de,player_team_seasons,position_de,MOVE,player_team_seasons.position_de,players.position_de,yes,P2,HIGH,Playing position is season-specific assignment data.
+players,position_en,player_team_seasons,position_en,MOVE,player_team_seasons.position_en,players.position_en,yes,P2,HIGH,Playing position is season-specific assignment data.
+players,image_url,players,image_url,KEEP,players.image_url,players.image_url,no,CURRENT,LOW,Player person master data remains here.
+players,is_active,players,is_active,KEEP,players.is_active,players.is_active,no,CURRENT,LOW,Player person master data remains here.
+players,sort_order,player_team_seasons,sort_order,MOVE,player_team_seasons.sort_order,players.sort_order,yes,P2,MEDIUM,Public ordering follows the seasonal assignment view.
+players,created_at,players,created_at,KEEP,players.created_at,players.created_at,no,CURRENT,LOW,Player person master data remains here.
+players,photo_url,players,image_url,MERGE,players.image_url,players.photo_url,yes,P3,MEDIUM,Compatibility alias to the canonical image field.
+players,description_de,players,description_de,KEEP,players.description_de,players.description_de,no,CURRENT,LOW,Player person master data remains here.
+players,description_en,players,description_en,KEEP,players.description_en,players.description_en,no,CURRENT,LOW,Player person master data remains here.
+players,birthdate,players,birthdate,KEEP,players.birthdate,players.birthdate,no,CURRENT,LOW,Player person master data remains here.
+players,year_group,players,year_group,KEEP,players.year_group,players.year_group,no,CURRENT,LOW,Player person master data remains here.
+players,strong_foot,players,strong_foot,KEEP,players.strong_foot,players.strong_foot,no,CURRENT,LOW,Player person master data remains here.
+players,nationality,players,nationality,KEEP,players.nationality,players.nationality,no,CURRENT,LOW,Player person master data remains here.
+players,is_captain,player_team_seasons,is_captain,MOVE,player_team_seasons.is_captain,players.is_captain,yes,P2,HIGH,Captain status is seasonal assignment data.
+players,jersey_number,player_team_seasons,shirt_number,MERGE,player_team_seasons.shirt_number,players.jersey_number,yes,P3,MEDIUM,Legacy alias for shirt_number.
+players,position,players,position,REMOVE_AFTER_MIGRATION,player_team_seasons.position_de / position_en,players.position,yes,P4,MEDIUM,Generic position label is superseded by language-specific assignment fields.
+players,name_de,players,name_de,REMOVE_AFTER_MIGRATION,players.first_name + players.last_name,players.name_de,yes,P4,MEDIUM,Multilingual display name is redundant to structured person data.
+players,name_en,players,name_en,REMOVE_AFTER_MIGRATION,players.first_name + players.last_name,players.name_en,yes,P4,MEDIUM,Multilingual display name is redundant to structured person data.
+players,gender,players,gender,KEEP,players.gender,players.gender,no,CURRENT,LOW,Player person master data remains here.
+players,joined_at,players,joined_at,KEEP,players.joined_at,players.joined_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+seasons,id,seasons,id,KEEP,seasons.id,seasons.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+seasons,name,seasons,name,KEEP,seasons.name,seasons.name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+seasons,slug,seasons,slug,KEEP,seasons.slug,seasons.slug,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+seasons,is_current,seasons,is_current,KEEP,seasons.is_current,seasons.is_current,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+seasons,is_active,seasons,is_active,KEEP,seasons.is_active,seasons.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+seasons,sort_order,seasons,sort_order,KEEP,seasons.sort_order,seasons.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+seasons,created_at,seasons,created_at,KEEP,seasons.created_at,seasons.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsor_categories,id,sponsor_categories,id,KEEP,sponsor_categories.id,sponsor_categories.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsor_categories,name_de,sponsor_categories,name_de,KEEP,sponsor_categories.name_de,sponsor_categories.name_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsor_categories,name_en,sponsor_categories,name_en,KEEP,sponsor_categories.name_en,sponsor_categories.name_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsor_categories,slug,sponsor_categories,slug,KEEP,sponsor_categories.slug,sponsor_categories.slug,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsor_categories,is_active,sponsor_categories,is_active,KEEP,sponsor_categories.is_active,sponsor_categories.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsor_categories,sort_order,sponsor_categories,sort_order,KEEP,sponsor_categories.sort_order,sponsor_categories.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsor_categories,created_at,sponsor_categories,created_at,KEEP,sponsor_categories.created_at,sponsor_categories.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,id,sponsors,id,KEEP,sponsors.id,sponsors.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,category_id,sponsors,category_id,KEEP,sponsors.category_id,sponsors.category_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,name,sponsors,name,KEEP,sponsors.name,sponsors.name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,description_de,sponsors,description_de,KEEP,sponsors.description_de,sponsors.description_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,description_en,sponsors,description_en,KEEP,sponsors.description_en,sponsors.description_en,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,image_url,sponsors,image_url,KEEP,sponsors.image_url,sponsors.image_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,website_url,sponsors,website_url,KEEP,sponsors.website_url,sponsors.website_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,facebook_url,sponsors,facebook_url,KEEP,sponsors.facebook_url,sponsors.facebook_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,instagram_url,sponsors,instagram_url,KEEP,sponsors.instagram_url,sponsors.instagram_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,tiktok_url,sponsors,tiktok_url,KEEP,sponsors.tiktok_url,sponsors.tiktok_url,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,is_active,sponsors,is_active,KEEP,sponsors.is_active,sponsors.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,sort_order,sponsors,sort_order,KEEP,sponsors.sort_order,sponsors.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+sponsors,created_at,sponsors,created_at,KEEP,sponsors.created_at,sponsors.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_seasons,id,team_seasons,id,KEEP,team_seasons.id,team_seasons.id,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,team_id,team_seasons,team_id,KEEP,team_seasons.team_id,team_seasons.team_id,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,season_id,team_seasons,season_id,KEEP,team_seasons.season_id,team_seasons.season_id,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,name_de,team_seasons,name_de,KEEP,team_seasons.name_de,team_seasons.name_de,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,name_en,team_seasons,name_en,KEEP,team_seasons.name_en,team_seasons.name_en,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,slug,team_seasons,slug,KEEP,team_seasons.slug,team_seasons.slug,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,age_group,team_seasons,age_group,KEEP,team_seasons.age_group,team_seasons.age_group,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,description_de,team_seasons,description_de,KEEP,team_seasons.description_de,team_seasons.description_de,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,description_en,team_seasons,description_en,KEEP,team_seasons.description_en,team_seasons.description_en,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,training_times_de,team_seasons,training_times_de,KEEP,team_seasons.training_times_de,team_seasons.training_times_de,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,training_times_en,team_seasons,training_times_en,KEEP,team_seasons.training_times_en,team_seasons.training_times_en,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,team_image_url,team_seasons,team_image_url,KEEP,team_seasons.team_image_url,team_seasons.team_image_url,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,contact_name,team_seasons,contact_name,KEEP,team_seasons.contact_name,team_seasons.contact_name,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,contact_email,team_seasons,contact_email,KEEP,team_seasons.contact_email,team_seasons.contact_email,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,contact_phone,team_seasons,contact_phone,KEEP,team_seasons.contact_phone,team_seasons.contact_phone,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,contact_image_url,team_seasons,contact_image_url,KEEP,team_seasons.contact_image_url,team_seasons.contact_image_url,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,fussball_de_matches_widget_id,team_seasons,fussball_de_matches_widget_id,KEEP,team_seasons.fussball_de_matches_widget_id,team_seasons.fussball_de_matches_widget_id,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,fussball_de_table_widget_id,team_seasons,fussball_de_table_widget_id,KEEP,team_seasons.fussball_de_table_widget_id,team_seasons.fussball_de_table_widget_id,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,fussball_de_team_url,team_seasons,fussball_de_team_url,KEEP,team_seasons.fussball_de_team_url,team_seasons.fussball_de_team_url,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,is_active,team_seasons,is_active,KEEP,team_seasons.is_active,team_seasons.is_active,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,sort_order,team_seasons,sort_order,KEEP,team_seasons.sort_order,team_seasons.sort_order,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_seasons,created_at,team_seasons,created_at,KEEP,team_seasons.created_at,team_seasons.created_at,no,CURRENT,LOW,Season-specific team snapshot remains canonical.
+team_templates,id,team_templates,id,KEEP,team_templates.id,team_templates.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_templates,name_de,team_templates,name_de,KEEP,team_templates.name_de,team_templates.name_de,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_templates,slug,team_templates,slug,KEEP,team_templates.slug,team_templates.slug,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_templates,age_group,team_templates,age_group,KEEP,team_templates.age_group,team_templates.age_group,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_templates,is_active,team_templates,is_active,KEEP,team_templates.is_active,team_templates.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_templates,sort_order,team_templates,sort_order,KEEP,team_templates.sort_order,team_templates.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_templates,created_at,team_templates,created_at,KEEP,team_templates.created_at,team_templates.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,id,team_training_exceptions,id,KEEP,team_training_exceptions.id,team_training_exceptions.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,team_training_time_id,team_training_exceptions,team_training_time_id,KEEP,team_training_exceptions.team_training_time_id,team_training_exceptions.team_training_time_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,exception_date,team_training_exceptions,exception_date,KEEP,team_training_exceptions.exception_date,team_training_exceptions.exception_date,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,exception_type,team_training_exceptions,exception_type,KEEP,team_training_exceptions.exception_type,team_training_exceptions.exception_type,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,override_start_time,team_training_exceptions,override_start_time,KEEP,team_training_exceptions.override_start_time,team_training_exceptions.override_start_time,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,override_end_time,team_training_exceptions,override_end_time,KEEP,team_training_exceptions.override_end_time,team_training_exceptions.override_end_time,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,override_training_type,team_training_exceptions,override_training_type,KEEP,team_training_exceptions.override_training_type,team_training_exceptions.override_training_type,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,override_location_name,team_training_exceptions,override_location_name,KEEP,team_training_exceptions.override_location_name,team_training_exceptions.override_location_name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,override_location_address,team_training_exceptions,override_location_address,KEEP,team_training_exceptions.override_location_address,team_training_exceptions.override_location_address,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,override_location_city,team_training_exceptions,override_location_city,KEEP,team_training_exceptions.override_location_city,team_training_exceptions.override_location_city,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,override_location_note,team_training_exceptions,override_location_note,KEEP,team_training_exceptions.override_location_note,team_training_exceptions.override_location_note,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,note,team_training_exceptions,note,KEEP,team_training_exceptions.note,team_training_exceptions.note,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,is_active,team_training_exceptions,is_active,KEEP,team_training_exceptions.is_active,team_training_exceptions.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,created_at,team_training_exceptions,created_at,KEEP,team_training_exceptions.created_at,team_training_exceptions.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_exceptions,updated_at,team_training_exceptions,updated_at,KEEP,team_training_exceptions.updated_at,team_training_exceptions.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,id,team_training_times,id,KEEP,team_training_times.id,team_training_times.id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,team_season_id,team_training_times,team_season_id,KEEP,team_training_times.team_season_id,team_training_times.team_season_id,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,weekday,team_training_times,weekday,KEEP,team_training_times.weekday,team_training_times.weekday,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,start_time,team_training_times,start_time,KEEP,team_training_times.start_time,team_training_times.start_time,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,end_time,team_training_times,end_time,KEEP,team_training_times.end_time,team_training_times.end_time,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,training_type,team_training_times,training_type,KEEP,team_training_times.training_type,team_training_times.training_type,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,location_name,team_training_times,location_name,KEEP,team_training_times.location_name,team_training_times.location_name,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,location_address,team_training_times,location_address,KEEP,team_training_times.location_address,team_training_times.location_address,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,location_city,team_training_times,location_city,KEEP,team_training_times.location_city,team_training_times.location_city,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,location_note,team_training_times,location_note,KEEP,team_training_times.location_note,team_training_times.location_note,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,effective_from,team_training_times,effective_from,KEEP,team_training_times.effective_from,team_training_times.effective_from,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,effective_until,team_training_times,effective_until,KEEP,team_training_times.effective_until,team_training_times.effective_until,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,is_active,team_training_times,is_active,KEEP,team_training_times.is_active,team_training_times.is_active,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,sort_order,team_training_times,sort_order,KEEP,team_training_times.sort_order,team_training_times.sort_order,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,note,team_training_times,note,KEEP,team_training_times.note,team_training_times.note,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,created_at,team_training_times,created_at,KEEP,team_training_times.created_at,team_training_times.created_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+team_training_times,updated_at,team_training_times,updated_at,KEEP,team_training_times.updated_at,team_training_times.updated_at,no,CURRENT,LOW,Canonical data remains unchanged in the target model.
+teams,id,teams,id,KEEP,teams.id,teams.id,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,department_id,teams,department_id,KEEP,teams.department_id,teams.department_id,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,name_de,teams,name_de,KEEP,teams.name_de,teams.name_de,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,name_en,teams,name_en,KEEP,teams.name_en,teams.name_en,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,slug,teams,slug,KEEP,teams.slug,teams.slug,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,age_group,team_seasons,age_group,MOVE,team_seasons.age_group,teams.age_group,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,season,team_seasons,season_id,REMOVE_AFTER_MIGRATION,team_seasons.season_id,teams.season,yes,P4,HIGH,Legacy text season label is replaced by the season relation on team_seasons.
+teams,is_active,teams,is_active,KEEP,teams.is_active,teams.is_active,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,sort_order,teams,sort_order,KEEP,teams.sort_order,teams.sort_order,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,created_at,teams,created_at,KEEP,teams.created_at,teams.created_at,no,CURRENT,LOW,Stable team master data remains in teams.
+teams,description_de,team_seasons,description_de,MOVE,team_seasons.description_de,teams.description_de,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,description_en,team_seasons,description_en,MOVE,team_seasons.description_en,teams.description_en,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,training_times_de,team_seasons,training_times_de,MOVE,team_seasons.training_times_de,teams.training_times_de,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,training_times_en,team_seasons,training_times_en,MOVE,team_seasons.training_times_en,teams.training_times_en,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,team_image_url,team_seasons,team_image_url,MOVE,team_seasons.team_image_url,teams.team_image_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,contact_name,team_seasons,contact_name,MOVE,team_seasons.contact_name,teams.contact_name,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,contact_email,team_seasons,contact_email,MOVE,team_seasons.contact_email,teams.contact_email,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,contact_phone,team_seasons,contact_phone,MOVE,team_seasons.contact_phone,teams.contact_phone,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,contact_image_url,team_seasons,contact_image_url,MOVE,team_seasons.contact_image_url,teams.contact_image_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_matches_widget_url,team_seasons,fussball_de_matches_widget_url,MOVE,team_seasons.fussball_de_matches_widget_url,teams.fussball_de_matches_widget_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_matches_url,team_seasons,fussball_de_matches_url,MOVE,team_seasons.fussball_de_matches_url,teams.fussball_de_matches_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,dfb_matches_widget_url,team_seasons,dfb_matches_widget_url,MOVE,team_seasons.dfb_matches_widget_url,teams.dfb_matches_widget_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_table_widget_url,team_seasons,fussball_de_table_widget_url,MOVE,team_seasons.fussball_de_table_widget_url,teams.fussball_de_table_widget_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_table_url,team_seasons,fussball_de_table_url,MOVE,team_seasons.fussball_de_table_url,teams.fussball_de_table_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,dfb_table_widget_url,team_seasons,dfb_table_widget_url,MOVE,team_seasons.dfb_table_widget_url,teams.dfb_table_widget_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_team_id,team_seasons,fussball_de_team_id,MOVE,team_seasons.fussball_de_team_id,teams.fussball_de_team_id,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_competition_id,team_seasons,fussball_de_competition_id,MOVE,team_seasons.fussball_de_competition_id,teams.fussball_de_competition_id,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_club_id,team_seasons,fussball_de_club_id,MOVE,team_seasons.fussball_de_club_id,teams.fussball_de_club_id,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_team_url,team_seasons,fussball_de_team_url,MOVE,team_seasons.fussball_de_team_url,teams.fussball_de_team_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fupa_matches_widget_id,team_seasons,fupa_matches_widget_id,MOVE,team_seasons.fupa_matches_widget_id,teams.fupa_matches_widget_id,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fupa_table_widget_id,team_seasons,fupa_table_widget_id,MOVE,team_seasons.fupa_table_widget_id,teams.fupa_table_widget_id,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fupa_club_url,team_seasons,fupa_club_url,MOVE,team_seasons.fupa_club_url,teams.fupa_club_url,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_matches_widget_id,team_seasons,fussball_de_matches_widget_id,MOVE,team_seasons.fussball_de_matches_widget_id,teams.fussball_de_matches_widget_id,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.
+teams,fussball_de_table_widget_id,team_seasons,fussball_de_table_widget_id,MOVE,team_seasons.fussball_de_table_widget_id,teams.fussball_de_table_widget_id,yes,P1,MEDIUM,Season-specific team presentation data belongs in team_seasons.

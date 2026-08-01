@@ -21,6 +21,8 @@ import {
   createInitialPlayerForm,
   createPlayerPayload,
   getYearGroupFromBirthdate,
+  getPlayerFormBlockingMessage,
+  getPlayerFormWarningMessage,
   validatePlayerForm,
 } from "./playerForm.helpers";
 import PlayerBasicFields from "./fields/PlayerBasicFields";
@@ -38,9 +40,17 @@ const PLAYER_FORM_TABS = [
   { id: "settings", label: "Einstellungen" },
 ];
 
-export default function AdminPlayersForm({ player, teams = [] }) {
+export default function AdminPlayersForm({
+  player,
+  teamOptionsResult,
+  playerSeasonalReadModel,
+}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
+  const teamOptions = useMemo(
+    () => teamOptionsResult?.teamOptions || [],
+    [teamOptionsResult?.teamOptions],
+  );
   const {
     form,
     setForm,
@@ -52,18 +62,27 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     validateForm,
     hasErrors,
   } = useEntityForm({
-    initialForm: createInitialPlayerForm(player),
+    initialForm: createInitialPlayerForm(player, playerSeasonalReadModel),
     validate: validatePlayerForm,
   });
 
+  const blockingMessage = getPlayerFormBlockingMessage(
+    teamOptionsResult,
+    playerSeasonalReadModel,
+  );
+  const warningMessage = getPlayerFormWarningMessage(playerSeasonalReadModel);
+
   const selectedTeam = useMemo(
-    () => teams.find((team) => team.id === form.team_id),
-    [form.team_id, teams],
+    () =>
+      teamOptions.find(
+        (teamOption) => teamOption.teamSeasonId === form.team_season_id,
+      ),
+    [form.team_season_id, teamOptions],
   );
 
   const positionOptions = useMemo(
-    () => getPositionOptions(selectedTeam?.name_de),
-    [selectedTeam?.name_de],
+    () => getPositionOptions(selectedTeam?.teamNameDe),
+    [selectedTeam?.teamNameDe],
   );
 
   const calculatedYearGroup = getYearGroupFromBirthdate(form.birthdate);
@@ -81,20 +100,28 @@ export default function AdminPlayersForm({ player, teams = [] }) {
   }
 
   const { uploadImage, removeImage } = useImageUpload({
-    currentUrl: form.photo_url,
+    currentUrl: form.image_url,
     placeholderUrl: PLAYER_PLACEHOLDER_IMAGE,
     uploadAction: uploadPlayerImage,
     deleteAction: deletePlayerImage,
-    onChange: (url) => updateField("photo_url", url),
+    onChange: (url) => updateField("image_url", url),
     getUploadContext: () => ({
       id: player?.id,
       first_name: form.first_name,
       last_name: form.last_name,
+      image_url: form.image_url,
     }),
   });
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (blockingMessage) {
+      setActiveTab("basic");
+      alert(blockingMessage);
+      return;
+    }
+
     logAdminSaveEvent({
       module: "players",
       mode: player?.id ? "edit" : "create",
@@ -152,6 +179,10 @@ export default function AdminPlayersForm({ player, teams = [] }) {
         onChange={setActiveTab}
       />
 
+      {blockingMessage && <FormAlert>{blockingMessage}</FormAlert>}
+      {!blockingMessage && warningMessage && (
+        <FormAlert tone="warning">{warningMessage}</FormAlert>
+      )}
       {hasErrors && <FormAlert>{REQUIRED_FIELDS_MESSAGE}</FormAlert>}
 
       {activeTab === "basic" && (
@@ -163,7 +194,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           <PlayerBasicFields
             form={form}
             errors={errors}
-            teams={teams}
+            teamOptions={teamOptions}
             updateField={updateField}
           />
         </FormSection>
@@ -217,7 +248,7 @@ export default function AdminPlayersForm({ player, teams = [] }) {
           description="Das Bild wird in der Verwaltung, Mannschaftsübersicht und Spielerprofilseite verwendet."
         >
           <PlayerImageUpload
-            imageUrl={form.photo_url || PLAYER_PLACEHOLDER_IMAGE}
+            imageUrl={form.image_url || PLAYER_PLACEHOLDER_IMAGE}
             placeholderUrl={PLAYER_PLACEHOLDER_IMAGE}
             onUpload={uploadImage}
             onRemove={removeImage}

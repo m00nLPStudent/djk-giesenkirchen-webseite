@@ -1,6 +1,8 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminSettingsEditor } from "@/components/admin/settings";
+import { createCoachReadDto } from "@/components/admin/persons/coachReadDto";
+import { getCoachSeasonalReadModelsMap } from "@/components/admin/persons/coachSeasonalReadModelRepository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
 
@@ -48,9 +50,7 @@ export default async function AdminSettingsPage() {
       .order("created_at", { ascending: false }),
     db
       .from("coaches")
-      .select(
-        "id, first_name, last_name, name, email, role, role_de, teams(name_de)",
-      )
+      .select("id, first_name, last_name, name, email, role, role_de, role_en")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true }),
     db
@@ -93,6 +93,15 @@ export default async function AdminSettingsPage() {
     );
   }
 
+  const coachRows = coachesResult?.data || [];
+  const coachReadModels = await getCoachSeasonalReadModelsMap(
+    db,
+    coachRows.map((coach) => coach.id).filter(Boolean),
+  );
+  const initialCoaches = coachRows.map((coach) =>
+    createCoachReadDto(coach, coachReadModels.get(coach.id) || {}),
+  );
+
   return (
     <AdminLayout
       title="Einstellungen"
@@ -111,7 +120,7 @@ export default async function AdminSettingsPage() {
         initialPages={pagesResult?.data || []}
         initialMembershipRecipients={recipientsResult?.data || []}
         initialMembershipRequests={requestsResult?.data || []}
-        initialCoaches={coachesResult?.data || []}
+        initialCoaches={initialCoaches}
         initialBoardMembers={boardMembersResult?.data || []}
       />
     </AdminLayout>

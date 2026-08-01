@@ -5,6 +5,8 @@ import {
   canAccessTeamOnServer,
   loadServerTeamScopeContext,
 } from "@/components/admin/teams/serverTeamScope";
+import { loadTeamEditCoachData } from "@/components/admin/teams/teamEditCoach.repository";
+import { loadTeamEditPlayerOptions } from "@/components/admin/teams/teamEditPlayer.repository";
 import BackButton from "@/components/admin/ui/BackButton";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
@@ -39,10 +41,8 @@ export default async function EditTeamPage({ params }) {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  const { data: teamSeasons } = await supabaseServer
-    .from("team_seasons")
-    .select("*")
-    .eq("team_id", id);
+  const coachEditData = await loadTeamEditCoachData(supabaseServer, id);
+  const teamSeasons = coachEditData.teamSeasons;
 
   const ids = (teamSeasons || []).map((item) => item.id);
 
@@ -53,26 +53,7 @@ export default async function EditTeamPage({ params }) {
         .in("team_season_id", ids)
     : { data: [] };
 
-  const { data: coachAssignments } = ids.length
-    ? await supabaseServer
-        .from("coach_team_seasons")
-        .select("*")
-        .in("team_season_id", ids)
-    : { data: [] };
-
-  const { data: players } = await supabaseServer
-    .from("players")
-    .select("*")
-    .eq("is_active", true)
-    .or(`team_id.is.null,team_id.eq.${id}`)
-    .order("last_name", { ascending: true });
-
-  const { data: coaches } = await supabaseServer
-    .from("coaches")
-    .select("*")
-    .eq("is_active", true)
-    .or(`team_id.is.null,team_id.eq.${id}`)
-    .order("last_name", { ascending: true });
+  const players = await loadTeamEditPlayerOptions(supabaseServer, id);
 
   return (
     <AdminLayout title="Mannschaft bearbeiten" subtitle="Mannschaften">
@@ -83,9 +64,14 @@ export default async function EditTeamPage({ params }) {
           seasons={seasons || []}
           teamSeasons={teamSeasons || []}
           players={players || []}
-          coaches={coaches || []}
+          coaches={coachEditData.coaches || []}
           playerAssignments={playerAssignments || []}
-          coachAssignments={coachAssignments || []}
+          coachAssignments={coachEditData.coachAssignments || []}
+          currentSeasonCoachAssignments={
+            coachEditData.currentSeasonCoachAssignments || []
+          }
+          currentSeasonResolution={coachEditData.currentSeasonResolution}
+          currentTeamSeasons={coachEditData.currentTeamSeasons || []}
         />
       </TeamScopeGate>
     </AdminLayout>

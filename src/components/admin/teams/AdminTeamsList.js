@@ -47,7 +47,7 @@ export default function AdminTeamsList({ teams = [] }) {
           team.name_de,
           team.name_en,
           team.age_group,
-          team.season,
+          team.public_season_name,
           team.training_times_de,
           team.contact_name,
         ],

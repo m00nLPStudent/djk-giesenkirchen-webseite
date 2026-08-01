@@ -9,21 +9,21 @@ import {
   loadScopedActiveTeamsForPeople,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
-import { savePlayer } from "@/components/admin/players/services/players.service";
+import {
+  loadScopedPlayerTeamSeasonOptions,
+  resolvePlayerTeamSeasonTarget,
+} from "@/components/admin/players/services/playerTeamSeasonOptions.repository";
+import { savePlayer } from "@/components/admin/players/services/playerWrite.service";
 import { revalidatePath } from "next/cache";
 
 function buildError(message) {
   return { error: { message } };
 }
 
-function normalizeTargetTeamIds(payload = {}) {
-  return Array.from(new Set([payload?.team_id].filter(Boolean)));
-}
-
 async function loadPlayerById(client, playerId) {
   const { data } = await client
     .from("players")
-    .select("*")
+    .select("id")
     .eq("id", playerId)
     .maybeSingle();
 
@@ -31,104 +31,127 @@ async function loadPlayerById(client, playerId) {
 }
 
 export async function loadPlayerFormTeamsAction(requiredPermission) {
-  const permissionResult = await assertAdminActionPermission({
-    requiredPermission,
-  });
+  try {
+    const permissionResult = await assertAdminActionPermission({
+      requiredPermission,
+    });
 
-  if (!permissionResult.ok) {
+    if (!permissionResult.ok) {
+      return {
+        ok: false,
+        message: permissionResult.message || "Berechtigung fehlt.",
+        teams: [],
+      };
+    }
+
+    const scopeContext = await loadServerPersonScopeContext(permissionResult);
+    const teams = await loadScopedActiveTeamsForPeople(
+      scopeContext,
+      permissionResult.supabaseServer,
+    );
+    const teamOptionsResult = await loadScopedPlayerTeamSeasonOptions(
+      scopeContext,
+      permissionResult.supabaseServer,
+    );
+
+    return { ok: true, teams, scopeContext, teamOptionsResult };
+  } catch (error) {
     return {
       ok: false,
-      message: permissionResult.message || "Berechtigung fehlt.",
+      message:
+        error?.message ||
+        "Die Mannschaftsoptionen konnten nicht geladen werden.",
       teams: [],
+      teamOptionsResult: null,
     };
   }
-
-  const scopeContext = await loadServerPersonScopeContext(permissionResult);
-  const teams = await loadScopedActiveTeamsForPeople(
-    scopeContext,
-    permissionResult.supabaseServer,
-  );
-
-  return { ok: true, teams, scopeContext };
 }
 
 export async function savePlayerWithScopeAction(
   playerPayload,
   playerId = null,
 ) {
-  const requiredPermission = playerId ? "players.edit" : "players.create";
-  const permissionResult = await assertAdminActionPermission({
-    requiredPermission,
-  });
+  try {
+    const requiredPermission = playerId ? "players.edit" : "players.create";
+    const permissionResult = await assertAdminActionPermission({
+      requiredPermission,
+    });
 
-  if (!permissionResult.ok) {
-    return buildError(permissionResult.message || "Berechtigung fehlt.");
-  }
-
-  const scopeContext = await loadServerPersonScopeContext(permissionResult);
-  const supabaseServer = permissionResult.supabaseServer;
-  const targetTeamIds = normalizeTargetTeamIds(playerPayload || {});
-
-  const { data: allTeams, error: allTeamsError } = await supabaseServer
-    .from("teams")
-    .select("*")
-    .order("sort_order", { ascending: true });
-
-  if (allTeamsError) {
-    return buildError(
-      `Mannschaften konnten nicht geladen werden: ${allTeamsError.message}`,
-    );
-  }
-
-  const targetTeamMap = new Map(
-    (allTeams || [])
-      .filter((team) => team?.is_active !== false)
-      .map((team) => [team.id, team]),
-  );
-
-  if (playerId) {
-    const existingPlayer = await loadPlayerById(supabaseServer, playerId);
-    if (!existingPlayer) {
-      return buildError("Spieler nicht gefunden.");
+    if (!permissionResult.ok) {
+      return buildError(permissionResult.message || "Berechtigung fehlt.");
     }
 
-    const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(
+    const scopeContext = await loadServerPersonScopeContext(permissionResult);
+    const supabaseServer = permissionResult.supabaseServer;
+    const targetResolution = await resolvePlayerTeamSeasonTarget(
       supabaseServer,
-      [playerId],
+      playerPayload?.team_season_id,
     );
-    const existingTeamIds = teamIdsByPlayerId.get(playerId) || [];
 
-    if (!canEditPlayerOnServer(scopeContext, existingTeamIds, teamById)) {
-      return buildError("Du darfst diesen Spieler nicht bearbeiten.");
+    if (!targetResolution.ok) {
+      return buildError(
+        targetResolution.message ||
+          "Die Zielmannschaft konnte nicht aufgeloest werden.",
+      );
     }
 
-    if (
-      targetTeamIds.length > 0 &&
+    const targetTeamIds = [targetResolution.teamSeasonOption.teamId];
+    const targetTeamMap = new Map([
+      [
+        targetResolution.teamSeasonOption.team.id,
+        targetResolution.teamSeasonOption.team,
+      ],
+    ]);
+
+    if (playerId) {
+      const existingPlayer = await loadPlayerById(supabaseServer, playerId);
+      if (!existingPlayer) {
+        return buildError("Spieler nicht gefunden.");
+      }
+
+      const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(
+        supabaseServer,
+        [playerId],
+      );
+      const existingTeamIds = teamIdsByPlayerId.get(playerId) || [];
+
+      if (!canEditPlayerOnServer(scopeContext, existingTeamIds, teamById)) {
+        return buildError("Du darfst diesen Spieler nicht bearbeiten.");
+      }
+
+      if (
+        targetTeamIds.length > 0 &&
+        !canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap)
+      ) {
+        return buildError(
+          "Du darfst den Spieler keiner fremden Mannschaft zuordnen.",
+        );
+      }
+    } else if (
       !canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap)
     ) {
       return buildError(
-        "Du darfst den Spieler keiner fremden Mannschaft zuordnen.",
+        "Du darfst keinen Spieler fuer diese Mannschaft anlegen.",
       );
     }
-  } else if (
-    !canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap)
-  ) {
+
+    const { error } = await savePlayer(playerPayload || {}, playerId, {
+      client: supabaseServer,
+      targetTeamSeasonOption: targetResolution.teamSeasonOption,
+    });
+
+    if (error) {
+      return buildError(error.message || "Fehler beim Speichern.");
+    }
+
+    revalidatePath("/admin/players");
+
+    return { error: null };
+  } catch (error) {
     return buildError(
-      "Du darfst keinen Spieler fuer diese Mannschaft anlegen.",
+      error?.message || "Der Spieler konnte nicht gespeichert werden.",
     );
   }
-
-  const { error } = await savePlayer(playerPayload || {}, playerId, {
-    client: supabaseServer,
-  });
-
-  if (error) {
-    return buildError(error.message || "Fehler beim Speichern.");
-  }
-
-  revalidatePath("/admin/players");
-
-  return { error: null };
 }
 
 export async function removePlayerWithScopeAction(playerId) {

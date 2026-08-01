@@ -2,9 +2,8 @@ import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import Can from "@/components/admin/auth/Can";
 import { AdminCoachesOverview } from "@/components/admin/coaches";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { createCoachReadDto } from "@/components/admin/persons/coachReadDto";
+import { getCoachSeasonalReadModelsMap } from "@/components/admin/persons/coachSeasonalReadModelRepository";
 import {
   canCreateCoachOnServer,
   canDeleteCoachOnServer,
@@ -13,6 +12,9 @@ import {
   getCoachTeamIdsMap,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
+import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -32,12 +34,16 @@ export default async function AdminCoachesPage() {
   const { data: coaches } = await supabaseServer
     .from("coaches")
     .select(
-      "id, first_name, last_name, name, slug, role, email, nationality, image_url, is_active, team_id, team_name, admin_profile_id, sort_order",
+      "id, first_name, last_name, name, slug, role, role_de, role_en, email, nationality, image_url, photo_url, is_active, admin_profile_id, sort_order",
     )
     .order("sort_order", { ascending: true });
 
   const coachListRaw = coaches || [];
   const coachIds = coachListRaw.map((coach) => coach.id).filter(Boolean);
+  const coachReadModels = await getCoachSeasonalReadModelsMap(
+    supabaseServer,
+    coachIds,
+  );
   const { teamIdsByCoachId, teamById } = await getCoachTeamIdsMap(
     supabaseServer,
     coachIds,
@@ -50,29 +56,16 @@ export default async function AdminCoachesPage() {
     })
     .map((coach) => {
       const coachTeamIds = teamIdsByCoachId.get(coach.id) || [];
-      const primaryTeam = teamById.get(coachTeamIds[0]) || null;
+      const dto = createCoachReadDto(
+        coach,
+        coachReadModels.get(coach.id) || {},
+        { includeAdminProfileLinked: true },
+      );
 
       return {
-        id: coach.id,
-        first_name: coach.first_name,
-        last_name: coach.last_name,
-        name: coach.name,
-        slug: coach.slug,
-        role: coach.role,
-        email: coach.email,
-        nationality: coach.nationality,
-        image_url: coach.image_url,
-        is_active: coach.is_active,
-        team_id: coach.team_id,
-        team_name: coach.team_name,
-        sort_order: coach.sort_order,
-        teams: primaryTeam
-          ? {
-              id: primaryTeam.id,
-              name_de: primaryTeam.name_de,
-              slug: primaryTeam.slug,
-            }
-          : null,
+        ...dto,
+        is_active: dto.isActive,
+        image_url: dto.imageUrl,
         _canEditInScope: canEditCoachOnServer(
           scopeContext,
           coach,

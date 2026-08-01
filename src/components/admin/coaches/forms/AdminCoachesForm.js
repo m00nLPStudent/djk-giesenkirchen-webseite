@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import { saveCoachWithScopeAction } from "@/app/admin/coaches/actions";
@@ -13,13 +13,12 @@ import TabNavigation from "@/components/admin/ui/TabNavigation";
 import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import CoachImageUpload from "../components/CoachImageUpload";
-import {
-  deleteCoachImage,
-  uploadCoachImage,
-} from "../services/coaches.service";
+import { deleteCoachImage, uploadCoachImage } from "../services/coaches.service";
 import {
   createCoachPayload,
   createInitialCoachForm,
+  getCoachFormBlockingMessage,
+  getCoachFormWarningMessage,
   validateCoachForm,
 } from "./coachForm.helpers";
 import CoachBasicFields from "./fields/CoachBasicFields";
@@ -37,21 +36,46 @@ const COACH_FORM_TABS = [
   { id: "settings", label: "Einstellungen" },
 ];
 
-export default function AdminCoachesForm({ coach, teams = [] }) {
+export default function AdminCoachesForm({
+  coach,
+  teamOptionsResult,
+  coachSeasonalReadModel,
+}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
+  const teamOptions = useMemo(
+    () => teamOptionsResult?.teamOptions || [],
+    [teamOptionsResult?.teamOptions],
+  );
   const {
     form,
+    setForm,
     errors,
+    setErrors,
     loading,
     setLoading,
     updateField,
     validateForm,
     hasErrors,
   } = useEntityForm({
-    initialForm: createInitialCoachForm(coach),
+    initialForm: createInitialCoachForm(
+      coach,
+      coachSeasonalReadModel,
+      teamOptions,
+    ),
     validate: validateCoachForm,
   });
+
+  const blockingMessage = getCoachFormBlockingMessage(
+    teamOptionsResult,
+    coachSeasonalReadModel,
+    form.assignments,
+  );
+  const warningMessage = getCoachFormWarningMessage(
+    teamOptionsResult,
+    coachSeasonalReadModel,
+    teamOptions,
+  );
 
   const { uploadImage, removeImage } = useImageUpload({
     currentUrl: form.image_url,
@@ -62,11 +86,19 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     getUploadContext: () => ({
       id: coach?.id,
       name: `${form.first_name} ${form.last_name}`.trim(),
+      image_url: form.image_url,
     }),
   });
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (blockingMessage) {
+      setActiveTab("role");
+      alert(blockingMessage);
+      return;
+    }
+
     logAdminSaveEvent({
       module: "coaches",
       mode: coach?.id ? "edit" : "create",
@@ -75,19 +107,16 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     });
 
     const nextErrors = validateForm();
-
     if (Object.keys(nextErrors).length > 0) {
-      setActiveTab("basic");
+      setActiveTab(nextErrors.assignments ? "role" : "basic");
       return;
     }
 
     setLoading(true);
-
     const { error } = await saveCoachWithScopeAction(
       createCoachPayload(form),
       coach?.id ?? null,
     );
-
     setLoading(false);
 
     if (error) {
@@ -112,9 +141,13 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
     });
 
     await revalidatePublicContentAction("coaches");
-
     router.push("/admin/coaches");
     router.refresh();
+  }
+
+  function handleAssignmentErrorReset() {
+    if (!errors.assignments) return;
+    setErrors((current) => ({ ...current, assignments: null }));
   }
 
   return (
@@ -125,13 +158,17 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         onChange={setActiveTab}
       />
 
+      {blockingMessage && <FormAlert>{blockingMessage}</FormAlert>}
+      {!blockingMessage && warningMessage && (
+        <FormAlert tone="warning">{warningMessage}</FormAlert>
+      )}
       {hasErrors && <FormAlert>{REQUIRED_FIELDS_MESSAGE}</FormAlert>}
 
       {activeTab === "basic" && (
         <FormSection
           eyebrow="Trainer"
-          title="Persönliche Daten"
-          description="Grunddaten für die interne Verwaltung und die öffentliche Trainerseite."
+          title="Persoenliche Daten"
+          description="Grunddaten fuer die interne Verwaltung und die oeffentliche Trainerseite."
         >
           <CoachBasicFields
             form={form}
@@ -145,12 +182,17 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         <FormSection
           eyebrow="Verein"
           title="Vereinsdaten"
-          description="Funktion, Mannschaftszuordnung, Lizenz und Anzeige-Reihenfolge."
+          description="Fallback-Funktion fuer teamlose Trainer, Lizenz und aktuelle Saisonzuordnungen mit mehreren Mannschaften oder Rollen."
         >
           <CoachRoleFields
             form={form}
             errors={errors}
-            teams={teams}
+            teamOptions={teamOptions}
+            blockingMessage={blockingMessage}
+            setForm={(updater) => {
+              handleAssignmentErrorReset();
+              setForm(updater);
+            }}
             updateField={updateField}
           />
         </FormSection>
@@ -160,7 +202,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         <FormSection
           eyebrow="Kontakt"
           title="Kontaktdaten"
-          description="Telefon und WhatsApp werden automatisch ins internationale Format für Links umgewandelt."
+          description="Telefon und WhatsApp werden automatisch ins internationale Format fuer Links umgewandelt."
         >
           <CoachContactFields
             form={form}
@@ -174,7 +216,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         <FormSection
           eyebrow="Profil"
           title="Profilangaben"
-          description="Weitere Angaben für die öffentliche Darstellung."
+          description="Weitere Angaben fuer die oeffentliche Darstellung."
         >
           <CoachProfileFields
             form={form}
@@ -188,7 +230,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
         <FormSection
           eyebrow="Medien"
           title="Trainerbild"
-          description="Das Bild wird im Adminbereich und auf der öffentlichen Trainerprofilseite verwendet."
+          description="Das Bild wird im Adminbereich und auf der oeffentlichen Trainerprofilseite verwendet."
         >
           <CoachImageUpload
             imageUrl={form.image_url || COACH_PLACEHOLDER_IMAGE}
@@ -200,7 +242,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
       )}
 
       {activeTab === "settings" && (
-        <FormSection eyebrow="Einstellungen" title="Status & Sortierung">
+        <FormSection eyebrow="Einstellungen" title="Status und Fallback-Sortierung">
           <CoachSettingsFields form={form} updateField={updateField} />
         </FormSection>
       )}

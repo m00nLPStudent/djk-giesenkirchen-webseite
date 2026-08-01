@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createCoachTeamView } from "@/components/admin/persons/coachReadDto";
 import { getUniqueAssignedTeams } from "../utils/coachStats";
 
 export default function CoachTeamsOverview({ coaches = [] }) {
@@ -42,14 +43,18 @@ export default function CoachTeamsOverview({ coaches = [] }) {
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
-            {team.coaches.map((coach) => (
-              <span
-                key={coach.id}
-                className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-white/70"
-              >
-                {coach.name || `${coach.first_name || ""} ${coach.last_name || ""}`.trim()} · {coach.role}
-              </span>
-            ))}
+            {team.coaches.map((coach) => {
+              const teamView = createCoachTeamView(coach, team.id);
+
+              return (
+                <span
+                  key={coach.id}
+                  className="rounded-full bg-white/10 px-3 py-1 text-sm font-bold text-white/70"
+                >
+                  {teamView.displayName} - {teamView.teamRoleDisplayLabel}
+                </span>
+              );
+            })}
           </div>
         </div>
       ))}

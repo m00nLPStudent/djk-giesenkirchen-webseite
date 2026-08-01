@@ -25,16 +25,13 @@ import PlayerStatusBadge from "./PlayerStatusBadge";
 
 export default function PlayerCard({ player }) {
   const fullName = getFullName(player, "Unbekannter Spieler");
-  const team = getEntityTeam(player);
+  const team = getEntityTeam(player, { includeLegacyTeamId: false });
   const nationality = getCountryByValue(player.nationality);
   const genderLabel = getGenderLabel(player.gender);
   const profileUrl = team.slug
     ? `/fussball/${team.slug}/spieler/${player.id}`
     : null;
-  const imageUrl = getEntityImage(player, PLAYER_PLACEHOLDER_IMAGE, [
-    "photo_url",
-    "image_url",
-  ]);
+  const imageUrl = getEntityImage(player, PLAYER_PLACEHOLDER_IMAGE);
 
   return (
     <EntityCard image={imageUrl} imageAlt={fullName} imageSize="sm">

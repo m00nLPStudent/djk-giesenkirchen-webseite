@@ -1,4 +1,5 @@
 import {
+  buildCoachTeamState,
   findTeamSeason,
   getAssignedIds,
   getCurrentSeason,
@@ -10,6 +11,8 @@ export function createInitialTeamForm({
   teamSeasons = [],
   playerAssignments = [],
   coachAssignments = [],
+  coaches = [],
+  currentSeasonCoachAssignments = [],
   seasonId = null,
 }) {
   const publicSeason = getCurrentSeason(seasons);
@@ -17,6 +20,12 @@ export function createInitialTeamForm({
     seasons.find((season) => season.id === seasonId) || publicSeason;
   const selectedTeamSeason = findTeamSeason(teamSeasons, selectedSeason?.id);
   const source = selectedTeamSeason || team || {};
+  const coachTeamState = buildCoachTeamState({
+    coaches,
+    coachAssignments,
+    currentSeasonCoachAssignments,
+    teamSeasonId: selectedTeamSeason?.id || null,
+  });
 
   return {
     season_id: selectedSeason?.id || "",
@@ -28,11 +37,11 @@ export function createInitialTeamForm({
       selectedTeamSeason?.id,
       "player_id",
     ),
-    selected_coach_ids: getAssignedIds(
-      coachAssignments,
-      selectedTeamSeason?.id,
-      "coach_id",
-    ),
+    selected_coach_ids: coachTeamState
+      .filter((coach) => coach.isAssignedToCurrentTeam)
+      .map((coach) => coach.coach_id)
+      .filter(Boolean),
+    coach_team_state: coachTeamState,
     team_template_id: "",
     name_de: source.name_de || team?.name_de || "",
     name_en: source.name_en || team?.name_en || "",

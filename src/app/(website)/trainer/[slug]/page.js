@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import ProfileDetailsCard from "@/components/website/profile/ProfileDetailsCard";
 import {
   CoachProfileHeader,
   CoachProfileImageCard,
@@ -9,16 +8,13 @@ import {
   getCountry,
   getTeam,
 } from "@/components/website/coach-profile";
+import { loadPublicCoachBySlug } from "@/components/website/coach/coachPublic.repository";
+import ProfileDetailsCard from "@/components/website/profile/ProfileDetailsCard";
 import { supabase } from "@/lib/supabase";
 
 export default async function CoachProfilePage({ params }) {
   const { slug } = await params;
-
-  const { data: coach } = await supabase
-    .from("coaches")
-    .select("*, teams(id, name_de, slug)")
-    .eq("slug", slug)
-    .single();
+  const coach = await loadPublicCoachBySlug(supabase, slug);
 
   if (!coach) {
     notFound();
@@ -28,14 +24,20 @@ export default async function CoachProfilePage({ params }) {
   const country = getCountry(coach.nationality);
   const team = getTeam(coach);
   const contact = getCoachContact(coach);
-  const teamName = team?.name_de || coach.team_name || "Keine Mannschaft";
+  const roleLabel = coach.roleLabels.join(", ") || coach.primaryRoleLabel;
+  const teamName =
+    coach.teamNames.length > 1
+      ? coach.teamNames.join(", ")
+      : team?.name_de || coach.primaryTeamName || "Keine Mannschaft";
+  const teamHref =
+    coach.teamNames.length === 1 && team?.slug ? `/fussball/${team.slug}` : null;
 
   const details = [
-    { label: "Funktion", value: coach.role },
+    { label: "Funktion", value: roleLabel || "Trainer" },
     {
       label: "Mannschaft",
       value: teamName,
-      href: team?.slug ? `/fussball/${team.slug}` : null,
+      href: teamHref,
     },
     { label: "Lizenz", value: coach.license, type: "license" },
     {
@@ -50,7 +52,7 @@ export default async function CoachProfilePage({ params }) {
       href: contact.phoneHref,
       type: "phone",
     },
-    { label: "Status", value: coach.is_active ? "Aktiv" : "Inaktiv" },
+    { label: "Status", value: coach.isActive ? "Aktiv" : "Inaktiv" },
   ];
 
   return (

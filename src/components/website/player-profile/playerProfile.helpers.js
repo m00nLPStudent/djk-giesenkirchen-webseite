@@ -17,6 +17,16 @@ export function getCountry(value) {
 }
 
 export function getTeam(player) {
+  const primaryAssignment = player?.primaryAssignment || player?.assignments?.[0] || null;
+  if (primaryAssignment?.teamId) {
+    return {
+      id: primaryAssignment.teamId,
+      name_de: primaryAssignment.teamNameDe || primaryAssignment.teamNameEn || null,
+      slug: primaryAssignment.teamSlug || null,
+      season_name: primaryAssignment.seasonName || null,
+    };
+  }
+
   if (Array.isArray(player?.teams)) return player.teams[0] || null;
   return player?.teams || null;
 }
@@ -47,5 +57,5 @@ export function formatDate(date) {
 }
 
 export function getFullName(player) {
-  return `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim();
+  return `${player.first_name ?? player.firstName ?? ""} ${player.last_name ?? player.lastName ?? ""}`.trim();
 }

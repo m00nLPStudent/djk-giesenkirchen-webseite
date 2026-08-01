@@ -1,9 +1,15 @@
-import { supabase } from "@/lib/supabase";
+import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 import {
+  loadPublicCoachDtosByIds,
+  mapCoachDtosForTeam,
+} from "@/components/website/coach/coachPublic.repository";
+import {
+  TeamDetailTabs,
   TeamHero,
   TeamIntroCard,
-  TeamDetailTabs,
 } from "@/components/website/team";
+import { mapTeamRosterPlayers } from "@/components/website/team/teamRoster.core.mjs";
+import { supabase } from "@/lib/supabase";
 
 const tournamentItems = [
   "Spielpläne",
@@ -29,10 +35,13 @@ const eventItems = [
 ];
 
 function mergeTeamSeason(team, teamSeason, season) {
+  const seasonName = season?.name || null;
+
   if (!teamSeason) {
     return {
       ...team,
-      season: season?.name || team?.season,
+      season: seasonName,
+      public_season_name: seasonName,
       selected_season_id: season?.id || null,
     };
   }
@@ -43,35 +52,10 @@ function mergeTeamSeason(team, teamSeason, season) {
     id: team.id,
     team_season_id: teamSeason.id,
     base_slug: team.slug,
-    season: season?.name || team.season,
+    season: seasonName,
+    public_season_name: seasonName,
     selected_season_id: season?.id || null,
   };
-}
-
-function mapSeasonPlayers(assignments = []) {
-  return assignments
-    .map((assignment) => ({
-      ...assignment.players,
-      shirt_number: assignment.shirt_number ?? assignment.players?.shirt_number,
-      position_de: assignment.position_de || assignment.players?.position_de,
-      position_en: assignment.position_en || assignment.players?.position_en,
-      is_captain: assignment.is_captain ?? assignment.players?.is_captain,
-      is_active: assignment.is_active ?? assignment.players?.is_active,
-      sort_order: assignment.sort_order ?? assignment.players?.sort_order,
-    }))
-    .filter((player) => player?.id && player.is_active !== false);
-}
-
-function mapSeasonCoaches(assignments = []) {
-  return assignments
-    .map((assignment) => ({
-      ...assignment.coaches,
-      role_de: assignment.role_de || assignment.coaches?.role_de,
-      role_en: assignment.role_en || assignment.coaches?.role_en,
-      is_active: assignment.is_active ?? assignment.coaches?.is_active,
-      sort_order: assignment.sort_order ?? assignment.coaches?.sort_order,
-    }))
-    .filter((coach) => coach?.id && coach.is_active !== false);
 }
 
 export default async function TeamPage({ params }) {
@@ -156,13 +140,16 @@ export default async function TeamPage({ params }) {
     );
   }
 
-  const { data: seasons } = await supabase
-    .from("seasons")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+  const [seasonResult, currentSeasonResolution] = await Promise.all([
+    supabase
+      .from("seasons")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true }),
+    loadCurrentSeasonResolution(supabase),
+  ]);
 
-  const seasonList = seasons || [];
+  const seasonList = seasonResult.data || [];
   const selectedSeason =
     seasonList.find((season) => season.is_current) || seasonList[0] || null;
 
@@ -187,46 +174,39 @@ export default async function TeamPage({ params }) {
   let coaches = [];
   let players = [];
 
-  if (teamSeason?.id) {
-    const { data: coachAssignments } = await supabase
-      .from("coach_team_seasons")
-      .select("*, coaches(*)")
-      .eq("team_season_id", teamSeason.id)
+  if (currentSeasonResolution.activeSeasonId && team?.id) {
+    const { data: currentCoachTeamSeason } = await supabase
+      .from("team_seasons")
+      .select("id")
+      .eq("team_id", team.id)
+      .eq("season_id", currentSeasonResolution.activeSeasonId)
       .eq("is_active", true)
-      .order("sort_order", { ascending: true });
+      .maybeSingle();
 
+    if (currentCoachTeamSeason?.id) {
+      const { data: coachAssignments } = await supabase
+        .from("coach_team_seasons")
+        .select("coach_id")
+        .eq("team_season_id", currentCoachTeamSeason.id)
+        .eq("is_active", true);
+
+      const coachDtos = await loadPublicCoachDtosByIds(
+        supabase,
+        (coachAssignments || []).map((assignment) => assignment.coach_id),
+      );
+      coaches = mapCoachDtosForTeam(coachDtos, team.id);
+    }
+  }
+
+  if (teamSeason?.id) {
     const { data: playerAssignments } = await supabase
       .from("player_team_seasons")
-      .select("*, players(*)")
+      .select("id, player_id, shirt_number, position_de, position_en, is_captain, is_active, sort_order, players(id, first_name, last_name, image_url, photo_url, is_active, year_group, strong_foot)")
       .eq("team_season_id", teamSeason.id)
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
 
-    coaches = mapSeasonCoaches(coachAssignments || []);
-    players = mapSeasonPlayers(playerAssignments || []);
-  }
-
-  if (!coaches.length) {
-    const { data: fallbackCoaches } = await supabase
-      .from("coaches")
-      .select("*")
-      .eq("team_id", team?.id)
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true });
-
-    coaches = fallbackCoaches || [];
-  }
-
-  if (!players.length) {
-    const { data: fallbackPlayers } = await supabase
-      .from("players")
-      .select("*")
-      .eq("team_id", team?.id)
-      .eq("is_active", true)
-      .order("sort_order", { ascending: true })
-      .order("last_name", { ascending: true });
-
-    players = fallbackPlayers || [];
+    players = mapTeamRosterPlayers(playerAssignments || []);
   }
 
   return (

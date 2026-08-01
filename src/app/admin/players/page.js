@@ -4,6 +4,9 @@ import Can from "@/components/admin/auth/Can";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminPlayersList, PlayerStats } from "@/components/admin/players";
+import { sortPlayersByIdentity } from "@/components/admin/players/list/playerList.helpers";
+import { createPlayerReadDto } from "@/components/admin/persons/playerReadDto";
+import { getPlayerSeasonalReadModelsMap } from "@/components/admin/persons/playerSeasonalReadModelRepository";
 import PlayerNationalityList from "@/components/admin/players/stats/PlayerNationalityList";
 import { getPlayerStats } from "@/components/admin/players/stats/playerStats.helpers";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
@@ -11,11 +14,41 @@ import {
   canDeletePlayerOnServer,
   canEditPlayerOnServer,
   canViewPlayerOnServer,
-  getPlayerTeamIdsMap,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
 
 export const dynamic = "force-dynamic";
+
+function buildPlayerScopeMaps(readModels = new Map()) {
+  const teamIdsByPlayerId = new Map();
+  const teamById = new Map();
+
+  readModels.forEach((readModel, playerId) => {
+    const teamIds = [];
+
+    (readModel?.assignments || []).forEach((assignment) => {
+      if (!assignment?.teamId) return;
+
+      if (!teamById.has(assignment.teamId)) {
+        teamById.set(assignment.teamId, {
+          id: assignment.teamId,
+          name_de: assignment.teamNameDe || assignment.teamNameEn || "Keine Mannschaft",
+          slug: assignment.teamSlug || null,
+          age_group: assignment.ageGroup || null,
+          is_active: assignment.isActive !== false,
+        });
+      }
+
+      if (!teamIds.includes(assignment.teamId)) {
+        teamIds.push(assignment.teamId);
+      }
+    });
+
+    teamIdsByPlayerId.set(playerId, teamIds);
+  });
+
+  return { teamIdsByPlayerId, teamById };
+}
 
 export default async function AdminPlayersPage({ searchParams }) {
   const params = await searchParams;
@@ -34,48 +67,65 @@ export default async function AdminPlayersPage({ searchParams }) {
   const { data: players } = await supabaseServer
     .from("players")
     .select(
-      "id, first_name, last_name, shirt_number, position_de, photo_url, image_url, is_active, is_captain, year_group, strong_foot, description_de, nationality, gender, team_id, sort_order",
+      "id, first_name, last_name, photo_url, image_url, is_active, year_group, strong_foot, description_de, description_en, nationality, gender, birthdate, joined_at, created_at",
     )
-    .order("sort_order", { ascending: true })
-    .order("last_name", { ascending: true });
+    .order("last_name", { ascending: true })
+    .order("first_name", { ascending: true })
+    .order("id", { ascending: true });
 
   const playerListRaw = players || [];
   const playerIds = playerListRaw.map((player) => player.id).filter(Boolean);
-  const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(
+  const playerReadModels = await getPlayerSeasonalReadModelsMap(
     supabaseServer,
     playerIds,
   );
+  const { teamIdsByPlayerId, teamById } = buildPlayerScopeMaps(playerReadModels);
 
-  const playerList = playerListRaw
-    .filter((player) => {
+  const playerList = sortPlayersByIdentity(
+    playerListRaw
+      .filter((player) => {
       const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
       return canViewPlayerOnServer(scopeContext, playerTeamIds, teamById);
-    })
-    .map((player) => {
-      const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
-      const primaryTeam = teamById.get(playerTeamIds[0]) || null;
+      })
+      .map((player) => {
+        const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
+        const dto = createPlayerReadDto(
+          player,
+          playerReadModels.get(player.id) || {},
+        );
 
-      return {
-        ...player,
-        teams: primaryTeam
-          ? {
-              id: primaryTeam.id,
-              name_de: primaryTeam.name_de,
-              slug: primaryTeam.slug,
-            }
-          : null,
-        _canEditInScope: canEditPlayerOnServer(
-          scopeContext,
-          playerTeamIds,
-          teamById,
-        ),
-        _canDeleteInScope: canDeletePlayerOnServer(
-          scopeContext,
-          playerTeamIds,
-          teamById,
-        ),
-      };
-    });
+        return {
+          ...dto,
+          first_name: dto.firstName,
+          last_name: dto.lastName,
+          image_url: dto.imageUrl,
+          is_active: dto.isActive,
+          shirt_number: dto.shirtNumber,
+          position_de: dto.positionDe,
+          position_en: dto.positionEn,
+          is_captain: dto.isCaptain,
+          year_group: dto.yearGroup,
+          strong_foot: dto.strongFoot,
+          description_de: dto.descriptionDe,
+          description_en: dto.descriptionEn,
+          birthdate: dto.birthdate,
+          joined_at: dto.joinedAt,
+          created_at: dto.createdAt,
+          nationality: dto.nationality,
+          gender: dto.gender,
+          _canEditInScope: canEditPlayerOnServer(
+            scopeContext,
+            playerTeamIds,
+            teamById,
+          ),
+          _canDeleteInScope: canDeletePlayerOnServer(
+            scopeContext,
+            playerTeamIds,
+            teamById,
+          ),
+        };
+      }),
+  );
 
   const stats = getPlayerStats(playerList);
 

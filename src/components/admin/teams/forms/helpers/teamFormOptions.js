@@ -1,3 +1,5 @@
+import { buildTeamCoachSelectionState } from "@/components/admin/teams/teamCoachAssignments.core.mjs";
+
 export const TEAM_FORM_TABS = [
   { id: "season", label: "Saison" },
   { id: "base", label: "Mannschaft" },
@@ -12,7 +14,8 @@ export const TEAM_FORM_TABS = [
 ];
 
 export function getCurrentSeason(seasons = []) {
-  return seasons.find((season) => season.is_current) || seasons[0] || null;
+  const currentSeasons = (seasons || []).filter((season) => season.is_current);
+  return currentSeasons.length === 1 ? currentSeasons[0] : null;
 }
 
 export function findTeamSeason(teamSeasons = [], seasonId) {
@@ -39,4 +42,18 @@ export function getPersonName(person = {}) {
 export function belongsToTeam(item = {}, teamId) {
   if (!teamId) return true;
   return !item.team_id || item.team_id === teamId;
+}
+
+export function buildCoachTeamState({
+  coaches = [],
+  coachAssignments = [],
+  currentSeasonCoachAssignments = [],
+  teamSeasonId = null,
+}) {
+  return buildTeamCoachSelectionState({
+    coaches,
+    coachAssignments,
+    currentSeasonCoachAssignments,
+    teamSeasonId,
+  });
 }

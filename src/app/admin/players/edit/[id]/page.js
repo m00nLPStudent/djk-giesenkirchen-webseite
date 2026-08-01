@@ -6,9 +6,10 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import {
   canEditPlayerOnServer,
   getPlayerTeamIdsMap,
-  loadScopedActiveTeamsForPeople,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
+import { getPlayerSeasonalReadModel } from "@/components/admin/persons/playerSeasonalReadModelRepository";
+import { loadScopedPlayerTeamSeasonOptions } from "@/components/admin/players/services/playerTeamSeasonOptions.repository";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export default async function EditPlayerPage({ params }) {
 
   const { data: player } = await supabaseServer
     .from("players")
-    .select("*")
+    .select("id, first_name, last_name, image_url, photo_url, is_active, description_de, description_en, birthdate, joined_at, year_group, strong_foot, nationality, gender")
     .eq("id", id)
     .maybeSingle();
 
@@ -45,7 +46,11 @@ export default async function EditPlayerPage({ params }) {
     redirect("/admin/unauthorized?reason=missing-player-scope");
   }
 
-  const teams = await loadScopedActiveTeamsForPeople(
+  const playerSeasonalReadModel = await getPlayerSeasonalReadModel(
+    supabaseServer,
+    id,
+  );
+  const teamOptionsResult = await loadScopedPlayerTeamSeasonOptions(
     scopeContext,
     supabaseServer,
   );
@@ -53,7 +58,11 @@ export default async function EditPlayerPage({ params }) {
   return (
     <AdminLayout title="Spieler bearbeiten" subtitle="Spieler">
       <BackButton />
-      <AdminPlayersForm player={player} teams={teams || []} />
+      <AdminPlayersForm
+        player={player}
+        teamOptionsResult={teamOptionsResult}
+        playerSeasonalReadModel={playerSeasonalReadModel}
+      />
     </AdminLayout>
   );
 }

@@ -19,10 +19,18 @@ export default function AdminCoachesList({
 
   const filteredCoaches = statFilteredCoaches.filter((coach) => {
     const team = getEntityTeam(coach);
+    const searchValues = [
+      coach.displayName,
+      coach.primaryRoleLabel,
+      coach.roleLabels?.join(" "),
+      coach.email,
+      team.name,
+      coach.teamNames?.join(" "),
+    ];
 
     return (
       matchesActiveStatus(coach, filter) &&
-      matchesSearch([coach.name, coach.role, coach.email, team.name], search)
+      matchesSearch(searchValues, search)
     );
   });
 

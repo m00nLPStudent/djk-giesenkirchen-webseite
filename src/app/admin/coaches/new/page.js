@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
   canCreateCoachOnServer,
-  loadScopedActiveTeamsForPeople,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
+import { loadScopedCoachTeamSeasonOptions } from "@/components/admin/coaches/services/coachTeamSeasonOptions.repository";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +26,7 @@ export default async function NewCoachPage() {
     redirect("/admin/unauthorized?reason=missing-coach-scope");
   }
 
-  const teams = await loadScopedActiveTeamsForPeople(
+  const teamOptionsResult = await loadScopedCoachTeamSeasonOptions(
     scopeContext,
     permissionResult.supabaseServer,
   );
@@ -34,7 +34,7 @@ export default async function NewCoachPage() {
   return (
     <AdminLayout title="Neuer Trainer" subtitle="Trainer">
       <BackButton />
-      <AdminCoachesForm teams={teams || []} />
+      <AdminCoachesForm teamOptionsResult={teamOptionsResult} />
     </AdminLayout>
   );
 }

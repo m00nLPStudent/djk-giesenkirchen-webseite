@@ -1,4 +1,8 @@
+import { resolveSeasonDisplayName } from "@/lib/football/seasonDisplay";
+
 export default function TeamIntroCard({ team }) {
+  const seasonName = resolveSeasonDisplayName(team, "Keine Saison");
+
   return (
     <section className="min-w-0 rounded-[2rem] border border-white/10 bg-white/5 p-5 sm:p-6 md:p-8">
       <p className="text-xs font-bold uppercase tracking-[0.35em] text-red-400">
@@ -20,7 +24,7 @@ export default function TeamIntroCard({ team }) {
             Saison
           </p>
           <p className="mt-2 text-2xl font-black text-white">
-            {team?.season || "Keine Saison"}
+            {seasonName}
           </p>
         </div>
       </div>

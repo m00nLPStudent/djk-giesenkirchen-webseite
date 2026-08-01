@@ -1,21 +1,22 @@
 import ProfileDetailsCard from "@/components/website/profile/ProfileDetailsCard";
 
 const PLAYER_DETAIL_ORDER = [
-  "rückennummer",
+  "rueckennummer",
   "position",
   "mannschaft",
+  "mannschaften",
+  "saison",
+  "spielfuehrer",
   "geschlecht",
   "geburtsdatum",
   "geburtstag",
   "alter",
-  "starker fuß",
   "starker fuss",
   "im verein seit",
 ];
 
 const HIDDEN_PLAYER_DETAIL_LABELS = [
   "jahrgang",
-  "nationalität",
   "nationalitaet",
 ];
 

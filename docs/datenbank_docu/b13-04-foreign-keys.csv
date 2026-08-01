@@ -1,0 +1,29 @@
+source_schema,source_table,source_column,constraint_name,target_schema,target_table,target_column,on_update,on_delete,position_in_key
+public,admin_profiles,id,admin_profiles_id_fkey,auth,users,id,NO ACTION,CASCADE,1
+public,admin_role_permissions,permission_id,admin_role_permissions_permission_id_fkey,public,admin_permissions,id,NO ACTION,CASCADE,1
+public,admin_role_permissions,role_id,admin_role_permissions_role_id_fkey,public,admin_roles,id,NO ACTION,CASCADE,1
+public,admin_user_roles,role_id,admin_user_roles_role_id_fkey,public,admin_roles,id,NO ACTION,CASCADE,1
+public,admin_user_roles,user_id,admin_user_roles_user_id_fkey,auth,users,id,NO ACTION,CASCADE,1
+public,board_members,admin_profile_id,board_members_admin_profile_id_fkey,public,admin_profiles,id,NO ACTION,SET NULL,1
+public,board_members,role_id,board_members_role_id_fkey,public,board_roles,id,NO ACTION,SET NULL,1
+public,club_closure_periods,team_season_id,club_closure_periods_team_season_id_fkey,public,team_seasons,id,NO ACTION,CASCADE,1
+public,club_history_images,club_history_page_id,club_history_images_club_history_page_id_fkey,public,club_history_pages,id,NO ACTION,CASCADE,1
+public,club_history_milestones,club_history_page_id,club_history_milestones_club_history_page_id_fkey,public,club_history_pages,id,NO ACTION,CASCADE,1
+public,coach_team_seasons,coach_id,coach_team_seasons_coach_id_fkey,public,coaches,id,NO ACTION,CASCADE,1
+public,coach_team_seasons,team_season_id,coach_team_seasons_team_season_id_fkey,public,team_seasons,id,NO ACTION,CASCADE,1
+public,coaches,admin_profile_id,coaches_admin_profile_id_fkey,public,admin_profiles,id,NO ACTION,SET NULL,1
+public,coaches,team_id,coaches_team_id_fkey,public,teams,id,NO ACTION,SET NULL,1
+public,event_documents,event_id,event_documents_event_id_fkey,public,events,id,NO ACTION,CASCADE,1
+public,events,team_id,events_team_id_fkey,public,teams,id,NO ACTION,SET NULL,1
+public,membership_requests,desired_team_id,membership_requests_desired_team_id_fkey,public,teams,id,NO ACTION,SET NULL,1
+public,news,football_team_id,news_football_team_id_fkey,public,teams,id,NO ACTION,SET NULL,1
+public,news_documents,news_id,news_documents_news_id_fkey,public,news,id,NO ACTION,CASCADE,1
+public,player_team_seasons,player_id,player_team_seasons_player_id_fkey,public,players,id,NO ACTION,CASCADE,1
+public,player_team_seasons,team_season_id,player_team_seasons_team_season_id_fkey,public,team_seasons,id,NO ACTION,CASCADE,1
+public,players,team_id,players_team_id_fkey,public,teams,id,NO ACTION,SET NULL,1
+public,sponsors,category_id,sponsors_category_id_fkey,public,sponsor_categories,id,NO ACTION,SET NULL,1
+public,team_seasons,season_id,team_seasons_season_id_fkey,public,seasons,id,NO ACTION,CASCADE,1
+public,team_seasons,team_id,team_seasons_team_id_fkey,public,teams,id,NO ACTION,CASCADE,1
+public,team_training_exceptions,team_training_time_id,team_training_exceptions_team_training_time_id_fkey,public,team_training_times,id,NO ACTION,CASCADE,1
+public,team_training_times,team_season_id,team_training_times_team_season_id_fkey,public,team_seasons,id,NO ACTION,CASCADE,1
+public,teams,department_id,teams_department_id_fkey,public,departments,id,NO ACTION,CASCADE,1

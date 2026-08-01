@@ -1,55 +1,98 @@
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
-import { validateRequiredFields } from "@/components/admin/utils/validation";
 import { createSlug } from "@/lib/slug";
 import { normalizeGermanPhoneNumber } from "@/lib/phone";
+import { CURRENT_SEASON_STATUSES } from "@/components/admin/persons/seasonalReadModelCore.mjs";
 import { REQUIRED_COACH_FIELDS } from "./coachForm.config";
+import {
+  createCoachAssignmentDraft,
+  createCoachSubmissionPayload,
+  createInitialCoachFormState,
+  findLegacyTeamSeasonOption,
+  validateCoachFormState,
+} from "./coachForm.core.mjs";
 
-export function splitCoachName(name = "") {
-  const parts = String(name).trim().split(" ").filter(Boolean);
-
-  return {
-    firstName: parts[0] || "",
-    lastName: parts.slice(1).join(" ") || "",
-  };
-}
-
-export function createInitialCoachForm(coach) {
-  const fallbackName = splitCoachName(coach?.name);
-
-  return {
-    first_name: coach?.first_name || fallbackName.firstName,
-    last_name: coach?.last_name || fallbackName.lastName,
-    name: coach?.name || "",
-    slug: coach?.slug || "",
-    role: coach?.role || "Trainer",
-    email: coach?.email || "",
-    phone: coach?.phone || "",
-    whatsapp: coach?.whatsapp || "",
-    license: coach?.license || "Keine Lizenz",
-    team_id: coach?.team_id || "",
-    nationality: coach?.nationality || "",
-    image_url: coach?.image_url || COACH_PLACEHOLDER_IMAGE,
-    sort_order: coach?.sort_order || 0,
-    is_active: coach?.is_active ?? true,
-  };
+export function createInitialCoachForm(
+  coach,
+  coachSeasonalReadModel,
+  teamOptions = [],
+) {
+  return createInitialCoachFormState(
+    coach,
+    coachSeasonalReadModel,
+    teamOptions,
+    { placeholderImage: COACH_PLACEHOLDER_IMAGE },
+  );
 }
 
 export function validateCoachForm(form) {
-  return validateRequiredFields(form, REQUIRED_COACH_FIELDS);
+  return validateCoachFormState(form, REQUIRED_COACH_FIELDS);
 }
 
 export function createCoachPayload(form) {
-  const fullName = `${form.first_name} ${form.last_name}`.trim();
+  return createCoachSubmissionPayload(form, {
+    createSlug,
+    normalizeGermanPhoneNumber,
+    placeholderImage: COACH_PLACEHOLDER_IMAGE,
+  });
+}
 
-  return {
-    ...form,
-    name: fullName,
-    slug: form.slug || createSlug(fullName),
-    phone: normalizeGermanPhoneNumber(form.phone),
-    whatsapp: normalizeGermanPhoneNumber(form.whatsapp),
-    image_url: form.image_url || COACH_PLACEHOLDER_IMAGE,
-    team_id: form.team_id || null,
-    sort_order: Number(form.sort_order),
-    is_active: form.is_active,
-  };
+export function createCoachAssignment(role = "") {
+  return createCoachAssignmentDraft(role);
+}
+
+export function getCoachFormBlockingMessage(
+  teamOptionsResult,
+  coachSeasonalReadModel,
+  assignments = [],
+) {
+  const needsSeasonContext =
+    (assignments || []).length > 0 || coachSeasonalReadModel?.legacyFallbackUsed;
+
+  if (
+    needsSeasonContext &&
+    teamOptionsResult?.activeSeasonStatus === CURRENT_SEASON_STATUSES.MISSING
+  ) {
+    return "Es ist keine aktuelle Saison markiert. Aktive Trainerzuordnungen koennen derzeit nicht gespeichert werden.";
+  }
+
+  if (
+    needsSeasonContext &&
+    teamOptionsResult?.activeSeasonStatus === CURRENT_SEASON_STATUSES.AMBIGUOUS
+  ) {
+    return "Es sind mehrere aktuelle Saisons markiert. Aktive Trainerzuordnungen koennen derzeit nicht eindeutig gespeichert werden.";
+  }
+
+  return null;
+}
+
+export function getCoachFormWarningMessage(
+  teamOptionsResult,
+  coachSeasonalReadModel,
+  teamOptions = [],
+) {
+  if (coachSeasonalReadModel?.legacyFallbackUsed) {
+    const legacyOption = findLegacyTeamSeasonOption(
+      coachSeasonalReadModel,
+      teamOptions,
+    );
+
+    if (legacyOption) {
+      return "Die vorausgewaehlte Trainerzuordnung wurde temporaer aus coaches.team_id auf die aktuelle Team-Saison gemappt. Beim Speichern werden die relationalen Saisonzuordnungen kanonisch geschrieben.";
+    }
+
+    return "Dieses Trainerprofil nutzt noch Legacy-Snapshots ohne aktive Saisonzuordnung. Bitte pruefe die Zuordnungen vor dem Speichern.";
+  }
+
+  if (coachSeasonalReadModel?.legacyRoleFallbackUsed) {
+    return "Dieses Trainerprofil nutzt fuer teamlose oder historisierte Zustaende noch eine temporaere Masterrollen-Synchronisierung. Relationale Rollen bleiben fuehrend, sobald aktuelle Saisonzuordnungen vorhanden sind.";
+  }
+
+  if (
+    teamOptionsResult?.activeSeasonStatus === CURRENT_SEASON_STATUSES.RESOLVED &&
+    (teamOptionsResult?.teamOptions || []).length === 0
+  ) {
+    return "Innerhalb deines Scopes stehen in der aktuellen Saison keine aktiven Mannschaften fuer Trainerzuordnungen zur Verfuegung.";
+  }
+
+  return null;
 }

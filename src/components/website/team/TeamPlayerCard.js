@@ -1,11 +1,12 @@
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { resolvePlayerImageUrl } from "@/lib/people/imageUrl";
 
 export default function TeamPlayerCard({ player }) {
   const fullName =
     `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() ||
     "Unbekannter Spieler";
 
-  const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
+  const imageUrl = resolvePlayerImageUrl(player, PLAYER_PLACEHOLDER_IMAGE);
 
   return (
     <article className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">

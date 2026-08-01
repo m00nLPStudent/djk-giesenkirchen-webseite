@@ -1,0 +1,440 @@
+table_name,ordinal_position,column_name,data_type,udt_name,is_nullable,default_value,identity,generated,character_maximum_length,numeric_precision,numeric_scale
+admin_permissions,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+admin_permissions,2,key,text,text,NO,null,NO,NEVER,null,null,null
+admin_permissions,3,name,text,text,NO,null,NO,NEVER,null,null,null
+admin_permissions,4,description,text,text,YES,null,NO,NEVER,null,null,null
+admin_permissions,5,category,text,text,NO,'general'::text,NO,NEVER,null,null,null
+admin_permissions,6,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+admin_permissions,7,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+admin_profiles,1,id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+admin_profiles,2,full_name,text,text,NO,null,NO,NEVER,null,null,null
+admin_profiles,3,email,text,text,NO,null,NO,NEVER,null,null,null
+admin_profiles,4,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+admin_profiles,5,last_login_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+admin_profiles,6,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+admin_profiles,7,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+admin_role_permissions,1,role_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+admin_role_permissions,2,permission_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+admin_role_permissions,3,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+admin_roles,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+admin_roles,2,key,text,text,NO,null,NO,NEVER,null,null,null
+admin_roles,3,name,text,text,NO,null,NO,NEVER,null,null,null
+admin_roles,4,description,text,text,YES,null,NO,NEVER,null,null,null
+admin_roles,5,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+admin_roles,6,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+admin_roles,7,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+admin_roles,8,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+admin_user_roles,1,user_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+admin_user_roles,2,role_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+admin_user_roles,3,is_primary,boolean,bool,NO,false,NO,NEVER,null,null,null
+admin_user_roles,4,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+board_members,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+board_members,2,first_name,text,text,NO,null,NO,NEVER,null,null,null
+board_members,3,last_name,text,text,NO,null,NO,NEVER,null,null,null
+board_members,4,role_de,text,text,NO,null,NO,NEVER,null,null,null
+board_members,5,role_en,text,text,YES,null,NO,NEVER,null,null,null
+board_members,6,email,text,text,YES,null,NO,NEVER,null,null,null
+board_members,7,phone,text,text,YES,null,NO,NEVER,null,null,null
+board_members,8,image_url,text,text,YES,null,NO,NEVER,null,null,null
+board_members,9,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+board_members,10,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+board_members,11,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+board_members,12,role_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+board_members,13,admin_profile_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+board_roles,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+board_roles,2,name_de,text,text,NO,null,NO,NEVER,null,null,null
+board_roles,3,name_en,text,text,YES,null,NO,NEVER,null,null,null
+board_roles,4,slug,text,text,NO,null,NO,NEVER,null,null,null
+board_roles,5,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+board_roles,6,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+board_roles,7,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+club_closure_periods,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+club_closure_periods,2,title,text,text,NO,null,NO,NEVER,null,null,null
+club_closure_periods,3,reason,text,text,YES,null,NO,NEVER,null,null,null
+club_closure_periods,4,starts_on,date,date,NO,null,NO,NEVER,null,null,null
+club_closure_periods,5,ends_on,date,date,NO,null,NO,NEVER,null,null,null
+club_closure_periods,6,applies_to_all,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_closure_periods,7,team_season_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+club_closure_periods,8,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_closure_periods,9,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_closure_periods,10,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_contacts,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+club_contacts,2,category,text,text,NO,'allgemein'::text,NO,NEVER,null,null,null
+club_contacts,3,role_key,text,text,NO,null,NO,NEVER,null,null,null
+club_contacts,4,role_de,text,text,NO,null,NO,NEVER,null,null,null
+club_contacts,5,role_en,text,text,YES,null,NO,NEVER,null,null,null
+club_contacts,6,contact_name,text,text,NO,null,NO,NEVER,null,null,null
+club_contacts,7,email,text,text,YES,null,NO,NEVER,null,null,null
+club_contacts,8,phone,text,text,YES,null,NO,NEVER,null,null,null
+club_contacts,9,image_url,text,text,YES,null,NO,NEVER,null,null,null
+club_contacts,10,is_public,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_contacts,11,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_contacts,12,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+club_contacts,13,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_contacts,14,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_history_images,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+club_history_images,2,club_history_page_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+club_history_images,3,image_url,text,text,NO,null,NO,NEVER,null,null,null
+club_history_images,4,image_path,text,text,YES,null,NO,NEVER,null,null,null
+club_history_images,5,alt_text_de,text,text,YES,null,NO,NEVER,null,null,null
+club_history_images,6,caption_de,text,text,YES,null,NO,NEVER,null,null,null
+club_history_images,7,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+club_history_images,8,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_history_images,9,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_history_images,10,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_history_images,11,alt_text_en,text,text,YES,null,NO,NEVER,null,null,null
+club_history_images,12,caption_en,text,text,YES,null,NO,NEVER,null,null,null
+club_history_milestones,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+club_history_milestones,2,club_history_page_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+club_history_milestones,3,milestone_year,integer,int4,NO,null,NO,NEVER,null,32,0
+club_history_milestones,4,title_de,text,text,YES,null,NO,NEVER,null,null,null
+club_history_milestones,5,description_de,text,text,NO,null,NO,NEVER,null,null,null
+club_history_milestones,6,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+club_history_milestones,7,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_history_milestones,8,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_history_milestones,9,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_history_milestones,10,title_en,text,text,YES,null,NO,NEVER,null,null,null
+club_history_milestones,11,description_en,text,text,YES,null,NO,NEVER,null,null,null
+club_history_milestones,12,milestone_year_to,integer,int4,YES,null,NO,NEVER,null,32,0
+club_history_milestones,13,milestone_year_until,integer,int4,YES,null,NO,NEVER,null,32,0
+club_history_pages,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+club_history_pages,2,page_key,text,text,NO,'fussball-vereinsgeschichte'::text,NO,NEVER,null,null,null
+club_history_pages,3,title_de,text,text,NO,null,NO,NEVER,null,null,null
+club_history_pages,4,teaser_de,text,text,YES,null,NO,NEVER,null,null,null
+club_history_pages,5,content_de,text,text,NO,null,NO,NEVER,null,null,null
+club_history_pages,6,is_published,boolean,bool,NO,false,NO,NEVER,null,null,null
+club_history_pages,7,published_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+club_history_pages,8,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+club_history_pages,9,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_history_pages,10,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_history_pages,11,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_history_pages,12,title_en,text,text,YES,null,NO,NEVER,null,null,null
+club_history_pages,13,teaser_en,text,text,YES,null,NO,NEVER,null,null,null
+club_history_pages,14,content_en,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+club_settings,2,singleton,boolean,bool,NO,true,NO,NEVER,null,null,null
+club_settings,3,club_name,text,text,NO,null,NO,NEVER,null,null,null
+club_settings,4,short_name,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,5,street,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,6,house_number,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,7,postal_code,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,8,city,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,9,phone,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,10,email,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,11,website_url,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,12,club_colors,jsonb,jsonb,NO,'[]'::jsonb,NO,NEVER,null,null,null
+club_settings,13,registry_info,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,14,copyright_text,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,15,google_maps_url,text,text,YES,null,NO,NEVER,null,null,null
+club_settings,16,social_links,jsonb,jsonb,NO,'{}'::jsonb,NO,NEVER,null,null,null
+club_settings,17,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+club_settings,18,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+coach_team_seasons,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+coach_team_seasons,2,coach_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+coach_team_seasons,3,team_season_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+coach_team_seasons,4,role_de,text,text,YES,'Trainer'::text,NO,NEVER,null,null,null
+coach_team_seasons,5,role_en,text,text,YES,'Coach'::text,NO,NEVER,null,null,null
+coach_team_seasons,6,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+coach_team_seasons,7,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+coach_team_seasons,8,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+coaches,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+coaches,2,team_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+coaches,3,name,text,text,NO,null,NO,NEVER,null,null,null
+coaches,4,role_de,text,text,YES,'Trainer'::text,NO,NEVER,null,null,null
+coaches,5,role_en,text,text,YES,'Coach'::text,NO,NEVER,null,null,null
+coaches,6,email,text,text,YES,null,NO,NEVER,null,null,null
+coaches,7,phone,text,text,YES,null,NO,NEVER,null,null,null
+coaches,8,image_url,text,text,YES,null,NO,NEVER,null,null,null
+coaches,9,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+coaches,10,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+coaches,11,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+coaches,12,team_slug,text,text,YES,null,NO,NEVER,null,null,null
+coaches,13,photo_url,text,text,YES,null,NO,NEVER,null,null,null
+coaches,14,license,text,text,YES,null,NO,NEVER,null,null,null
+coaches,15,slug,text,text,YES,null,NO,NEVER,null,null,null
+coaches,16,role,text,text,YES,null,NO,NEVER,null,null,null
+coaches,17,team_name,text,text,YES,null,NO,NEVER,null,null,null
+coaches,18,whatsapp,text,text,YES,null,NO,NEVER,null,null,null
+coaches,19,nationality,text,text,YES,null,NO,NEVER,null,null,null
+coaches,20,first_name,text,text,YES,null,NO,NEVER,null,null,null
+coaches,21,last_name,text,text,YES,null,NO,NEVER,null,null,null
+coaches,22,admin_profile_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+departments,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+departments,2,name_de,text,text,NO,null,NO,NEVER,null,null,null
+departments,3,name_en,text,text,YES,null,NO,NEVER,null,null,null
+departments,4,slug,text,text,NO,null,NO,NEVER,null,null,null
+departments,5,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+departments,6,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+departments,7,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+event_documents,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+event_documents,2,event_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+event_documents,3,display_name_de,text,text,NO,null,NO,NEVER,null,null,null
+event_documents,4,display_name_en,text,text,YES,null,NO,NEVER,null,null,null
+event_documents,5,description_de,text,text,YES,null,NO,NEVER,null,null,null
+event_documents,6,description_en,text,text,YES,null,NO,NEVER,null,null,null
+event_documents,7,file_name,text,text,NO,null,NO,NEVER,null,null,null
+event_documents,8,file_path,text,text,NO,null,NO,NEVER,null,null,null
+event_documents,9,file_url,text,text,NO,null,NO,NEVER,null,null,null
+event_documents,10,mime_type,text,text,YES,null,NO,NEVER,null,null,null
+event_documents,11,file_size,bigint,int8,YES,null,NO,NEVER,null,64,0
+event_documents,12,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+event_documents,13,is_public,boolean,bool,YES,true,NO,NEVER,null,null,null
+event_documents,14,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+event_documents,15,updated_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+events,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+events,2,title_de,text,text,NO,null,NO,NEVER,null,null,null
+events,3,title_en,text,text,YES,null,NO,NEVER,null,null,null
+events,4,teaser_de,text,text,YES,null,NO,NEVER,null,null,null
+events,5,teaser_en,text,text,YES,null,NO,NEVER,null,null,null
+events,6,description_de,text,text,YES,null,NO,NEVER,null,null,null
+events,7,description_en,text,text,YES,null,NO,NEVER,null,null,null
+events,8,event_type,text,text,NO,'vereinstermin'::text,NO,NEVER,null,null,null
+events,9,is_all_day,boolean,bool,NO,false,NO,NEVER,null,null,null
+events,10,starts_at,timestamp with time zone,timestamptz,NO,null,NO,NEVER,null,null,null
+events,11,ends_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+events,12,location_name,text,text,YES,null,NO,NEVER,null,null,null
+events,13,location_address,text,text,YES,null,NO,NEVER,null,null,null
+events,14,location_city,text,text,YES,null,NO,NEVER,null,null,null
+events,15,team_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+events,16,external_url,text,text,YES,null,NO,NEVER,null,null,null
+events,17,image_url,text,text,YES,null,NO,NEVER,null,null,null
+events,18,is_published,boolean,bool,NO,false,NO,NEVER,null,null,null
+events,19,is_featured,boolean,bool,NO,false,NO,NEVER,null,null,null
+events,20,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+events,21,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+events,22,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+events,23,slug,text,text,NO,null,NO,NEVER,null,null,null
+events,24,recurrence_type,text,text,NO,'none'::text,NO,NEVER,null,null,null
+events,25,recurrence_interval,integer,int4,YES,1,NO,NEVER,null,32,0
+events,26,recurrence_until,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+events,27,recurrence_count,integer,int4,YES,null,NO,NEVER,null,32,0
+membership_request_recipients,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+membership_request_recipients,2,email,text,text,NO,null,NO,NEVER,null,null,null
+membership_request_recipients,3,label,text,text,YES,null,NO,NEVER,null,null,null
+membership_request_recipients,4,request_type,text,text,YES,null,NO,NEVER,null,null,null
+membership_request_recipients,5,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+membership_request_recipients,6,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+membership_request_recipients,7,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+membership_request_recipients,8,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+membership_requests,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+membership_requests,2,first_name,text,text,NO,null,NO,NEVER,null,null,null
+membership_requests,3,last_name,text,text,NO,null,NO,NEVER,null,null,null
+membership_requests,4,phone,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,5,birthdate,date,date,YES,null,NO,NEVER,null,null,null
+membership_requests,6,email,text,text,NO,null,NO,NEVER,null,null,null
+membership_requests,7,request_type,text,text,NO,null,NO,NEVER,null,null,null
+membership_requests,8,year_group,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,9,desired_team_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+membership_requests,10,message,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,11,status,text,text,NO,'new'::text,NO,NEVER,null,null,null
+membership_requests,12,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+membership_requests,13,processed_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+membership_requests,14,processed_by,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,15,mail_sent_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+membership_requests,16,internal_note,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,17,forwarded_to_type,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,18,forwarded_to_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+membership_requests,19,forwarded_to_name,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,20,forwarded_to_email,text,text,YES,null,NO,NEVER,null,null,null
+membership_requests,21,forwarded_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+membership_requests,22,forwarded_note,text,text,YES,null,NO,NEVER,null,null,null
+news,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+news,2,title_de,text,text,NO,null,NO,NEVER,null,null,null
+news,3,title_en,text,text,YES,null,NO,NEVER,null,null,null
+news,4,slug,text,text,NO,null,NO,NEVER,null,null,null
+news,5,teaser_de,text,text,YES,null,NO,NEVER,null,null,null
+news,6,teaser_en,text,text,YES,null,NO,NEVER,null,null,null
+news,7,content_de,text,text,YES,null,NO,NEVER,null,null,null
+news,8,content_en,text,text,YES,null,NO,NEVER,null,null,null
+news,9,image_url,text,text,YES,null,NO,NEVER,null,null,null
+news,10,is_published,boolean,bool,YES,false,NO,NEVER,null,null,null
+news,11,published_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+news,12,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+news,13,author,text,text,YES,'DJK/VfL Giesenkirchen'::text,NO,NEVER,null,null,null
+news,14,category,text,text,YES,'Verein'::text,NO,NEVER,null,null,null
+news,15,scheduled_at,timestamp with time zone,timestamptz,YES,null,NO,NEVER,null,null,null
+news,16,category_key,text,text,YES,'verein'::text,NO,NEVER,null,null,null
+news,17,football_team_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+news_documents,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+news_documents,2,news_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+news_documents,3,display_name_de,text,text,NO,null,NO,NEVER,null,null,null
+news_documents,4,display_name_en,text,text,YES,null,NO,NEVER,null,null,null
+news_documents,5,description_de,text,text,YES,null,NO,NEVER,null,null,null
+news_documents,6,description_en,text,text,YES,null,NO,NEVER,null,null,null
+news_documents,7,file_name,text,text,NO,null,NO,NEVER,null,null,null
+news_documents,8,file_path,text,text,NO,null,NO,NEVER,null,null,null
+news_documents,9,file_url,text,text,NO,null,NO,NEVER,null,null,null
+news_documents,10,mime_type,text,text,YES,null,NO,NEVER,null,null,null
+news_documents,11,file_size,bigint,int8,YES,null,NO,NEVER,null,64,0
+news_documents,12,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+news_documents,13,is_public,boolean,bool,YES,true,NO,NEVER,null,null,null
+news_documents,14,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+news_documents,15,updated_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+pages,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+pages,2,slug,text,text,NO,null,NO,NEVER,null,null,null
+pages,3,title_de,text,text,NO,null,NO,NEVER,null,null,null
+pages,4,title_en,text,text,YES,null,NO,NEVER,null,null,null
+pages,5,content_de,text,text,YES,null,NO,NEVER,null,null,null
+pages,6,content_en,text,text,YES,null,NO,NEVER,null,null,null
+pages,7,is_published,boolean,bool,NO,false,NO,NEVER,null,null,null
+pages,8,show_in_footer,boolean,bool,NO,false,NO,NEVER,null,null,null
+pages,9,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+pages,10,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+pages,11,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+player_team_seasons,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+player_team_seasons,2,player_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+player_team_seasons,3,team_season_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+player_team_seasons,4,shirt_number,integer,int4,YES,null,NO,NEVER,null,32,0
+player_team_seasons,5,position_de,text,text,YES,null,NO,NEVER,null,null,null
+player_team_seasons,6,position_en,text,text,YES,null,NO,NEVER,null,null,null
+player_team_seasons,7,is_captain,boolean,bool,YES,false,NO,NEVER,null,null,null
+player_team_seasons,8,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+player_team_seasons,9,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+player_team_seasons,10,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+players,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+players,2,team_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+players,3,first_name,text,text,NO,null,NO,NEVER,null,null,null
+players,4,last_name,text,text,YES,null,NO,NEVER,null,null,null
+players,5,shirt_number,integer,int4,YES,null,NO,NEVER,null,32,0
+players,6,position_de,text,text,YES,null,NO,NEVER,null,null,null
+players,7,position_en,text,text,YES,null,NO,NEVER,null,null,null
+players,8,image_url,text,text,YES,null,NO,NEVER,null,null,null
+players,9,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+players,10,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+players,11,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+players,12,photo_url,text,text,YES,null,NO,NEVER,null,null,null
+players,13,description_de,text,text,YES,null,NO,NEVER,null,null,null
+players,14,description_en,text,text,YES,null,NO,NEVER,null,null,null
+players,15,birthdate,date,date,YES,null,NO,NEVER,null,null,null
+players,16,year_group,text,text,YES,null,NO,NEVER,null,null,null
+players,17,strong_foot,text,text,YES,null,NO,NEVER,null,null,null
+players,18,nationality,text,text,YES,null,NO,NEVER,null,null,null
+players,19,is_captain,boolean,bool,YES,false,NO,NEVER,null,null,null
+players,20,jersey_number,integer,int4,YES,null,NO,NEVER,null,32,0
+players,21,position,text,text,YES,null,NO,NEVER,null,null,null
+players,22,name_de,text,text,YES,null,NO,NEVER,null,null,null
+players,23,name_en,text,text,YES,null,NO,NEVER,null,null,null
+players,24,gender,text,text,YES,null,NO,NEVER,null,null,null
+players,25,joined_at,date,date,YES,null,NO,NEVER,null,null,null
+seasons,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+seasons,2,name,text,text,NO,null,NO,NEVER,null,null,null
+seasons,3,slug,text,text,NO,null,NO,NEVER,null,null,null
+seasons,4,is_current,boolean,bool,YES,false,NO,NEVER,null,null,null
+seasons,5,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+seasons,6,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+seasons,7,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+sponsor_categories,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+sponsor_categories,2,name_de,text,text,NO,null,NO,NEVER,null,null,null
+sponsor_categories,3,name_en,text,text,YES,null,NO,NEVER,null,null,null
+sponsor_categories,4,slug,text,text,NO,null,NO,NEVER,null,null,null
+sponsor_categories,5,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+sponsor_categories,6,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+sponsor_categories,7,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+sponsors,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+sponsors,2,category_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+sponsors,3,name,text,text,NO,null,NO,NEVER,null,null,null
+sponsors,4,description_de,text,text,YES,null,NO,NEVER,null,null,null
+sponsors,5,description_en,text,text,YES,null,NO,NEVER,null,null,null
+sponsors,6,image_url,text,text,YES,null,NO,NEVER,null,null,null
+sponsors,7,website_url,text,text,YES,null,NO,NEVER,null,null,null
+sponsors,8,facebook_url,text,text,YES,null,NO,NEVER,null,null,null
+sponsors,9,instagram_url,text,text,YES,null,NO,NEVER,null,null,null
+sponsors,10,tiktok_url,text,text,YES,null,NO,NEVER,null,null,null
+sponsors,11,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+sponsors,12,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+sponsors,13,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+team_seasons,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+team_seasons,2,team_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+team_seasons,3,season_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+team_seasons,4,name_de,text,text,NO,null,NO,NEVER,null,null,null
+team_seasons,5,name_en,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,6,slug,text,text,NO,null,NO,NEVER,null,null,null
+team_seasons,7,age_group,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,8,description_de,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,9,description_en,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,10,training_times_de,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,11,training_times_en,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,12,team_image_url,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,13,contact_name,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,14,contact_email,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,15,contact_phone,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,16,contact_image_url,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,17,fussball_de_matches_widget_id,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,18,fussball_de_table_widget_id,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,19,fussball_de_team_url,text,text,YES,null,NO,NEVER,null,null,null
+team_seasons,20,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+team_seasons,21,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+team_seasons,22,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+team_templates,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+team_templates,2,name_de,text,text,NO,null,NO,NEVER,null,null,null
+team_templates,3,slug,text,text,NO,null,NO,NEVER,null,null,null
+team_templates,4,age_group,text,text,NO,null,NO,NEVER,null,null,null
+team_templates,5,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+team_templates,6,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+team_templates,7,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+team_training_exceptions,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+team_training_exceptions,2,team_training_time_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+team_training_exceptions,3,exception_date,date,date,NO,null,NO,NEVER,null,null,null
+team_training_exceptions,4,exception_type,text,text,NO,null,NO,NEVER,null,null,null
+team_training_exceptions,5,override_start_time,time without time zone,time,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,6,override_end_time,time without time zone,time,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,7,override_training_type,text,text,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,8,override_location_name,text,text,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,9,override_location_address,text,text,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,10,override_location_city,text,text,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,11,override_location_note,text,text,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,12,note,text,text,YES,null,NO,NEVER,null,null,null
+team_training_exceptions,13,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+team_training_exceptions,14,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+team_training_exceptions,15,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+team_training_times,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+team_training_times,2,team_season_id,uuid,uuid,NO,null,NO,NEVER,null,null,null
+team_training_times,3,weekday,smallint,int2,NO,null,NO,NEVER,null,16,0
+team_training_times,4,start_time,time without time zone,time,NO,null,NO,NEVER,null,null,null
+team_training_times,5,end_time,time without time zone,time,NO,null,NO,NEVER,null,null,null
+team_training_times,6,training_type,text,text,NO,'training'::text,NO,NEVER,null,null,null
+team_training_times,7,location_name,text,text,YES,null,NO,NEVER,null,null,null
+team_training_times,8,location_address,text,text,YES,null,NO,NEVER,null,null,null
+team_training_times,9,location_city,text,text,YES,null,NO,NEVER,null,null,null
+team_training_times,10,location_note,text,text,YES,null,NO,NEVER,null,null,null
+team_training_times,11,effective_from,date,date,YES,null,NO,NEVER,null,null,null
+team_training_times,12,effective_until,date,date,YES,null,NO,NEVER,null,null,null
+team_training_times,13,is_active,boolean,bool,NO,true,NO,NEVER,null,null,null
+team_training_times,14,sort_order,integer,int4,NO,0,NO,NEVER,null,32,0
+team_training_times,15,note,text,text,YES,null,NO,NEVER,null,null,null
+team_training_times,16,created_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+team_training_times,17,updated_at,timestamp with time zone,timestamptz,NO,now(),NO,NEVER,null,null,null
+teams,1,id,uuid,uuid,NO,gen_random_uuid(),NO,NEVER,null,null,null
+teams,2,department_id,uuid,uuid,YES,null,NO,NEVER,null,null,null
+teams,3,name_de,text,text,NO,null,NO,NEVER,null,null,null
+teams,4,name_en,text,text,YES,null,NO,NEVER,null,null,null
+teams,5,slug,text,text,NO,null,NO,NEVER,null,null,null
+teams,6,age_group,text,text,YES,null,NO,NEVER,null,null,null
+teams,7,season,text,text,YES,'2026/2027'::text,NO,NEVER,null,null,null
+teams,8,is_active,boolean,bool,YES,true,NO,NEVER,null,null,null
+teams,9,sort_order,integer,int4,YES,0,NO,NEVER,null,32,0
+teams,10,created_at,timestamp with time zone,timestamptz,YES,now(),NO,NEVER,null,null,null
+teams,11,description_de,text,text,YES,null,NO,NEVER,null,null,null
+teams,12,description_en,text,text,YES,null,NO,NEVER,null,null,null
+teams,13,training_times_de,text,text,YES,null,NO,NEVER,null,null,null
+teams,14,training_times_en,text,text,YES,null,NO,NEVER,null,null,null
+teams,15,team_image_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,16,contact_name,text,text,YES,null,NO,NEVER,null,null,null
+teams,17,contact_email,text,text,YES,null,NO,NEVER,null,null,null
+teams,18,contact_phone,text,text,YES,null,NO,NEVER,null,null,null
+teams,19,contact_image_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,20,fussball_de_matches_widget_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,21,fussball_de_matches_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,22,dfb_matches_widget_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,23,fussball_de_table_widget_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,24,fussball_de_table_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,25,dfb_table_widget_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,26,fussball_de_team_id,text,text,YES,null,NO,NEVER,null,null,null
+teams,27,fussball_de_competition_id,text,text,YES,null,NO,NEVER,null,null,null
+teams,28,fussball_de_club_id,text,text,YES,null,NO,NEVER,null,null,null
+teams,29,fussball_de_team_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,30,fupa_matches_widget_id,text,text,YES,null,NO,NEVER,null,null,null
+teams,31,fupa_table_widget_id,text,text,YES,null,NO,NEVER,null,null,null
+teams,32,fupa_club_url,text,text,YES,null,NO,NEVER,null,null,null
+teams,34,fussball_de_matches_widget_id,text,text,YES,null,NO,NEVER,null,null,null
+teams,35,fussball_de_table_widget_id,text,text,YES,null,NO,NEVER,null,null,null

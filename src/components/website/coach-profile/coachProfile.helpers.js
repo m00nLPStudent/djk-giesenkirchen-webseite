@@ -18,11 +18,20 @@ export function getCountry(value) {
 }
 
 export function getCoachFullName(coach) {
+  if (coach?.displayName) return coach.displayName;
   const fullName = `${coach?.first_name ?? ""} ${coach?.last_name ?? ""}`.trim();
   return fullName || coach?.name || "Trainer";
 }
 
 export function getTeam(coach) {
+  if (coach?.primaryAssignment) {
+    return {
+      id: coach.primaryAssignment.teamId,
+      name_de:
+        coach.primaryAssignment.teamNameDe || coach.primaryAssignment.teamNameEn,
+      slug: coach.primaryAssignment.teamSlug || null,
+    };
+  }
   if (Array.isArray(coach?.teams)) return coach.teams[0] || null;
   return coach?.teams || null;
 }

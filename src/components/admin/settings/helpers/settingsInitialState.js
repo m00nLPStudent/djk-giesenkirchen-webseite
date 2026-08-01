@@ -1,4 +1,4 @@
-import { ROLE_TEMPLATES } from "./settingsOptions";
+import { ROLE_TEMPLATES } from "./settingsOptions.js";
 
 function parseJsonObject(source, fallback = {}) {
   if (!source) return fallback;
@@ -36,9 +36,7 @@ export function createClubSettingsForm(settings) {
 }
 
 function findRoleTemplateValue(roleDe = "") {
-  const normalized = String(roleDe || "")
-    .trim()
-    .toLowerCase();
+  const normalized = String(roleDe || "").trim().toLowerCase();
   if (!normalized) return "jugendschutzbeauftragter";
 
   const found = ROLE_TEMPLATES.find(
@@ -111,15 +109,22 @@ function getPersonDisplayName(person = {}) {
 
 function getCoachOptionLabel(coach) {
   const name = getPersonDisplayName(coach);
-  const role = coach?.role_de || coach?.role || "Trainer";
-  const team = coach?.teams?.name_de || "Ohne Mannschaft";
-  return `${name} · ${role} · ${team}`;
+  const role =
+    coach?.roleLabels?.join(", ") ||
+    coach?.primaryRoleLabel ||
+    coach?.role_de ||
+    coach?.role ||
+    coach?.role_en ||
+    "Trainer";
+  const team =
+    coach?.teams?.name_de || coach?.primaryTeamName || "Ohne Mannschaft";
+  return `${name} - ${role} - ${team}`;
 }
 
 function getBoardOptionLabel(member) {
   const name = getPersonDisplayName(member);
   const role = member?.role_de || "Vorstand";
-  return `${name} · ${role}`;
+  return `${name} - ${role}`;
 }
 
 export function getForwardTargets(type, coaches = [], boardMembers = []) {

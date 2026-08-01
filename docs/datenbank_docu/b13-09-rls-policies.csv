@@ -1,0 +1,140 @@
+schemaname,tablename,policyname,permissive,roles,command,using_expression,with_check_expression
+public,admin_permissions,admin_permissions_select_authenticated,PERMISSIVE,{authenticated},SELECT,true,null
+public,admin_profiles,admin_profiles_delete_superadmin,PERMISSIVE,{authenticated},DELETE,is_superadmin_actor(),null
+public,admin_profiles,admin_profiles_insert_superadmin,PERMISSIVE,{authenticated},INSERT,null,"(EXISTS ( SELECT 1
+   FROM (admin_user_roles aur
+     JOIN admin_roles ar ON ((ar.id = aur.role_id)))
+  WHERE ((aur.user_id = auth.uid()) AND (ar.key = 'superadmin'::text))))"
+public,admin_profiles,admin_profiles_select_authenticated,PERMISSIVE,{authenticated},SELECT,true,null
+public,admin_profiles,admin_profiles_update_own_authenticated,PERMISSIVE,{authenticated},UPDATE,(id = auth.uid()),(id = auth.uid())
+public,admin_profiles,admin_profiles_update_superadmin,PERMISSIVE,{authenticated},UPDATE,"(EXISTS ( SELECT 1
+   FROM (admin_user_roles aur
+     JOIN admin_roles ar ON ((ar.id = aur.role_id)))
+  WHERE ((aur.user_id = auth.uid()) AND (ar.key = 'superadmin'::text))))","(EXISTS ( SELECT 1
+   FROM (admin_user_roles aur
+     JOIN admin_roles ar ON ((ar.id = aur.role_id)))
+  WHERE ((aur.user_id = auth.uid()) AND (ar.key = 'superadmin'::text))))"
+public,admin_role_permissions,admin_role_permissions_select_authenticated,PERMISSIVE,{authenticated},SELECT,true,null
+public,admin_roles,admin_roles_select_authenticated,PERMISSIVE,{authenticated},SELECT,true,null
+public,admin_user_roles,admin_user_roles_delete_superadmin,PERMISSIVE,{authenticated},DELETE,"(EXISTS ( SELECT 1
+   FROM (admin_user_roles aur
+     JOIN admin_roles ar ON ((ar.id = aur.role_id)))
+  WHERE ((aur.user_id = auth.uid()) AND (ar.key = 'superadmin'::text))))",null
+public,admin_user_roles,admin_user_roles_insert_superadmin,PERMISSIVE,{authenticated},INSERT,null,"(EXISTS ( SELECT 1
+   FROM (admin_user_roles aur
+     JOIN admin_roles ar ON ((ar.id = aur.role_id)))
+  WHERE ((aur.user_id = auth.uid()) AND (ar.key = 'superadmin'::text))))"
+public,admin_user_roles,admin_user_roles_select_authenticated,PERMISSIVE,{authenticated},SELECT,true,null
+public,admin_user_roles,admin_user_roles_update_superadmin,PERMISSIVE,{authenticated},UPDATE,"(EXISTS ( SELECT 1
+   FROM (admin_user_roles aur
+     JOIN admin_roles ar ON ((ar.id = aur.role_id)))
+  WHERE ((aur.user_id = auth.uid()) AND (ar.key = 'superadmin'::text))))","(EXISTS ( SELECT 1
+   FROM (admin_user_roles aur
+     JOIN admin_roles ar ON ((ar.id = aur.role_id)))
+  WHERE ((aur.user_id = auth.uid()) AND (ar.key = 'superadmin'::text))))"
+public,board_members,board_members_delete_all,PERMISSIVE,{public},DELETE,true,null
+public,board_members,board_members_insert_all,PERMISSIVE,{public},INSERT,null,true
+public,board_members,board_members_select_all,PERMISSIVE,{public},SELECT,true,null
+public,board_members,board_members_update_all,PERMISSIVE,{public},UPDATE,true,true
+public,board_roles,board_roles_select_all,PERMISSIVE,{public},SELECT,true,null
+public,club_closure_periods,club_closure_periods_admin_delete,PERMISSIVE,{authenticated},DELETE,"(COALESCE(((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text), ''::text) = 'admin'::text)",null
+public,club_closure_periods,club_closure_periods_admin_insert,PERMISSIVE,{authenticated},INSERT,null,"(COALESCE(((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text), ''::text) = 'admin'::text)"
+public,club_closure_periods,club_closure_periods_admin_update,PERMISSIVE,{authenticated},UPDATE,"(COALESCE(((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text), ''::text) = 'admin'::text)","(COALESCE(((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text), ''::text) = 'admin'::text)"
+public,club_closure_periods,club_closure_periods_public_read,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,club_contacts,club_contacts_delete_admin,PERMISSIVE,{public},DELETE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),null
+public,club_contacts,club_contacts_insert_admin,PERMISSIVE,{public},INSERT,null,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text))
+public,club_contacts,club_contacts_read_public_active,PERMISSIVE,{public},SELECT,((is_public = true) AND (is_active = true)),null
+public,club_contacts,club_contacts_update_admin,PERMISSIVE,{public},UPDATE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text))
+public,club_history_images,club_history_images_dev_write,PERMISSIVE,"{anon,authenticated}",ALL,true,true
+public,club_history_images,club_history_images_public_read,PERMISSIVE,"{anon,authenticated}",SELECT,"((is_active = true) AND (EXISTS ( SELECT 1
+   FROM club_history_pages p
+  WHERE ((p.id = club_history_images.club_history_page_id) AND (p.is_active = true) AND (p.is_published = true) AND ((p.published_at IS NULL) OR (p.published_at <= now()))))))",null
+public,club_history_milestones,club_history_milestones_dev_write,PERMISSIVE,"{anon,authenticated}",ALL,true,true
+public,club_history_milestones,club_history_milestones_public_read,PERMISSIVE,"{anon,authenticated}",SELECT,"((is_active = true) AND (EXISTS ( SELECT 1
+   FROM club_history_pages p
+  WHERE ((p.id = club_history_milestones.club_history_page_id) AND (p.is_active = true) AND (p.is_published = true) AND ((p.published_at IS NULL) OR (p.published_at <= now()))))))",null
+public,club_history_pages,club_history_pages_dev_write,PERMISSIVE,"{anon,authenticated}",ALL,true,true
+public,club_history_pages,club_history_pages_public_read,PERMISSIVE,"{anon,authenticated}",SELECT,((is_active = true) AND (is_published = true) AND ((published_at IS NULL) OR (published_at <= now()))),null
+public,club_settings,club_settings_delete_admin,PERMISSIVE,{public},DELETE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),null
+public,club_settings,club_settings_insert_admin,PERMISSIVE,{public},INSERT,null,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text))
+public,club_settings,club_settings_read_all,PERMISSIVE,{public},SELECT,true,null
+public,club_settings,club_settings_update_admin,PERMISSIVE,{public},UPDATE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text))
+public,coach_team_seasons,Allow read coach team seasons,PERMISSIVE,{public},SELECT,true,null
+public,coach_team_seasons,Allow write coach team seasons,PERMISSIVE,{public},ALL,true,true
+public,coaches,Allow public delete coaches,PERMISSIVE,{public},DELETE,true,null
+public,coaches,Allow public insert coaches,PERMISSIVE,{public},INSERT,null,true
+public,coaches,Allow public select coaches,PERMISSIVE,{public},SELECT,true,null
+public,coaches,Allow public update coaches,PERMISSIVE,{public},UPDATE,true,true
+public,coaches,Public can read coaches,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,departments,Public can read active departments,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,event_documents,event_documents_admin_delete,PERMISSIVE,"{anon,authenticated}",DELETE,true,null
+public,event_documents,event_documents_admin_insert,PERMISSIVE,"{anon,authenticated}",INSERT,null,true
+public,event_documents,event_documents_admin_update,PERMISSIVE,"{anon,authenticated}",UPDATE,true,true
+public,event_documents,event_documents_public_read,PERMISSIVE,"{anon,authenticated}",SELECT,"((is_public = true) AND (EXISTS ( SELECT 1
+   FROM events e
+  WHERE ((e.id = event_documents.event_id) AND (e.is_published = true)))))",null
+public,events,events_admin_delete,PERMISSIVE,"{anon,authenticated}",DELETE,true,null
+public,events,events_admin_insert,PERMISSIVE,"{anon,authenticated}",INSERT,null,true
+public,events,events_admin_update,PERMISSIVE,"{anon,authenticated}",UPDATE,true,true
+public,events,events_public_read_published,PERMISSIVE,"{anon,authenticated}",SELECT,(is_published = true),null
+public,membership_request_recipients,membership_request_recipients_delete_admin,PERMISSIVE,{public},DELETE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),null
+public,membership_request_recipients,membership_request_recipients_insert_admin,PERMISSIVE,{public},INSERT,null,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text))
+public,membership_request_recipients,membership_request_recipients_select_admin,PERMISSIVE,{public},SELECT,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),null
+public,membership_request_recipients,membership_request_recipients_update_admin,PERMISSIVE,{public},UPDATE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text))
+public,membership_requests,membership_requests_delete_admin,PERMISSIVE,{public},DELETE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),null
+public,membership_requests,membership_requests_insert_public,PERMISSIVE,{public},INSERT,null,true
+public,membership_requests,membership_requests_select_admin,PERMISSIVE,{public},SELECT,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),null
+public,membership_requests,membership_requests_update_admin,PERMISSIVE,{public},UPDATE,((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text)),((auth.role() = 'authenticated'::text) AND (((auth.jwt() -> 'app_metadata'::text) ->> 'role'::text) = 'admin'::text))
+public,news,Public can delete news,PERMISSIVE,{public},DELETE,true,null
+public,news,Public can insert news,PERMISSIVE,{public},INSERT,null,true
+public,news,Public can read news,PERMISSIVE,{public},SELECT,true,null
+public,news,Public can update news,PERMISSIVE,{public},UPDATE,true,true
+public,news_documents,Allow anon delete news documents,PERMISSIVE,{anon},DELETE,true,null
+public,news_documents,Allow anon insert news documents,PERMISSIVE,{anon},INSERT,null,true
+public,news_documents,Allow anon update news documents,PERMISSIVE,{anon},UPDATE,true,true
+public,news_documents,Allow authenticated delete news documents,PERMISSIVE,{authenticated},DELETE,true,null
+public,news_documents,Allow authenticated insert news documents,PERMISSIVE,{authenticated},INSERT,null,true
+public,news_documents,Allow authenticated update news documents,PERMISSIVE,{authenticated},UPDATE,true,true
+public,news_documents,Allow public read news documents,PERMISSIVE,{public},SELECT,(is_public = true),null
+public,pages,pages_delete_dev,PERMISSIVE,"{anon,authenticated}",DELETE,true,null
+public,pages,pages_insert_dev,PERMISSIVE,"{anon,authenticated}",INSERT,null,true
+public,pages,pages_read_published,PERMISSIVE,{public},SELECT,(is_published = true),null
+public,pages,pages_update_dev,PERMISSIVE,"{anon,authenticated}",UPDATE,true,true
+public,player_team_seasons,Allow read player team seasons,PERMISSIVE,{public},SELECT,true,null
+public,player_team_seasons,Allow write player team seasons,PERMISSIVE,{public},ALL,true,true
+public,players,Public can read players,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,seasons,Allow read seasons,PERMISSIVE,{public},SELECT,true,null
+public,seasons,Allow write seasons,PERMISSIVE,{public},ALL,true,true
+public,sponsor_categories,sponsor_categories_select_all,PERMISSIVE,{public},SELECT,true,null
+public,sponsors,sponsors_delete_all,PERMISSIVE,{public},DELETE,true,null
+public,sponsors,sponsors_insert_all,PERMISSIVE,{public},INSERT,null,true
+public,sponsors,sponsors_select_all,PERMISSIVE,{public},SELECT,true,null
+public,sponsors,sponsors_update_all,PERMISSIVE,{public},UPDATE,true,true
+public,team_seasons,Allow read team seasons,PERMISSIVE,{public},SELECT,true,null
+public,team_seasons,Allow write team seasons,PERMISSIVE,{public},ALL,true,true
+public,team_templates,Allow public read team templates,PERMISSIVE,{public},SELECT,true,null
+public,team_training_exceptions,team_training_exceptions_admin_delete,PERMISSIVE,"{anon,authenticated}",DELETE,true,null
+public,team_training_exceptions,team_training_exceptions_admin_insert,PERMISSIVE,"{anon,authenticated}",INSERT,null,true
+public,team_training_exceptions,team_training_exceptions_admin_update,PERMISSIVE,"{anon,authenticated}",UPDATE,true,true
+public,team_training_exceptions,team_training_exceptions_public_read,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,team_training_times,team_training_times_admin_delete,PERMISSIVE,"{anon,authenticated}",DELETE,true,null
+public,team_training_times,team_training_times_admin_insert,PERMISSIVE,"{anon,authenticated}",INSERT,null,true
+public,team_training_times,team_training_times_admin_update,PERMISSIVE,"{anon,authenticated}",UPDATE,true,true
+public,team_training_times,team_training_times_public_read,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,teams,Public can insert teams,PERMISSIVE,{public},INSERT,null,true
+public,teams,Public can read active teams,PERMISSIVE,{public},SELECT,(is_active = true),null
+public,teams,Public can read teams,PERMISSIVE,{public},SELECT,true,null
+public,teams,Public can update teams,PERMISSIVE,{public},UPDATE,true,true
+storage,objects,Allow anon delete news documents storage,PERMISSIVE,{anon},DELETE,(bucket_id = 'news-documents'::text),null
+storage,objects,Allow anon upload news documents,PERMISSIVE,{anon},INSERT,null,(bucket_id = 'news-documents'::text)
+storage,objects,Allow authenticated delete news documents,PERMISSIVE,{authenticated},DELETE,(bucket_id = 'news-documents'::text),null
+storage,objects,Allow authenticated update news documents,PERMISSIVE,{authenticated},UPDATE,(bucket_id = 'news-documents'::text),(bucket_id = 'news-documents'::text)
+storage,objects,Allow authenticated upload news documents,PERMISSIVE,{authenticated},INSERT,null,(bucket_id = 'news-documents'::text)
+storage,objects,Allow public delete media objects,PERMISSIVE,{public},DELETE,(bucket_id = 'media'::text),null
+storage,objects,Allow public read news documents storage,PERMISSIVE,{public},SELECT,(bucket_id = 'news-documents'::text),null
+storage,objects,Public can read media,PERMISSIVE,{public},SELECT,(bucket_id = 'media'::text),null
+storage,objects,Public can upload media,PERMISSIVE,{public},INSERT,null,(bucket_id = 'media'::text)
+storage,objects,events_documents_storage_delete,PERMISSIVE,"{anon,authenticated}",DELETE,(bucket_id = 'events-documents'::text),null
+storage,objects,events_documents_storage_insert,PERMISSIVE,"{anon,authenticated}",INSERT,null,(bucket_id = 'events-documents'::text)
+storage,objects,events_documents_storage_public_read,PERMISSIVE,"{anon,authenticated}",SELECT,(bucket_id = 'events-documents'::text),null
+storage,objects,events_documents_storage_update,PERMISSIVE,"{anon,authenticated}",UPDATE,(bucket_id = 'events-documents'::text),(bucket_id = 'events-documents'::text)

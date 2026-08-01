@@ -1,5 +1,8 @@
+import { resolveSeasonDisplayName } from "@/lib/football/seasonDisplay";
+
 export default function TeamHero({ team }) {
   if (!team?.team_image_url) return null;
+  const seasonName = resolveSeasonDisplayName(team, "Keine Saison ausgewählt");
 
   return (
     <section className="relative min-w-0 overflow-hidden rounded-[2rem] border border-white/10">
@@ -13,7 +16,7 @@ export default function TeamHero({ team }) {
 
       <div className="absolute inset-x-0 bottom-0 min-w-0 p-4 sm:p-6 md:p-10">
         <p className="text-xs font-bold uppercase tracking-[0.35em] text-red-400 md:text-sm">
-          {team.season || "Saison 2026/2027"}
+          {seasonName}
         </p>
 
         <h1 className="mt-3 max-w-full break-words text-2xl font-black leading-tight sm:text-4xl md:text-7xl">

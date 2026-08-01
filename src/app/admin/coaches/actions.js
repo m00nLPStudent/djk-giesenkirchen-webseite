@@ -9,11 +9,21 @@ import {
   loadScopedActiveTeamsForPeople,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
-import { saveCoach } from "@/components/admin/coaches/services/coaches.service";
+import { saveCoach } from "@/components/admin/coaches/services/coachWrite.service";
+import {
+  loadScopedCoachTeamSeasonOptions,
+  resolveCoachTeamSeasonTargets,
+} from "@/components/admin/coaches/services/coachTeamSeasonOptions.repository";
 import { revalidatePath } from "next/cache";
 
 function buildError(message) {
   return { error: { message } };
+}
+
+function revalidatePublicCoachPages() {
+  revalidatePath("/fussball/abteilung/trainer");
+  revalidatePath("/trainer/[slug]", "page");
+  revalidatePath("/fussball/[slug]", "page");
 }
 
 async function loadCoachById(client, coachId) {
@@ -26,59 +36,127 @@ async function loadCoachById(client, coachId) {
   return data || null;
 }
 
+export async function loadCoachFormTeamsAction(requiredPermission) {
+  try {
+    const permissionResult = await assertAdminActionPermission({
+      requiredPermission,
+    });
+
+    if (!permissionResult.ok) {
+      return {
+        ok: false,
+        message: permissionResult.message || "Berechtigung fehlt.",
+        teamOptionsResult: null,
+      };
+    }
+
+    const scopeContext = await loadServerPersonScopeContext(permissionResult);
+    const teamOptionsResult = await loadScopedCoachTeamSeasonOptions(
+      scopeContext,
+      permissionResult.supabaseServer,
+    );
+
+    return { ok: true, scopeContext, teamOptionsResult };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error?.message ||
+        "Die Mannschaftsoptionen konnten nicht geladen werden.",
+      teamOptionsResult: null,
+    };
+  }
+}
+
 export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
-  const requiredPermission = coachId ? "coaches.edit" : "coaches.create";
-  const permissionResult = await assertAdminActionPermission({
-    requiredPermission,
-  });
+  try {
+    const requiredPermission = coachId ? "coaches.edit" : "coaches.create";
+    const permissionResult = await assertAdminActionPermission({
+      requiredPermission,
+    });
 
-  if (!permissionResult.ok) {
-    return buildError(permissionResult.message || "Berechtigung fehlt.");
-  }
+    if (!permissionResult.ok) {
+      return buildError(permissionResult.message || "Berechtigung fehlt.");
+    }
 
-  const scopeContext = await loadServerPersonScopeContext(permissionResult);
-  const supabaseServer = permissionResult.supabaseServer;
-  const allowedTeams = await loadScopedActiveTeamsForPeople(
-    scopeContext,
-    supabaseServer,
-  );
-  const allowedTeamIds = new Set(allowedTeams.map((team) => team.id));
-  const targetTeamId = coachPayload?.team_id || null;
+    const scopeContext = await loadServerPersonScopeContext(permissionResult);
+    const supabaseServer = permissionResult.supabaseServer;
 
-  if (targetTeamId && !allowedTeamIds.has(targetTeamId)) {
-    return buildError("Du darfst Trainer nicht fremden Mannschaften zuordnen.");
-  }
+    if (!coachId && !canCreateCoachOnServer(scopeContext)) {
+      return buildError("Du darfst keine Trainerprofile erstellen.");
+    }
 
-  if (coachId) {
-    const coach = await loadCoachById(supabaseServer, coachId);
-    if (!coach) {
+    const existingCoach = coachId
+      ? await loadCoachById(supabaseServer, coachId)
+      : null;
+
+    if (coachId && !existingCoach) {
       return buildError("Trainer nicht gefunden.");
     }
 
-    const { teamIdsByCoachId, teamById } = await getCoachTeamIdsMap(
-      supabaseServer,
-      [coachId],
-    );
-    const coachTeamIds = teamIdsByCoachId.get(coachId) || [];
+    if (coachId) {
+      const { teamIdsByCoachId, teamById } = await getCoachTeamIdsMap(
+        supabaseServer,
+        [coachId],
+      );
+      const existingTeamIds = teamIdsByCoachId.get(coachId) || [];
 
-    if (!canEditCoachOnServer(scopeContext, coach, coachTeamIds, teamById)) {
-      return buildError("Du darfst dieses Trainerprofil nicht bearbeiten.");
+      if (
+        !canEditCoachOnServer(
+          scopeContext,
+          existingCoach,
+          existingTeamIds,
+          teamById,
+        )
+      ) {
+        return buildError("Du darfst dieses Trainerprofil nicht bearbeiten.");
+      }
     }
-  } else if (!canCreateCoachOnServer(scopeContext)) {
-    return buildError("Du darfst keine Trainerprofile erstellen.");
+
+    const targetResolution = await resolveCoachTeamSeasonTargets(
+      supabaseServer,
+      coachPayload?.assignments || [],
+    );
+
+    if (!targetResolution.ok) {
+      return buildError(
+        targetResolution.message ||
+          "Die Zielmannschaften konnten nicht aufgeloest werden.",
+      );
+    }
+
+    const allowedTeams = await loadScopedActiveTeamsForPeople(
+      scopeContext,
+      supabaseServer,
+    );
+    const allowedTeamIds = new Set((allowedTeams || []).map((team) => team.id));
+    const outOfScopeTarget = (targetResolution.teamSeasonOptions || []).find(
+      (option) => !allowedTeamIds.has(option.teamId),
+    );
+
+    if (outOfScopeTarget) {
+      return buildError(
+        "Du darfst Trainer keinen fremden Mannschaften zuordnen.",
+      );
+    }
+
+    const { error } = await saveCoach(coachPayload || {}, coachId, {
+      client: supabaseServer,
+      teamSeasonOptions: targetResolution.teamSeasonOptions,
+    });
+
+    if (error) {
+      return buildError(error.message || "Fehler beim Speichern.");
+    }
+
+    revalidatePath("/admin/coaches");
+    revalidatePublicCoachPages();
+    return { error: null };
+  } catch (error) {
+    return buildError(
+      error?.message || "Das Trainerprofil konnte nicht gespeichert werden.",
+    );
   }
-
-  const { error } = await saveCoach(coachPayload || {}, coachId, {
-    client: supabaseServer,
-  });
-
-  if (error) {
-    return buildError(error.message || "Fehler beim Speichern.");
-  }
-
-  revalidatePath("/admin/coaches");
-
-  return { error: null };
 }
 
 export async function removeCoachWithScopeAction(coachId) {
@@ -115,6 +193,7 @@ export async function removeCoachWithScopeAction(coachId) {
 
   if (!result.error) {
     revalidatePath("/admin/coaches");
+    revalidatePublicCoachPages();
   }
 
   return result;

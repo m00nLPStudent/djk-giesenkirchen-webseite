@@ -4,17 +4,14 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveTeamWithScopeAction } from "@/app/admin/teams/actions";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import { FormAlert } from "@/components/admin/forms";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { uploadTeamImage } from "../services/teams.service";
 import TeamFormTabs from "./components/TeamFormTabs";
 import TeamSubmitBar from "./components/TeamSubmitBar";
 import { createInitialTeamForm } from "./helpers/teamFormInitialState";
 import { createTeamFormPayload } from "./helpers/teamFormPayload";
-import {
-  belongsToTeam,
-  getCurrentSeason,
-  getPersonName,
-} from "./helpers/teamFormOptions";
+import { getCurrentSeason, getPersonName } from "./helpers/teamFormOptions";
 import TeamBaseTab from "./tabs/TeamBaseTab";
 import TeamCompetitionTab from "./tabs/TeamCompetitionTab";
 import TeamContactTab from "./tabs/TeamContactTab";
@@ -28,6 +25,31 @@ import TeamTrainingTab from "./tabs/TeamTrainingTab";
 import useTeamScope from "../useTeamScope";
 import { isYouthTeam } from "../teamScope";
 
+function getCoachStatusMessage(currentSeasonResolution, currentTeamSeasons = []) {
+  if (!currentSeasonResolution?.activeSeasonStatus) return null;
+
+  if (currentSeasonResolution.activeSeasonStatus === "CURRENT_SEASON_MISSING") {
+    return "Es ist keine aktuelle Saison markiert. Trainerzuordnungen fuer Team-Edit koennen derzeit nicht eindeutig geladen werden.";
+  }
+
+  if (
+    currentSeasonResolution.activeSeasonStatus ===
+    "CURRENT_SEASON_AMBIGUOUS"
+  ) {
+    return "Es sind mehrere aktuelle Saisons markiert. Trainerzuordnungen fuer Team-Edit koennen derzeit nicht eindeutig geladen werden.";
+  }
+
+  if (currentTeamSeasons.length === 0) {
+    return "Fuer dieses Team existiert in der aktuellen Saison noch keine team_seasons-Zeile. Trainerzuordnungen koennen erst danach eindeutig bearbeitet werden.";
+  }
+
+  if (currentTeamSeasons.length > 1) {
+    return "Fuer dieses Team existieren mehrere team_seasons-Zeilen in der aktuellen Saison. Trainerzuordnungen koennen derzeit nicht eindeutig geladen werden.";
+  }
+
+  return null;
+}
+
 export default function AdminTeamsForm({
   team,
   seasons = [],
@@ -37,6 +59,9 @@ export default function AdminTeamsForm({
   coaches = [],
   playerAssignments = [],
   coachAssignments = [],
+  currentSeasonCoachAssignments = [],
+  currentSeasonResolution = null,
+  currentTeamSeasons = [],
 }) {
   const router = useRouter();
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
@@ -46,8 +71,10 @@ export default function AdminTeamsForm({
       team,
       seasons,
       teamSeasons,
+      coaches,
       playerAssignments,
       coachAssignments,
+      currentSeasonCoachAssignments,
       seasonId: initialSeason?.id,
     }),
   );
@@ -55,18 +82,26 @@ export default function AdminTeamsForm({
   const isEditMode = Boolean(team?.id);
   const { scopeContext, canAccessTeamInScope, canCreateTeamInScope } =
     useTeamScope();
-
-  const filteredPlayers = useMemo(
-    () => players.filter((player) => belongsToTeam(player, team?.id)),
-    [players, team?.id],
-  );
-  const filteredCoaches = useMemo(
-    () => coaches.filter((coach) => belongsToTeam(coach, team?.id)),
-    [coaches, team?.id],
+  const coachStatusMessage = useMemo(
+    () => getCoachStatusMessage(currentSeasonResolution, currentTeamSeasons),
+    [currentSeasonResolution, currentTeamSeasons],
   );
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateCoachSelection(nextSelectedIds = []) {
+    const selectedIds = new Set(nextSelectedIds);
+
+    setForm((current) => ({
+      ...current,
+      selected_coach_ids: nextSelectedIds,
+      coach_team_state: (current.coach_team_state || []).map((coachItem) => ({
+        ...coachItem,
+        isAssignedToCurrentTeam: selectedIds.has(coachItem.coach_id),
+      })),
+    }));
   }
 
   function updateSeason(seasonId) {
@@ -75,8 +110,10 @@ export default function AdminTeamsForm({
       team,
       seasons,
       teamSeasons,
+      coaches,
       playerAssignments,
       coachAssignments,
+      currentSeasonCoachAssignments,
       seasonId: season?.id,
     });
 
@@ -99,6 +136,10 @@ export default function AdminTeamsForm({
       age_group: template?.age_group || "Jugend",
       selected_player_ids: [],
       selected_coach_ids: [],
+      coach_team_state: (current.coach_team_state || []).map((coachItem) => ({
+        ...coachItem,
+        isAssignedToCurrentTeam: false,
+      })),
     }));
   }
 
@@ -164,21 +205,19 @@ export default function AdminTeamsForm({
     });
 
     if (!form.season_id) {
-      alert("Bitte zuerst eine Saison auswählen.");
+      alert("Bitte zuerst eine Saison auswaehlen.");
       setActiveTab("season");
       return;
     }
 
     if (!form.name_de || !form.slug) {
-      alert("Bitte zuerst im Reiter Mannschaft eine Mannschaft auswählen.");
+      alert("Bitte zuerst im Reiter Mannschaft eine Mannschaft auswaehlen.");
       setActiveTab("base");
       return;
     }
 
     setLoading(true);
-
     const payload = createTeamFormPayload(form);
-
     const { error } = await saveTeamWithScopeAction(payload, team?.id ?? null);
     setLoading(false);
 
@@ -204,7 +243,6 @@ export default function AdminTeamsForm({
     });
 
     await revalidatePublicContentAction("teams");
-
     router.push("/admin/teams");
     router.refresh();
   }
@@ -212,6 +250,10 @@ export default function AdminTeamsForm({
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6">
       <TeamFormTabs activeTab={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "staff" && coachStatusMessage && (
+        <FormAlert tone="warning">{coachStatusMessage}</FormAlert>
+      )}
 
       {activeTab === "season" && (
         <TeamSeasonTab
@@ -233,33 +275,28 @@ export default function AdminTeamsForm({
       {activeTab === "description" && (
         <TeamDescriptionTab form={form} onFieldChange={updateField} />
       )}
-
       {activeTab === "training" && (
         <TeamTrainingTab form={form} onFieldChange={updateField} />
       )}
-
       {activeTab === "players" && (
         <TeamPlayersTab
-          items={filteredPlayers}
+          items={players}
           selectedIds={form.selected_player_ids}
           onChange={(value) => updateField("selected_player_ids", value)}
           getPersonName={getPersonName}
         />
       )}
-
       {activeTab === "staff" && (
         <TeamStaffTab
-          items={filteredCoaches}
+          items={form.coach_team_state || []}
           selectedIds={form.selected_coach_ids}
-          onChange={(value) => updateField("selected_coach_ids", value)}
+          onChange={updateCoachSelection}
           getPersonName={getPersonName}
         />
       )}
-
       {activeTab === "competition" && (
         <TeamCompetitionTab form={form} onFieldChange={updateField} />
       )}
-
       {activeTab === "contact" && (
         <TeamContactTab
           form={form}
@@ -267,7 +304,6 @@ export default function AdminTeamsForm({
           onUploadContactImage={uploadContactImage}
         />
       )}
-
       {activeTab === "media" && (
         <TeamMediaTab
           form={form}
@@ -275,7 +311,6 @@ export default function AdminTeamsForm({
           onUploadImage={uploadImage}
         />
       )}
-
       {activeTab === "settings" && (
         <TeamSettingsTab
           form={form}

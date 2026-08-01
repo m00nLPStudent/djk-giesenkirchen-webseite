@@ -4,7 +4,6 @@ import Can from "@/components/admin/auth/Can";
 import { removeTeamWithScopeAction } from "@/app/admin/teams/actions";
 import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
-import useTeamScope from "../useTeamScope";
 import {
   EntityActionLink,
   EntityCard,
@@ -13,6 +12,8 @@ import {
   EntityCardMeta,
   EntityCardTitle,
 } from "@/components/admin/ui/EntityCard";
+import { resolveSeasonDisplayName } from "@/lib/football/seasonDisplay";
+import useTeamScope from "../useTeamScope";
 import TeamStatusBadge from "./TeamStatusBadge";
 
 function TeamInfoGrid({ team }) {
@@ -46,6 +47,7 @@ export default function TeamCard({ team }) {
     team.fussball_de_matches_widget_id || team.fussball_de_table_widget_id,
   );
   const canManageTeam = canAccessTeamInScope(team);
+  const seasonName = resolveSeasonDisplayName(team, "-");
 
   return (
     <EntityCard
@@ -58,7 +60,7 @@ export default function TeamCard({ team }) {
           {team.age_group || "Mannschaft"}
         </EntityBadge>
         <TeamStatusBadge active={team.is_active} />
-        <EntityBadge>Saison {team.season || "—"}</EntityBadge>
+        <EntityBadge>Saison {seasonName}</EntityBadge>
         <EntityBadge>
           {hasFootballDe ? "fussball.de aktiv" : "fussball.de fehlt"}
         </EntityBadge>
@@ -102,7 +104,7 @@ export default function TeamCard({ team }) {
               preserved={[
                 "Spielerprofile",
                 "Trainerprofile",
-                "News-Beiträge",
+                "News-Beitraege",
                 "Saisons",
                 "Termine",
                 "Mitgliedsanfragen",

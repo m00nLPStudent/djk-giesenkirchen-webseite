@@ -1,0 +1,87 @@
+schema_name,function_name,identity_arguments,return_type,language,security_definer,volatility,function_definition
+public,is_superadmin_actor,,boolean,sql,yes,STABLE,"CREATE OR REPLACE FUNCTION public.is_superadmin_actor()
+ RETURNS boolean
+ LANGUAGE sql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.admin_user_roles aur
+    JOIN public.admin_roles ar ON ar.id = aur.role_id
+    WHERE aur.user_id = auth.uid()
+      AND ar.key = 'superadmin'
+  );
+$function$
+"
+public,remove_entity,"entity_type text, entity_uuid uuid",void,plpgsql,yes,VOLATILE,"CREATE OR REPLACE FUNCTION public.remove_entity(entity_type text, entity_uuid uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+AS $function$
+begin
+  case entity_type
+
+    when 'sponsor' then
+      delete from sponsors where id = entity_uuid;
+
+    when 'board_member' then
+      delete from board_members where id = entity_uuid;
+
+    when 'player' then
+      delete from player_team_seasons where player_id = entity_uuid;
+      delete from players where id = entity_uuid;
+
+    when 'coach' then
+      delete from coach_team_seasons where coach_id = entity_uuid;
+      delete from coaches where id = entity_uuid;
+
+    when 'team' then
+      delete from player_team_seasons
+      where team_season_id in (
+        select id from team_seasons where team_id = entity_uuid
+      );
+
+      delete from coach_team_seasons
+      where team_season_id in (
+        select id from team_seasons where team_id = entity_uuid
+      );
+
+      delete from team_seasons where team_id = entity_uuid;
+
+      update players set team_id = null where team_id = entity_uuid;
+      update coaches set team_id = null where team_id = entity_uuid;
+      update news set football_team_id = null where football_team_id = entity_uuid;
+
+      delete from teams where id = entity_uuid;
+
+    when 'news' then
+      delete from news where id = entity_uuid;
+
+    else
+      raise exception 'Unknown entity type: %', entity_type;
+
+  end case;
+end;
+$function$
+"
+public,set_updated_at,,trigger,plpgsql,no,VOLATILE,"CREATE OR REPLACE FUNCTION public.set_updated_at()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$function$
+"
+public,tg_set_updated_at_team_training_schedules,,trigger,plpgsql,no,VOLATILE,"CREATE OR REPLACE FUNCTION public.tg_set_updated_at_team_training_schedules()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$function$
+"

@@ -1,25 +1,33 @@
 import { FaEnvelope, FaWhatsapp } from "react-icons/fa";
+import { resolveCoachImageUrl } from "@/lib/people/imageUrl";
 
 export default function TeamCoachCard({ coach }) {
+  const imageUrl = resolveCoachImageUrl(coach, null);
+  const roleLabel = coach.teamRoleDisplayLabel || "Rolle offen";
+
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/40">
       <div className="flex items-center gap-5">
-        {coach.image_url ? (
+        {imageUrl ? (
           <img
-            src={coach.image_url}
-            alt={coach.name}
+            src={imageUrl}
+            alt={coach.displayName || coach.name}
             className="h-24 w-24 rounded-full object-cover"
           />
         ) : (
           <div className="flex h-24 w-24 items-center justify-center rounded-full bg-red-700 text-3xl font-black">
-            {coach.name?.charAt(0)}
+            {(coach.displayName || coach.name || "T").charAt(0)}
           </div>
         )}
 
         <div>
-          <h3 className="text-2xl font-black">{coach.name}</h3>
+          <h3 className="text-2xl font-black">
+            {coach.displayName || coach.name}
+          </h3>
 
-          <p className="text-red-400 font-semibold">{coach.role}</p>
+          <p className="text-red-400 font-semibold">
+            {roleLabel}
+          </p>
 
           {coach.license && (
             <p className="mt-2 text-sm text-white/60">{coach.license}</p>

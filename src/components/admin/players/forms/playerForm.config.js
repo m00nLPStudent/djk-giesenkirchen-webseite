@@ -22,7 +22,7 @@ export const POSITION_EN = {
 };
 
 export const REQUIRED_PLAYER_FIELDS = {
-  team_id: "Mannschaft",
+  team_season_id: "Mannschaft",
   first_name: "Vorname",
   last_name: "Nachname",
   birthdate: "Geburtsdatum",

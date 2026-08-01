@@ -13,11 +13,13 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 function mergeTeamSeason(team, teamSeason, season) {
+  const seasonName = season?.name || null;
+
   if (!teamSeason) {
     return {
       ...team,
-      season: season?.name || team.season,
-      public_season_name: season?.name || team.season,
+      season: seasonName,
+      public_season_name: seasonName,
     };
   }
 
@@ -28,8 +30,8 @@ function mergeTeamSeason(team, teamSeason, season) {
     is_active: team.is_active,
     team_season_is_active: teamSeason.is_active,
     base_slug: team.slug,
-    season: season?.name || team.season,
-    public_season_name: season?.name || team.season,
+    season: seasonName,
+    public_season_name: seasonName,
   };
 }
 

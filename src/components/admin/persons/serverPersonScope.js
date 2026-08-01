@@ -99,11 +99,10 @@ export async function loadServerPersonScopeContext(permissionResult) {
 export async function getPlayerTeamIdsMap(
   supabaseServer,
   playerIds = [],
-  { activeSeasonId = null, includeLegacyFallback = true } = {},
+  { activeSeasonId = null } = {},
 ) {
   return await getPlayerTeamIdsMapFromRepository(supabaseServer, playerIds, {
     activeSeasonId,
-    includeLegacyFallback,
   });
 }
 

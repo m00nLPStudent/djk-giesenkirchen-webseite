@@ -1,7 +1,12 @@
 import { FormGrid } from "@/components/admin/forms";
 import { InputField, SelectField } from "./FormField";
 
-export default function PlayerBasicFields({ form, errors, teams, updateField }) {
+export default function PlayerBasicFields({
+  form,
+  errors,
+  teamOptions,
+  updateField,
+}) {
   return (
     <div className="space-y-4">
       <FormGrid>
@@ -28,14 +33,23 @@ export default function PlayerBasicFields({ form, errors, teams, updateField }) 
         <SelectField
           label="Mannschaft"
           required
-          value={form.team_id}
-          onChange={(event) => updateField("team_id", event.target.value)}
-          error={errors.team_id}
+          value={form.team_season_id}
+          onChange={(event) =>
+            updateField("team_season_id", event.target.value)
+          }
+          error={errors.team_season_id}
         >
-          <option value="">Mannschaft auswählen</option>
-          {teams.map((team) => (
-            <option key={team.id} value={team.id}>
-              {team.name_de}
+          <option value="">
+            {teamOptions.length > 0
+              ? "Mannschaft auswählen"
+              : "Keine Mannschaft verfügbar"}
+          </option>
+          {teamOptions.map((teamOption) => (
+            <option
+              key={teamOption.teamSeasonId}
+              value={teamOption.teamSeasonId}
+            >
+              {teamOption.teamNameDe}
             </option>
           ))}
         </SelectField>

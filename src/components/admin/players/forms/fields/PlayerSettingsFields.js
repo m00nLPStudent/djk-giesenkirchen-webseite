@@ -8,8 +8,8 @@ export default function PlayerSettingsFields({ form, updateField }) {
   return (
     <div className="space-y-6">
       <SortOrderField
-        value={form.sort_order}
-        onChange={(value) => updateField("sort_order", value)}
+        value={form.assignment_sort_order}
+        onChange={(value) => updateField("assignment_sort_order", value)}
       />
 
       <ActiveStatusField

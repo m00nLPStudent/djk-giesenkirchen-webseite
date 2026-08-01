@@ -4,14 +4,11 @@ import {
   DepartmentPersonGrid,
   getCoachTeamName,
 } from "@/components/website/department";
+import { loadActivePublicCoachDtos } from "@/components/website/coach/coachPublic.repository";
 import { supabase } from "@/lib/supabase";
 
 export default async function DepartmentCoachesPage() {
-  const { data: coaches } = await supabase
-    .from("coaches")
-    .select("*, teams(name_de)")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+  const coaches = await loadActivePublicCoachDtos(supabase);
 
   return (
     <DepartmentPageLayout
@@ -19,7 +16,7 @@ export default async function DepartmentCoachesPage() {
       description="Unser Trainer- und Betreuerteam mit Mannschaftszuordnung, Lizenz und Kontaktmöglichkeiten."
     >
       <DepartmentPersonGrid>
-        {(coaches || []).map((coach) => (
+        {coaches.map((coach) => (
           <DepartmentPersonCard
             key={coach.id}
             person={coach}

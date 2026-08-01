@@ -29,13 +29,28 @@ export default function CoachCard({ coach }) {
   const imageUrl = getEntityImage(coach, COACH_PLACEHOLDER_IMAGE);
   const fullName = getFullName(coach, "Trainer");
   const team = getEntityTeam(coach);
+  const assignmentLabels =
+    (coach.assignments || []).length > 0
+      ? coach.assignments.map((assignment) =>
+          [assignment.teamNameDe || assignment.teamNameEn, assignment.roleDe || assignment.roleEn]
+            .filter(Boolean)
+            .join(" · "),
+        )
+      : [team.name];
 
   return (
     <EntityCard image={imageUrl} imageAlt={fullName}>
       <EntityCardBadges>
-        <EntityBadge variant="red">{coach.role || "Trainer"}</EntityBadge>
+        <EntityBadge variant="red">
+          {coach.primaryRoleLabel || "Trainer"}
+        </EntityBadge>
         <CoachStatusBadge active={coach.is_active} />
-        <EntityBadge>{team.name}</EntityBadge>
+        {assignmentLabels.map((label) => (
+          <EntityBadge key={`${coach.id}-${label}`}>{label}</EntityBadge>
+        ))}
+        {coach.hasMultipleActiveAssignments && (
+          <EntityBadge variant="yellow">Mehrfachzuordnung</EntityBadge>
+        )}
         {country && (
           <EntityBadge>
             <CountryFlag country={country} />

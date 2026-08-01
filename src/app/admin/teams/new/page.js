@@ -6,6 +6,7 @@ import {
   filterScopedTeamsOnServer,
   loadServerTeamScopeContext,
 } from "@/components/admin/teams/serverTeamScope";
+import { loadTeamEditPlayerOptions } from "@/components/admin/teams/teamEditPlayer.repository";
 import { isYouthTeam } from "@/components/admin/teams/teamScope";
 import BackButton from "@/components/admin/ui/BackButton";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
@@ -57,30 +58,20 @@ export default async function NewTeamPage() {
       })
     : [];
 
-  let playersQuery = supabaseServer
-    .from("players")
-    .select("*")
-    .eq("is_active", true)
-    .order("last_name", { ascending: true });
-
   let coachesQuery = supabaseServer
     .from("coaches")
     .select("*")
     .eq("is_active", true)
     .order("last_name", { ascending: true });
 
-  const playerScopeFilter = scopedTeamIds.length
-    ? `team_id.is.null,team_id.in.(${scopedTeamIds.join(",")})`
-    : "team_id.is.null";
   const coachScopeFilter = scopedTeamIds.length
     ? `team_id.is.null,team_id.in.(${scopedTeamIds.join(",")})`
     : "team_id.is.null";
 
-  playersQuery = playersQuery.or(playerScopeFilter);
   coachesQuery = coachesQuery.or(coachScopeFilter);
 
-  const [{ data: players }, { data: coaches }] = await Promise.all([
-    playersQuery,
+  const [players, { data: coaches }] = await Promise.all([
+    loadTeamEditPlayerOptions(supabaseServer),
     coachesQuery,
   ]);
 

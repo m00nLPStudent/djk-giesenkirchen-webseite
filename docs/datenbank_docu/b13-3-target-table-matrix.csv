@@ -1,0 +1,65 @@
+schema_name,current_table,target_table,module,decision,target_purpose,data_source_of_truth,migration_complexity,risk,dependencies,notes
+auth,audit_log_entries,auth.audit_log_entries,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,custom_oauth_providers,auth.custom_oauth_providers,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,flow_state,auth.flow_state,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,identities,auth.identities,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,instances,auth.instances,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,mfa_amr_claims,auth.mfa_amr_claims,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,mfa_challenges,auth.mfa_challenges,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,mfa_factors,auth.mfa_factors,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,oauth_authorizations,auth.oauth_authorizations,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,oauth_client_states,auth.oauth_client_states,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,oauth_clients,auth.oauth_clients,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,oauth_consents,auth.oauth_consents,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,one_time_tokens,auth.one_time_tokens,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,refresh_tokens,auth.refresh_tokens,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,saml_providers,auth.saml_providers,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,saml_relay_states,auth.saml_relay_states,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,schema_migrations,auth.schema_migrations,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,sessions,auth.sessions,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,sso_domains,auth.sso_domains,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,sso_providers,auth.sso_providers,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,users,auth.users,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,webauthn_challenges,auth.webauthn_challenges,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+auth,webauthn_credentials,auth.webauthn_credentials,system,KEEP,Supabase auth system table,Supabase auth subsystem,LOW,LOW,auth.users,Platform-managed auth table; keep unchanged.
+public,admin_permissions,admin_permissions,admin/auth,KEEP_AND_HARDEN,permission catalog,admin_permissions,LOW,HIGH,admin_role_permissions,Admin authorization tables remain active and server-controlled.
+public,admin_profiles,admin_profiles,admin/auth,KEEP_AND_HARDEN,admin person profile with auth-user linkage,admin_profiles,LOW,HIGH,auth.users; admin_user_roles; board_members; coaches,Admin authorization tables remain active and server-controlled.
+public,admin_role_permissions,admin_role_permissions,admin/auth,KEEP_AND_HARDEN,bridge table for authorization graph,admin_role_permissions,LOW,HIGH,admin_roles; admin_permissions,Admin authorization tables remain active and server-controlled.
+public,admin_roles,admin_roles,admin/auth,KEEP_AND_HARDEN,authorisation role registry,admin_roles,LOW,HIGH,admin_user_roles; admin_role_permissions,Admin authorization tables remain active and server-controlled.
+public,admin_user_roles,admin_user_roles,admin/auth,KEEP_AND_HARDEN,bridge table for authorization graph,admin_user_roles,LOW,HIGH,admin_roles,Admin authorization tables remain active and server-controlled.
+public,board_members,board_members,board,KEEP_AND_HARDEN,board person master and admin-profile link,board_members,LOW,MEDIUM,board_roles; admin_profiles,"Role labels should be derived from board_roles, not duplicated in the person row."
+public,board_roles,board_roles,board,KEEP_AND_HARDEN,board role taxonomy,board_roles,LOW,MEDIUM,board_members,Lookup table for board role labels stays canonical.
+public,club_closure_periods,club_closure_periods,training,KEEP_AND_HARDEN,club closure window,club_closure_periods,MEDIUM,MEDIUM,team_training_times,Training and closure tables remain the calendar source of truth.
+public,club_contacts,club_contacts,cms,KEEP_AND_HARDEN,public contact directory,club_contacts,MEDIUM,MEDIUM,pages; club_settings,CMS content stays separated from structured domain data.
+public,club_history_images,club_history_images,cms,KEEP_AND_HARDEN,history gallery image,club_history_images,MEDIUM,MEDIUM,club_history_pages,CMS content stays separated from structured domain data.
+public,club_history_milestones,club_history_milestones,cms,KEEP_AND_HARDEN,history timeline item,club_history_milestones,MEDIUM,MEDIUM,club_history_pages,CMS content stays separated from structured domain data.
+public,club_history_pages,club_history_pages,cms,KEEP_AND_HARDEN,history page root content,club_history_pages,HIGH,MEDIUM,club_history_pages,CMS content stays separated from structured domain data.
+public,club_settings,club_settings,cms,KEEP_AND_HARDEN,singleton club configuration document,club_settings,MEDIUM,MEDIUM,club_contacts; pages,CMS content stays separated from structured domain data.
+public,coach_team_seasons,coach_team_seasons,people,KEEP_AND_HARDEN,seasonal coach assignment,coach_team_seasons,HIGH,HIGH,coaches; team_seasons,Seasonal relation table is the canonical assignment store.
+public,coaches,coaches,people,KEEP_AND_HARDEN,coach/staff person master profile,coaches,HIGH,HIGH,coach_team_seasons; admin_profiles,Person master row only; assignment and role data move out.
+public,departments,departments,teams,KEEP_AND_HARDEN,"team identity, seasonal snapshot or structure lookup",departments,LOW,LOW,team_seasons,Template or section lookup remains stable.
+public,event_documents,event_documents,content,KEEP_AND_HARDEN,event attachment table,event_documents,MEDIUM,MEDIUM,events; events-documents bucket,Separate attachment tables stay intact for public downloads.
+public,events,events,content,KEEP_AND_HARDEN,public event and training calendar entry,events,HIGH,HIGH,event_documents; teams; team_seasons,Recurrence and publication state stay in one canonical event table.
+public,membership_request_recipients,membership_request_recipients,membership,KEEP_AND_HARDEN,recipient configuration for membership routing,membership_request_recipients,HIGH,HIGH,membership_requests,Recipient routing remains a separate configuration table.
+public,membership_requests,membership_requests,membership,KEEP_AND_HARDEN,membership inquiry and workflow record,membership_requests,HIGH,HIGH,teams; membership_request_recipients,Membership requests remain separate from future contribution tables.
+public,news,news,content,KEEP_AND_HARDEN,public news article and publication record,news,HIGH,HIGH,news_documents; teams,Category remains transitional; documents stay separate.
+public,news_documents,news_documents,content,KEEP_AND_HARDEN,news attachment table,news_documents,MEDIUM,MEDIUM,news; news-documents bucket,Separate attachment tables stay intact for public downloads.
+public,pages,pages,cms,KEEP_AND_HARDEN,CMS page content,pages,MEDIUM,MEDIUM,club_settings,CMS content stays separated from structured domain data.
+public,player_team_seasons,player_team_seasons,people,KEEP_AND_HARDEN,seasonal player assignment,player_team_seasons,HIGH,HIGH,players; team_seasons,Seasonal relation table is the canonical assignment store.
+public,players,players,people,KEEP_AND_HARDEN,player person master profile,players,HIGH,HIGH,player_team_seasons; teams,Person master row only; assignment data moves out.
+public,seasons,seasons,system,KEEP_AND_HARDEN,canonical public data table,seasons,MEDIUM,MEDIUM,,Keep and harden as part of the public/runtime model.
+public,sponsor_categories,sponsor_categories,sponsors,KEEP_AND_HARDEN,sponsor category taxonomy,sponsor_categories,LOW,MEDIUM,sponsors,Sponsor model remains separate from content and team tables.
+public,sponsors,sponsors,sponsors,KEEP_AND_HARDEN,sponsor master data,sponsors,LOW,MEDIUM,sponsor_categories,Sponsor model remains separate from content and team tables.
+public,team_seasons,team_seasons,teams,KEEP_AND_HARDEN,"team identity, seasonal snapshot or structure lookup",team_seasons,VERY_HIGH,HIGH,team_seasons,Season-specific team snapshot remains canonical.
+public,team_templates,team_templates,teams,KEEP_AND_HARDEN,"team identity, seasonal snapshot or structure lookup",team_templates,LOW,LOW,team_seasons,Template or section lookup remains stable.
+public,team_training_exceptions,team_training_exceptions,training,KEEP_AND_HARDEN,date-specific schedule override,team_training_exceptions,MEDIUM,MEDIUM,team_training_times; club_closure_periods,Training and closure tables remain the calendar source of truth.
+public,team_training_times,team_training_times,training,KEEP_AND_HARDEN,canonical recurring training schedule,team_training_times,MEDIUM,MEDIUM,team_seasons; team_training_exceptions; club_closure_periods,Training and closure tables remain the calendar source of truth.
+public,teams,teams,teams,KEEP_AND_HARDEN,"team identity, seasonal snapshot or structure lookup",teams,VERY_HIGH,HIGH,team_seasons,Master team identity stays in teams; seasonal attributes move to team_seasons.
+storage,buckets,storage.buckets,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.
+storage,buckets_analytics,storage.buckets_analytics,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.
+storage,buckets_vectors,storage.buckets_vectors,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.
+storage,migrations,storage.migrations,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.
+storage,objects,storage.objects,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.
+storage,s3_multipart_uploads,storage.s3_multipart_uploads,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.
+storage,s3_multipart_uploads_parts,storage.s3_multipart_uploads_parts,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.
+storage,vector_indexes,storage.vector_indexes,system,KEEP,Supabase storage system table,Supabase storage subsystem,LOW,LOW,storage.objects; storage.buckets,Platform-managed storage table; keep unchanged.

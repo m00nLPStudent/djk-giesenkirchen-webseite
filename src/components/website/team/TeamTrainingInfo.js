@@ -1,4 +1,8 @@
+import { resolveSeasonDisplayName } from "@/lib/football/seasonDisplay";
+
 export default function TeamTrainingInfo({ team, className = "" }) {
+  const seasonName = resolveSeasonDisplayName(team, "Keine Saison");
+
   return (
     <section
       className={`h-full min-w-0 rounded-[2rem] border border-white/10 bg-white/5 p-5 sm:p-6 md:p-8 ${className}`}
@@ -27,7 +31,7 @@ export default function TeamTrainingInfo({ team, className = "" }) {
               Saison
             </p>
             <p className="mt-2 break-words text-base font-black text-white sm:text-lg">
-              {team?.season || "Keine Saison"}
+              {seasonName}
             </p>
           </div>
 

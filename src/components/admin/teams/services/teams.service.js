@@ -2,6 +2,7 @@ import { uploadMediaFile, deleteMediaFile } from "@/lib/storage";
 import { supabase } from "@/lib/supabase";
 import { createEntityRepository } from "@/components/admin/services/entity.repository";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
+import { syncTeamCoachAssignments } from "./teamCoachAssignments.service";
 
 export const TEAM_PLACEHOLDER_IMAGE = "";
 export const TEAM_CONTACT_PLACEHOLDER_IMAGE = "";
@@ -119,31 +120,6 @@ async function replacePlayerAssignments(
   );
 }
 
-async function replaceCoachAssignments(
-  teamSeasonId,
-  coachIds = [],
-  client = null,
-) {
-  const db = resolveClient(client);
-  const deleteResult = await db
-    .from("coach_team_seasons")
-    .delete()
-    .eq("team_season_id", teamSeasonId);
-
-  if (deleteResult.error) return deleteResult;
-
-  if (!coachIds.length) return { error: null };
-
-  return await db.from("coach_team_seasons").insert(
-    coachIds.map((coachId, index) => ({
-      coach_id: coachId,
-      team_season_id: teamSeasonId,
-      sort_order: index,
-      is_active: true,
-    })),
-  );
-}
-
 async function setCurrentPublicSeason(seasonId, client = null) {
   if (!seasonId) return { error: null };
 
@@ -251,10 +227,10 @@ export async function saveTeamWithSeason(
 
     if (playerResult.error) return playerResult;
 
-    const coachResult = await replaceCoachAssignments(
+    const coachResult = await syncTeamCoachAssignments(
+      db,
       savedTeamSeason.id,
       team.selected_coach_ids || [],
-      db,
     );
 
     logAdminSaveEvent({

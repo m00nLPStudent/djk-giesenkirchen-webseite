@@ -6,15 +6,15 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import {
   canEditCoachOnServer,
   getCoachTeamIdsMap,
-  loadScopedActiveTeamsForPeople,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
+import { getCoachSeasonalReadModel } from "@/components/admin/persons/coachSeasonalReadModelRepository";
+import { loadScopedCoachTeamSeasonOptions } from "@/components/admin/coaches/services/coachTeamSeasonOptions.repository";
 
 export const dynamic = "force-dynamic";
 
 export default async function EditCoachPage({ params }) {
   const { id } = await params;
-
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: "coaches.edit",
   });
@@ -46,7 +46,11 @@ export default async function EditCoachPage({ params }) {
     redirect("/admin/unauthorized?reason=missing-coach-scope");
   }
 
-  const teams = await loadScopedActiveTeamsForPeople(
+  const coachSeasonalReadModel = await getCoachSeasonalReadModel(
+    supabaseServer,
+    id,
+  );
+  const teamOptionsResult = await loadScopedCoachTeamSeasonOptions(
     scopeContext,
     supabaseServer,
   );
@@ -54,7 +58,11 @@ export default async function EditCoachPage({ params }) {
   return (
     <AdminLayout title="Trainer bearbeiten" subtitle="Trainer">
       <BackButton />
-      <AdminCoachesForm coach={coach} teams={teams || []} />
+      <AdminCoachesForm
+        coach={coach}
+        teamOptionsResult={teamOptionsResult}
+        coachSeasonalReadModel={coachSeasonalReadModel}
+      />
     </AdminLayout>
   );
 }

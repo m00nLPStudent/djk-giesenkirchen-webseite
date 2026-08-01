@@ -30,21 +30,50 @@ export function isSupervisorRole(role) {
   );
 }
 
+function getCoachAssignments(coach = {}) {
+  return Array.isArray(coach.assignments) ? coach.assignments : [];
+}
+
+function getCoachRoleLabels(coach = {}) {
+  if (Array.isArray(coach.roleLabels) && coach.roleLabels.length > 0) {
+    return coach.roleLabels;
+  }
+
+  return [coach.primaryRoleLabel].filter(Boolean);
+}
+
+function getCoachTeamIds(coach = {}) {
+  return Array.from(
+    new Set(
+      getCoachAssignments(coach)
+        .map((assignment) => assignment.teamId)
+        .filter(Boolean),
+    ),
+  );
+}
+
 export function getUniqueAssignedTeams(coaches = []) {
   const teams = new Map();
 
   coaches.forEach((coach) => {
-    const team = Array.isArray(coach.teams) ? coach.teams[0] : coach.teams;
-    const teamId = team?.id || coach.team_id;
-    const teamName = team?.name_de || coach.team_name;
+    getCoachAssignments(coach).forEach((assignment) => {
+      if (!assignment?.teamId) return;
 
-    if (!teamId || !teamName) return;
+      const existing = teams.get(assignment.teamId) || {
+        id: assignment.teamId,
+        name:
+          assignment.teamNameDe ||
+          assignment.teamNameEn ||
+          "Keine Mannschaft",
+        slug: assignment.teamSlug || null,
+        coaches: [],
+      };
 
-    teams.set(teamId, {
-      id: teamId,
-      name: teamName,
-      slug: team?.slug,
-      coaches: coaches.filter((item) => item.team_id === teamId),
+      if (!existing.coaches.some((item) => item.id === coach.id)) {
+        existing.coaches.push(coach);
+      }
+
+      teams.set(assignment.teamId, existing);
     });
   });
 
@@ -53,28 +82,40 @@ export function getUniqueAssignedTeams(coaches = []) {
 
 export function getCoachStats(coaches = []) {
   return {
-    trainer: coaches.filter((coach) => isTrainerRole(coach.role)).length,
-    coTrainer: coaches.filter((coach) => isCoTrainerRole(coach.role)).length,
-    supervisors: coaches.filter((coach) => isSupervisorRole(coach.role)).length,
+    trainer: coaches.filter((coach) =>
+      getCoachRoleLabels(coach).some((role) => isTrainerRole(role)),
+    ).length,
+    coTrainer: coaches.filter((coach) =>
+      getCoachRoleLabels(coach).some((role) => isCoTrainerRole(role)),
+    ).length,
+    supervisors: coaches.filter((coach) =>
+      getCoachRoleLabels(coach).some((role) => isSupervisorRole(role)),
+    ).length,
     teams: getUniqueAssignedTeams(coaches).length,
   };
 }
 
 export function filterCoachesByStats(coaches = [], filter = "alle") {
   if (filter === "trainer") {
-    return coaches.filter((coach) => isTrainerRole(coach.role));
+    return coaches.filter((coach) =>
+      getCoachRoleLabels(coach).some((role) => isTrainerRole(role)),
+    );
   }
 
   if (filter === "co-trainer") {
-    return coaches.filter((coach) => isCoTrainerRole(coach.role));
+    return coaches.filter((coach) =>
+      getCoachRoleLabels(coach).some((role) => isCoTrainerRole(role)),
+    );
   }
 
   if (filter === "betreuer") {
-    return coaches.filter((coach) => isSupervisorRole(coach.role));
+    return coaches.filter((coach) =>
+      getCoachRoleLabels(coach).some((role) => isSupervisorRole(role)),
+    );
   }
 
   if (filter === "mannschaften") {
-    return coaches.filter((coach) => coach.team_id);
+    return coaches.filter((coach) => getCoachTeamIds(coach).length > 0);
   }
 
   return coaches;

@@ -1,4 +1,5 @@
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { resolvePlayerImageUrl } from "@/lib/people/imageUrl";
 
 function FlagIcon({ country }) {
   if (!country || country.iso === "OTHER") return null;
@@ -13,7 +14,7 @@ function FlagIcon({ country }) {
 }
 
 export default function PlayerProfileImageCard({ player, fullName, country }) {
-  const imageUrl = player.photo_url || PLAYER_PLACEHOLDER_IMAGE;
+  const imageUrl = resolvePlayerImageUrl(player, PLAYER_PLACEHOLDER_IMAGE);
   const isPlaceholder = imageUrl === PLAYER_PLACEHOLDER_IMAGE;
 
   return (

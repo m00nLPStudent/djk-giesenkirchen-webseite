@@ -1,0 +1,4 @@
+id,name,public,file_size_limit,allowed_mime_types,created_at,updated_at
+events-documents,events-documents,true,null,null,2026-07-04 15:43:25.720044+00,2026-07-04 15:43:25.720044+00
+media,media,true,null,null,2026-06-23 16:37:27.645301+00,2026-06-23 16:37:27.645301+00
+news-documents,news-documents,true,null,null,2026-07-04 07:00:56.106089+00,2026-07-04 07:00:56.106089+00

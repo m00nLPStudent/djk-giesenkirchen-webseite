@@ -1,0 +1,106 @@
+schema_name,table_name,constraint_name,constraint_type,constraint_definition
+public,admin_permissions,admin_permissions_key_key,UNIQUE,UNIQUE (key)
+public,admin_permissions,admin_permissions_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,admin_profiles,admin_profiles_email_key,UNIQUE,UNIQUE (email)
+public,admin_profiles,admin_profiles_id_fkey,FOREIGN KEY,FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+public,admin_profiles,admin_profiles_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,admin_role_permissions,admin_role_permissions_permission_id_fkey,FOREIGN KEY,FOREIGN KEY (permission_id) REFERENCES admin_permissions(id) ON DELETE CASCADE
+public,admin_role_permissions,admin_role_permissions_pkey,PRIMARY KEY,"PRIMARY KEY (role_id, permission_id)"
+public,admin_role_permissions,admin_role_permissions_role_id_fkey,FOREIGN KEY,FOREIGN KEY (role_id) REFERENCES admin_roles(id) ON DELETE CASCADE
+public,admin_roles,admin_roles_key_key,UNIQUE,UNIQUE (key)
+public,admin_roles,admin_roles_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,admin_user_roles,admin_user_roles_pkey,PRIMARY KEY,"PRIMARY KEY (user_id, role_id)"
+public,admin_user_roles,admin_user_roles_role_id_fkey,FOREIGN KEY,FOREIGN KEY (role_id) REFERENCES admin_roles(id) ON DELETE CASCADE
+public,admin_user_roles,admin_user_roles_user_id_fkey,FOREIGN KEY,FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+public,board_members,board_members_admin_profile_id_fkey,FOREIGN KEY,FOREIGN KEY (admin_profile_id) REFERENCES admin_profiles(id) ON DELETE SET NULL
+public,board_members,board_members_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,board_members,board_members_role_id_fkey,FOREIGN KEY,FOREIGN KEY (role_id) REFERENCES board_roles(id) ON DELETE SET NULL
+public,board_roles,board_roles_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,board_roles,board_roles_slug_key,UNIQUE,UNIQUE (slug)
+public,club_closure_periods,club_closure_periods_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,club_closure_periods,club_closure_periods_range_check,CHECK,CHECK (ends_on >= starts_on)
+public,club_closure_periods,club_closure_periods_scope_check,CHECK,CHECK (applies_to_all = true AND team_season_id IS NULL OR applies_to_all = false)
+public,club_closure_periods,club_closure_periods_team_season_id_fkey,FOREIGN KEY,FOREIGN KEY (team_season_id) REFERENCES team_seasons(id) ON DELETE CASCADE
+public,club_contacts,club_contacts_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,club_contacts,club_contacts_role_key_format_check,CHECK,CHECK (role_key ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::text)
+public,club_history_images,club_history_images_club_history_page_id_fkey,FOREIGN KEY,FOREIGN KEY (club_history_page_id) REFERENCES club_history_pages(id) ON DELETE CASCADE
+public,club_history_images,club_history_images_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,club_history_milestones,club_history_milestones_club_history_page_id_fkey,FOREIGN KEY,FOREIGN KEY (club_history_page_id) REFERENCES club_history_pages(id) ON DELETE CASCADE
+public,club_history_milestones,club_history_milestones_milestone_year_check,CHECK,CHECK (milestone_year >= 1800 AND milestone_year <= 2200)
+public,club_history_milestones,club_history_milestones_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,club_history_pages,club_history_pages_page_key_key,UNIQUE,UNIQUE (page_key)
+public,club_history_pages,club_history_pages_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,club_settings,club_settings_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,club_settings,club_settings_singleton_check,CHECK,CHECK (singleton = true)
+public,club_settings,club_settings_singleton_key,UNIQUE,UNIQUE (singleton)
+public,coach_team_seasons,coach_team_seasons_coach_id_fkey,FOREIGN KEY,FOREIGN KEY (coach_id) REFERENCES coaches(id) ON DELETE CASCADE
+public,coach_team_seasons,coach_team_seasons_coach_id_team_season_id_key,UNIQUE,"UNIQUE (coach_id, team_season_id)"
+public,coach_team_seasons,coach_team_seasons_coach_team_unique,UNIQUE,"UNIQUE (coach_id, team_season_id)"
+public,coach_team_seasons,coach_team_seasons_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,coach_team_seasons,coach_team_seasons_team_season_id_fkey,FOREIGN KEY,FOREIGN KEY (team_season_id) REFERENCES team_seasons(id) ON DELETE CASCADE
+public,coaches,coaches_admin_profile_id_fkey,FOREIGN KEY,FOREIGN KEY (admin_profile_id) REFERENCES admin_profiles(id) ON DELETE SET NULL
+public,coaches,coaches_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,coaches,coaches_team_id_fkey,FOREIGN KEY,FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE SET NULL
+public,departments,departments_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,departments,departments_slug_key,UNIQUE,UNIQUE (slug)
+public,event_documents,event_documents_event_id_fkey,FOREIGN KEY,FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+public,event_documents,event_documents_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,events,events_end_after_start_check,CHECK,CHECK (ends_at IS NULL OR ends_at >= starts_at)
+public,events,events_event_type_check,CHECK,"CHECK (event_type = ANY (ARRAY['training'::text, 'spiel'::text, 'vereinstermin'::text, 'turnier'::text, 'sonstiges'::text]))"
+public,events,events_external_url_http_check,CHECK,CHECK (external_url IS NULL OR external_url ~* '^https?://'::text)
+public,events,events_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,events,events_recurrence_count_check,CHECK,CHECK (recurrence_count IS NULL OR recurrence_count >= 1)
+public,events,events_recurrence_interval_check,CHECK,CHECK (recurrence_interval >= 1)
+public,events,events_recurrence_type_check,CHECK,"CHECK (recurrence_type = ANY (ARRAY['none'::text, 'daily'::text, 'weekly'::text, 'monthly'::text, 'yearly'::text]))"
+public,events,events_team_id_fkey,FOREIGN KEY,FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE SET NULL
+public,membership_request_recipients,membership_request_recipients_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,membership_requests,membership_requests_desired_team_id_fkey,FOREIGN KEY,FOREIGN KEY (desired_team_id) REFERENCES teams(id) ON DELETE SET NULL
+public,membership_requests,membership_requests_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,membership_requests,membership_requests_request_type_check,CHECK,"CHECK (request_type = ANY (ARRAY['aktives-mitglied-fussball'::text, 'trainer-werden'::text, 'passives-mitglied'::text, 'sonstiges'::text]))"
+public,news,news_football_team_id_fkey,FOREIGN KEY,FOREIGN KEY (football_team_id) REFERENCES teams(id) ON DELETE SET NULL
+public,news,news_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,news,news_slug_key,UNIQUE,UNIQUE (slug)
+public,news_documents,news_documents_news_id_fkey,FOREIGN KEY,FOREIGN KEY (news_id) REFERENCES news(id) ON DELETE CASCADE
+public,news_documents,news_documents_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,pages,pages_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,pages,pages_publish_requires_de_content_check,CHECK,"CHECK (is_published = false OR length(TRIM(BOTH FROM COALESCE(title_de, ''::text))) > 0 AND length(TRIM(BOTH FROM COALESCE(content_de, ''::text))) > 0)"
+public,pages,pages_slug_format_check,CHECK,CHECK (slug ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'::text)
+public,pages,pages_slug_key,UNIQUE,UNIQUE (slug)
+public,player_team_seasons,player_team_seasons_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,player_team_seasons,player_team_seasons_player_id_fkey,FOREIGN KEY,FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE
+public,player_team_seasons,player_team_seasons_player_id_team_season_id_key,UNIQUE,"UNIQUE (player_id, team_season_id)"
+public,player_team_seasons,player_team_seasons_player_team_unique,UNIQUE,"UNIQUE (player_id, team_season_id)"
+public,player_team_seasons,player_team_seasons_team_season_id_fkey,FOREIGN KEY,FOREIGN KEY (team_season_id) REFERENCES team_seasons(id) ON DELETE CASCADE
+public,players,players_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,players,players_team_id_fkey,FOREIGN KEY,FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE SET NULL
+public,seasons,seasons_name_key,UNIQUE,UNIQUE (name)
+public,seasons,seasons_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,seasons,seasons_slug_key,UNIQUE,UNIQUE (slug)
+public,sponsor_categories,sponsor_categories_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,sponsor_categories,sponsor_categories_slug_key,UNIQUE,UNIQUE (slug)
+public,sponsors,sponsors_category_id_fkey,FOREIGN KEY,FOREIGN KEY (category_id) REFERENCES sponsor_categories(id) ON DELETE SET NULL
+public,sponsors,sponsors_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,team_seasons,team_seasons_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,team_seasons,team_seasons_season_id_fkey,FOREIGN KEY,FOREIGN KEY (season_id) REFERENCES seasons(id) ON DELETE CASCADE
+public,team_seasons,team_seasons_season_id_slug_key,UNIQUE,"UNIQUE (season_id, slug)"
+public,team_seasons,team_seasons_season_id_slug_unique,UNIQUE,"UNIQUE (season_id, slug)"
+public,team_seasons,team_seasons_team_id_fkey,FOREIGN KEY,FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
+public,team_seasons,team_seasons_team_id_season_id_key,UNIQUE,"UNIQUE (team_id, season_id)"
+public,team_seasons,team_seasons_team_id_season_id_unique,UNIQUE,"UNIQUE (team_id, season_id)"
+public,team_templates,team_templates_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,team_templates,team_templates_slug_key,UNIQUE,UNIQUE (slug)
+public,team_training_exceptions,team_training_exceptions_override_time_range_check,CHECK,CHECK (override_start_time IS NULL OR override_end_time IS NULL OR override_end_time > override_start_time)
+public,team_training_exceptions,team_training_exceptions_override_training_type_check,CHECK,"CHECK (override_training_type IS NULL OR (override_training_type = ANY (ARRAY['training'::text, 'spiel'::text, 'torwart'::text, 'foerdertraining'::text, 'athletik'::text, 'hallentraining'::text, 'sonstiges'::text])))"
+public,team_training_exceptions,team_training_exceptions_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,team_training_exceptions,team_training_exceptions_team_training_time_id_fkey,FOREIGN KEY,FOREIGN KEY (team_training_time_id) REFERENCES team_training_times(id) ON DELETE CASCADE
+public,team_training_exceptions,team_training_exceptions_type_check,CHECK,"CHECK (exception_type = ANY (ARRAY['cancelled'::text, 'moved'::text]))"
+public,team_training_exceptions,team_training_exceptions_unique_date,UNIQUE,"UNIQUE (team_training_time_id, exception_date)"
+public,team_training_times,team_training_times_effective_range_check,CHECK,CHECK (effective_until IS NULL OR effective_from IS NULL OR effective_until >= effective_from)
+public,team_training_times,team_training_times_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,team_training_times,team_training_times_team_season_id_fkey,FOREIGN KEY,FOREIGN KEY (team_season_id) REFERENCES team_seasons(id) ON DELETE CASCADE
+public,team_training_times,team_training_times_time_range_check,CHECK,CHECK (end_time > start_time)
+public,team_training_times,team_training_times_training_type_check,CHECK,"CHECK (training_type = ANY (ARRAY['training'::text, 'spiel'::text, 'torwart'::text, 'foerdertraining'::text, 'athletik'::text, 'hallentraining'::text, 'sonstiges'::text]))"
+public,team_training_times,team_training_times_weekday_check,CHECK,CHECK (weekday >= 1 AND weekday <= 7)
+public,teams,teams_department_id_fkey,FOREIGN KEY,FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE
+public,teams,teams_pkey,PRIMARY KEY,PRIMARY KEY (id)
+public,teams,teams_slug_key,UNIQUE,UNIQUE (slug)

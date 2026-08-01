@@ -3,6 +3,7 @@ import { ActiveStatusField, SortOrderField } from "@/components/admin/forms";
 export function CoachSortOrderField({ form, updateField }) {
   return (
     <SortOrderField
+      label="Fallback-Reihenfolge"
       value={form.sort_order}
       onChange={(value) => updateField("sort_order", value)}
     />

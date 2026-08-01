@@ -1,42 +1,51 @@
 import { validateRequiredFields } from "@/components/admin/utils/validation";
+import { CURRENT_SEASON_STATUSES } from "@/components/admin/persons/seasonalReadModelCore.mjs";
 import { PLAYER_PLACEHOLDER_IMAGE } from "../services/players.service";
 import { REQUIRED_PLAYER_FIELDS } from "./playerForm.config";
+import {
+  createInitialPlayerFormData,
+  createPlayerPayloadData,
+  getPlayerFormBlockingMessageData,
+  getPlayerFormWarningMessageData,
+  getYearGroupFromBirthdate,
+} from "./playerForm.core.mjs";
 
-export function createInitialPlayerForm(player) {
-  return {
-    team_id: player?.team_id || "",
-    first_name: player?.first_name || "",
-    last_name: player?.last_name || "",
-    shirt_number: player?.shirt_number || "",
-    position_de: player?.position_de || "",
-    position_en: player?.position_en || "",
-    photo_url: player?.photo_url || PLAYER_PLACEHOLDER_IMAGE,
-    description_de: player?.description_de || "",
-    description_en: player?.description_en || "",
-    birthdate: player?.birthdate || "",
-    joined_at: player?.joined_at || "",
-    strong_foot: player?.strong_foot || "",
-    nationality: player?.nationality || "",
-    gender: player?.gender || "",
-    sort_order: player?.sort_order || 0,
-    is_active: player?.is_active ?? true,
-    is_captain: player?.is_captain ?? false,
-  };
+export function createInitialPlayerForm(
+  player,
+  playerSeasonalReadModel,
+) {
+  return createInitialPlayerFormData(
+    player,
+    playerSeasonalReadModel,
+    PLAYER_PLACEHOLDER_IMAGE,
+  );
 }
-
-export function getYearGroupFromBirthdate(birthdate) {
-  if (!birthdate) return "";
-  return String(new Date(birthdate).getFullYear());
-}
+export { getYearGroupFromBirthdate };
 
 export function validatePlayerForm(form) {
   return validateRequiredFields(form, REQUIRED_PLAYER_FIELDS);
 }
 
 export function createPlayerPayload(form, yearGroup) {
-  return {
-    ...form,
-    photo_url: form.photo_url || PLAYER_PLACEHOLDER_IMAGE,
-    year_group: yearGroup,
-  };
+  return createPlayerPayloadData(form, yearGroup, PLAYER_PLACEHOLDER_IMAGE);
+}
+
+export function getPlayerFormBlockingMessage(
+  teamOptionsResult,
+  playerSeasonalReadModel,
+) {
+  return getPlayerFormBlockingMessageData(
+    teamOptionsResult,
+    playerSeasonalReadModel,
+    CURRENT_SEASON_STATUSES,
+  );
+}
+
+export function getPlayerFormWarningMessage(
+  playerSeasonalReadModel,
+) {
+  return getPlayerFormWarningMessageData(
+    playerSeasonalReadModel,
+    CURRENT_SEASON_STATUSES,
+  );
 }

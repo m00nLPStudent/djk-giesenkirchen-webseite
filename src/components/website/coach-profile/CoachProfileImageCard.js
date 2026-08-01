@@ -1,4 +1,5 @@
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { resolveCoachImageUrl } from "@/lib/people/imageUrl";
 
 function FlagIcon({ country }) {
   if (!country || country.iso === "OTHER") return null;
@@ -13,7 +14,7 @@ function FlagIcon({ country }) {
 }
 
 export default function CoachProfileImageCard({ coach, fullName, country }) {
-  const imageUrl = coach.image_url || COACH_PLACEHOLDER_IMAGE;
+  const imageUrl = resolveCoachImageUrl(coach, COACH_PLACEHOLDER_IMAGE);
   const isPlaceholder = imageUrl === COACH_PLACEHOLDER_IMAGE;
 
   return (
