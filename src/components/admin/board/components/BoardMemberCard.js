@@ -39,19 +39,25 @@ export default function BoardMemberCard({ member }) {
         {[member.email, member.phone].filter(Boolean).join(" · ")}
       </EntityCardMeta>
       <EntityCardActions>
-        <Can permission="settings.edit" uiOnly>
-          <EntityActionLink href={`/admin/department/board/edit/${member.id}`}>
-            Bearbeiten
-          </EntityActionLink>
+        <Can permission="settings.view" uiOnly fallback={null}>
+          {member._canEditInScope === false ? null : (
+            <EntityActionLink
+              href={`/admin/department/board/edit/${member.id}`}
+            >
+              Bearbeiten
+            </EntityActionLink>
+          )}
         </Can>
-        <Can permission="settings.edit" uiOnly>
-          <AdminRemoveButton
-            label="Vorstandsmitglied"
-            name={fullName}
-            action={() => removeBoardMemberRecord(member)}
-            affected={["Vorstandsprofil"]}
-            preserved={["Trainer", "Mannschaften", "News"]}
-          />
+        <Can permission="settings.edit" uiOnly fallback={null}>
+          {member._canDeleteInScope === false ? null : (
+            <AdminRemoveButton
+              label="Vorstandsmitglied"
+              name={fullName}
+              action={() => removeBoardMemberRecord(member)}
+              affected={["Vorstandsprofil"]}
+              preserved={["Trainer", "Mannschaften", "News"]}
+            />
+          )}
         </Can>
       </EntityCardActions>
     </EntityCard>

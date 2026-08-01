@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import { saveBoardMemberWithScopeAction } from "@/app/admin/department/board/actions";
 import {
   ActiveStatusField,
   EmailField,
@@ -18,7 +19,6 @@ import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import BoardMemberImageUpload from "../components/BoardMemberImageUpload";
 import {
   BOARD_PLACEHOLDER_IMAGE,
-  saveBoardMember,
   uploadBoardImage,
 } from "../services/board.service";
 
@@ -73,7 +73,10 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
       success: true,
     });
     setLoading(true);
-    const { error } = await saveBoardMember(form, member?.id || null);
+    const { error } = await saveBoardMemberWithScopeAction(
+      form,
+      member?.id || null,
+    );
     setLoading(false);
 
     if (error) {

@@ -6,6 +6,7 @@ import {
   filterScopedTeamsOnServer,
   loadServerTeamScopeContext,
 } from "@/components/admin/teams/serverTeamScope";
+import { isYouthTeam } from "@/components/admin/teams/teamScope";
 import BackButton from "@/components/admin/ui/BackButton";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
@@ -46,6 +47,16 @@ export default async function NewTeamPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
+  const filteredTeamTemplates = canReachTeamCreateOnServer(scopeContext)
+    ? (teamTemplates || []).filter((template) => {
+        if (scopeContext?.canAccessYouthAll && !scopeContext?.isGlobal) {
+          return isYouthTeam(template);
+        }
+
+        return true;
+      })
+    : [];
+
   let playersQuery = supabaseServer
     .from("players")
     .select("*")
@@ -79,7 +90,7 @@ export default async function NewTeamPage() {
       <TeamScopeGate requireCreateScope>
         <AdminTeamsForm
           seasons={seasons || []}
-          teamTemplates={teamTemplates || []}
+          teamTemplates={filteredTeamTemplates}
           players={players || []}
           coaches={coaches || []}
         />

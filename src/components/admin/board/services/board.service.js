@@ -5,6 +5,10 @@ import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 
 export const BOARD_PLACEHOLDER_IMAGE = COACH_PLACEHOLDER_IMAGE;
 
+function resolveClient(client = null) {
+  return client || supabase;
+}
+
 export async function uploadBoardImage(file, member = {}) {
   return await uploadMediaFile(file, {
     folder: "board",
@@ -20,7 +24,12 @@ export async function deleteBoardImage(imageUrl) {
   });
 }
 
-export async function saveBoardMember(member, id = null) {
+export async function saveBoardMember(
+  member,
+  id = null,
+  { client = null } = {},
+) {
+  const db = resolveClient(client);
   const payload = {
     role_id: member.role_id || null,
     first_name: member.first_name || null,
@@ -35,7 +44,7 @@ export async function saveBoardMember(member, id = null) {
   };
 
   if (id) {
-    const result = await supabase
+    const result = await db
       .from("board_members")
       .update(payload)
       .eq("id", id)
@@ -54,10 +63,7 @@ export async function saveBoardMember(member, id = null) {
     return result;
   }
 
-  const result = await supabase
-    .from("board_members")
-    .insert(payload)
-    .select("*");
+  const result = await db.from("board_members").insert(payload).select("*");
 
   logAdminSaveEvent({
     module: "board_members",

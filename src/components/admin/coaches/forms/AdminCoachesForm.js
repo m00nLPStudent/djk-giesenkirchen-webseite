@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import { saveCoachWithScopeAction } from "@/app/admin/coaches/actions";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { FormAlert, FormSection } from "@/components/admin/forms";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
@@ -15,7 +16,6 @@ import CoachImageUpload from "../components/CoachImageUpload";
 import {
   deleteCoachImage,
   uploadCoachImage,
-  saveCoach,
 } from "../services/coaches.service";
 import {
   createCoachPayload,
@@ -83,7 +83,7 @@ export default function AdminCoachesForm({ coach, teams = [] }) {
 
     setLoading(true);
 
-    const { error } = await saveCoach(
+    const { error } = await saveCoachWithScopeAction(
       createCoachPayload(form),
       coach?.id ?? null,
     );

@@ -81,26 +81,30 @@ export default function PlayerCard({ player }) {
       )}
 
       <EntityCardActions>
-        <Can permission="players.edit" uiOnly>
-          <EntityActionLink href={`/admin/players/edit/${player.id}`}>
-            Bearbeiten
-          </EntityActionLink>
+        <Can permission="players.edit" uiOnly fallback={null}>
+          {player._canEditInScope === false ? null : (
+            <EntityActionLink href={`/admin/players/edit/${player.id}`}>
+              Bearbeiten
+            </EntityActionLink>
+          )}
         </Can>
         <EntityActionLink href={profileUrl} target="_blank" variant="primary">
           Profil anzeigen
         </EntityActionLink>
-        <Can permission="players.delete" uiOnly>
-          <AdminRemoveButton
-            label="Spieler"
-            name={fullName}
-            action={() => removePlayerRecord(player)}
-            affected={[
-              "Spielerprofil",
-              "Kader-Zuordnungen",
-              "Spielerbild, sofern vorhanden",
-            ]}
-            preserved={["Mannschaften", "Trainer", "News", "Saisons"]}
-          />
+        <Can permission="players.delete" uiOnly fallback={null}>
+          {player._canDeleteInScope === false ? null : (
+            <AdminRemoveButton
+              label="Spieler"
+              name={fullName}
+              action={() => removePlayerRecord(player)}
+              affected={[
+                "Spielerprofil",
+                "Kader-Zuordnungen",
+                "Spielerbild, sofern vorhanden",
+              ]}
+              preserved={["Mannschaften", "Trainer", "News", "Saisons"]}
+            />
+          )}
         </Can>
       </EntityCardActions>
     </EntityCard>

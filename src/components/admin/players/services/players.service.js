@@ -1,5 +1,6 @@
 import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
 import { createEntityRepository } from "@/components/admin/services/entity.repository";
+import { supabase } from "@/lib/supabase";
 
 export const PLAYER_PLACEHOLDER_IMAGE =
   "https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/players/Blanko.png";
@@ -9,6 +10,10 @@ const playerRepository = createEntityRepository({
   placeholderImage: PLAYER_PLACEHOLDER_IMAGE,
   imageFields: ["photo_url", "image_url"],
 });
+
+function resolveClient(client = null) {
+  return client || supabase;
+}
 
 export async function deletePlayerImage(imageUrl) {
   return await deleteMediaFile(imageUrl, {
@@ -25,7 +30,8 @@ export async function uploadPlayerImage(file, player = {}) {
   });
 }
 
-export async function savePlayer(player, id = null) {
+export async function savePlayer(player, id = null, { client = null } = {}) {
+  const db = resolveClient(client);
   const payload = {
     team_id: player.team_id || null,
     first_name: player.first_name || null,
@@ -48,5 +54,13 @@ export async function savePlayer(player, id = null) {
     is_captain: player.is_captain ?? false,
   };
 
-  return await playerRepository.upsert(payload, id);
+  if (!client) {
+    return await playerRepository.upsert(payload, id);
+  }
+
+  if (id) {
+    return await db.from("players").update(payload).eq("id", id).select("*");
+  }
+
+  return await db.from("players").insert(payload).select("*");
 }

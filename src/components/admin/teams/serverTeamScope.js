@@ -8,6 +8,17 @@ import {
   filterTeamsByScope,
 } from "./teamScope";
 
+const GLOBAL_TEAM_MODULE_ROLE_KEYS = ["vorstand", "fussball-vorstand"];
+
+function canAccessAllTeamsModule(scopeContext) {
+  return Boolean(
+    scopeContext?.isGlobal ||
+    GLOBAL_TEAM_MODULE_ROLE_KEYS.some((roleKey) =>
+      (scopeContext?.roleKeys || []).includes(roleKey),
+    ),
+  );
+}
+
 function normalizePermissionKeys(permissions = []) {
   return (permissions || [])
     .map((permission) => permission?.key || permission)
@@ -31,6 +42,10 @@ export async function loadServerTeamScopeContext(permissionResult) {
 }
 
 export function resolveTeamScopeType(scopeContext) {
+  if (canAccessAllTeamsModule(scopeContext)) {
+    return "global";
+  }
+
   return resolveRoleScope(scopeContext, "teams");
 }
 

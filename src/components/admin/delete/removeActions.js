@@ -1,5 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import { removePlayerWithScopeAction } from "@/app/admin/players/actions";
+import { removeCoachWithScopeAction } from "@/app/admin/coaches/actions";
+import { removeBoardMemberWithScopeAction } from "@/app/admin/department/board/actions";
 
 async function removeEntity(entityType, entityId) {
   return await supabase.rpc("remove_entity", {
@@ -9,11 +12,11 @@ async function removeEntity(entityType, entityId) {
 }
 
 export async function removePlayerRecord(player) {
-  return await removeEntity("player", player?.id);
+  return await removePlayerWithScopeAction(player?.id);
 }
 
 export async function removeCoachRecord(coach) {
-  return await removeEntity("coach", coach?.id);
+  return await removeCoachWithScopeAction(coach?.id);
 }
 
 export async function removeTeamRecord(team) {
@@ -25,7 +28,7 @@ export async function removeNewsRecord(news) {
 }
 
 export async function removeBoardMemberRecord(member) {
-  return await removeEntity("board_member", member?.id);
+  return await removeBoardMemberWithScopeAction(member?.id);
 }
 
 export async function removeSponsorRecord(sponsor) {

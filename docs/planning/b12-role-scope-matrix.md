@@ -43,9 +43,9 @@ Legende: yes | no | draft_only
 | Vorstand          | Dashboard          | yes  | no         | no         | no         | no      | read_only      |
 | Vorstand          | News               | yes  | yes        | yes        | yes        | yes     | global         |
 | Vorstand          | Termine            | yes  | yes        | yes        | yes        | yes     | global         |
-| Vorstand          | Mannschaften       | yes  | no         | no         | no         | no      | read_only      |
-| Vorstand          | Trainer            | yes  | no         | no         | no         | no      | read_only      |
-| Vorstand          | Spieler            | yes  | no         | no         | no         | no      | read_only      |
+| Vorstand          | Mannschaften       | yes  | yes        | yes        | yes        | no      | global         |
+| Vorstand          | Trainer            | yes  | yes        | yes        | yes        | no      | global         |
+| Vorstand          | Spieler            | yes  | yes        | yes        | yes        | no      | global         |
 | Vorstand          | Sponsoren          | yes  | yes        | yes        | yes        | yes     | global         |
 | Vorstand          | Abteilung/Vorstand | yes  | no         | yes        | no         | no      | own_board_card |
 | Vorstand          | Vereinsgeschichte  | yes  | yes        | yes        | yes        | yes     | global         |
@@ -58,9 +58,9 @@ Legende: yes | no | draft_only
 | Fussballvorstand  | Dashboard          | yes  | no         | no         | no         | no      | read_only      |
 | Fussballvorstand  | News               | yes  | yes        | yes        | yes        | yes     | global         |
 | Fussballvorstand  | Termine            | yes  | yes        | yes        | yes        | yes     | global         |
-| Fussballvorstand  | Mannschaften       | yes  | no         | no         | no         | no      | read_only      |
-| Fussballvorstand  | Trainer            | yes  | no         | no         | no         | no      | read_only      |
-| Fussballvorstand  | Spieler            | yes  | no         | no         | no         | no      | read_only      |
+| Fussballvorstand  | Mannschaften       | yes  | yes        | yes        | yes        | no      | global         |
+| Fussballvorstand  | Trainer            | yes  | yes        | yes        | yes        | no      | global         |
+| Fussballvorstand  | Spieler            | yes  | yes        | yes        | yes        | no      | global         |
 | Fussballvorstand  | Sponsoren          | yes  | yes        | yes        | yes        | yes     | global         |
 | Fussballvorstand  | Abteilung/Vorstand | yes  | no         | yes        | no         | no      | own_board_card |
 | Fussballvorstand  | Vereinsgeschichte  | yes  | yes        | yes        | yes        | yes     | global         |
@@ -73,9 +73,9 @@ Legende: yes | no | draft_only
 | Jugendkoordinator | Dashboard          | yes  | no         | no         | no         | no      | read_only      |
 | Jugendkoordinator | News               | yes  | yes        | yes        | yes        | yes     | global         |
 | Jugendkoordinator | Termine            | yes  | yes        | yes        | yes        | yes     | global         |
-| Jugendkoordinator | Mannschaften       | yes  | yes        | yes        | no         | no      | youth_all      |
-| Jugendkoordinator | Trainer            | yes  | no         | yes        | no         | no      | youth_all      |
-| Jugendkoordinator | Spieler            | yes  | yes        | yes        | no         | no      | youth_all      |
+| Jugendkoordinator | Mannschaften       | yes  | no         | yes        | yes        | no      | youth_all      |
+| Jugendkoordinator | Trainer            | yes  | yes        | yes        | yes        | no      | youth_all      |
+| Jugendkoordinator | Spieler            | yes  | yes        | yes        | yes        | no      | youth_all      |
 | Jugendkoordinator | Sponsoren          | no   | no         | no         | no         | no      | none           |
 | Jugendkoordinator | Abteilung/Vorstand | yes  | no         | yes        | no         | no      | own_board_card |
 | Jugendkoordinator | Vereinsgeschichte  | no   | no         | no         | no         | no      | none           |
@@ -177,6 +177,10 @@ Legende: yes | no | draft_only
 | Gast              | eigenes Profil     | yes  | yes        | yes        | no         | no      | own_profile    |
 
 ## Scope-Ableitung und Teamzuordnungen
+
+- Jugendkoordinator verwendet fuer Mannschaften, Trainer und Spieler den Scope `youth_all` mit bestehenden Permission-Keys `*.view/create/edit/delete`.
+- Vorstand und Fussballvorstand erhalten globalen Modulscope ausschliesslich fuer Mannschaften, Trainer und Spieler.
+- Vorstandsrechte fuer Abteilung/Vorstand bleiben getrennt: eigene Kachel ueber `own_board_card`, globale Bearbeitung nur mit bestehender Board-Permission.
 
 - global und youth_all werden aus Rolle und Permission abgeleitet
 - global und youth_all werden nicht als kuenstliche Teamzeilen gespeichert

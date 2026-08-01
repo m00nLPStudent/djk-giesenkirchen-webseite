@@ -4,6 +4,21 @@ import {
   canAccessYouth,
 } from "@/lib/admin-auth/scopes/scopeEngine";
 
+const GLOBAL_TEAM_MODULE_ROLE_KEYS = ["vorstand", "fussball-vorstand"];
+
+function hasRoleKey(scopeContext, roleKey) {
+  return Boolean((scopeContext?.roleKeys || []).includes(roleKey));
+}
+
+function canAccessAllTeamsModule(scopeContext) {
+  return (
+    canAccessAll(scopeContext) ||
+    GLOBAL_TEAM_MODULE_ROLE_KEYS.some((roleKey) =>
+      hasRoleKey(scopeContext, roleKey),
+    )
+  );
+}
+
 function normalizeText(value = "") {
   return String(value || "")
     .trim()
@@ -33,7 +48,7 @@ export function isYouthTeam(team = {}) {
 export function canAccessTeamInScope(scopeContext, team = {}) {
   if (!team?.id) return false;
 
-  if (canAccessAll(scopeContext)) return true;
+  if (canAccessAllTeamsModule(scopeContext)) return true;
 
   if (canAccessYouth(scopeContext) && isYouthTeam(team)) {
     return true;
@@ -49,7 +64,7 @@ export function filterTeamsByScope(scopeContext, teams = []) {
 }
 
 export function canCreateTeamInScope(scopeContext, draftTeam = {}) {
-  if (canAccessAll(scopeContext)) return true;
+  if (canAccessAllTeamsModule(scopeContext)) return true;
 
   if (canAccessYouth(scopeContext)) {
     return isYouthTeam(draftTeam);
@@ -59,11 +74,11 @@ export function canCreateTeamInScope(scopeContext, draftTeam = {}) {
 }
 
 export function canReachTeamCreate(scopeContext) {
-  return canAccessAll(scopeContext) || canAccessYouth(scopeContext);
+  return canAccessAllTeamsModule(scopeContext) || canAccessYouth(scopeContext);
 }
 
 export function hasTeamManagementScope(scopeContext) {
-  if (canAccessAll(scopeContext)) return true;
+  if (canAccessAllTeamsModule(scopeContext)) return true;
   if (canAccessYouth(scopeContext)) return true;
   return (scopeContext?.assignedTeamIds || []).length > 0;
 }

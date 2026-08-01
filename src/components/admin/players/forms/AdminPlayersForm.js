@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { savePlayerWithScopeAction } from "@/app/admin/players/actions";
 import { FormAlert, FormSection } from "@/components/admin/forms";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import useEntityForm from "@/components/admin/hooks/useEntityForm";
@@ -13,7 +14,6 @@ import PlayerImageUpload from "../components/PlayerImageUpload";
 import {
   deletePlayerImage,
   PLAYER_PLACEHOLDER_IMAGE,
-  savePlayer,
   uploadPlayerImage,
 } from "../services/players.service";
 import { getPositionOptions, POSITION_EN } from "./playerForm.config";
@@ -112,7 +112,10 @@ export default function AdminPlayersForm({ player, teams = [] }) {
     setLoading(true);
 
     const payload = createPlayerPayload(form, calculatedYearGroup);
-    const { error } = await savePlayer(payload, player?.id ?? null);
+    const { error } = await savePlayerWithScopeAction(
+      payload,
+      player?.id ?? null,
+    );
 
     setLoading(false);
 

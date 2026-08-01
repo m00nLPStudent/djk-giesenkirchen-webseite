@@ -38,7 +38,7 @@ const navItems = [
     href: "/admin/department",
     label: "Abteilung",
     icon: Building2,
-    requiredPermission: "system.view",
+    requiredPermission: "settings.view",
   },
   {
     href: "/admin/sponsors",
