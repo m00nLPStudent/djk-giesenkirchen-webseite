@@ -1,7 +1,7 @@
-import TabNavigation from "@/components/admin/ui/TabNavigation";
+import SettingsToolbar from "./SettingsToolbar";
 
 export default function SettingsTabs({ tabs, activeTab, onChange }) {
   return (
-    <TabNavigation tabs={tabs} activeTab={activeTab} onChange={onChange} />
+    <SettingsToolbar items={tabs} activeId={activeTab} onChange={onChange} />
   );
 }

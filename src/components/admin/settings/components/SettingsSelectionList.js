@@ -1,4 +1,4 @@
-import AdminSelectionList from "@/components/admin/common/AdminSelectionList";
+import { AdminModuleEmptyState } from "@/components/admin/design-system";
 
 export default function SettingsSelectionList({
   items = [],
@@ -6,11 +6,6 @@ export default function SettingsSelectionList({
   renderItem,
 }) {
   return (
-    <AdminSelectionList
-      items={items}
-      emptyText={emptyText}
-      renderItem={renderItem}
-      containerClassName="space-y-3"
-    />
+    items.length ? <div className="space-y-3">{items.map(renderItem)}</div> : <AdminModuleEmptyState title={emptyText} />
   );
 }

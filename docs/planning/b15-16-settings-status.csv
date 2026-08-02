@@ -1,0 +1,15 @@
+Bereich,Status,Anmerkung
+Seitenrahmen,erledigt,AdminModulePage
+Seitenkopf,erledigt,AdminModuleHeader mit vorgegebenem Text
+Haupttabs,erledigt,AdminActionBar und AdminButton
+Mitgliedschaft-Untertabs,erledigt,Gemeinsame SettingsToolbar
+Vereinsdaten,erledigt,Vorhandenes Formular und Handler unverändert
+Kontakte,erledigt,Auswahl Editor Upload und Löschpfad unverändert
+Mitgliedschaftsempfänger,erledigt,Auswahl Editor und Löschpfad unverändert
+Mitgliedsanfragen,erledigt,Permissions Query-Gates und Aktionen unverändert
+CMS-Seiten,erledigt,Auswahl Editor und Löschpfad unverändert
+Empty States,erledigt,AdminModuleEmptyState
+Gefahrenbereiche,erledigt,AdminDangerZone für bestehende Löschaktionen
+Responsive,erledigt,Zweispaltig ab xl darunter gestapelt
+SQL,nicht geändert,Keine SQL- oder Datenbankänderung
+Permissions und Scopes,nicht geändert,Vorhandene Gates unverändert

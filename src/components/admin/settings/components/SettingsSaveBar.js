@@ -10,31 +10,19 @@ export default function SettingsSaveBar({
   loadingLabel,
 }) {
   return (
-    <div className="flex flex-wrap justify-end gap-3">
-      <button
-        type="button"
-        onClick={onReset}
-        className="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-      >
+    <div className="space-y-6">
+      <AdminActionBar className="justify-end">
+      <AdminButton onClick={onReset}>
         {newLabel}
-      </button>
-      {hasSelection && (
-        <button
-          type="button"
-          onClick={onDelete}
-          className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-600 hover:text-white"
-        >
-          {deleteLabel}
-        </button>
-      )}
-      <button
-        type="submit"
-        onClick={onSubmit}
-        disabled={loading}
-        className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-      >
+      </AdminButton>
+      <AdminButton variant="primary" type="submit" onClick={onSubmit} disabled={loading}>
         {loading ? loadingLabel : saveLabel}
-      </button>
+      </AdminButton>
+      </AdminActionBar>
+      {hasSelection && <AdminDangerZone title={deleteLabel} description="Dieser bestehende Eintrag wird dauerhaft entfernt.">
+        <AdminButton variant="danger" onClick={onDelete}>{deleteLabel}</AdminButton>
+      </AdminDangerZone>}
     </div>
   );
 }
+import { AdminActionBar, AdminButton, AdminDangerZone } from "@/components/admin/design-system";

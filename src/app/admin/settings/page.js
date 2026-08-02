@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import { AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { AdminSettingsEditor } from "@/components/admin/settings";
 import { createCoachReadDto } from "@/components/admin/persons/coachReadDto";
 import { getCoachSeasonalReadModelsMap } from "@/components/admin/persons/coachSeasonalReadModelRepository";
@@ -79,16 +79,18 @@ export default async function AdminSettingsPage() {
         subtitle="Adminbereich"
         showHeader={false}
       >
-        <AdminPageHeader
+        <AdminModulePage>
+        <AdminModuleHeader
           eyebrow="System"
           title="Einstellungen"
-          description="Globale Inhalte, Kontaktangaben und interne Zuordnungen zentral verwalten."
+          description="Vereinsdaten, Systemeinstellungen und Verwaltung konfigurieren."
         />
 
         <div className="rounded-3xl border border-red-500/40 bg-red-600/10 p-6 text-sm text-red-100">
           Einstellungen konnten nicht vollständig geladen werden. Bitte Seite
           neu laden.
         </div>
+        </AdminModulePage>
       </AdminLayout>
     );
   }
@@ -108,10 +110,11 @@ export default async function AdminSettingsPage() {
       subtitle="Adminbereich"
       showHeader={false}
     >
-      <AdminPageHeader
+      <AdminModulePage>
+      <AdminModuleHeader
         eyebrow="System"
         title="Einstellungen"
-        description="Globale Inhalte, Kontaktangaben und interne Zuordnungen zentral verwalten."
+        description="Vereinsdaten, Systemeinstellungen und Verwaltung konfigurieren."
       />
 
       <AdminSettingsEditor
@@ -123,6 +126,7 @@ export default async function AdminSettingsPage() {
         initialCoaches={initialCoaches}
         initialBoardMembers={boardMembersResult?.data || []}
       />
+      </AdminModulePage>
     </AdminLayout>
   );
 }

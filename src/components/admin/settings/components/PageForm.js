@@ -1,6 +1,7 @@
 import { FormGrid, FormSection, InputField } from "@/components/admin/forms";
 import Can from "@/components/admin/auth/Can";
 import AdminRichTextEditor from "@/components/admin/richtext/AdminRichTextEditor";
+import { AdminDangerZone } from "@/components/admin/design-system";
 
 export default function PageForm({
   selectedPage,
@@ -98,6 +99,7 @@ export default function PageForm({
             Neue Seite
           </button>
           {selectedPage && (
+            <AdminDangerZone title="Seite löschen" description="Die bestehende Seite wird dauerhaft entfernt.">
             <button
               type="button"
               onClick={onDelete}
@@ -105,6 +107,7 @@ export default function PageForm({
             >
               Seite löschen
             </button>
+            </AdminDangerZone>
           )}
           <button
             type="submit"

@@ -1,5 +1,5 @@
-import AdminEmptyState from "@/components/admin/common/AdminEmptyState";
+import { AdminModuleEmptyState } from "@/components/admin/design-system";
 
 export default function SettingsEmptyState({ text }) {
-  return <AdminEmptyState text={text} />;
+  return <AdminModuleEmptyState title={text} />;
 }

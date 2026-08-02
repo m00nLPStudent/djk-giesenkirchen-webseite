@@ -8,6 +8,7 @@ import {
 import Can from "@/components/admin/auth/Can";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import SectionHeader from "./SectionHeader";
+import { AdminActionBar, AdminButton } from "@/components/admin/design-system";
 
 export default function MembershipRequestDetail({
   selectedMembershipRequest,
@@ -179,18 +180,16 @@ export default function MembershipRequestDetail({
               )}
 
               <Can permission="membership_requests.forward" uiOnly>
-                <div className="mt-5 flex justify-end">
-                  <button
-                    type="button"
+                <AdminActionBar className="mt-5 justify-end">
+                  <AdminButton
                     onClick={onForward}
                     disabled={membershipRequestLoading}
-                    className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-200 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
                   >
                     {membershipRequestLoading
                       ? "Leitet weiter..."
                       : "Weiterleiten"}
-                  </button>
-                </div>
+                  </AdminButton>
+                </AdminActionBar>
               </Can>
             </div>
 
@@ -235,23 +234,21 @@ export default function MembershipRequestDetail({
 
       {selectedMembershipRequest && (
         <Can permission="membership_requests.edit" uiOnly>
-          <div className="flex flex-wrap justify-end gap-3">
-            <button
-              type="button"
+          <AdminActionBar className="justify-end">
+            <AdminButton
               onClick={onMarkDone}
               disabled={membershipRequestLoading}
-              className="rounded-full border border-green-500/60 px-6 py-3 text-sm font-bold text-green-300 transition hover:bg-green-600 hover:text-white disabled:opacity-50"
             >
               Als erledigt markieren
-            </button>
-            <button
+            </AdminButton>
+            <AdminButton
               type="submit"
+              variant="primary"
               disabled={membershipRequestLoading}
-              className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
             >
               {membershipRequestLoading ? "Speichert..." : "Anfrage speichern"}
-            </button>
-          </div>
+            </AdminButton>
+          </AdminActionBar>
         </Can>
       )}
     </form>

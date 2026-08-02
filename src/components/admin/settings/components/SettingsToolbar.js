@@ -1,14 +1,15 @@
-import AdminToolbar from "@/components/admin/common/AdminToolbar";
+import { AdminActionBar, AdminButton, AdminPanel } from "@/components/admin/design-system";
 
 export default function SettingsToolbar({ items = [], activeId, onChange }) {
   return (
-    <AdminToolbar
-      items={items}
-      activeId={activeId}
-      onChange={onChange}
-      outerClassName="flex flex-wrap gap-2 rounded-[2rem] border border-white/10 bg-[#17171d]/95 p-3 backdrop-blur"
-      innerClassName="contents"
-      itemClassName="rounded-full px-5 py-3 text-sm font-black transition"
-    />
+    <AdminPanel className="p-3">
+      <AdminActionBar role="tablist" aria-label="Einstellungsbereiche">
+        {items.map((item) => (
+          <AdminButton key={item.id} variant={activeId === item.id ? "primary" : "secondary"} onClick={() => onChange(item.id)} role="tab" aria-selected={activeId === item.id}>
+            {item.label}
+          </AdminButton>
+        ))}
+      </AdminActionBar>
+    </AdminPanel>
   );
 }

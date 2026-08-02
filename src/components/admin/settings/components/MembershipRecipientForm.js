@@ -5,6 +5,7 @@ import {
   SelectField,
 } from "@/components/admin/forms";
 import Can from "@/components/admin/auth/Can";
+import { AdminDangerZone } from "@/components/admin/design-system";
 
 export default function MembershipRecipientForm({
   selectedMembershipRecipient,
@@ -86,6 +87,7 @@ export default function MembershipRecipientForm({
             Neuer Empfänger
           </button>
           {selectedMembershipRecipient && (
+            <AdminDangerZone title="Empfänger löschen" description="Der bestehende Empfänger wird dauerhaft entfernt.">
             <button
               type="button"
               onClick={onDelete}
@@ -93,6 +95,7 @@ export default function MembershipRecipientForm({
             >
               Empfänger löschen
             </button>
+            </AdminDangerZone>
           )}
           <button
             type="submit"

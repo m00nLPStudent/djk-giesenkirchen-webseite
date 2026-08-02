@@ -6,6 +6,7 @@ import {
 } from "@/components/admin/forms";
 import Can from "@/components/admin/auth/Can";
 import { AdminImageUpload } from "@/components/admin/media";
+import { AdminDangerZone } from "@/components/admin/design-system";
 
 export default function ContactForm({
   selectedContact,
@@ -148,6 +149,7 @@ export default function ContactForm({
             Neuer Kontakt
           </button>
           {selectedContact && (
+            <AdminDangerZone title="Kontakt löschen" description="Der bestehende Kontakt wird dauerhaft entfernt.">
             <button
               type="button"
               onClick={onDelete}
@@ -155,6 +157,7 @@ export default function ContactForm({
             >
               Kontakt löschen
             </button>
+            </AdminDangerZone>
           )}
           <button
             type="submit"

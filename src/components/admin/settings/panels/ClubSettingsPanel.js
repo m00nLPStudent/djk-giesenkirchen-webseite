@@ -1,6 +1,6 @@
 import { FormGrid, FormSection, InputField } from "@/components/admin/forms";
 import Can from "@/components/admin/auth/Can";
-import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
+import { AdminActionBar, AdminButton } from "@/components/admin/design-system";
 
 export default function ClubSettingsPanel({
   clubForm,
@@ -193,11 +193,11 @@ export default function ClubSettingsPanel({
       </FormSection>
 
       <Can permission="settings.edit" uiOnly>
-        <AdminSaveBar
-          loading={clubLoading}
-          submitLabel="Vereinsdaten speichern"
-          loadingLabel="Speichert Vereinsdaten..."
-        />
+        <AdminActionBar className="justify-end">
+          <AdminButton type="submit" variant="primary" disabled={clubLoading}>
+            {clubLoading ? "Speichert Vereinsdaten..." : "Vereinsdaten speichern"}
+          </AdminButton>
+        </AdminActionBar>
       </Can>
     </form>
   );
