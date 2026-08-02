@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
+import { AdminButton, AdminModuleFilters } from "@/components/admin/design-system";
 import PlayerFiltersDialog from "./PlayerFiltersDialog";
 
 const defaultFilters = {
@@ -17,8 +18,6 @@ const defaultFilters = {
 
 export default function PlayerFilters(props) {
   const {
-    search,
-    setSearch,
     statusFilter,
     setStatusFilter,
     teamFilter,
@@ -167,40 +166,16 @@ export default function PlayerFilters(props) {
   }
 
   return (
-    <div className="mb-8 rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-bold uppercase tracking-[0.25em] text-red-400">
-            Spielerliste
-          </p>
-          <p className="mt-1 text-sm text-white/50">
-            {resultCount} Spieler gefunden
-            {activeFilterCount > 0 ? ` | ${activeFilterCount} Filter aktiv` : ""}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-5 grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-        <input
-          placeholder="Spieler suchen..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          className="h-14 w-full rounded-2xl border border-white/10 bg-black/20 px-4 text-white outline-none transition placeholder:text-white/30 focus:border-red-500"
-        />
-
-        <button
-          type="button"
-          onClick={openPanel}
-          disabled={isPending}
-          className="h-14 rounded-2xl bg-red-600 px-6 text-sm font-black text-white transition hover:bg-red-700"
-        >
+    <AdminModuleFilters
+      title="Spielerliste eingrenzen"
+      panelId="player-filter-panel"
+      badge={activeFilterCount > 0 ? <span className="rounded-full border border-red-400/35 bg-red-500/10 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-red-200">{activeFilterCount} aktiv</span> : null}
+    >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-white/55">{resultCount} Spieler gefunden</p>
+        <AdminButton variant="primary" onClick={openPanel} disabled={isPending}>
           {isPending ? "Aktualisiert..." : "Sortieren & Filter"}
-          {activeFilterCount > 0 ? (
-            <span className="ml-2 rounded-full bg-white px-2 py-0.5 text-xs text-red-600">
-              {activeFilterCount}
-            </span>
-          ) : null}
-        </button>
+        </AdminButton>
       </div>
 
       <PlayerFiltersDialog
@@ -214,6 +189,6 @@ export default function PlayerFilters(props) {
         onReset={resetFilters}
         onUpdateDraft={updateDraft}
       />
-    </div>
+    </AdminModuleFilters>
   );
 }

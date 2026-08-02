@@ -1,3 +1,5 @@
+import { resolvePlayerImageUrl } from "../../../lib/people/imageUrl.js";
+
 function normalizeText(value) {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
@@ -76,12 +78,7 @@ export function getPlayerDisplayName(player = {}) {
 }
 
 export function getPlayerImageUrl(player = {}, fallbackImage = null) {
-  return (
-    normalizeText(player.imageUrl) ||
-    normalizeText(player.image_url) ||
-    normalizeText(player.photo_url) ||
-    fallbackImage
-  );
+  return resolvePlayerImageUrl(player, fallbackImage);
 }
 
 export function createPlayerReadDto(player = {}, seasonalReadModel = {}) {

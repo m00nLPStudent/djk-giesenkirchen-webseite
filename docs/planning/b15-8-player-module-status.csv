@@ -1,0 +1,16 @@
+surface,old_component,new_component,design_system_used,desktop,mobile,permission_unchanged,scope_unchanged,test_status,status,notes
+overview_header,AdminPageHeader,AdminPlayersOverview,AdminModuleHeader|AdminModuleSearch|AdminModulePrimaryAction,yes,yes,yes,yes,PASS,DONE,Suche im Header
+summary,PlayerStats large grid,PlayerStats compact metrics,AdminModuleSummary|AdminMetric,yes,yes,yes,yes,PASS,DONE,Klickfilter erhalten
+filters,PlayerFilters card,PlayerFilters disclosure,AdminModuleFilters|AdminButton,yes,yes,yes,yes,PASS,DONE,URL-Logik und Dialog erhalten
+desktop_list,custom player table,AdminPlayersList,AdminModuleList|AdminListHeader|AdminListRow|AdminListChevron,yes,n/a,yes,yes,PASS,DONE,Breakpoint xl
+mobile_cards,custom player cards,PlayerMobileCard,AdminModuleCards|AdminListMobileCard|AdminListChevron,n/a,yes,yes,yes,PASS,DONE,Ganze Karte klickbar
+avatar,getEntityImage or no image,PlayerAvatar,resolvePlayerImageUrl,yes,yes,yes,yes,PASS,DONE,Load-Error Initialenfallback
+empty_state,PlayerEmptyState custom,PlayerEmptyState adapter,AdminModuleEmptyState|AdminModulePrimaryAction,yes,yes,yes,yes,PASS,DONE,Suche und Filter
+detail_header,custom detail section,PlayerContributionDetailView,AdminDetailHeader|AdminActionBar|AdminButton,yes,yes,yes,yes,PASS,DONE,Nur Beitrag öffnen und Bearbeiten im Header
+detail_information,missing compact overview,PlayerContributionDetailView,AdminInformationSection|AdminInformationRow,yes,yes,yes,yes,PASS,DONE,Nur vorhandene DTO-Werte
+contribution,custom metric grid,PlayerContributionDetailView,AdminModuleSummary|AdminMetric|AdminStatusChip,yes,yes,yes,yes,PASS,DONE,Fachstatus unverändert
+danger_zone,header ArchiveButton,detail danger zone,AdminDangerZone,yes,yes,yes,yes,PASS,DONE,Einziger Ort für Archivierung; Action und Preview unverändert
+create_form,BackButton and AdminLayout,NewPlayerPage,AdminModulePage|AdminModuleHeader|AdminBackLink,yes,yes,yes,yes,PASS,DONE,Formlogik unverändert
+edit_form,BackButton and AdminLayout,EditPlayerPage,AdminModulePage|AdminModuleHeader|AdminBackLink,yes,yes,yes,yes,PASS,DONE,Formlogik unverändert
+pagination,not present,not added,AdminModulePagination,n/a,n/a,yes,yes,N/A,DEFERRED,Keine bestehende Pagination
+public_player,public route,unchanged,none,yes,yes,yes,yes,PASS,DONE,Nicht angefasst

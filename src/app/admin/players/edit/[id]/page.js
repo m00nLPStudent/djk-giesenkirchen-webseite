@@ -1,6 +1,6 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminPlayersForm } from "@/components/admin/players";
-import BackButton from "@/components/admin/ui/BackButton";
+import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { redirect } from "next/navigation";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
@@ -56,13 +56,16 @@ export default async function EditPlayerPage({ params }) {
   );
 
   return (
-    <AdminLayout title="Spieler bearbeiten" subtitle="Spieler">
-      <BackButton />
-      <AdminPlayersForm
-        player={player}
-        teamOptionsResult={teamOptionsResult}
-        playerSeasonalReadModel={playerSeasonalReadModel}
-      />
+    <AdminLayout title="Spieler bearbeiten" subtitle="Spieler" showHeader={false}>
+      <AdminModulePage>
+        <AdminBackLink href={`/admin/players/${id}`}>Zurück zu Spielerdetails</AdminBackLink>
+        <AdminModuleHeader eyebrow="Spieler" title="Spieler bearbeiten" description="Spielerprofil und Mannschaftszuordnung bearbeiten." />
+        <AdminPlayersForm
+          player={player}
+          teamOptionsResult={teamOptionsResult}
+          playerSeasonalReadModel={playerSeasonalReadModel}
+        />
+      </AdminModulePage>
     </AdminLayout>
   );
 }

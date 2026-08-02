@@ -1,0 +1,29 @@
+Bereich,Komponente,Zweck,Referenzanbindung,Status
+Seite,AdminModulePage,Vertikaler Seitenrhythmus,Neue Module,Bereit
+Header,AdminModuleHeader,Titel Beschreibung Suche Aktionen,AdminPageHeader und Trainer,Bereit
+Toolbar,AdminModuleToolbar,Suche und Zusatzaktionen,Neue Module,Bereit
+Suche,AdminModuleSearch,Einheitliches Suchfeld,Neue Module,Bereit
+Aktion,AdminButton,Primary Secondary Danger Link,Neue Module,Bereit
+Aktion,AdminModulePrimaryAction,Primäraktion im Header,Neue Module,Bereit
+Filter,AdminModuleFilters,Eingeklapptes Accordion,Trainer,Bereit
+Summary,AdminModuleSummary,Kompakte Kennzahlenleiste,Trainer,Bereit
+Metric,AdminMetric,Kennzahlen-Chip,Trainer,Bereit
+Liste,AdminModuleList,Desktop-Tabellencontainer,Neue Migrationen,Bereit
+Liste,AdminModuleCards,Mobile-Kartencontainer,Neue Migrationen,Bereit
+Liste,AdminListHeader,Konfigurierbarer Tabellenkopf,Neue Migrationen,Bereit
+Liste,AdminListRow,Interaktive Desktopzeile,Neue Migrationen,Bereit
+Liste,AdminListMobileCard,Interaktive Mobile-Karte,Neue Migrationen,Bereit
+Liste,AdminListChevron,Einheitlicher Detailpfeil,Neue Migrationen,Bereit
+Pagination,AdminModulePagination,Seitennavigation,Neue Migrationen,Bereit
+Detail,AdminDetailLayout,Header Inhalt Gefahrenbereich,Trainer,Bereit
+Detail,AdminDetailHeader,Zurück Titel Status Aktionen,Trainer und Vereinsbeiträge,Bereit
+Detail,AdminBackLink,Einheitliche Rücknavigation,Trainer und Vereinsbeiträge,Bereit
+Information,AdminInformationSection,Semantischer Info-Container,Trainer,Bereit
+Information,AdminInformationRow,Label und Wert,Trainer und Vereinsbeiträge,Bereit
+Gefahr,AdminDangerZone,Destruktive Aktionen,Trainer,Bereit
+Status,AdminStatusChip,Alle Statusfarben,EntityBadge und Beiträge,Bereit
+Feedback,AdminModuleEmptyState,Leerzustand mit Aktion,Neue Migrationen,Bereit
+Timeline,AdminTimeline,Chronologische Ereignisse,Neue Detailmigrationen,Bereit
+Metadaten,AdminMetaList,Semantische Metadatenliste,Neue Detailmigrationen,Bereit
+Abschnitt,AdminSectionTitle,Titel Beschreibung Aktionen,Neue Module,Bereit
+Oberfläche,AdminPanel,Standardcontainer,Neue Module,Bereit

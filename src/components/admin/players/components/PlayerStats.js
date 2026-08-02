@@ -1,43 +1,8 @@
 "use client";
 
-import { AlertTriangle, Globe2, PauseCircle, Users } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
-
-function StatItem({
-  title,
-  value,
-  icon: Icon,
-  boxClassName,
-  textClassName,
-  onClick,
-  disabled = false,
-}) {
-  const interactive = typeof onClick === "function" && !disabled;
-
-  return (
-    <button
-      type="button"
-      onClick={interactive ? onClick : undefined}
-      disabled={!interactive}
-      className={`flex w-full items-center gap-3 px-4 py-3 text-left transition ${
-        interactive
-          ? "hover:bg-white/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60"
-          : "cursor-default"
-      } ${disabled ? "opacity-70" : ""}`}
-    >
-      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${boxClassName}`}>
-        <Icon className={textClassName} size={20} />
-      </div>
-      <div className="min-w-0">
-        <p className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-white/45">
-          {title}
-        </p>
-        <p className="mt-1 text-xl font-black text-white">{value}</p>
-      </div>
-    </button>
-  );
-}
+import { AdminMetric, AdminModuleSummary } from "@/components/admin/design-system";
 
 export default function PlayerStats({
   total = 0,
@@ -106,32 +71,20 @@ export default function PlayerStats({
     {
       title: "Spieler",
       value: total,
-      icon: Users,
-      boxClassName: "bg-red-500/20",
-      textClassName: "text-red-400",
     },
     {
       title: "Inaktiv",
       value: inactive,
-      icon: PauseCircle,
-      boxClassName: "bg-yellow-500/20",
-      textClassName: "text-yellow-400",
     },
     {
       title: "Nationalitaeten",
       value: nationalityCount,
-      icon: Globe2,
-      boxClassName: "bg-blue-500/20",
-      textClassName: "text-blue-400",
       onClick: handleNationalityClick,
       disabled: !selectableNationalities.length || isPending,
     },
     {
       title: "Beitragsfaelle offen",
       value: openContributions,
-      icon: AlertTriangle,
-      boxClassName: "bg-orange-500/20",
-      textClassName: "text-orange-300",
       onClick: handleOpenContributionsClick,
       disabled: !enableContributionFilter || isPending,
     },
@@ -139,13 +92,9 @@ export default function PlayerStats({
 
   return (
     <>
-      <div className="mb-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.04]">
-        <div className="grid divide-y divide-white/10 md:grid-cols-2 md:divide-x md:divide-y-0 xl:grid-cols-4">
-          {stats.map((item) => (
-            <StatItem key={item.title} {...item} />
-          ))}
-        </div>
-      </div>
+      <AdminModuleSummary>
+        {stats.map((item) => <AdminMetric key={item.title} label={item.title} value={item.value} onClick={item.onClick} disabled={item.disabled} />)}
+      </AdminModuleSummary>
 
       {showNationalityDialog ? (
         <div className="fixed inset-0 z-50">

@@ -1,10 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import Can from "@/components/admin/auth/Can";
 import { FormAlert } from "@/components/admin/forms";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
-import { AdminPlayersList, PlayerStats } from "@/components/admin/players";
+import AdminPlayersOverview from "@/components/admin/players/AdminPlayersOverview";
 import {
   getContributionStatusVisibility,
 } from "@/components/admin/contributions/helpers/contributionStatusScope";
@@ -204,49 +201,18 @@ export default async function AdminPlayersPage({ searchParams }) {
       subtitle="Adminbereich"
       showHeader={false}
     >
-      <AdminPageHeader
-        eyebrow="Spieler"
-        title="Spieler verwalten"
-        description="Spielerprofile, Positionen und Nationalitäten mit schnellen Filtern organisieren."
-        actions={
-          <Can permission="players.create" uiOnly>
-            <Link
-              href="/admin/players/new"
-              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-            >
-              Neuer Spieler
-            </Link>
-          </Can>
-        }
-      />
-
-      <PlayerStats
-        total={stats.total}
-        inactive={stats.inactive}
-        nationalityCount={stats.nationalityCount}
-        openContributions={stats.openContributions}
-        nationalities={stats.nationalities}
-        enableContributionFilter={canFilterByContribution}
-      />
-
-      {contributionSeasonWarning ? (
+      <AdminPlayersOverview
+        players={visiblePlayers}
+        initialFilters={initialFilters}
+        showContributionStatus={canShowContributionStatus && !contributionSeasonWarning}
+        canFilterByContribution={canFilterByContribution}
+        stats={stats}
+        notices={contributionSeasonWarning ? (
         <FormAlert className="mb-6 border-amber-400/30 bg-amber-500/10 text-amber-50" tone="warning">
           {contributionSeasonWarning}
         </FormAlert>
-      ) : null}
-
-      {showNationalities && (
-        <PlayerNationalityList nationalities={stats.nationalities} />
-      )}
-
-      <AdminPlayersList
-        key={JSON.stringify(initialFilters)}
-        players={visiblePlayers}
-        initialFilters={initialFilters}
-        showContributionStatus={
-          canShowContributionStatus &&
-          !contributionSeasonWarning
-        }
+        ) : null}
+        nationalityView={showNationalities ? <PlayerNationalityList nationalities={stats.nationalities} /> : null}
       />
     </AdminLayout>
   );

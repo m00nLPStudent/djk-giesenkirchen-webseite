@@ -1,6 +1,6 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminPlayersForm } from "@/components/admin/players";
-import BackButton from "@/components/admin/ui/BackButton";
+import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { redirect } from "next/navigation";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
@@ -35,9 +35,12 @@ export default async function NewPlayerPage() {
   }
 
   return (
-    <AdminLayout title="Neuer Spieler" subtitle="Spieler">
-      <BackButton />
-      <AdminPlayersForm teamOptionsResult={teamOptionsResult} />
+    <AdminLayout title="Neuer Spieler" subtitle="Spieler" showHeader={false}>
+      <AdminModulePage>
+        <AdminBackLink href="/admin/players">Zurück zu Spielern</AdminBackLink>
+        <AdminModuleHeader eyebrow="Spieler" title="Neuer Spieler" description="Spielerprofil und Mannschaftszuordnung anlegen." />
+        <AdminPlayersForm teamOptionsResult={teamOptionsResult} />
+      </AdminModulePage>
     </AdminLayout>
   );
 }

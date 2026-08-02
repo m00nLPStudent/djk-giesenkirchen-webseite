@@ -5,17 +5,19 @@ import test from "node:test";
 const root = new URL("./", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
-test("coach overview keeps search in the page header and filters collapsed", async () => {
-  const [overview, filters] = await Promise.all([
+test("coach overview keeps search in the page header and uses shared filters", async () => {
+  const [overview, filters, filterSystem] = await Promise.all([
     read("AdminCoachesOverview.js"),
     read("components/CoachFilters.js"),
+    read("../design-system/AdminFilters.js"),
   ]);
 
   assert.match(overview, /<AdminPageHeader/);
   assert.match(overview, /type="search"/);
   assert.match(overview, /<CoachStats coaches=\{coaches\}/);
-  assert.match(filters, /useState\(false\)/);
-  assert.match(filters, /aria-expanded=\{expanded\}/);
+  assert.match(filters, /AdminModuleFilters/);
+  assert.match(filterSystem, /defaultExpanded = false/);
+  assert.match(filterSystem, /aria-expanded=\{expanded\}/);
 });
 
 test("coach list switches from mobile cards to a desktop table at lg", async () => {
@@ -43,11 +45,16 @@ test("shared coach avatar uses the canonical resolver and a load-error fallback"
 });
 
 test("coach work view exposes compact information and danger sections", async () => {
-  const detail = await read("components/CoachDetailOverview.js");
+  const [detail, detailSystem] = await Promise.all([
+    read("components/CoachDetailOverview.js"),
+    read("../design-system/AdminDetail.js"),
+  ]);
 
-  for (const section of ["Persönliche Daten", "Kontakt", "Mannschaften", "Lizenzen", "Notizen", "Historie", "Gefahrenbereich"]) {
+  for (const section of ["Persönliche Daten", "Kontakt", "Mannschaften", "Lizenzen", "Notizen", "Historie"]) {
     assert.ok(detail.includes(section));
   }
+  assert.match(detail, /AdminDangerZone/);
+  assert.match(detailSystem, /title = "Gefahrenbereich"/);
   assert.match(detail, /#coach-edit-form/);
   assert.match(detail, /Eine Archivfunktion ist nicht vorhanden/);
   assert.match(detail, /<CoachAvatar coach=\{coach\} sizeClassName="h-16 w-16"/);

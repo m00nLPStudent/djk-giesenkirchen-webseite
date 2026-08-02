@@ -1,0 +1,11 @@
+Reihenfolge,Modul,Schwerpunkt,Risiko,Voraussetzung
+1,Spieler,Header Filter Liste Detail Status,Mittel,Visuelle Abnahme B15.7
+2,Mannschaften,Header Liste Detail Info Gefahrenbereich,Mittel,Spieler-Migration stabil
+3,News,Header Toolbar Karten Empty State,Niedrig,Listenmuster stabil
+4,Termine,Header Filter Liste Status Detail,Mittel,Statusmapping dokumentiert
+5,Sponsoren,Header Karten Formaktionen,Niedrig,Buttonmuster stabil
+6,Vereinsgeschichte,Header Medienlisten Empty State,Mittel,Medienlayout separat geprüft
+7,Vorstand und Abteilung,Header Personenlisten Detail,Niedrig,Personenmuster stabil
+8,Benutzer Rollen Berechtigungen,Header Tabellen Dialoge Status,Hoch,Keine Änderung der Permissionlogik
+9,Dashboard intern,Panels SectionTitle Empty State,Niedrig,Referenzansicht visuell eingefroren
+10,Vereinsbeiträge Rest,Filter Liste Pagination DangerZone,Mittel,Beitragsregression vollständig grün
