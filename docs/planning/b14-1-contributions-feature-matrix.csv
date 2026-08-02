@@ -1,0 +1,32 @@
+feature,included,phase,description,required_permission,data_source,risk,status,notes
+module_overview,yes,phase_1,Zentrale Admin-Uebersicht fuer Spielerbeitraege,contributions.view,"player_contributions; seasons; players; team_seasons",medium,REQUIRED,Keine Finanzdaten fuer unberechtigte Rollen
+contribution_create,yes,phase_1,Neue Beitragsposition fuer einen Spieler anlegen,contributions.create,"players; seasons; team_seasons; player_contributions",medium,REQUIRED,Spieler und Saison sind Pflicht
+contribution_edit,yes,phase_1,Beitragsmetadaten und Status pflegen,contributions.edit,player_contributions,medium,REQUIRED,Keine harte Loeschung
+contribution_detail,yes,phase_1,Detailansicht mit Historie und Auditdaten,contributions.view,"player_contributions; player_contribution_payments",medium,REQUIRED,Interne Notizen nur serverseitig laden
+payment_history,yes,phase_1,Mehrere Zahlungen pro Beitrag nachvollziehen,contributions.view,player_contribution_payments,high,REQUIRED,Source of truth fuer Zahlungen
+record_payment,yes,phase_1,Zahlung erfassen und Cache aktualisieren,contributions.record_payment,"player_contribution_payments; player_contributions",high,REQUIRED,Nur serverseitiger Write-Pfad
+cancel_payment,yes,phase_1,Zahlung stornieren statt loeschen,contributions.cancel_payment,player_contribution_payments,high,REQUIRED,Erfordert Auditfelder auf Payment-Ebene
+partial_payment,yes,phase_1,Teilzahlungen mit Restbetrag abbilden,contributions.record_payment,"player_contribution_payments; player_contributions.amount_paid",medium,REQUIRED,Status wird aus Summenlage abgeleitet
+multiple_partial_payments,yes,phase_1,Beliebig viele Teilzahlungen pro Beitrag,contributions.record_payment,player_contribution_payments,medium,REQUIRED,Keine Ueberschreibung von amount_paid als alleinige Historie
+installment_basic,yes,phase_1,Ratenzahlungsvereinbarung ueber Vereinbarungsfelder,contributions.edit,player_contributions,medium,REQUIRED,Keine separate Ratenplan-Tabelle in Phase 1
+installment_plan_table,no,later,Eigene Ratenplan-Tabelle,none,none,medium,OPTIONAL_LATER,Nur falls feste Teilraten fachlich benoetigt werden
+deferral,yes,phase_1,Gestundete Forderung mit Frist und Begruendung,contributions.defer,player_contributions,medium,REQUIRED,Status deferred mit deferred_until
+full_exemption,yes,phase_1,Vollstaendige Befreiung einer Forderung,contributions.exempt,player_contributions,high,REQUIRED,Ursprungsbetrag soll auditiert bleiben
+partial_exemption,no,later,Teilbefreiung als eigener UI-Prozess,none,player_contributions,medium,OPTIONAL_LATER,Fachlich moeglich aber nicht fuer Phase 1 empfohlen
+cancel_contribution,yes,phase_1,Beitragsposition fachlich stornieren,contributions.cancel,player_contributions,high,REQUIRED,Nicht hart loeschen
+hard_delete_contribution,no,never,Harte Loeschung von Beitragspositionen,none,none,high,EXCLUDED,Verhindert Auditverlust
+coach_support,no,never,Verwaltung von Coach- oder Trainerbeitraegen,none,none,high,EXCLUDED,B12 coach_id ist fachlich ueberholt
+board_support,no,never,Beitragspflicht fuer Vorstandsmitglieder,none,none,high,EXCLUDED,Nicht Teil des Moduls
+parent_debtor_records,no,never,Schuldnerstammsaetze fuer Eltern,none,none,medium,EXCLUDED,Beitrag bleibt am Spieler haengen
+trainer_access,no,phase_1,Trainer duerfen Finanzdaten sehen,none,none,high,EXCLUDED,Keine Team-Scope-Vererbung fuer Finanzdaten
+youth_coordinator_access,no,phase_1,Jugendleiter sieht Finanzdaten,none,none,high,REQUIRES_DECISION,Empfehlung fuer Phase 1: kein Zugriff
+board_read_access,yes,phase_1,Vorstand mit Leserechten und optional Export,contributions.view,"player_contributions; player_contribution_payments",medium,REQUIRES_DECISION,Empfehlung read-only
+dashboard_tile,yes,phase_1,Finanz-Kachel im Admin-Dashboard,contributions.view,player_contributions,low,REQUIRED,Nur fuer berechtigte Rollen
+sidebar_entry,yes,phase_1,Sidebar-Eintrag Vereinsbeitraege,contributions.view,admin_navigation,low,REQUIRED,Neue Route /admin/contributions
+csv_export,yes,phase_1,CSV-Export fuer Listen und Kontrolle,contributions.export,"player_contributions; player_contribution_payments; players; seasons; team_seasons",medium,REQUIRED,Keine internen Notizen standardmaessig
+pdf_export,no,later,PDF-Export,none,none,low,EXCLUDED,Nicht fuer Phase 1
+datev_export,no,later,DATEV-Export,none,none,medium,EXCLUDED,Nicht fuer Phase 1
+team_snapshot,yes,phase_1,Optionaler team_season_id Snapshot auf der Beitragszeile,contributions.create,"team_seasons; player_team_seasons",medium,REQUIRED,Historie darf nicht an aktueller Mannschaft haengen
+free_text_contribution_key,no,phase_1,Frei editierbarer Beitragsschluessel,none,none,medium,EXCLUDED,Kontrollierter Typkatalog empfohlen
+controlled_contribution_types,yes,phase_1,Kontrollierter Katalog fuer Beitragstypen,contributions.create,application_enum_or_catalog,low,REQUIRED,Seasonal fee und Korrekturfaelle sauber trennen
+live_db_preflight,yes,pre_implementation,Pruefung des realen DB-Stands vor jeder Migration,system.view,docs_datenbank_docu_plus_live_db,medium,REQUIRED,Aktueller Export zeigt Beitrags-Tabellen nicht

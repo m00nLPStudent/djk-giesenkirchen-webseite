@@ -1,0 +1,10 @@
+
+> djk-giesenkirchen-webseite@0.1.0 dev
+> next dev --port 3002
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3002
+- Network:       http://192.168.178.104:3002
+- Environments: .env.local
+✓ Ready in 501ms
+[?25h

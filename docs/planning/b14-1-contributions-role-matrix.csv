@@ -1,0 +1,8 @@
+role_key,view,create,edit,record_payment,cancel_payment,defer,exempt,cancel_contribution,export,scope,notes
+superadmin,yes,yes,yes,yes,yes,yes,yes,yes,yes,global,Vollzugriff
+vorstand,yes,no,no,no,no,no,no,no,yes,global_read_only,Empfehlung: Leserechte plus Export aber keine operativen Finanzbuchungen
+kassierer,yes,yes,yes,yes,yes,yes,yes,yes,yes,global,Technischer Bestands-Key fuer fachliche Rolle Kassenwart
+jugendleiter,no,no,no,no,no,no,no,no,no,none,Empfehlung Phase 1 kein Zugriff wegen sensibler Finanzdaten
+trainer,no,no,no,no,no,no,no,no,no,none,Keine Team-Scope-Vererbung fuer Finanzdaten
+betreuer,no,no,no,no,no,no,no,no,no,none,Kein Zugriff
+gast,no,no,no,no,no,no,no,no,no,none,Kein Zugriff

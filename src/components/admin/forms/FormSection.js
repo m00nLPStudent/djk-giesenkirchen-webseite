@@ -34,6 +34,8 @@ export function FormAlert({ children, tone = "error", className = "" }) {
   const toneClass =
     tone === "warning"
       ? "border-yellow-500/30 bg-yellow-500/10 text-yellow-100"
+      : tone === "info"
+        ? "border-blue-500/30 bg-blue-500/10 text-blue-100"
       : "border-red-500/30 bg-red-500/10 text-red-200";
 
   if (!children) return null;

@@ -5,6 +5,7 @@ import DashboardMembershipRequests from "./DashboardMembershipRequests";
 import DashboardUpcomingEvents from "./DashboardUpcomingEvents";
 import DashboardNewsOverview from "./DashboardNewsOverview";
 import DashboardSystemStatus from "./DashboardSystemStatus";
+import ContributionDashboardPanel from "@/components/admin/contributions/components/ContributionDashboardPanel";
 
 export default function DashboardPageShell({
   now,
@@ -14,12 +15,15 @@ export default function DashboardPageShell({
   latestNews,
   draftOrPlannedNews,
   statusSignals,
+  contributionStats,
 }) {
   return (
     <div className="space-y-8">
       <DashboardHeader now={now} />
 
       <DashboardStatGrid stats={stats} />
+
+      <ContributionDashboardPanel stats={contributionStats} />
 
       <DashboardQuickActions />
 

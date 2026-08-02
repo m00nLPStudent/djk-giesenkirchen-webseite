@@ -105,32 +105,10 @@ export function canEditOwnContent(adminProfileId, createdByAdminProfileId) {
 
 export function canViewContribution(scopeContext, contribution) {
   if (!contribution) return false;
-
-  if (
-    canAccessAll(scopeContext) ||
-    hasPermission(scopeContext, "contributions.view")
-  ) {
-    return true;
-  }
-
-  if (
-    canAccessYouth(scopeContext) &&
-    canAccessYouthTeam(contribution?.team || null)
-  ) {
-    return true;
-  }
-
-  return canAccessAssignedTeam(scopeContext, contribution?.team_id);
+  return hasPermission(scopeContext, "contributions.view");
 }
 
 export function canEditContribution(scopeContext, contribution) {
   if (!contribution) return false;
-
-  if (!hasPermission(scopeContext, "contributions.edit")) {
-    return false;
-  }
-
-  if (canAccessAll(scopeContext)) return true;
-
-  return canAccessAssignedTeam(scopeContext, contribution?.team_id);
+  return hasPermission(scopeContext, "contributions.edit");
 }

@@ -1,0 +1,21 @@
+operation,permission,repository,service,server_action,validation,test_status,rls_access,status,notes
+create_contribution,contributions.create,contributionsWrite.repository.js,contributionCreate.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Regular-Dublette fachlich und per DB-Fehler abgedeckt
+update_contribution,contributions.edit,contributionsWrite.repository.js,contributionUpdate.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Keine freie Statuswahl
+record_payment,contributions.record_payment,contributionsWrite.repository.js,contributionPayment.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Deferred wird in Phase 1 geblockt
+cancel_payment,contributions.cancel_payment,contributionsWrite.repository.js,contributionPayment.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Kein Hard-Delete
+defer_contribution,contributions.defer,contributionsWrite.repository.js,contributionState.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Datum und Grund sind Pflicht
+resume_contribution,contributions.defer,contributionsWrite.repository.js,contributionState.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Resume leert die Deferred-Felder
+exempt_contribution,contributions.exempt,contributionsWrite.repository.js,contributionState.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Nur Vollbefreiung
+revoke_exemption,contributions.exempt,none,none,none,deferred,not_implemented,service_role_after_admin_guard,DEFERRED,Bewusst nicht erzwungen
+cancel_contribution,contributions.cancel,contributionsWrite.repository.js,contributionState.service.js,actions.js,done,done,service_role_after_admin_guard,DONE,Mit Zahlungen absichtlich blockiert
+load_contribution_by_id,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Detail-DTO mit payments und Audit
+load_filtered_contributions,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Search und Batch-Enrichment ohne N+1
+load_player_contributions,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Wrapper auf Filter-Repository
+load_season_contributions,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Wrapper auf Filter-Repository
+load_open_contributions,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Status open
+load_overdue_contributions,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Faelligkeit plus fachliche Overdue-Pruefung
+load_partially_paid_contributions,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Status partially_paid
+load_payments_for_contribution,contributions.view,contributionsRead.repository.js,none,none,done,covered_indirectly,service_role_after_admin_guard,DONE,Payment-Historie bleibt sichtbar
+load_contribution_stats,contributions.view,contributionsRead.repository.js,contributionStats.service.js,none,done,done,service_role_after_admin_guard,DONE,Season-filterbar
+build_export_rows,contributions.export,contributionsRead.repository.js,contributionExport.service.js,none,partial,not_implemented,service_role_after_admin_guard,PARTIAL,Nur Row-Builder ohne Download-UI
+permission_matrix,contributions.view,none,none,none,done,done,admin_permission_guard,DONE,Keine Team- oder Jugend-Scope-Vererbung

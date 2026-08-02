@@ -1,0 +1,8 @@
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3001
+- PID:          13340
+- Dir:          C:\Users\swen7\Desktop\Website_GK\djk-giesenkirchen-webseite
+- Log:          .next\dev\logs\next-development.log
+
+Run taskkill /PID 13340 /F to stop it.

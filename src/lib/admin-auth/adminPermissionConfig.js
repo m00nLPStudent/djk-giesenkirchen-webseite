@@ -122,6 +122,18 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "exact",
     priority: 500,
   }),
+  buildRule("/admin/contributions/new", "contributions.create", {
+    matchType: "exact",
+    priority: 500,
+  }),
+  buildRule("/admin/contributions/[id]/edit", "contributions.edit", {
+    matchType: "exact",
+    priority: 500,
+  }),
+  buildRule("/admin/contributions/:id/edit", "contributions.edit", {
+    matchType: "exact",
+    priority: 500,
+  }),
   buildRule("/admin/sponsors/new", "sponsors.create", {
     matchType: "exact",
     priority: 500,
@@ -160,6 +172,10 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     priority: 300,
   }),
   buildRule("/admin/players", "players.view", {
+    matchType: "prefix",
+    priority: 300,
+  }),
+  buildRule("/admin/contributions", "contributions.view", {
     matchType: "prefix",
     priority: 300,
   }),
@@ -315,6 +331,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin/teams": "teams.view",
   "/admin/coaches": "coaches.view",
   "/admin/players": "players.view",
+  "/admin/contributions": "contributions.view",
   "/admin/media": "system.view",
   "/admin/events": "events.view",
   "/admin/club-history": "club_history.view",

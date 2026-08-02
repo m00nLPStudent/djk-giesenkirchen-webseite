@@ -1,0 +1,47 @@
+table_name,column_name,data_type,nullable,default_value,foreign_key,purpose,source_of_truth,required,status,notes
+player_contributions,id,uuid,no,gen_random_uuid(),,Primarschluessel,row_identity,yes,CHANGE_FROM_B12,Aus B12 uebernommen aber neue Tabelle
+player_contributions,player_id,uuid,no,,players.id,Eindeutiger Spielerbezug,players,yes,CHANGE_FROM_B12,player_id bleibt Pflicht
+player_contributions,season_id,uuid,no,,seasons.id,Beitragszeitraum,seasons,yes,CHANGE_FROM_B12,Ersetzt B12 season_key
+player_contributions,team_season_id,uuid,yes,,team_seasons.id,Optionaler historischer Team-Snapshot,team_seasons,yes,NEW,Snapshot nur zur Historie
+player_contributions,contribution_type,text,no,,,"Kontrollierter Beitragstyp",application_catalog,yes,CHANGE_FROM_B12,Ersetzt freies contribution_key als Hauptsteuerung
+player_contributions,title,text,yes,,,"Lesbare Kurzbezeichnung",editorial_label,no,KEEP_FROM_B12,Optional fuer manuelle Zusatzpositionen
+player_contributions,amount_due,numeric(10,2),no,0,,"Urspruenglicher Sollbetrag",player_contributions,yes,KEEP_FROM_B12,Muss >= 0 sein
+player_contributions,amount_paid,numeric(10,2),no,0,,"Cache des gebuchten Zahlbetrags",player_contribution_payments,yes,KEEP_FROM_B12,Nur serverseitig synchronisieren
+player_contributions,amount_waived,numeric(10,2),no,0,,"Erlassener Betrag",player_contributions,yes,NEW,Erlaubt saubere Befreiungslogik
+player_contributions,amount_outstanding,numeric(10,2) generated,yes,derived,,"Offener Betrag",derived_from_due_paid_waived,yes,CHANGE_FROM_B12,Status canceled/exempt soll 0 ergeben
+player_contributions,status,text,no,open,,"Fachstatus der Forderung",player_contributions,yes,KEEP_FROM_B12,open partially_paid paid deferred exempt canceled
+player_contributions,due_date,date,yes,,,"Faelligkeitsdatum",player_contributions,yes,KEEP_FROM_B12,Fuer offene regulaere Forderungen empfohlen
+player_contributions,paid_at,timestamptz,yes,,,"Zeitpunkt der Vollbezahlung",derived_from_payments,yes,KEEP_FROM_B12,Nur wenn Status paid
+player_contributions,installment_enabled,boolean,no,false,,"Ratenzahlung vereinbart",player_contributions,yes,CHANGE_FROM_B12,B12 installment_agreement umbenennen
+player_contributions,installment_note,text,yes,,,"Interne Ratenvereinbarung",player_contributions,no,NEW,Einfache Phase-1-Loesung
+player_contributions,next_due_date,date,yes,,,"Naechster Termin bei Ratenzahlung oder Wiedervorlage",player_contributions,no,NEW,Optional aber sinnvoll
+player_contributions,deferred_until,date,yes,,,"Stundung bis",player_contributions,no,KEEP_FROM_B12,Nur bei deferred Pflicht
+player_contributions,deferred_reason,text,yes,,,"Begruendung der Stundung",player_contributions,no,NEW,Ablage nicht nur als Freitextnote
+player_contributions,exemption_reason,text,yes,,,"Begruendung der Befreiung",player_contributions,no,KEEP_FROM_B12,Bei exempt Pflicht
+player_contributions,exempted_at,timestamptz,yes,,,"Zeitpunkt der Befreiung",player_contributions,no,NEW,Auditfeld fuer Befreiungsaktion
+player_contributions,exempted_by,uuid,yes,,admin_profiles.id,Fachlicher Freigeber der Befreiung,admin_profiles,no,NEW,Getrennt von updated_by
+player_contributions,canceled_at,timestamptz,yes,,,"Zeitpunkt der Stornierung",player_contributions,no,NEW,Keine harte Loeschung
+player_contributions,canceled_by,uuid,yes,,admin_profiles.id,Fachlicher Storno-Akteur,admin_profiles,no,NEW,Getrennt von updated_by
+player_contributions,cancel_reason,text,yes,,,"Begruendung des Stornos",player_contributions,no,NEW,Auditpflicht fuer Storno
+player_contributions,internal_notes,text,yes,,,"Interne Notizen",player_contributions,no,KEEP_FROM_B12,Nicht oeffentlich und nicht Standardexport
+player_contributions,created_by,uuid,yes,,admin_profiles.id,Ersteller,admin_profiles,yes,KEEP_FROM_B12,Auditfeld
+player_contributions,updated_by,uuid,yes,,admin_profiles.id,Letzter Bearbeiter,admin_profiles,yes,KEEP_FROM_B12,Auditfeld
+player_contributions,created_at,timestamptz,no,now(),,Erstellungszeitpunkt,system,yes,KEEP_FROM_B12,Standardaudit
+player_contributions,updated_at,timestamptz,no,now(),,Aenderungszeitpunkt,system,yes,KEEP_FROM_B12,Updated-at Trigger spaeter pruefen
+player_contribution_payments,id,uuid,no,gen_random_uuid(),,Primarschluessel,row_identity,yes,CHANGE_FROM_B12,Aus B12 uebernommen aber neue Tabelle
+player_contribution_payments,contribution_id,uuid,no,,player_contributions.id,Zahlung gehoert zu einer Beitragszeile,player_contributions,yes,CHANGE_FROM_B12,FK auf neue Tabelle
+player_contribution_payments,amount,numeric(10,2),no,,,"Gebuchter Zahlbetrag",player_contribution_payments,yes,KEEP_FROM_B12,Positiver Betrag
+player_contribution_payments,paid_at,timestamptz,no,now(),,"Zeitpunkt der Zahlung",player_contribution_payments,yes,KEEP_FROM_B12,Fachlicher Zahlungseingang
+player_contribution_payments,payment_method,text,yes,,,"Zahlungsart",player_contribution_payments,no,KEEP_FROM_B12,Optional
+player_contribution_payments,reference,text,yes,,,"Referenz oder Verwendungszweck",player_contribution_payments,no,KEEP_FROM_B12,Optional
+player_contribution_payments,status,text,no,posted,,"Payment-Status",player_contribution_payments,yes,NEW,posted oder canceled
+player_contribution_payments,canceled_at,timestamptz,yes,,,"Zeitpunkt Zahlungsstorno",player_contribution_payments,no,NEW,Audit statt Delete
+player_contribution_payments,canceled_by,uuid,yes,,admin_profiles.id,Storno-Akteur,admin_profiles,no,NEW,Erforderlich fuer cancel_payment
+player_contribution_payments,cancel_reason,text,yes,,,"Begruendung Zahlungsstorno",player_contribution_payments,no,NEW,Optional aber empfohlen
+player_contribution_payments,internal_notes,text,yes,,,"Interne Zahlungsnotiz",player_contribution_payments,no,KEEP_FROM_B12,Nicht Standardexport
+player_contribution_payments,created_by,uuid,yes,,admin_profiles.id,Erfassender Admin,admin_profiles,yes,KEEP_FROM_B12,Auditfeld
+player_contribution_payments,created_at,timestamptz,no,now(),,Erstellungszeitpunkt,system,yes,KEEP_FROM_B12,Standardaudit
+player_contribution_payments,updated_at,timestamptz,no,now(),,Aenderungszeitpunkt,system,yes,KEEP_FROM_B12,Updated-at Trigger spaeter pruefen
+membership_contributions,coach_id,uuid,yes,,coaches.id,Polymorpher Coach-Bezug,b12_proposal_only,no,REMOVE_FROM_SCOPE,Passt nicht mehr zum Spieler-only-Modul
+membership_contributions,team_id,uuid,yes,,teams.id,Legacy Team-Snapshot,b12_proposal_only,no,REMOVE_FROM_SCOPE,team_season_id ist fachlich sauberer
+membership_contributions,season_key,text,no,,,"Textbasierter Periodenschluessel",b12_proposal_only,no,REMOVE_FROM_SCOPE,Ersetzt durch season_id

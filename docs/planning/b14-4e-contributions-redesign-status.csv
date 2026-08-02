@@ -1,0 +1,11 @@
+feature,old_design,new_design,component,desktop,tablet,mobile,test_status,status,notes
+page_header,hero_like_header,compact_toolbar_header,src/app/admin/contributions/page.js,DONE,DONE,DONE,PARTIAL,DONE,"Reduced height, same actions"
+summary_cards,twelve_separate_cards,single_summary_bar,src/components/admin/contributions/components/ContributionSummaryBar.js,DONE,DONE,DONE,PARTIAL,DONE,"Status chips plus money row"
+status_quick_filters,large_stat_cards,compact_clickable_chips,src/components/admin/contributions/components/ContributionSummaryBar.js,DONE,DONE,DONE,DONE,DONE,"URL params preserved, page reset to 1"
+money_summary,large_money_cards,compact_info_segments,src/components/admin/contributions/components/ContributionSummaryBar.js,DONE,DONE,DONE,PARTIAL,DONE,"Outstanding amount highlighted"
+filter_panel,large_card_disclosure,compact_filter_disclosure,src/components/admin/contributions/components/ContributionFilters.js,DONE,DONE,DONE,PARTIAL,DONE,"Default remains collapsed"
+desktop_list,mid_breakpoint_table,table_only_at_xl,src/components/admin/contributions/components/ContributionsTable.js,DONE,DEFERRED,DEFERRED,PARTIAL,DONE,"Prevents cramped intermediate widths"
+team_column,verbose_missing_team_label,compact_missing_team_label,src/components/admin/contributions/helpers/contributionOverview.js,DONE,DONE,DONE,DONE,DONE,"Shows 'Keine Mannschaft' with full title hint"
+status_badges,full_labels_only,compact_overview_badges,src/components/admin/contributions/components/ContributionStatusBadge.js,DONE,DONE,DONE,DONE,DONE,"Partially paid becomes Teilbezahlt in overview only"
+mobile_list,basic_mobile_cards,compact_work_cards,src/components/admin/contributions/components/ContributionsTable.js,DEFERRED,DONE,DONE,PARTIAL,DONE,"Cards shown below xl"
+permissions,unchanged_permissions,unchanged_permissions,src/app/admin/contributions/page.js,DONE,DONE,DONE,PARTIAL,DONE,"No permission logic changes"

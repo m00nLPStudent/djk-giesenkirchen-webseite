@@ -5,6 +5,9 @@ import {
   resolveTeamScopeType,
 } from "@/components/admin/teams/serverTeamScope";
 import DashboardPageShell from "@/components/admin/dashboard/DashboardPageShell";
+import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository.js";
+import { loadContributionStats } from "@/components/admin/contributions/services/contributionStats.service.js";
+import { resolveContributionServerContext } from "@/components/admin/contributions/services/contributionAccess.service";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
   expandRecurringEvents,
@@ -66,6 +69,19 @@ async function getScopedTeamsTotal() {
 export default async function AdminPage() {
   const now = new Date();
   const nowIso = now.toISOString();
+  const contributionAccess = await resolveContributionServerContext(
+    "contributions.view",
+  );
+  let contributionStats = null;
+
+  if (contributionAccess.ok) {
+    const seasonResolution = await loadCurrentSeasonResolution(
+      contributionAccess.readClient,
+    );
+    contributionStats = await loadContributionStats(contributionAccess.readClient, {
+      seasonId: seasonResolution.activeSeasonId || undefined,
+    });
+  }
 
   const [
     newsTotal,
@@ -198,6 +214,7 @@ export default async function AdminPage() {
         latestNews={latestNews || []}
         draftOrPlannedNews={draftOrPlannedNews || []}
         statusSignals={statusSignals}
+        contributionStats={contributionStats}
       />
     </AdminLayout>
   );

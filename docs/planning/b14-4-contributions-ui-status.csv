@@ -1,0 +1,18 @@
+feature,route_or_component,permission,server_source,client_state,responsive,test_status,status,notes
+overview,/admin/contributions,contributions.view,loadContributionsOverviewData,query_params_only,done,done,DONE,Serverseitige Filter und Pagination
+create_route,/admin/contributions/new,contributions.create,loadContributionFormOptions,local_form_state,done,covered_indirectly,DONE,Spieler und Saison serverseitig geladen
+detail_route,/admin/contributions/[id],contributions.view,loadContributionById,dialog_query_state,done,covered_indirectly,DONE,Mutationsdialoge ueber Query steuerbar
+edit_route,/admin/contributions/[id]/edit,contributions.edit,loadContributionById,local_form_state,done,covered_indirectly,DONE,Gesperrt fuer canceled und exempt
+sidebar,AdminSidebar,contributions.view,adminPermissionConfig,none,done,covered_indirectly,DONE,Eintrag nur fuer view
+stats,ContributionStats,contributions.view,loadContributionStats,none,done,done,DONE,Canceled aus offenen Summen herausgenommen
+filters,ContributionFilters,contributions.view,loadContributionsOverviewData,query_params_only,done,done,DONE,Saison Spieler Team Status Typ Suche Sortierung
+list,ContributionsTable,contributions.view,contributionReadDto,none,done,covered_indirectly,DONE,Mobile Karten plus Desktop-Tabelle
+payment_dialog,RecordPaymentDialog,contributions.record_payment,recordContributionPaymentAction,local_dialog_state,done,covered_indirectly,DONE,Restbetrag sichtbar
+payment_cancel_dialog,CancelPaymentDialog,contributions.cancel_payment,cancelContributionPaymentAction,local_dialog_state,done,covered_indirectly,DONE,Kein Hard-Delete
+defer_dialog,DeferContributionDialog,contributions.defer,deferContributionAction/resumeContributionAction,local_dialog_state,done,covered_indirectly,DONE,Resume ohne freie Statuswahl
+exempt_dialog,ExemptContributionDialog,contributions.exempt,exemptContributionAction,local_dialog_state,done,covered_indirectly,DONE,Keine Ruecknahme angeboten
+cancel_dialog,CancelContributionDialog,contributions.cancel,cancelContributionAction,local_dialog_state,done,covered_indirectly,DONE,Zahlungen muessen vorher storniert sein
+csv_export,/admin/contributions/export,contributions.export,loadContributionsExportData,query_params_only,n/a,done,DONE,CSV-Injection neutralisiert
+dashboard_tile,ContributionDashboardPanel,contributions.view,loadContributionStats,none,done,covered_indirectly,DONE,Aktuelle Saison ohne Detaildaten
+ui_permissions,contributionUiState.js,permission_keys_only,none,derived_local_state,n/a,done,DONE,Vorstand read-only plus Export
+data_privacy,all routes,permission_specific,resolveContributionServerContext,minimal_local_state,n/a,covered_indirectly,DONE,Keine Client-Supabase-Queries

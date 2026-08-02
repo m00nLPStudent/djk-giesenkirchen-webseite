@@ -19,6 +19,7 @@ import {
   Building2,
   Handshake,
   BookOpen,
+  Wallet,
 } from "lucide-react";
 
 const navItems = [
@@ -63,6 +64,12 @@ const navItems = [
     label: "Spieler",
     icon: Users,
     requiredPermission: "players.view",
+  },
+  {
+    href: "/admin/contributions",
+    label: "Vereinsbeitraege",
+    icon: Wallet,
+    requiredPermission: "contributions.view",
   },
   {
     href: "/admin/media",
@@ -135,6 +142,7 @@ export default function AdminSidebar({ mobile = false, onNavigate }) {
         "/admin/teams",
         "/admin/coaches",
         "/admin/players",
+        "/admin/contributions",
         "/admin/club-history",
         "/admin/tournaments",
       ],

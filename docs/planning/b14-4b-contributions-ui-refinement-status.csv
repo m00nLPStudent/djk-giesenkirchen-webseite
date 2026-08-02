@@ -1,0 +1,11 @@
+feature,component_or_route,data_source,permission,desktop,mobile,test_status,status,notes
+dropdown-styling,/admin/contributions + forms,local contributions styles,contributions.view,done,done,targeted,DONE,Dark select with readable native options
+player-season-assignments,ContributionForm + loadContributionFormOptions,"player_team_seasons|team_seasons|teams",contributions.create,done,done,targeted,DONE,No client Supabase and no players.team_id fallback
+team-snapshot-autofill,ContributionForm,"prepared player seasonAssignments",contributions.create,done,done,targeted,DONE,Single auto-select multiple selectable none stays empty
+historical-season-snapshot,ContributionForm,"selected season assignments",contributions.create,done,done,targeted,DONE,Season change recalculates snapshot options
+title-defaults,ContributionForm + helper,local helper,contributions.create,done,done,targeted,DONE,Custom titles stay untouched
+actions-dropdown,ContributionActionsMenu,permission-derived UI state,contributions.view,done,done,targeted,DONE,Escape and outside click handled
+collapsible-filters,/admin/contributions,URL search params,contributions.view,done,done,partial,DONE,Client collapse state without duplicating filter truth
+clickable-stats,/admin/contributions,URL search params,contributions.view,done,done,targeted,DONE,Quick filters preserve season and reset page
+team-snapshot-fallback,ContributionCard + ContributionsTable,stored team_snapshot_name,contributions.view,done,done,reviewed,DONE,Shows neutral empty label instead of guessed team
+manual-admin-session,/admin/contributions live route,authenticated browser session,admin session,blocked,blocked,manual,BLOCKED,Terminal context had no authenticated admin session

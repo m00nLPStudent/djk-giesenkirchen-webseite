@@ -1,0 +1,133 @@
+
+> djk-giesenkirchen-webseite@0.1.0 dev
+> next dev --port 3001
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.178.104:3001
+- Environments: .env.local
+✓ Ready in 558ms
+Creating turbopack project {
+  dir: 'C:\\Users\\swen7\\Desktop\\Website_GK\\djk-giesenkirchen-webseite',
+  testMode: true
+}
+
+[admin-proxy:cookies:request] {
+  pathname: '/admin/contributions',
+  hasAuthCookies: false,
+  authCookieNames: []
+}
+[admin-proxy] {
+  pathname: '/admin/contributions',
+  hasUser: false,
+  hasError: true,
+  hasAuthCookiesInRequest: false,
+  responseHasAuthCookies: false,
+  responseAuthCookieNames: [],
+  userErrorCode: null,
+  userErrorStatus: 400,
+  userErrorMessage: 'Auth session missing!',
+  cookieSyncTriggered: false
+}
+[admin-proxy:cookies:request] {
+  pathname: '/admin/contributions',
+  hasAuthCookies: false,
+  authCookieNames: []
+}
+[admin-proxy] {
+  pathname: '/admin/contributions',
+  hasUser: false,
+  hasError: true,
+  hasAuthCookiesInRequest: false,
+  responseHasAuthCookies: false,
+  responseAuthCookieNames: [],
+  userErrorCode: null,
+  userErrorStatus: 400,
+  userErrorMessage: 'Auth session missing!',
+  cookieSyncTriggered: false
+}
+[admin-proxy:cookies:request] {
+  pathname: '/admin/contributions',
+  hasAuthCookies: false,
+  authCookieNames: []
+}
+[admin-proxy] {
+  pathname: '/admin/contributions',
+  hasUser: false,
+  hasError: true,
+  hasAuthCookiesInRequest: false,
+  responseHasAuthCookies: false,
+  responseAuthCookieNames: [],
+  userErrorCode: null,
+  userErrorStatus: 400,
+  userErrorMessage: 'Auth session missing!',
+  cookieSyncTriggered: false
+}
+[admin-proxy:cookies:request] {
+  pathname: '/admin/contributions/test-id',
+  hasAuthCookies: false,
+  authCookieNames: []
+}
+[admin-proxy] {
+  pathname: '/admin/contributions/test-id',
+  hasUser: false,
+  hasError: true,
+  hasAuthCookiesInRequest: false,
+  responseHasAuthCookies: false,
+  responseAuthCookieNames: [],
+  userErrorCode: null,
+  userErrorStatus: 400,
+  userErrorMessage: 'Auth session missing!',
+  cookieSyncTriggered: false
+}
+[admin-proxy:cookies:request] {
+  pathname: '/admin/contributions',
+  hasAuthCookies: false,
+  authCookieNames: []
+}
+[admin-proxy] {
+  pathname: '/admin/contributions',
+  hasUser: false,
+  hasError: true,
+  hasAuthCookiesInRequest: false,
+  responseHasAuthCookies: false,
+  responseAuthCookieNames: [],
+  userErrorCode: null,
+  userErrorStatus: 400,
+  userErrorMessage: 'Auth session missing!',
+  cookieSyncTriggered: false
+}
+[admin-proxy:cookies:request] {
+  pathname: '/admin/contributions/test-id',
+  hasAuthCookies: false,
+  authCookieNames: []
+}
+[admin-proxy] {
+  pathname: '/admin/contributions/test-id',
+  hasUser: false,
+  hasError: true,
+  hasAuthCookiesInRequest: false,
+  responseHasAuthCookies: false,
+  responseAuthCookieNames: [],
+  userErrorCode: null,
+  userErrorStatus: 400,
+  userErrorMessage: 'Auth session missing!',
+  cookieSyncTriggered: false
+}
+[admin-proxy:cookies:request] {
+  pathname: '/admin/contributions/test-id',
+  hasAuthCookies: false,
+  authCookieNames: []
+}
+[admin-proxy] {
+  pathname: '/admin/contributions/test-id',
+  hasUser: false,
+  hasError: true,
+  hasAuthCookiesInRequest: false,
+  responseHasAuthCookies: false,
+  responseAuthCookieNames: [],
+  userErrorCode: null,
+  userErrorStatus: 400,
+  userErrorMessage: 'Auth session missing!',
+  cookieSyncTriggered: false
+}

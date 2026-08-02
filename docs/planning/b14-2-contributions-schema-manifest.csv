@@ -1,0 +1,45 @@
+table_name,column_name,data_type,nullable,default_value,generated_expression,foreign_key,on_delete,constraint,index_name,source_of_truth,purpose,status,notes
+player_contributions,id,uuid,no,gen_random_uuid(),,,,"primary key",player_contributions_pkey,row_identity,primary_key,NEW,Neue Kerntabelle
+player_contributions,player_id,uuid,no,,,players.id,NO ACTION,player_contributions_player_id_fkey,idx_player_contributions_player_season,players,Spielerbezug,NEW,Audit-Erhalt vor Delete-Komfort
+player_contributions,season_id,uuid,no,,,seasons.id,NO ACTION,player_contributions_season_id_fkey,idx_player_contributions_player_season,seasons,Beitragszeitraum,NEW,Saison statt freiem season_key
+player_contributions,contribution_key,text,no,,,,"","player_contributions_contribution_key_check",idx_player_contributions_contribution_key,application_enum,Technischer Beitragstyp,NEW,Kontrollierter Key-Katalog
+player_contributions,title,text,no,,,,"","player_contributions_title_check",,editorial_input,Lesbare Bezeichnung,NEW,Darf nicht leer sein
+player_contributions,amount_due,"numeric(10,2)",no,0,,,"","player_contributions_amount_due_check",,player_contributions,Ursprungssoll,NEW,Nicht negativ
+player_contributions,amount_paid,"numeric(10,2)",no,0,,,"","player_contributions_amount_paid_check",,player_contribution_payments,Synchronisierter Zahl-Cache,NEW,Booked payments only
+player_contributions,amount_waived,"numeric(10,2)",no,0,,,"","player_contributions_amount_waived_check",,player_contributions,Erlassener Betrag,NEW,Vollbefreiung in Phase 1
+player_contributions,amount_outstanding,"numeric(10,2)",yes,derived,"GREATEST(0::numeric, amount_due - amount_waived - amount_paid)",,,"player_contributions_amount_balance_check",,derived_from_due_paid_waived,Offener Betrag,NEW,Generated stored
+player_contributions,currency,text,no,EUR,,,"","player_contributions_currency_check",,application_constant,Waehrung,NEW,Phase 1 nur EUR
+player_contributions,status,text,no,open,,,"","player_contributions_status_check",idx_player_contributions_status_due_date,server_write_path,Beitragsstatus,NEW,Server/trigger-gesteuert mit Checks
+player_contributions,due_date,date,yes,,,,"","",idx_player_contributions_status_due_date,player_contributions,Faelligkeit,NEW,Optional
+player_contributions,deferred_until,date,yes,,,,"","player_contributions_deferred_check",,player_contributions,Stundungsfrist,NEW,Nur bei deferred Pflicht
+player_contributions,deferred_reason,text,yes,,,,"","",,player_contributions,Stundungsgrund,NEW,Interne Begruendung
+player_contributions,installment_agreement,boolean,no,false,,,"","",,player_contributions,Ratenvereinbarung aktiv,NEW,Einfache Phase-1-Abbildung
+player_contributions,installment_notes,text,yes,,,,"","",,player_contributions,Ratennotiz,NEW,Keine eigene Plan-Tabelle
+player_contributions,exemption_reason,text,yes,,,,"","player_contributions_exempt_check",,player_contributions,Befreiungsgrund,NEW,Bei exempt relevant
+player_contributions,exempted_at,timestamptz,yes,,,,"","player_contributions_exempt_check",,player_contributions,Befreiungszeitpunkt,NEW,Auditfeld
+player_contributions,exempted_by,uuid,yes,,,admin_profiles.id,SET NULL,player_contributions_exempted_by_fkey,,admin_profiles,Befreiung durch,NEW,Auditfeld
+player_contributions,canceled_at,timestamptz,yes,,,,"","player_contributions_canceled_check",,player_contributions,Stornozeitpunkt,NEW,Bei canceled Pflicht
+player_contributions,canceled_by,uuid,yes,,,admin_profiles.id,SET NULL,player_contributions_canceled_by_fkey,,admin_profiles,Storno durch,NEW,Auditfeld
+player_contributions,cancellation_reason,text,yes,,,,"","",,player_contributions,Stornogrund,NEW,Empfohlen
+player_contributions,internal_notes,text,yes,,,,"","",,player_contributions,Interne Notizen,NEW,Nicht fuer Standardexport
+player_contributions,team_snapshot_name,text,yes,,,,"","",,snapshot_input,Historischer Teamname,NEW,Textsnapshot ohne FK
+player_contributions,paid_at,timestamptz,yes,,,,"","player_contributions_paid_at_check",,derived_from_payments,Vollbezahlungszeitpunkt,NEW,Null fuer exempt/canceled
+player_contributions,created_by,uuid,yes,,,admin_profiles.id,SET NULL,player_contributions_created_by_fkey,,admin_profiles,Ersteller,NEW,Auditfeld
+player_contributions,updated_by,uuid,yes,,,admin_profiles.id,SET NULL,player_contributions_updated_by_fkey,,admin_profiles,Letzter Bearbeiter,NEW,Auditfeld
+player_contributions,created_at,timestamptz,no,now(),,,,"",,system,Erstellungszeitpunkt,NEW,Standardaudit
+player_contributions,updated_at,timestamptz,no,now(),,,,"",,system,Aenderungszeitpunkt,NEW,Trigger via set_updated_at
+player_contribution_payments,id,uuid,no,gen_random_uuid(),,,,"primary key",player_contribution_payments_pkey,row_identity,primary_key,NEW,Neue Payment-Tabelle
+player_contribution_payments,contribution_id,uuid,no,,,player_contributions.id,NO ACTION,player_contribution_payments_contribution_id_fkey,idx_player_contribution_payments_contribution_id,player_contributions,Zuordnung zur Beitragszeile,NEW,Keine Hard-Delete-Kaskade
+player_contribution_payments,amount,"numeric(10,2)",no,,,,"","player_contribution_payments_amount_check",,player_contribution_payments,Gebuchter Zahlbetrag,NEW,Muss > 0 sein
+player_contribution_payments,paid_at,timestamptz,no,now(),,,,"",idx_player_contribution_payments_paid_at,player_contribution_payments,Zahlungszeitpunkt,NEW,Fachlicher Zahlungseingang
+player_contribution_payments,payment_method,text,yes,,,,"","",,player_contribution_payments,Zahlungsart,NEW,Optional freies Feld
+player_contribution_payments,reference,text,yes,,,,"","",,player_contribution_payments,Referenz,NEW,Optional
+player_contribution_payments,internal_notes,text,yes,,,,"","",,player_contribution_payments,Interne Zahlungsnotiz,NEW,Nicht Standardexport
+player_contribution_payments,status,text,no,booked,,,"","player_contribution_payments_status_check",idx_player_contribution_payments_status_contribution,player_contribution_payments,Payment-Status,NEW,booked oder canceled
+player_contribution_payments,canceled_at,timestamptz,yes,,,,"","player_contribution_payments_canceled_check",,player_contribution_payments,Zahlungsstornozeitpunkt,NEW,Bei canceled Pflicht
+player_contribution_payments,canceled_by,uuid,yes,,,admin_profiles.id,SET NULL,player_contribution_payments_canceled_by_fkey,,admin_profiles,Zahlungsstorno durch,NEW,Auditfeld
+player_contribution_payments,cancellation_reason,text,yes,,,,"","",,player_contribution_payments,Zahlungsstornogrund,NEW,Optional aber empfohlen
+player_contribution_payments,created_by,uuid,yes,,,admin_profiles.id,SET NULL,player_contribution_payments_created_by_fkey,,admin_profiles,Erfasser,NEW,Auditfeld
+player_contribution_payments,updated_by,uuid,yes,,,admin_profiles.id,SET NULL,player_contribution_payments_updated_by_fkey,,admin_profiles,Letzter Bearbeiter,NEW,Auditfeld
+player_contribution_payments,created_at,timestamptz,no,now(),,,,"",,system,Erstellungszeitpunkt,NEW,Standardaudit
+player_contribution_payments,updated_at,timestamptz,no,now(),,,,"",,system,Aenderungszeitpunkt,NEW,Trigger via set_updated_at

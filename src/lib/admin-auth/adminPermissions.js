@@ -54,6 +54,15 @@ export const ADMIN_PERMISSION_KEYS = [
   "roles.view",
   "roles.edit",
   "system.view",
+  "contributions.view",
+  "contributions.create",
+  "contributions.edit",
+  "contributions.record_payment",
+  "contributions.cancel_payment",
+  "contributions.defer",
+  "contributions.exempt",
+  "contributions.cancel",
+  "contributions.export",
 ];
 
 export const ADMIN_PERMISSION_GROUPS = {
@@ -95,4 +104,15 @@ export const ADMIN_PERMISSION_GROUPS = {
   users: ["users.view", "users.create", "users.edit", "users.delete"],
   roles: ["roles.view", "roles.edit"],
   system: ["system.view"],
+  contributions: [
+    "contributions.view",
+    "contributions.create",
+    "contributions.edit",
+    "contributions.record_payment",
+    "contributions.cancel_payment",
+    "contributions.defer",
+    "contributions.exempt",
+    "contributions.cancel",
+    "contributions.export",
+  ],
 };
