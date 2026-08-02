@@ -1,61 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { Plus, Search } from "lucide-react";
+import Can from "@/components/admin/auth/Can";
+import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import { matchesActiveStatus, matchesSearch } from "@/components/admin/utils/list";
 import AdminCoachesList from "./AdminCoachesList";
+import CoachFilters from "./components/CoachFilters";
 import CoachStats from "./components/CoachStats";
-import CoachTeamsOverview from "./components/CoachTeamsOverview";
-import { getCoachStats } from "./utils/coachStats";
 
-const filterTitles = {
-  alle: "Alle Trainer & Betreuer",
-  trainer: "Trainer",
-  "co-trainer": "Co-Trainer",
-  betreuer: "Betreuer",
-  mannschaften: "Mannschaften",
-};
-
-export default function AdminCoachesOverview({ coaches = [] }) {
-  const [activeStatsFilter, setActiveStatsFilter] = useState("alle");
-  const stats = getCoachStats(coaches);
-
-  function handleStatsFilter(filter) {
-    setActiveStatsFilter((current) => (current === filter ? "alle" : filter));
-  }
+export default function AdminCoachesOverview({ coaches = [], canCreate = false }) {
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("alle");
+  const filteredCoaches = useMemo(() => coaches.filter((coach) =>
+    matchesActiveStatus(coach, status) && matchesSearch([
+      coach.displayName,
+      coach.primaryRoleLabel,
+      coach.roleLabels?.join(" "),
+      coach.teamNames?.join(" "),
+    ], search)
+  ), [coaches, search, status]);
 
   return (
-    <>
-      <CoachStats
-        {...stats}
-        activeFilter={activeStatsFilter}
-        onFilterChange={handleStatsFilter}
-      />
-
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-red-400">
-            Übersicht
-          </p>
-          <h2 className="mt-2 text-2xl font-black">
-            {filterTitles[activeStatsFilter] || filterTitles.alle}
-          </h2>
-        </div>
-
-        {activeStatsFilter !== "alle" && (
-          <button
-            type="button"
-            onClick={() => setActiveStatsFilter("alle")}
-            className="rounded-full border border-white/10 px-5 py-2 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-          >
-            Auswahl zurücksetzen
-          </button>
-        )}
-      </div>
-
-      {activeStatsFilter === "mannschaften" ? (
-        <CoachTeamsOverview coaches={coaches} />
-      ) : (
-        <AdminCoachesList coaches={coaches} activeStatsFilter={activeStatsFilter} />
-      )}
-    </>
+    <div className="space-y-5">
+      <AdminPageHeader
+        eyebrow="Trainer"
+        title="Trainer verwalten"
+        description="Trainer- und Betreuerprofile kompakt verwalten."
+        actions={canCreate ? (
+          <Can permission="coaches.create" uiOnly>
+            <Link href="/admin/coaches/new" className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white transition hover:bg-red-700">
+              <Plus size={17} aria-hidden="true" /> Neuer Trainer
+            </Link>
+          </Can>
+        ) : null}
+      >
+        <label className="relative block max-w-xl">
+          <span className="sr-only">Trainer suchen</span>
+          <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40" aria-hidden="true" />
+          <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Trainer suchen …" className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-red-500" />
+        </label>
+      </AdminPageHeader>
+      <CoachStats coaches={coaches} />
+      <CoachFilters status={status} setStatus={setStatus} />
+      <AdminCoachesList coaches={filteredCoaches} />
+    </div>
   );
 }

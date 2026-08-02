@@ -1,92 +1,25 @@
-"use client";
-
-import Can from "@/components/admin/auth/Can";
-import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
-import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
-import { removeCoachRecord } from "@/components/admin/delete/removeActions";
-import EntityBadge from "@/components/admin/ui/EntityBadge";
-import {
-  EntityActionLink,
-  EntityCard,
-  EntityCardActions,
-  EntityCardBadges,
-  EntityCardMeta,
-  EntityCardTitle,
-} from "@/components/admin/ui/EntityCard";
-import {
-  CountryFlag,
-  getCountryByValue,
-} from "@/components/admin/utils/countries";
-import {
-  getEntityImage,
-  getEntityTeam,
-  getFullName,
-} from "@/components/admin/utils/entity";
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import CoachAvatar from "./CoachAvatar";
 import CoachStatusBadge from "./CoachStatusBadge";
 
 export default function CoachCard({ coach }) {
-  const country = getCountryByValue(coach.nationality);
-  const imageUrl = getEntityImage(coach, COACH_PLACEHOLDER_IMAGE);
-  const fullName = getFullName(coach, "Trainer");
-  const team = getEntityTeam(coach);
-  const assignmentLabels =
-    (coach.assignments || []).length > 0
-      ? coach.assignments.map((assignment) =>
-          [assignment.teamNameDe || assignment.teamNameEn, assignment.roleDe || assignment.roleEn]
-            .filter(Boolean)
-            .join(" · "),
-        )
-      : [team.name];
-
+  const teams = coach.teamNames?.length ? coach.teamNames.join(", ") : "Keine Mannschaft";
+  const href = coach._canEditInScope === false
+    ? `/trainer/${coach.slug}`
+    : `/admin/coaches/edit/${coach.id}`;
   return (
-    <EntityCard image={imageUrl} imageAlt={fullName}>
-      <EntityCardBadges>
-        <EntityBadge variant="red">
-          {coach.primaryRoleLabel || "Trainer"}
-        </EntityBadge>
-        <CoachStatusBadge active={coach.is_active} />
-        {assignmentLabels.map((label) => (
-          <EntityBadge key={`${coach.id}-${label}`}>{label}</EntityBadge>
-        ))}
-        {coach.hasMultipleActiveAssignments && (
-          <EntityBadge variant="yellow">Mehrfachzuordnung</EntityBadge>
-        )}
-        {country && (
-          <EntityBadge>
-            <CountryFlag country={country} />
-            {country.de}
-          </EntityBadge>
-        )}
-      </EntityCardBadges>
-
-      <EntityCardTitle>{fullName}</EntityCardTitle>
-      <EntityCardMeta>
-        {coach.email || "Keine E-Mail hinterlegt"}
-      </EntityCardMeta>
-
-      <EntityCardActions>
-        <Can permission="coaches.edit" uiOnly fallback={null}>
-          {coach._canEditInScope === false ? null : (
-            <EntityActionLink href={`/admin/coaches/edit/${coach.id}`}>
-              Bearbeiten
-            </EntityActionLink>
-          )}
-        </Can>
-        <EntityActionLink href={`/trainer/${coach.slug}`} target="_blank">
-          Profil ansehen
-        </EntityActionLink>
-        <Can permission="coaches.delete" uiOnly fallback={null}>
-          {coach._canDeleteInScope === false ? null : (
-            <AdminRemoveButton
-              label="Trainer"
-              name={fullName}
-              action={() => removeCoachRecord(coach)}
-              affected={["Profil", "Saison-Zuordnungen"]}
-              preserved={["Mannschaften", "Spieler", "News"]}
-            />
-          )}
-        </Can>
-      </EntityCardActions>
-    </EntityCard>
+    <Link href={href} aria-label={`Details zu ${coach.displayName} öffnen`} className="block rounded-[1.35rem] border border-white/10 bg-white/[0.04] p-4 transition hover:border-red-500/40 hover:bg-white/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400 lg:hidden">
+      <div className="flex items-start gap-3">
+        <CoachAvatar coach={coach} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0"><p className="truncate font-black text-white">{coach.displayName}</p><p className="mt-1 truncate text-sm text-white/55">{coach.primaryRoleLabel || "Trainer"}</p></div>
+            <ChevronRight size={18} className="mt-1 shrink-0 text-white/35" aria-hidden="true" />
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-2"><CoachStatusBadge active={coach.isActive} /><span className="min-w-0 truncate text-sm text-white/60">{teams}</span></div>
+        </div>
+      </div>
+    </Link>
   );
 }

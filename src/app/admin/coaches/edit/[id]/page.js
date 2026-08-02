@@ -1,9 +1,11 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminCoachesForm } from "@/components/admin/coaches";
-import BackButton from "@/components/admin/ui/BackButton";
+import CoachDetailOverview from "@/components/admin/coaches/components/CoachDetailOverview";
+import { createCoachReadDto } from "@/components/admin/persons/coachReadDto";
 import { redirect } from "next/navigation";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
+  canDeleteCoachOnServer,
   canEditCoachOnServer,
   getCoachTeamIdsMap,
   loadServerPersonScopeContext,
@@ -54,10 +56,21 @@ export default async function EditCoachPage({ params }) {
     scopeContext,
     supabaseServer,
   );
+  const canRemove = canDeleteCoachOnServer(
+    scopeContext,
+    coach,
+    coachTeamIds,
+    teamById,
+  );
+  const coachDetail = createCoachReadDto(coach, coachSeasonalReadModel);
 
   return (
-    <AdminLayout title="Trainer bearbeiten" subtitle="Trainer">
-      <BackButton />
+    <AdminLayout title="Trainer bearbeiten" subtitle="Trainer" showHeader={false}>
+      <CoachDetailOverview
+        coach={coachDetail}
+        notes={coach.notes || coach.bio_de || coach.bio_en || ""}
+        canRemove={canRemove}
+      />
       <AdminCoachesForm
         coach={coach}
         teamOptionsResult={teamOptionsResult}

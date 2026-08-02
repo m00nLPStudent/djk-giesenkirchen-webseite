@@ -53,4 +53,11 @@ test("resolveCoachImageUrl keeps legacy photo_url temporarily for bestandsdaten"
     "https://example.test/coach-legacy.png",
   );
   assert.equal(resolveCoachImageUrl({}, "fallback.png"), "fallback.png");
+  assert.equal(
+    resolveCoachImageUrl(
+      { imageUrl: "  ", image_url: "", photo_url: null },
+      "fallback.png",
+    ),
+    "fallback.png",
+  );
 });

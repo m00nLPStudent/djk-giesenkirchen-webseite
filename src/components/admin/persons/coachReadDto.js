@@ -1,4 +1,5 @@
 import { createCoachRoleSummary } from "./coachRoleSummary.mjs";
+import { resolveCoachImageUrl } from "../../../lib/people/imageUrl.js";
 
 function normalizeText(value) {
   if (typeof value !== "string") return null;
@@ -99,12 +100,7 @@ export function getCoachDisplayName(coach = {}) {
 }
 
 export function getCoachImageUrl(coach = {}, fallbackImage = null) {
-  return (
-    normalizeText(coach.imageUrl) ||
-    normalizeText(coach.image_url) ||
-    normalizeText(coach.photo_url) ||
-    fallbackImage
-  );
+  return resolveCoachImageUrl(coach, fallbackImage);
 }
 
 export function createCoachReadDto(

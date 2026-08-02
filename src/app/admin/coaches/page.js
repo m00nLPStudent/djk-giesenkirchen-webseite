@@ -1,19 +1,15 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
-import Can from "@/components/admin/auth/Can";
 import { AdminCoachesOverview } from "@/components/admin/coaches";
 import { createCoachReadDto } from "@/components/admin/persons/coachReadDto";
 import { getCoachSeasonalReadModelsMap } from "@/components/admin/persons/coachSeasonalReadModelRepository";
 import {
   canCreateCoachOnServer,
-  canDeleteCoachOnServer,
   canEditCoachOnServer,
   canViewCoachOnServer,
   getCoachTeamIdsMap,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -72,12 +68,6 @@ export default async function AdminCoachesPage() {
           coachTeamIds,
           teamById,
         ),
-        _canDeleteInScope: canDeleteCoachOnServer(
-          scopeContext,
-          coach,
-          coachTeamIds,
-          teamById,
-        ),
       };
     });
 
@@ -87,25 +77,7 @@ export default async function AdminCoachesPage() {
       subtitle="Adminbereich"
       showHeader={false}
     >
-      <AdminPageHeader
-        eyebrow="Trainer"
-        title="Trainer verwalten"
-        description="Trainer- und Betreuerprofile pflegen und Zuordnungen zu Mannschaften prüfen."
-        actions={
-          canCreateCoaches ? (
-            <Can permission="coaches.create" uiOnly>
-              <Link
-                href="/admin/coaches/new"
-                className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-              >
-                Neuer Trainer
-              </Link>
-            </Can>
-          ) : null
-        }
-      />
-
-      <AdminCoachesOverview coaches={coachList} />
+      <AdminCoachesOverview coaches={coachList} canCreate={canCreateCoaches} />
     </AdminLayout>
   );
 }

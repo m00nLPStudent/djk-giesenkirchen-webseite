@@ -151,7 +151,12 @@ export default function AdminCoachesForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
+    <form
+      id="coach-edit-form"
+      onSubmit={handleSubmit}
+      className="mt-5 space-y-6 scroll-mt-28"
+      noValidate
+    >
       <TabNavigation
         tabs={COACH_FORM_TABS}
         activeTab={activeTab}
