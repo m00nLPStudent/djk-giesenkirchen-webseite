@@ -1,12 +1,11 @@
 import {
-  createNews,
   deleteNewsDocument,
   getNewsDocuments,
-  updateNews,
   uploadNewsDocument,
   uploadNewsImage,
 } from "../services/news.service";
 import { createNewsPayload } from "./newsPayload";
+import { saveNewsWithAuthorAction } from "@/app/admin/news/actions";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 
@@ -112,9 +111,7 @@ export function createNewsHandlers({
 
     const payload = createNewsPayload(form, news);
 
-    const { data: savedNews, error } = isEdit
-      ? await updateNews(news.id, payload)
-      : await createNews(payload);
+    const { data: savedNews, error } = await saveNewsWithAuthorAction(payload, isEdit ? news.id : null);
 
     setLoading(false);
 

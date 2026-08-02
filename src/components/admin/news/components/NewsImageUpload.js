@@ -1,3 +1,6 @@
+import { AdminButton, AdminImagePreview } from "@/components/admin/design-system";
+import { resolveMediaFileName } from "../helpers/newsMedia.core.mjs";
+
 export default function NewsImageUpload({ imageUrl, onUpload, onRemove }) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
@@ -26,20 +29,10 @@ export default function NewsImageUpload({ imageUrl, onUpload, onRemove }) {
               Vorschau
             </p>
 
-            <button
-              type="button"
-              onClick={onRemove}
-              className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 hover:bg-red-500/10"
-            >
-              Bild entfernen
-            </button>
+            <AdminButton variant="danger" onClick={onRemove}>Bild entfernen</AdminButton>
           </div>
 
-          <img
-            src={imageUrl}
-            alt="Beitragsbild"
-            className="max-h-72 w-full rounded-xl object-contain"
-          />
+          <AdminImagePreview src={imageUrl} alt="Beitragsbild der News" fileName={resolveMediaFileName({ image_url: imageUrl }, "Bild")} />
         </div>
       )}
     </div>

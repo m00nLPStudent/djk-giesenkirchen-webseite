@@ -24,7 +24,11 @@ export async function removeTeamRecord(team) {
 }
 
 export async function removeNewsRecord(news) {
-  return await removeEntity("news", news?.id);
+  const result = await removeEntity("news", news?.id);
+  if (!result?.error) {
+    await revalidatePublicContentAction("news");
+  }
+  return result;
 }
 
 export async function removeBoardMemberRecord(member) {

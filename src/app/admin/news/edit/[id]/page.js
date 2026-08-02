@@ -1,6 +1,10 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminNewsEditForm } from "@/components/admin/news";
-import BackButton from "@/components/admin/ui/BackButton";
+import Can from "@/components/admin/auth/Can";
+import DeleteNewsButton from "@/components/admin/ui/DeleteNewsButton";
+import NewsDetailSummary from "@/components/admin/news/components/NewsDetailSummary";
+import NewsStatusBadge from "@/components/admin/news/components/NewsStatusBadge";
+import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminDetailLayout } from "@/components/admin/design-system";
 import { supabase } from "@/lib/supabase";
 
 export default async function EditNewsPage({ params }) {
@@ -19,9 +23,11 @@ export default async function EditNewsPage({ params }) {
     .order("sort_order", { ascending: true });
 
   return (
-    <AdminLayout title="News bearbeiten" subtitle="News">
-      <BackButton />
-      <AdminNewsEditForm news={news} teams={teams || []} />
+    <AdminLayout title="News bearbeiten" subtitle="News" showHeader={false}>
+      <AdminDetailLayout header={<AdminDetailHeader backHref="/admin/news" backLabel="Zurück zu News" backVariant="pill" eyebrow="News" title={news.title_de} status={<NewsStatusBadge isPublished={news.is_published} publishedAt={news.published_at} />} meta={`${news.author || "Autor nicht hinterlegt"} · ${news.published_at ? new Date(news.published_at).toLocaleString("de-DE") : "Kein Veröffentlichungsdatum"}`} actions={<AdminActionBar><AdminButton href="#news-editor-form" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />} dangerZone={<Can permission="news.delete" uiOnly><AdminDangerZone title="News löschen" description="Die News und ihre unmittelbar zugehörigen Inhalte werden dauerhaft entfernt. Mannschaften, Spieler und Trainer bleiben erhalten."><DeleteNewsButton id={news.id} title={news.title_de} /></AdminDangerZone></Can>}>
+        <NewsDetailSummary news={news} />
+        <AdminNewsEditForm news={news} teams={teams || []} />
+      </AdminDetailLayout>
     </AdminLayout>
   );
 }

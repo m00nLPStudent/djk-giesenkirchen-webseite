@@ -1,6 +1,6 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminNewsForm } from "@/components/admin/news";
-import BackButton from "@/components/admin/ui/BackButton";
+import { AdminDetailHeader, AdminDetailLayout } from "@/components/admin/design-system";
 import { supabase } from "@/lib/supabase";
 
 export default async function NewNewsPage() {
@@ -11,9 +11,10 @@ export default async function NewNewsPage() {
     .order("sort_order", { ascending: true });
 
   return (
-    <AdminLayout title="Neue News" subtitle="News">
-      <BackButton />
-      <AdminNewsForm teams={teams || []} />
+    <AdminLayout title="Neue News" subtitle="News" showHeader={false}>
+      <AdminDetailLayout header={<AdminDetailHeader backHref="/admin/news" backLabel="Zurück zu News" backVariant="pill" eyebrow="News" title="Neue News" meta="News erstellen und zur Veröffentlichung vorbereiten." />}>
+        <AdminNewsForm teams={teams || []} />
+      </AdminDetailLayout>
     </AdminLayout>
   );
 }

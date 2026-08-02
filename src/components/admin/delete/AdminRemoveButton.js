@@ -11,6 +11,7 @@ export default function AdminRemoveButton({
   preserved = [],
   hint = "",
   inlineError = false,
+  successHref = null,
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -38,6 +39,11 @@ export default function AdminRemoveButton({
 
     if (result?.message) {
       setSuccessMessage(result.message);
+    }
+
+    if (successHref) {
+      router.replace(successHref);
+      return;
     }
 
     router.refresh();

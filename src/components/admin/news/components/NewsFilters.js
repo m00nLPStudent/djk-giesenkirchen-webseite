@@ -1,4 +1,6 @@
-export default function NewsFilters({ filter, setFilter, search, setSearch }) {
+import { AdminModuleFilters } from "@/components/admin/design-system";
+
+export default function NewsFilters({ filter, setFilter }) {
   const filters = [
     ["alle", "Alle"],
     ["veroeffentlicht", "Veröffentlicht"],
@@ -7,7 +9,7 @@ export default function NewsFilters({ filter, setFilter, search, setSearch }) {
   ];
 
   return (
-    <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <AdminModuleFilters title="News filtern" badge={filter !== "alle" ? <span className="rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-bold text-red-300">1 aktiv</span> : null}>
       <div className="flex flex-wrap gap-3">
         {filters.map(([value, label]) => (
           <button
@@ -24,14 +26,6 @@ export default function NewsFilters({ filter, setFilter, search, setSearch }) {
           </button>
         ))}
       </div>
-
-      <input
-        type="text"
-        placeholder="News suchen..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-white lg:w-80"
-      />
-    </div>
+    </AdminModuleFilters>
   );
 }

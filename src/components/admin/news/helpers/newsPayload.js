@@ -8,9 +8,13 @@ export function createNewsPayload(form, news) {
     : null;
 
   return {
-    ...form,
+    title_de: form.title_de,
+    teaser_de: form.teaser_de,
+    content_de: form.content_de,
+    category: form.category,
+    category_key: form.category_key,
+    image_url: form.image_url,
     slug: news?.slug || createSlug(form.title_de),
-    author: news?.author || "DJK/VfL Giesenkirchen",
     football_team_id:
       form.category_key === "fussball" ? form.football_team_id || null : null,
     is_published: form.is_published,

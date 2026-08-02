@@ -3,6 +3,9 @@
 import { InputField, TextareaField } from "@/components/admin/forms";
 import { formatFileSize } from "@/lib/files";
 import { updateNewsDocument } from "../services/news.service";
+import { FileText } from "lucide-react";
+import { AdminButton, AdminModuleEmptyState, AdminPanel } from "@/components/admin/design-system";
+import { resolveMediaFileName } from "../helpers/newsMedia.core.mjs";
 
 export default function NewsDocumentsManager({
   newsId,
@@ -82,39 +85,27 @@ export default function NewsDocumentsManager({
       )}
 
       {!loading && documents.length === 0 && (
-        <div className="rounded-[1.75rem] border border-dashed border-white/10 bg-black/10 p-8 text-center text-sm text-white/55">
-          Noch keine Dokumente vorhanden.
-        </div>
+        <AdminModuleEmptyState title="Keine Dokumente" description="Für diese News wurden noch keine Dokumente hinterlegt." />
       )}
 
       <div className="space-y-4">
         {documents.map((documentItem) => {
           const fileSize = formatFileSize(documentItem.file_size);
           const mimeType = documentItem.mime_type || "Datei";
+          const fileName = resolveMediaFileName(documentItem, "Dokument");
 
           return (
-            <div
-              key={documentItem.id}
-              className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6"
-            >
+            <AdminPanel key={documentItem.id}>
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <p className="text-lg font-black text-white">
-                    {documentItem.file_name || "Dokument"}
-                  </p>
+                <div className="flex min-w-0 gap-3"><FileText className="mt-1 shrink-0 text-red-400" size={20} aria-hidden="true" /><div className="min-w-0">
+                  <p className="break-all text-base font-black text-white" title={fileName}>{fileName}</p>
                   <p className="mt-1 text-sm text-white/45">
                     {mimeType}
                     {fileSize ? ` · ${fileSize}` : ""}
                   </p>
-                </div>
+                </div></div>
 
-                <button
-                  type="button"
-                  onClick={() => handleDelete(documentItem)}
-                  className="rounded-full border border-red-500/40 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10"
-                >
-                  Löschen
-                </button>
+                <div className="flex flex-wrap gap-2">{documentItem.file_url ? <AdminButton href={documentItem.file_url} target="_blank" rel="noopener noreferrer">Öffnen</AdminButton> : null}<AdminButton variant="danger" onClick={() => handleDelete(documentItem)}>Löschen</AdminButton></div>
               </div>
 
               <div className="mt-6 grid gap-5 lg:grid-cols-2">
@@ -200,7 +191,7 @@ export default function NewsDocumentsManager({
                 />
                 Öffentlich sichtbar
               </label>
-            </div>
+            </AdminPanel>
           );
         })}
       </div>

@@ -1,0 +1,9 @@
+surface,old_behavior,new_behavior,data_source,permission,desktop,mobile,test_status,status,notes
+status,regular_chip,compact_chip,existing_publish_fields,news.view,compact,compact,PASS,DONE,no_new_status
+author_create,static_club_name,authenticated_profile_name,admin_profiles_full_name,news.create,author_column,detail_meta,PASS,DONE,text_field_only
+author_edit,client_payload,preserved_original_author,news_author,news.edit,unchanged,unchanged,PASS,DONE,no_overwrite
+legacy_author,stored_text,stored_text_or_neutral_fallback,news_author,news.view,visible,visible,PASS,DONE,no_backfill
+publisher,missing,missing,none,existing_permissions,not_shown,not_shown,DOCUMENTED,DEFERRED,no_schema_change
+english_fields,visible,hidden_and_omitted,existing_news_columns,news.edit,german_only,german_only,PASS,DONE,data_preserved
+image,large_inline_image,thumbnail_and_dialog,image_url,news.edit,dialog,viewport_dialog,PASS,DONE,no_list_thumbnail
+documents,editable_card_without_open,compact_metadata_and_safe_open,news_documents,news.edit,compact,wrapping,PASS,DONE,noopener_noreferrer

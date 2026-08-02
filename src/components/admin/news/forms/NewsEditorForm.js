@@ -34,10 +34,12 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
 
   useEffect(() => {
     handlers.loadDocuments();
+    // The document reload is intentionally tied to the persisted news record.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [news?.id]);
 
   return (
-    <form onSubmit={handlers.handleSubmit} className="mt-10 space-y-6">
+    <form id="news-editor-form" onSubmit={handlers.handleSubmit} className="space-y-5">
       <NewsToolbar
         tabs={NEWS_FORM_TABS}
         activeTab={activeTab}

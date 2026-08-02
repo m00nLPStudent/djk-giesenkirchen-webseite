@@ -1,0 +1,9 @@
+surface,old_behavior,new_behavior,design_system,desktop,mobile,permission,test_status,status,notes
+overview,split_header_and_search_card,integrated_header_search,AdminModuleHeader_and_AdminModuleSearch,shared_header,shared_header,news.create,PASS,DONE,no_query_change
+summary,large_stat_cards,compact_metrics,AdminModuleSummary_and_AdminMetric,inline_metrics,wrapping_metrics,news.view,PASS,DONE,existing_values_only
+filters,always_visible_custom_row,collapsed_filter_panel,AdminModuleFilters,collapsed,collapsed,news.view,PASS,DONE,local_filter_logic_retained
+list,large_content_cards,xl_table_and_mobile_cards,AdminModuleList,table,cards,news.edit,PASS,DONE,no_nested_buttons
+empty_state,custom_large_panel,shared_empty_state,AdminModuleEmptyState,compact,compact,news.create,PASS,DONE
+edit_detail,editor_only,detail_header_sections_and_editor,AdminDetailLayout,stacked,stacked,news.edit,PASS,DONE,route_unchanged
+danger_action,delete_in_overview,danger_zone_only,AdminDangerZone,bottom,bottom,news.delete,PASS,DONE,action_unchanged
+uploads,existing,unchanged,existing_media_components,unchanged,unchanged,existing,PASS,DONE,no_write_change

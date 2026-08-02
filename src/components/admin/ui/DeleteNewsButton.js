@@ -11,6 +11,7 @@ export default function DeleteNewsButton({ id, title = "News" }) {
       action={() => removeNewsRecord({ id })}
       affected={["Beitrag"]}
       preserved={["Mannschaften", "Spieler", "Trainer"]}
+      successHref="/admin/news"
     />
   );
 }

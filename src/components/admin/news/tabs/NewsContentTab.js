@@ -25,18 +25,12 @@ export default function NewsContentTab({
         title="News-Inhalt"
         description="Der vollständige Text für die spätere Detailseite."
       >
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div>
           <TextareaField
             label="Inhalt Deutsch"
             rows={14}
             value={form.content_de}
             onChange={(event) => updateField("content_de", event.target.value)}
-          />
-          <TextareaField
-            label="Inhalt Englisch"
-            rows={14}
-            value={form.content_en}
-            onChange={(event) => updateField("content_en", event.target.value)}
           />
         </div>
       </FormSection>
