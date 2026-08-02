@@ -1,9 +1,5 @@
 import Link from "next/link";
-import {
-  formatEventDate,
-  formatEventTime,
-  getEventTypeLabel,
-} from "@/lib/events";
+import { formatEventDate, formatEventTime } from "@/lib/events";
 
 export default function EventCard({ event }) {
   const locationLabel = [event.location_name, event.location_city]
@@ -40,7 +36,7 @@ export default function EventCard({ event }) {
       <div className="p-6 md:p-7">
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-red-600/20 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-red-400">
-            {getEventTypeLabel(event.event_type)}
+            {event.eventTypeLabel}
           </span>
 
           <span className="text-xs font-bold uppercase tracking-[0.15em] text-white/45">

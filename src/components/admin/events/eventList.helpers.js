@@ -27,7 +27,7 @@ export function filterAdminEventList(events, { search = "", status = "alle", sou
     if (status !== "alle" && event.admin_status !== status) return false;
     if (source !== "alle" && event.admin_source !== source) return false;
     if (!query) return true;
-    return [event.title_de, event.teaser_de, event.description_de, event.event_type, event.location_name, event.location_city, event.team_name_de, event.team_season_name]
+    return [event.title_de, event.teaser_de, event.description_de, event.eventTypeLabel, event.location_name, event.location_city, event.team_name_de, event.team_season_name]
       .filter(Boolean)
       .some((value) => String(value).toLocaleLowerCase("de-DE").includes(query));
   });

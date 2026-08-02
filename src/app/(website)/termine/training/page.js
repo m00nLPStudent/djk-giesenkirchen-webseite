@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { EventCard } from "@/components/website/events";
 import { getVirtualTrainingEvents } from "@/lib/events";
+import { supabase } from "@/lib/supabase";
+import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
+import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
 
 function getStartOfDay(date) {
   return new Date(
@@ -37,11 +40,11 @@ export default async function TrainingEventsPage({ searchParams }) {
       ? getEndOfDay(new Date(now.getTime() + 6 * 24 * 60 * 60 * 1000))
       : getEndOfDay(new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000));
 
-  const virtualTrainings = await getVirtualTrainingEvents({
-    from: trainingFrom,
-    to: trainingTo,
-    maxOccurrencesPerTraining: trainingRange === "week" ? 8 : 3,
-  });
+  const [trainingEvents, { data: eventTypes }] = await Promise.all([
+    getVirtualTrainingEvents({ from: trainingFrom, to: trainingTo, maxOccurrencesPerTraining: trainingRange === "week" ? 8 : 3 }),
+    loadEventTypes(supabase, { activeOnly: false }),
+  ]);
+  const virtualTrainings = createEventDtos(trainingEvents, eventTypes || []);
 
   return (
     <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">

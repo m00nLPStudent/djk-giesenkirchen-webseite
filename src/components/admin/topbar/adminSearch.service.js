@@ -8,6 +8,8 @@ import {
 import { supabase } from "@/lib/supabase";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { resolveNewsCategoryLabel } from "@/components/admin/news/helpers/newsCategories.core";
+import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
+import { resolveEventTypeLabel } from "@/components/admin/events/helpers/eventTypes.core";
 
 function normalize(value) {
   if (value === null || value === undefined) return "";
@@ -176,10 +178,12 @@ export async function searchAdminEntities(query) {
   const search = normalize(query);
   if (search.length < 2) return [];
 
-  const [news, newsCategories, teams, players, coaches, sponsors, boardMembers] =
+  const [news, newsCategories, events, eventTypes, teams, players, coaches, sponsors, boardMembers] =
     await Promise.all([
       supabase.from("news").select("id, title_de, category_key").limit(20),
       loadNewsCategories(supabase),
+      supabase.from("events").select("id, title_de, event_type").limit(20),
+      loadEventTypes(supabase, { activeOnly: false }),
       supabase.from("teams").select("id, name_de, age_group").limit(20),
       supabase
         .from("players")
@@ -214,6 +218,18 @@ export async function searchAdminEntities(query) {
           href: `/admin/news/edit/${item.id}`,
         }),
       ),
+    );
+
+  const eventTypeLabel = (item) => resolveEventTypeLabel(eventTypes.data || [], item.event_type);
+  (events.data || [])
+    .filter((item) => matches(item.title_de, search) || matches(eventTypeLabel(item), search))
+    .forEach((item) =>
+      results.push(mapResult({
+        type: "Termin",
+        title: item.title_de || "Ohne Titel",
+        subtitle: eventTypeLabel(item),
+        href: `/admin/events/edit/${item.id}`,
+      })),
     );
 
   (teams.data || [])

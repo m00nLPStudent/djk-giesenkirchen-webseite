@@ -1,14 +1,14 @@
 import { createSlug } from "@/lib/slug";
 import { formatDateLocalInput, formatDateTimeLocalInput } from "@/lib/dates";
 
-export function createInitialEventForm(event) {
+export function createInitialEventForm(event, eventTypes = []) {
   const initialSlug = event?.slug || createSlug(event?.title_de || "");
 
   return {
     title_de: event?.title_de || "",
     teaser_de: event?.teaser_de || "",
     description_de: event?.description_de || "",
-    event_type: event?.event_type || "vereinstermin",
+    event_type: event?.event_type || eventTypes[0]?.slug || "",
     starts_at: formatDateTimeLocalInput(event?.starts_at),
     ends_at: formatDateTimeLocalInput(event?.ends_at),
     is_all_day: event?.is_all_day ?? false,

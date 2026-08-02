@@ -1,11 +1,3 @@
-export const EVENT_TYPE_LABELS = {
-  training: "Training",
-  spiel: "Spiel",
-  turnier: "Turnier",
-  vereinstermin: "Vereinstermin",
-  sonstiges: "Sonstiges",
-};
-
 export const EVENT_RECURRENCE_LABELS = {
   none: "Keine Wiederholung",
   daily: "Täglich",
@@ -26,10 +18,6 @@ export function getTrainingTypeLabel(type = "training") {
   };
 
   return map[type] || "Training";
-}
-
-export function getEventTypeLabel(type) {
-  return EVENT_TYPE_LABELS[type] || "Event";
 }
 
 export function formatEventDate(value, locale = "de-DE") {

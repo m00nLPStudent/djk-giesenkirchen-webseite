@@ -7,6 +7,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { loadContributionStats } from "@/components/admin/contributions/services/contributionStats.service";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { resolveNewsCategoryLabel } from "@/components/admin/news/helpers/newsCategories.core";
+import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
+import { resolveEventTypeLabel } from "@/components/admin/events/helpers/eventTypes.core";
 import { ADMIN_NAVIGATION_SECTIONS } from "@/components/admin/navigation/adminNavigation.config";
 import { resolveAdminNavigation } from "@/components/admin/navigation/adminNavigation.resolver";
 import {
@@ -29,10 +31,11 @@ async function loadProfileName(db, profileId) {
 }
 
 async function loadEvents(db, nowIso, canEdit) {
-  const { data } = await db.from("events")
-    .select("id, title_de, starts_at, is_all_day, location_name, location_city")
-    .eq("is_published", true).gte("starts_at", nowIso).order("starts_at", { ascending: true }).limit(5);
-  return (data || []).map((item) => ({ id: item.id, title: item.title_de || "Unbenannter Termin", startsAt: item.starts_at, isAllDay: Boolean(item.is_all_day), location: [item.location_name, item.location_city].filter(Boolean).join(", ") || null, href: canEdit ? `/admin/events/edit/${item.id}` : "/admin/events" }));
+  const [{ data }, { data: eventTypes }] = await Promise.all([
+    db.from("events").select("id, title_de, event_type, starts_at, is_all_day, location_name, location_city").eq("is_published", true).gte("starts_at", nowIso).order("starts_at", { ascending: true }).limit(5),
+    loadEventTypes(db, { activeOnly: false }),
+  ]);
+  return (data || []).map((item) => ({ id: item.id, title: item.title_de || "Unbenannter Termin", eventTypeKey: item.event_type, eventTypeLabel: resolveEventTypeLabel(eventTypes || [], item.event_type), startsAt: item.starts_at, isAllDay: Boolean(item.is_all_day), location: [item.location_name, item.location_city].filter(Boolean).join(", ") || null, href: canEdit ? `/admin/events/edit/${item.id}` : "/admin/events" }));
 }
 
 async function loadNews(db, canEdit) {

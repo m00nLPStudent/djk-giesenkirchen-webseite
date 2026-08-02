@@ -7,14 +7,6 @@ export const EVENT_FORM_TABS = [
   { id: "settings", label: "Einstellungen" },
 ];
 
-export const EVENT_TYPES = [
-  ["vereinstermin", "Vereinstermin"],
-  ["training", "Training"],
-  ["spiel", "Spiel"],
-  ["turnier", "Turnier"],
-  ["sonstiges", "Sonstiges"],
-];
-
 export const RECURRENCE_TYPES = [
   ["none", "Keine Wiederholung"],
   ["daily", "Täglich"],

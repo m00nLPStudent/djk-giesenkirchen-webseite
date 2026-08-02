@@ -4,11 +4,12 @@ import {
   InputField,
   SelectField,
 } from "@/components/admin/forms";
-import { EVENT_TYPES, RECURRENCE_TYPES } from "../eventEditor.constants";
+import { RECURRENCE_TYPES } from "../eventEditor.constants";
 
 export default function EventTimeTab({
   form,
   teams,
+  eventTypes,
   hasRecurrence,
   updateField,
 }) {
@@ -26,9 +27,9 @@ export default function EventTimeTab({
             updateField("event_type", eventValue.target.value)
           }
         >
-          {EVENT_TYPES.map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
+          {eventTypes.map((eventType) => (
+            <option key={eventType.id || eventType.slug} value={eventType.slug}>
+              {eventType.name_de}
             </option>
           ))}
         </SelectField>

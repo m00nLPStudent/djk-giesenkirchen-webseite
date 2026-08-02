@@ -28,10 +28,10 @@ import {
   uploadEventImage,
 } from "../services/events.service";
 
-export default function EventEditorForm({ event = null, teams = [] }) {
+export default function EventEditorForm({ event = null, teams = [], eventTypes = [] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
-  const [form, setForm] = useState(() => createInitialEventForm(event));
+  const [form, setForm] = useState(() => createInitialEventForm(event, eventTypes));
   const [loading, setLoading] = useState(false);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documents, setDocuments] = useState(() =>
@@ -183,6 +183,7 @@ export default function EventEditorForm({ event = null, teams = [] }) {
         <EventTimeTab
           form={form}
           teams={teams}
+          eventTypes={eventTypes}
           hasRecurrence={hasRecurrence}
           updateField={updateField}
         />

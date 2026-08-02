@@ -2,6 +2,8 @@ import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { createPublicNewsCardDto } from "@/components/admin/news/helpers/newsCategories.core";
+import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
+import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
 import { HomeEventsSection } from "@/components/website/events";
 import {
   expandRecurringEvents,
@@ -10,7 +12,10 @@ import {
 } from "@/lib/events";
 
 export default async function Home() {
-  const { data: categories } = await loadNewsCategories(supabase, { activeOnly: false });
+  const [{ data: categories }, { data: eventTypes }] = await Promise.all([
+    loadNewsCategories(supabase, { activeOnly: false }),
+    loadEventTypes(supabase, { activeOnly: false }),
+  ]);
   const { data: latestNews } = await supabase
     .from("news")
     .select("*, football_team:football_team_id(name_de)")
@@ -46,10 +51,10 @@ export default async function Home() {
     to,
     maxOccurrencesPerTraining: 180,
   });
-  const mergedUpcomingEvents = mergeEventsWithVirtualTrainings(
+  const mergedUpcomingEvents = createEventDtos(mergeEventsWithVirtualTrainings(
     upcomingEventsOnly,
     virtualTrainings,
-  ).slice(0, 4);
+  ).slice(0, 4), eventTypes || []);
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">

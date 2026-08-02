@@ -1,20 +1,26 @@
 import { EventCard } from "@/components/website/events";
 import { getPublishedEvents } from "@/components/admin/events/services/events.service";
 import { expandRecurringEvents, splitEventsByTimeline } from "@/lib/events";
+import { supabase } from "@/lib/supabase";
+import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
+import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
 
 function filterRealEvents(events = []) {
   return events.filter((event) => !event?.is_virtual);
 }
 
 export default async function GeneralEventsPage() {
-  const { data: events } = await getPublishedEvents();
+  const [{ data: events }, { data: eventTypes }] = await Promise.all([
+    getPublishedEvents(),
+    loadEventTypes(supabase, { activeOnly: false }),
+  ]);
   const now = new Date();
   const expandedEvents = expandRecurringEvents(events || [], {
     from: new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000),
     to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
     maxOccurrencesPerEvent: 180,
   });
-  const realEvents = filterRealEvents(expandedEvents);
+  const realEvents = createEventDtos(filterRealEvents(expandedEvents), eventTypes || []);
   const { upcoming, past } = splitEventsByTimeline(realEvents, now);
 
   return (

@@ -1,9 +1,5 @@
 import Link from "next/link";
-import {
-  formatEventDate,
-  formatEventTime,
-  getEventTypeLabel,
-} from "@/lib/events";
+import { formatEventDate, formatEventTime } from "@/lib/events";
 
 export default function HomeEventsSection({ events = [] }) {
   return (
@@ -49,7 +45,7 @@ export default function HomeEventsSection({ events = [] }) {
                 className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 transition hover:border-red-500/50 hover:bg-white/10"
               >
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-red-400">
-                  {getEventTypeLabel(event.event_type)}
+                  {event.eventTypeLabel}
                 </p>
                 <h3 className="mt-3 text-xl font-black leading-tight">
                   {event.title_de}

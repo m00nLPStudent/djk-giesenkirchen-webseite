@@ -11,8 +11,10 @@ import {
   formatEventDate,
   formatRecurrenceText,
   formatEventTime,
-  getEventTypeLabel,
 } from "@/lib/events";
+import { supabase } from "@/lib/supabase";
+import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
+import { createEventDto } from "@/components/admin/events/helpers/eventTypes.core";
 import {
   diagnoseEventLookupBySlug,
   getPublishedEventBySlug,
@@ -21,9 +23,12 @@ import {
 export default async function EventDetailPage({ params }) {
   const resolvedParams = await Promise.resolve(params);
   const slug = resolvedParams?.slug;
-  const { data: event } = await getPublishedEventBySlug(slug);
+  const [{ data: storedEvent }, { data: eventTypes }] = await Promise.all([
+    getPublishedEventBySlug(slug),
+    loadEventTypes(supabase, { activeOnly: false }),
+  ]);
 
-  if (!event) {
+  if (!storedEvent) {
     const diagnostic = await diagnoseEventLookupBySlug(slug);
     console.warn("[events/detail] Event lookup failed", {
       slug,
@@ -35,6 +40,7 @@ export default async function EventDetailPage({ params }) {
     });
     notFound();
   }
+  const event = createEventDto(storedEvent, eventTypes || []);
 
   const location = [
     event.location_name,
@@ -69,7 +75,7 @@ export default async function EventDetailPage({ params }) {
           )}
 
           <p className="text-sm uppercase tracking-[0.35em] text-red-400">
-            {getEventTypeLabel(event.event_type)}
+            {event.eventTypeLabel}
           </p>
 
           <h1 className="mt-4 text-5xl font-black leading-tight md:text-6xl">

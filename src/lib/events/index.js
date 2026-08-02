@@ -14,11 +14,9 @@ export {
 
 export {
   EVENT_RECURRENCE_LABELS,
-  EVENT_TYPE_LABELS,
   formatEventDate,
   formatEventTime,
   getEventStatusKey,
-  getEventTypeLabel,
   getTrainingTypeLabel,
   splitEventsByTimeline,
 } from "./eventFormatter";
