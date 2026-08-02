@@ -1,15 +1,10 @@
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import { AdminModuleEmptyState } from "@/components/admin/design-system";
 import Can from "@/components/admin/auth/Can";
 import RoleStatusBadge from "./RoleStatusBadge";
 import { formatRoleDateTime } from "../helpers/roles.formatters";
 
-function ActionButtons({
-  role,
-  isUpdating,
-  onOpenDetails,
-  onEdit,
-  onToggleStatus,
-}) {
+function ActionButtons({ role, onOpenDetails }) {
   return (
     <div className="flex flex-col gap-2 xl:flex-row xl:flex-wrap">
       <button
@@ -20,66 +15,34 @@ function ActionButtons({
         Details
       </button>
 
-      <Can permission="roles.edit" uiOnly>
-        <button
-          type="button"
-          onClick={() => onEdit(role.id)}
-          className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white"
-        >
-          Bearbeiten
-        </button>
-      </Can>
-
-      <Can permission="roles.edit" uiOnly>
-        <button
-          type="button"
-          disabled={isUpdating}
-          onClick={() => onToggleStatus(role.id, role.key, !role.is_active)}
-          className="h-9 min-w-[104px] rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {role.is_active ? "Deaktivieren" : "Aktivieren"}
-        </button>
-      </Can>
     </div>
   );
 }
 
 export default function RolesTable({
   roles,
-  updatingRoleId,
   onOpenDetails,
-  onEdit,
-  onToggleStatus,
   onCreate,
 }) {
   if (!roles?.length) {
     return (
-      <AdminPanel className="p-7 md:p-8">
-        <div className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-8 text-center">
-          <p className="text-xl font-black text-white">
-            Noch keine Rollen angelegt.
-          </p>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-white/60">
-            Lege die erste Rolle an, um den Adminbereich sauber zu
-            strukturieren.
-          </p>
+      <AdminModuleEmptyState title="Keine Rollen gefunden" description="Passe Suche oder Filter an oder lege eine neue Rolle an." action={
           <Can permission="roles.edit" uiOnly>
             <button
               type="button"
               onClick={onCreate}
-              className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
             >
               Neue Rolle
             </button>
           </Can>
-        </div>
-      </AdminPanel>
+      } />
     );
   }
 
   return (
     <AdminPanel className="overflow-hidden p-0">
-      <div className="hidden lg:block">
+      <div className="hidden xl:block">
         <table className="w-full table-fixed">
           <colgroup>
             <col className="w-[29%]" />
@@ -142,10 +105,7 @@ export default function RolesTable({
                 <td className="px-3 py-3.5 align-middle">
                   <ActionButtons
                     role={role}
-                    isUpdating={updatingRoleId === role.id}
                     onOpenDetails={onOpenDetails}
-                    onEdit={onEdit}
-                    onToggleStatus={onToggleStatus}
                   />
                 </td>
               </tr>
@@ -154,7 +114,7 @@ export default function RolesTable({
         </table>
       </div>
 
-      <div className="grid gap-3 p-4 lg:hidden">
+      <div className="grid gap-3 p-4 xl:hidden">
         {roles.map((role) => (
           <div
             key={role.id}
@@ -194,10 +154,7 @@ export default function RolesTable({
             <div className="mt-4">
               <ActionButtons
                 role={role}
-                isUpdating={updatingRoleId === role.id}
                 onOpenDetails={onOpenDetails}
-                onEdit={onEdit}
-                onToggleStatus={onToggleStatus}
               />
             </div>
           </div>

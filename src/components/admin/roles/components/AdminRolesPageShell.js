@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import { AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import useAdminRolesViewModel from "../hooks/useAdminRolesViewModel";
 import RolesStatsGrid from "./RolesStatsGrid";
 import RolesToolbar from "./RolesToolbar";
@@ -118,27 +118,19 @@ export default function AdminRolesPageShell({ initialData }) {
 
   if (runtimeData?.loadState?.status === "no-session") {
     return (
-      <div className="space-y-8">
-        <AdminPageHeader
+      <AdminModulePage>
+        <AdminModuleHeader
           eyebrow="Rollen"
           title="Rollenverwaltung"
           description="Rollen zentral pflegen."
         />
         <AdminLoginRequiredNotice />
-      </div>
+      </AdminModulePage>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <AdminPageHeader
-        eyebrow="Rollen"
-        title="Rollenverwaltung"
-        description="Rollen zentral pflegen. Permissions und Benutzerzuweisungen sind in B3 read only sichtbar."
-      />
-
-      <RolesStatsGrid stats={vm.stats} />
-
+    <AdminModulePage>
       <RolesToolbar
         filters={vm.filters}
         statusOptions={vm.statusOptions}
@@ -148,6 +140,8 @@ export default function AdminRolesPageShell({ initialData }) {
         onSortChange={vm.setSort}
         onCreate={vm.openCreate}
       />
+
+      <RolesStatsGrid stats={vm.stats} />
 
       {error && (
         <p className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
@@ -174,6 +168,9 @@ export default function AdminRolesPageShell({ initialData }) {
         role={vm.selectedRole}
         open={vm.isDetailsOpen}
         onClose={vm.closeDetails}
+        onEdit={vm.openEdit}
+        onToggleStatus={handleToggleStatus}
+        isUpdating={vm.updatingRoleId === vm.selectedRole?.id}
       />
 
       <RoleEditorDialog
@@ -184,6 +181,6 @@ export default function AdminRolesPageShell({ initialData }) {
         onClose={vm.closeEditor}
         onSubmit={handleSave}
       />
-    </div>
+    </AdminModulePage>
   );
 }

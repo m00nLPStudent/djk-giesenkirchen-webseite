@@ -1,12 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAdminUiContext } from "@/components/admin/auth/AdminUiContext";
 import { canRenderAdminUiItem } from "@/lib/admin-auth/adminUiVisibility";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
-import AdminPanel from "@/components/admin/common/AdminPanel";
+import {
+  AdminButton,
+  AdminModuleHeader,
+  AdminModulePage,
+  AdminModuleSearch,
+} from "@/components/admin/design-system";
 import AdminLoginRequiredNotice from "@/components/admin/common/AdminLoginRequiredNotice";
 import { toggleRolePermissionAction } from "@/app/admin/permissions/actions";
 import usePermissionMatrixViewModel from "../hooks/usePermissionMatrixViewModel";
@@ -98,47 +101,36 @@ export default function PermissionMatrix({ initialData }) {
 
   if (runtimeData?.loadState?.status === "no-session") {
     return (
-      <div className="space-y-8 overflow-x-hidden">
-        <AdminPageHeader
+      <AdminModulePage className="overflow-x-hidden">
+        <AdminModuleHeader
           eyebrow="Permissions"
           title="Rollen-Permission-Matrix"
           description="Zuordnungen zwischen Rollen und Permissions verwalten."
         />
         <AdminLoginRequiredNotice />
-      </div>
+      </AdminModulePage>
     );
   }
 
   return (
-    <div className="space-y-8 overflow-x-hidden">
-      <AdminPageHeader
+    <AdminModulePage className="overflow-x-hidden">
+      <AdminModuleHeader
         eyebrow="Permissions"
         title="Rollen-Permission-Matrix"
-        description="Zuordnungen zwischen Rollen und Permissions pflegen. Die Zuordnungen werden in B4 gespeichert, aber noch nicht systemweit enforced."
+        description="Rollenzuordnungen der bestehenden Permissions verwalten."
         actions={
-          <Link
-            href="/admin/permissions"
-            className="rounded-xl border border-white/15 bg-white/[0.06] px-4 py-2 text-sm font-bold text-white/80"
-          >
+          <AdminButton href="/admin/permissions">
             Zur Permissions-Liste
-          </Link>
+          </AdminButton>
         }
-      />
-
-      <AdminPanel>
-        <label className="block">
-          <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
-            Suche
-          </span>
-          <input
-            type="search"
-            value={vm.query}
-            onChange={(event) => vm.setQuery(event.target.value)}
-            placeholder="Permission nach Name oder Key suchen"
-            className="mt-2 h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-sm text-white"
-          />
-        </label>
-      </AdminPanel>
+      >
+        <AdminModuleSearch
+          value={vm.query}
+          onChange={(event) => vm.setQuery(event.target.value)}
+          placeholder="Permission nach Name oder Key suchen"
+          label="Permission-Matrix durchsuchen"
+        />
+      </AdminModuleHeader>
 
       {error && (
         <p className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
@@ -166,6 +158,6 @@ export default function PermissionMatrix({ initialData }) {
           />
         ))}
       </div>
-    </div>
+    </AdminModulePage>
   );
 }

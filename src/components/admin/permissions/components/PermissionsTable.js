@@ -1,4 +1,5 @@
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import { AdminModuleEmptyState } from "@/components/admin/design-system";
 import Can from "@/components/admin/auth/Can";
 import PermissionCategoryBadge from "./PermissionCategoryBadge";
 import { formatPermissionDateTime } from "../helpers/permissions.formatters";
@@ -34,31 +35,23 @@ export default function PermissionsTable({
 }) {
   if (!permissions?.length) {
     return (
-      <AdminPanel className="p-7 md:p-8">
-        <div className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-8 text-center">
-          <p className="text-xl font-black text-white">
-            Noch keine Permissions angelegt.
-          </p>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-white/60">
-            Lege die erste Permission an und erweitere danach die Rollen-Matrix.
-          </p>
+      <AdminModuleEmptyState title="Keine Permissions gefunden" description="Passe Suche oder Filter an oder lege eine neue Permission an." action={
           <Can permission="permissions.edit" uiOnly>
             <button
               type="button"
               onClick={onCreate}
-              className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
             >
               Neue Permission
             </button>
           </Can>
-        </div>
-      </AdminPanel>
+      } />
     );
   }
 
   return (
     <AdminPanel className="overflow-hidden p-0">
-      <div className="hidden lg:block">
+      <div className="hidden xl:block">
         <table className="w-full table-fixed">
           <colgroup>
             <col className="w-[20%]" />
@@ -123,7 +116,7 @@ export default function PermissionsTable({
         </table>
       </div>
 
-      <div className="grid gap-3 p-4 lg:hidden">
+      <div className="grid gap-3 p-4 xl:hidden">
         {permissions.map((permission) => (
           <div
             key={permission.id}

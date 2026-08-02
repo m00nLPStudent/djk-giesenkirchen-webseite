@@ -3,19 +3,11 @@
 import UserAvatar from "../components/UserAvatar";
 import UserStatusBadge from "../components/UserStatusBadge";
 import { formatDateTime } from "../helpers/users.formatters";
+import { AdminInformationRow, AdminInformationSection } from "@/components/admin/design-system";
+import { AdminButton, AdminDangerZone } from "@/components/admin/design-system";
+import Can from "@/components/admin/auth/Can";
 
-function DetailRow({ label, value }) {
-  return (
-    <div>
-      <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
-        {label}
-      </p>
-      <p className="mt-1 text-sm text-white/85">{value || "-"}</p>
-    </div>
-  );
-}
-
-export default function UserDetailsDialog({ user, open, onClose }) {
+export default function UserDetailsDialog({ user, open, onClose, onEdit, onToggleStatus, isUpdating, currentUserId }) {
   if (!open || !user) return null;
 
   return (
@@ -35,6 +27,9 @@ export default function UserDetailsDialog({ user, open, onClose }) {
             </div>
           </div>
           <div className="flex justify-end">
+            <Can permission="users.edit" uiOnly>
+              <AdminButton onClick={() => onEdit(user.id)}>Bearbeiten</AdminButton>
+            </Can>
             <button
               type="button"
               onClick={onClose}
@@ -49,18 +44,12 @@ export default function UserDetailsDialog({ user, open, onClose }) {
           <UserStatusBadge isActive={user.is_active} />
         </div>
 
-        <div className="mt-5 grid gap-4 rounded-2xl border border-white/10 bg-black/25 p-4 md:grid-cols-2">
-          <DetailRow label="User-ID" value={user.id} />
-          <DetailRow label="Erstellt" value={formatDateTime(user.created_at)} />
-          <DetailRow
-            label="Letzter Login"
-            value={formatDateTime(user.last_login_at)}
-          />
-          <DetailRow
-            label="Primaere Rolle"
-            value={user.primaryRole?.name || "Keine primaere Rolle"}
-          />
-        </div>
+        <AdminInformationSection title="Benutzerkonto" className="mt-5">
+          <AdminInformationRow label="User-ID">{user.id}</AdminInformationRow>
+          <AdminInformationRow label="Erstellt">{formatDateTime(user.created_at)}</AdminInformationRow>
+          <AdminInformationRow label="Letzter Login">{formatDateTime(user.last_login_at)}</AdminInformationRow>
+          <AdminInformationRow label="Primäre Rolle">{user.primaryRole?.name || "Keine primäre Rolle"}</AdminInformationRow>
+        </AdminInformationSection>
 
         <div className="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4">
           <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
@@ -105,6 +94,14 @@ export default function UserDetailsDialog({ user, open, onClose }) {
             )}
           </div>
         </div>
+
+        <Can permission="users.edit" uiOnly>
+          <AdminDangerZone className="mt-5" title={user.is_active ? "Benutzer deaktivieren" : "Benutzer aktivieren"} description="Der bestehende Aktivstatus des Benutzerkontos wird geändert.">
+            <AdminButton variant="danger" disabled={isUpdating || (currentUserId === user.id && user.is_active)} onClick={() => onToggleStatus(user.id, !user.is_active)}>
+              {user.is_active ? "Deaktivieren" : "Aktivieren"}
+            </AdminButton>
+          </AdminDangerZone>
+        </Can>
       </div>
     </div>
   );

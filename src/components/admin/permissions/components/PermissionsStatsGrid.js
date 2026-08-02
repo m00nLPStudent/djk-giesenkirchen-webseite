@@ -1,24 +1,5 @@
-import PermissionsStatCard from "./PermissionsStatCard";
+import { AdminMetric, AdminModuleSummary } from "@/components/admin/design-system";
 
 export default function PermissionsStatsGrid({ stats }) {
-  return (
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <PermissionsStatCard
-        label="Permissions gesamt"
-        value={stats?.totalPermissions || 0}
-      />
-      <PermissionsStatCard
-        label="Kategorien gesamt"
-        value={stats?.totalCategories || 0}
-      />
-      <PermissionsStatCard
-        label="Zugeordnete Rollen-Permissions"
-        value={stats?.assignedRolePermissions || 0}
-      />
-      <PermissionsStatCard
-        label="Nicht zugeordnete Permissions"
-        value={stats?.unassignedPermissions || 0}
-      />
-    </section>
-  );
+  return <AdminModuleSummary><AdminMetric label="Permissions" value={stats?.totalPermissions || 0} /><AdminMetric label="Kategorien" value={stats?.totalCategories || 0} /><AdminMetric label="Zugeordnet" value={stats?.assignedRolePermissions || 0} /><AdminMetric label="Nicht zugeordnet" value={stats?.unassignedPermissions || 0} /></AdminModuleSummary>;
 }

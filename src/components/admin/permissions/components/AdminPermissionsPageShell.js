@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import { AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import useAdminPermissionsViewModel from "../hooks/useAdminPermissionsViewModel";
 import PermissionsStatsGrid from "./PermissionsStatsGrid";
 import PermissionsToolbar from "./PermissionsToolbar";
@@ -96,27 +96,19 @@ export default function AdminPermissionsPageShell({ initialData }) {
 
   if (runtimeData?.loadState?.status === "no-session") {
     return (
-      <div className="space-y-8">
-        <AdminPageHeader
+      <AdminModulePage>
+        <AdminModuleHeader
           eyebrow="Permissions"
           title="Permission-Verwaltung"
           description="Permissions zentral pflegen und fuer die Matrix vorbereiten."
         />
         <AdminLoginRequiredNotice />
-      </div>
+      </AdminModulePage>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <AdminPageHeader
-        eyebrow="Permissions"
-        title="Permission-Verwaltung"
-        description="Permissions zentral pflegen und fuer die Matrix vorbereiten. Enforcement folgt in spaeteren Phasen."
-      />
-
-      <PermissionsStatsGrid stats={vm.stats} />
-
+    <AdminModulePage>
       <PermissionsToolbar
         filters={vm.filters}
         categoryOptions={vm.categoryOptions}
@@ -126,6 +118,8 @@ export default function AdminPermissionsPageShell({ initialData }) {
         onSortChange={vm.setSort}
         onCreate={vm.openCreate}
       />
+
+      <PermissionsStatsGrid stats={vm.stats} />
 
       {error && (
         <p className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
@@ -160,6 +154,6 @@ export default function AdminPermissionsPageShell({ initialData }) {
         onClose={vm.closeEditor}
         onSubmit={handleSave}
       />
-    </div>
+    </AdminModulePage>
   );
 }

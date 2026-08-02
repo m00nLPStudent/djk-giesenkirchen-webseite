@@ -1,4 +1,5 @@
 import AdminPanel from "@/components/admin/common/AdminPanel";
+import { AdminModuleEmptyState } from "@/components/admin/design-system";
 import Can from "@/components/admin/auth/Can";
 import UserAvatar from "./UserAvatar";
 import UserStatusBadge from "./UserStatusBadge";
@@ -28,34 +29,9 @@ function RoleChips({ roles = [] }) {
   );
 }
 
-function ActionButtons({
-  user,
-  currentUserId,
-  isUpdating,
-  onOpenDetails,
-  onToggleStatus,
-  onEditUser,
-}) {
-  const isSelfDeactivate = Boolean(
-    currentUserId && currentUserId === user.id && user.is_active,
-  );
-
+function ActionButtons({ user, onOpenDetails }) {
   return (
-    <div className="grid gap-2">
-      <Can permission="users.edit" uiOnly>
-        <button
-          type="button"
-          disabled={!onEditUser}
-          title={
-            onEditUser ? "Benutzer bearbeiten" : "Bearbeiten nicht verfuegbar."
-          }
-          onClick={() => onEditUser?.(user.id)}
-          className="h-9 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-white/[0.09] hover:text-white disabled:opacity-45"
-        >
-          Bearbeiten
-        </button>
-      </Can>
-
+    <div>
       <button
         type="button"
         onClick={() => onOpenDetails(user.id)}
@@ -64,61 +40,34 @@ function ActionButtons({
         Details
       </button>
 
-      <Can permission="users.edit" uiOnly>
-        <button
-          type="button"
-          disabled={isUpdating || isSelfDeactivate}
-          onClick={() => onToggleStatus(user.id, !user.is_active)}
-          title={
-            isSelfDeactivate
-              ? "Eigener Benutzer kann nicht deaktiviert werden."
-              : undefined
-          }
-          className="h-9 w-full rounded-xl border border-white/15 bg-black/20 px-3 text-xs font-bold text-white/80 transition hover:border-red-500/40 hover:bg-black/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {user.is_active ? "Deaktivieren" : "Aktivieren"}
-        </button>
-      </Can>
     </div>
   );
 }
 
 export default function UsersTable({
   users,
-  updatingUserId,
-  currentUserId,
   onOpenDetails,
-  onEditUser,
-  onToggleStatus,
   onCreate,
 }) {
   if (!users?.length) {
     return (
-      <AdminPanel className="p-7 md:p-8">
-        <div className="rounded-2xl border border-dashed border-white/20 bg-black/20 p-8 text-center">
-          <p className="text-xl font-black text-white">
-            Noch keine Benutzer angelegt.
-          </p>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-white/60">
-            Benutzer werden spaeter ueber die Auth-Verwaltung angelegt.
-          </p>
+      <AdminModuleEmptyState title="Keine Benutzer gefunden" description="Passe Suche oder Filter an oder lege einen neuen Benutzer an." action={
           <Can permission="users.create" uiOnly>
             <button
               type="button"
               onClick={onCreate}
-              className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-red-600 px-5 text-sm font-black text-white transition hover:bg-red-700"
             >
               Neuer Benutzer
             </button>
           </Can>
-        </div>
-      </AdminPanel>
+      } />
     );
   }
 
   return (
     <AdminPanel className="overflow-hidden p-0">
-      <div className="hidden lg:block">
+      <div className="hidden xl:block">
         <table className="w-full table-fixed">
           <colgroup>
             <col className="w-[23%]" />
@@ -192,11 +141,7 @@ export default function UsersTable({
                   <td className="px-3 py-3.5 align-middle">
                     <ActionButtons
                       user={user}
-                      currentUserId={currentUserId}
-                      isUpdating={updatingUserId === user.id}
                       onOpenDetails={onOpenDetails}
-                      onEditUser={onEditUser}
-                      onToggleStatus={onToggleStatus}
                     />
                   </td>
                 </tr>
@@ -206,7 +151,7 @@ export default function UsersTable({
         </table>
       </div>
 
-      <div className="grid gap-3 p-4 lg:hidden">
+      <div className="grid gap-3 p-4 xl:hidden">
         {users.map((user) => {
           const secondaryRoles = (user.roles || []).filter(
             (role) => !role.is_primary,
@@ -249,11 +194,7 @@ export default function UsersTable({
               <div className="mt-4">
                 <ActionButtons
                   user={user}
-                  currentUserId={currentUserId}
-                  isUpdating={updatingUserId === user.id}
                   onOpenDetails={onOpenDetails}
-                  onEditUser={onEditUser}
-                  onToggleStatus={onToggleStatus}
                 />
               </div>
             </div>

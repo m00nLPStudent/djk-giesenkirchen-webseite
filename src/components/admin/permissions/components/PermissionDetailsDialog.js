@@ -2,17 +2,7 @@
 
 import PermissionCategoryBadge from "./PermissionCategoryBadge";
 import { formatPermissionDateTime } from "../helpers/permissions.formatters";
-
-function DetailRow({ label, value }) {
-  return (
-    <div>
-      <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
-        {label}
-      </p>
-      <p className="mt-1 text-sm text-white/85">{value || "-"}</p>
-    </div>
-  );
-}
+import { AdminInformationRow, AdminInformationSection } from "@/components/admin/design-system";
 
 export default function PermissionDetailsDialog({ permission, open, onClose }) {
   if (!open || !permission) return null;
@@ -41,25 +31,12 @@ export default function PermissionDetailsDialog({ permission, open, onClose }) {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 rounded-2xl border border-white/10 bg-black/25 p-4 md:grid-cols-2">
-          <DetailRow label="ID" value={permission.id} />
-          <DetailRow
-            label="Erstellt"
-            value={formatPermissionDateTime(permission.created_at)}
-          />
-          <DetailRow
-            label="Beschreibung"
-            value={permission.description || "-"}
-          />
-          <div>
-            <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">
-              Kategorie
-            </p>
-            <div className="mt-2">
-              <PermissionCategoryBadge category={permission.category} />
-            </div>
-          </div>
-        </div>
+        <AdminInformationSection title="Permission-Daten" className="mt-5">
+          <AdminInformationRow label="ID">{permission.id}</AdminInformationRow>
+          <AdminInformationRow label="Erstellt">{formatPermissionDateTime(permission.created_at)}</AdminInformationRow>
+          <AdminInformationRow label="Beschreibung">{permission.description || "-"}</AdminInformationRow>
+          <AdminInformationRow label="Kategorie"><PermissionCategoryBadge category={permission.category} /></AdminInformationRow>
+        </AdminInformationSection>
 
         <div className="mt-5 rounded-2xl border border-white/10 bg-black/25 p-4">
           <p className="text-[0.62rem] font-black uppercase tracking-[0.18em] text-white/45">

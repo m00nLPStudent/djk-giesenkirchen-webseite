@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import { AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import useAdminUsersViewModel from "../hooks/useAdminUsersViewModel";
 import UsersStatsGrid from "./UsersStatsGrid";
 import UsersToolbar from "./UsersToolbar";
@@ -130,27 +130,19 @@ export default function AdminUsersPageShell({ initialData }) {
 
   if (runtimeData?.loadState?.status === "no-session") {
     return (
-      <div className="space-y-8">
-        <AdminPageHeader
+      <AdminModulePage>
+        <AdminModuleHeader
           eyebrow="Benutzer"
           title="Benutzerverwaltung"
           description="Admin-Profile, Rollen und Aktivstatus zentral verwalten."
         />
         <AdminLoginRequiredNotice />
-      </div>
+      </AdminModulePage>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <AdminPageHeader
-        eyebrow="Benutzer"
-        title="Benutzerverwaltung"
-        description="Admin-Profile, Rollen und Aktivstatus zentral verwalten. Rechtepruefungen folgen in spaeteren Phasen."
-      />
-
-      <UsersStatsGrid stats={vm.stats} />
-
+    <AdminModulePage>
       <UsersToolbar
         filters={vm.filters}
         statusOptions={vm.statusOptions}
@@ -162,6 +154,8 @@ export default function AdminUsersPageShell({ initialData }) {
         onSortChange={vm.setSort}
         onOpenNewUser={vm.openCreate}
       />
+
+      <UsersStatsGrid stats={vm.stats} />
 
       {error && (
         <p className="rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
@@ -189,6 +183,10 @@ export default function AdminUsersPageShell({ initialData }) {
         user={vm.selectedUser}
         open={vm.isDetailsOpen}
         onClose={vm.closeDetails}
+        onEdit={vm.openEdit}
+        onToggleStatus={handleToggleStatus}
+        isUpdating={vm.updatingUserId === vm.selectedUser?.id}
+        currentUserId={vm.currentUserId}
       />
 
       <UserEditorDialog
@@ -204,6 +202,6 @@ export default function AdminUsersPageShell({ initialData }) {
         onSubmit={handleSubmitUserEditor}
         onClose={vm.closeEditor}
       />
-    </div>
+    </AdminModulePage>
   );
 }
