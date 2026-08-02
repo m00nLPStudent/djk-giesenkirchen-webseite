@@ -1,0 +1,23 @@
+section_key,item_key,label,href,permission_key,scope_type,feature_status,route_match,runtime_visible,test_status,status,notes
+overview,dashboard,Übersicht,/admin,dashboard.view,permission_only,active,exact,permission_dependent,PASS,DONE,only exact admin root
+club,news,News,/admin/news,news.view,permission_only,active,prefix,permission_dependent,PASS,DONE,
+club,events,Termine,/admin/events,events.view,permission_only,active,prefix,permission_dependent,PASS,DONE,
+club,sponsors,Sponsoren,/admin/sponsors,sponsors.view,permission_only,active,prefix,permission_dependent,PASS,DONE,
+club,club-history,Vereinsgeschichte,/admin/club-history,club_history.view,permission_only,active,prefix,permission_dependent,PASS,DONE,
+club,department,Vereinsstruktur,/admin/department,settings.view,board_access,active,prefix,permission_and_scope,PASS,PARTIAL,central route map still uses system.view
+club,settings,Seiten Kontakte & Einstellungen,/admin/settings,settings.view,permission_only,active,prefix,permission_dependent,PASS,DONE,combined to keep active href unique
+club,users,Benutzer,/admin/users,users.view,permission_only,active,prefix,permission_dependent,PASS,DONE,administration subsection
+club,roles,Rollen,/admin/roles,roles.view,permission_only,active,prefix,permission_dependent,PASS,DONE,administration subsection
+club,permissions,Rechte,/admin/permissions,permissions.view,permission_only,active,prefix,permission_dependent,PASS,DONE,administration subsection
+club,membership-requests,Mitgliedsanfragen,,membership_requests.view,permission_only,planned,none,no,PASS,DEFERRED,needs unique route
+club,media,Medien,,system.view,permission_only,planned,none,no,PASS,BLOCKED,no admin route
+football,teams,Mannschaften,/admin/teams,teams.view,team_access,active,prefix,permission_and_scope,PASS,DONE,
+football,players,Spieler,/admin/players,players.view,team_access,active,prefix,permission_and_scope,PASS,DONE,
+football,coaches,Trainer,/admin/coaches,coaches.view,staff_access,active,prefix,permission_and_scope,PASS,DONE,
+football,contributions,Vereinsbeiträge,/admin/contributions,contributions.view,permission_only,active,prefix,permission_dependent,PASS,DONE,read-only metadata derived from edit permission
+football,tournaments,Turniere,,none,team_access,planned,none,no,PASS,BLOCKED,no admin route
+football,match-operations,Spielbetrieb,,none,team_access,planned,none,no,PASS,DEFERRED,no dedicated module
+football,football-contacts,Fußball-Ansprechpartner,,none,board_access,planned,none,no,PASS,DEFERRED,no unique route
+table_tennis,all,Tischtennis Module,,none,department_unavailable,planned,none,no,PASS,DEFERRED,no department scope or admin routes
+disabled_sports,all,Behindertensport Module,,none,department_unavailable,planned,none,no,PASS,DEFERRED,no department scope or admin routes
+gymnastics,all,Gymnastikdamen Module,,none,department_unavailable,planned,none,no,PASS,DEFERRED,no department scope or admin routes

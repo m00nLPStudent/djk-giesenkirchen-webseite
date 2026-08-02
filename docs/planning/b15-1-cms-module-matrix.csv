@@ -1,0 +1,27 @@
+module,current_route,main_section,permission,scope,current_ui_pattern,target_ui_pattern,data_model_ready,public_page_ready,redesign_priority,status,notes
+Dashboard,/admin,overview,dashboard.view,personal_permission,stat_cards_and_panels,compact_work_overview,yes,not_applicable,high,REDESIGN,currently football and club metrics mixed
+News,/admin/news,club,news.view,own_content_or_read,cards_filters,standard_list,yes,yes,high,REDESIGN,public news routes exist
+Termine,/admin/events,club,events.view,own_content_or_read,cards_filters,standard_list,yes,yes,high,REDESIGN,recurrence and training dependencies
+Medien,/admin/media,club,system.view,none_defined,missing_route,standard_media_list,no,no,medium,BLOCKED,components exist but route absent
+Sponsoren,/admin/sponsors,club,sponsors.view,permission_only,cards,standard_list_detail,yes,yes,medium,REDESIGN,public page currently football route
+Vereinsgeschichte,/admin/club-history,club,club_history.view,own_content_or_read,special_editor,standard_detail_editor,yes,yes,medium,REDESIGN,dedicated data model
+Vereinsstruktur,/admin/department,club,settings.view,global_or_own_board,cards,standard_people_list,partial,yes,high,REQUIRES_DECISION,football board only and permission mismatch
+Seiten CMS,/admin/settings,club,settings.view,permission_only,settings_tab,standard_list_detail,yes,yes,medium,REDESIGN,pages generic but no department relation
+Allgemeine Ansprechpartner,/admin/settings,club,settings.view,permission_only,settings_tab,standard_list_detail,yes,yes,medium,REDESIGN,club_contacts reusable
+Mitgliedsanfragen,/admin/settings,club,membership_requests.view,permission_only,settings_tab,standard_inbox_detail,yes,yes,high,REDESIGN,page guard currently settings.view
+Mannschaften,/admin/teams,football,teams.view,global_youth_or_assigned_teams,list_and_detail,standard_list_detail,yes,yes,high,REDESIGN,preserve team seasons
+Spieler,/admin/players,football,players.view,global_youth_or_assigned_teams,list_and_detail,standard_list_detail,yes,yes,high,REDESIGN,preserve player team seasons
+Trainer,/admin/coaches,football,coaches.view,global_youth_assigned_or_own_staff,cards_and_forms,standard_list_detail,yes,yes,high,REDESIGN,preserve coach team seasons
+Vereinsbeiträge,/admin/contributions,football,contributions.view,contribution_role_access,dashboard_table_detail,standard_finance_list_detail,yes,no,high,REDESIGN,keep B14 permissions and inactive players
+Turniere,/admin/tournaments,football,system.view,none_defined,missing_route,standard_list_detail,no,no,low,BLOCKED,navigation entry only
+Spielbetrieb,-,football,REQUIRES_DECISION,team_or_department,none,competition_workspace,no,partial,low,NEW_LATER,widgets live inside teams
+Fußball Ansprechpartner,/admin/department,football,settings.view,global_or_own_board,board_cards,standard_people_list,yes,yes,medium,REDESIGN,current department module
+Tischtennis Übersicht,-,table_tennis,REQUIRES_DECISION,department,none,department_dashboard,no,yes,low,NEW_LATER,public static page only
+Tischtennis Teams und Personen,-,table_tennis,REQUIRES_DECISION,department_and_team,none,standard_list_detail,unknown,unknown,low,REQUIRES_DECISION,model reuse must be validated
+Behindertensport Inhalte,-,disabled_sports,REQUIRES_DECISION,department_content,none,page_editor,partial,no,low,NEW_LATER,pages contacts and media candidates
+Gymnastikdamen Inhalte,-,gymnastics,REQUIRES_DECISION,department_content,none,page_editor,partial,yes,low,NEW_LATER,public page exists
+Einstellungen,/admin/settings,club,settings.view,permission_only,multi_tab_editor,split_by_domain,yes,not_applicable,medium,REDESIGN,current page mixes content membership and system
+Benutzer,/admin/users,system,users.view,global_system,table_dialogs,standard_admin_table,yes,not_applicable,medium,REDESIGN,sensitive
+Rollen,/admin/roles,system,roles.view,global_system,table_dialogs,standard_admin_table,yes,not_applicable,medium,REDESIGN,sensitive
+Permissions,/admin/permissions,system,permissions.view,global_system,table_and_matrix,standard_admin_table,yes,not_applicable,medium,REDESIGN,sensitive
+Profil,/admin/profile,profile,dashboard.view,own_profile,form,standard_account_form,yes,not_applicable,low,EXISTING,remain in profile menu

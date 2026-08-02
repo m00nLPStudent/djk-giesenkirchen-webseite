@@ -1,0 +1,31 @@
+main_section,sub_section,label,current_route,target_route,permission_key,scope_type,current_location,target_location,desktop_navigation,mobile_navigation,implementation_status,risk,notes
+overview,overview,Übersicht,/admin,/admin,dashboard.view,permission_based,sidebar_inhalte,top_level,direct_link,direct_link,REDESIGN,medium,own top-level item recommended
+club,content,News,/admin/news,/admin/news,news.view,own_content_or_read,sidebar_inhalte,club_menu,mega_menu,accordion_link,MOVE,medium,public news dependencies
+club,content,Termine,/admin/events,/admin/events,events.view,own_content_or_read,sidebar_inhalte,club_menu,mega_menu,accordion_link,MOVE,medium,includes general and training-related events
+club,content,Medien,/admin/media,/admin/media,system.view,none_defined,sidebar_inhalte,club_menu,hidden_until_route_exists,accordion_link,BLOCKED,high,current route missing
+club,organization,Sponsoren,/admin/sponsors,/admin/sponsors,sponsors.view,permission_only,sidebar_vereinsstruktur,club_menu,mega_menu,accordion_link,MOVE,medium,public route currently under football
+club,organization,Vereinsgeschichte,/admin/club-history,/admin/club-history,club_history.view,own_content_or_read,sidebar_vereinsstruktur,club_menu,mega_menu,accordion_link,MOVE,low,existing module
+club,organization,Vereinsstruktur,/admin/department,/admin/department,settings.view,global_or_own_board,sidebar_vereinsstruktur,club_menu,mega_menu,accordion_link,MOVE,high,route map currently says system.view
+club,organization,Ansprechpartner,/admin/settings,/admin/settings,settings.view,permission_only,settings_tabs,club_menu,mega_menu,accordion_link,REDESIGN,medium,club_contacts tab not direct route
+club,content,Seiten CMS,/admin/settings,/admin/settings,settings.view,permission_only,settings_tabs,club_menu,mega_menu,accordion_link,REDESIGN,medium,pages tab not direct route
+club,organization,Mitgliedsanfragen,/admin/settings,/admin/settings,membership_requests.view,permission_only,settings_tabs,club_menu,mega_menu,accordion_link,REDESIGN,high,current page guard uses settings.view
+football,teams,Mannschaften,/admin/teams,/admin/teams,teams.view,global_youth_or_assigned_teams,sidebar_vereinsstruktur,football_menu,mega_menu,accordion_link,MOVE,high,preserve seasonal B13 B14 model
+football,people,Spieler,/admin/players,/admin/players,players.view,global_youth_or_assigned_teams,sidebar_vereinsstruktur,football_menu,mega_menu,accordion_link,MOVE,high,scope checked inside page
+football,people,Trainer,/admin/coaches,/admin/coaches,coaches.view,global_youth_assigned_or_own_staff,sidebar_vereinsstruktur,football_menu,mega_menu,accordion_link,MOVE,high,multiple seasonal assignments
+football,finance,Vereinsbeiträge,/admin/contributions,/admin/contributions,contributions.view,contribution_role_access,sidebar_vereinsstruktur,football_menu,mega_menu,accordion_link,MOVE,high,kassierer full and vorstand read export
+football,competition,Turniere,/admin/tournaments,/admin/tournaments,system.view,none_defined,sidebar_vereinsstruktur,football_menu,hidden_until_route_exists,accordion_link,BLOCKED,high,current route missing
+football,competition,Spielbetrieb,-,-,REQUIRES_DECISION,department_or_team,none,football_menu,hidden,accordion_link,NEW_LATER,high,no dedicated module
+football,organization,Fußball Ansprechpartner,/admin/department,/admin/department,settings.view,global_or_own_board,sidebar_vereinsstruktur,football_menu,mega_menu,accordion_link,REQUIRES_DECISION,high,current module specifically football board
+table_tennis,overview,Übersicht,-,-,REQUIRES_DECISION,department,none,table_tennis_menu,hidden,accordion_link,NEW_LATER,high,only public static page exists
+table_tennis,teams,Mannschaften,-,-,REQUIRES_DECISION,department_and_team,none,table_tennis_menu,hidden,accordion_link,NEW_LATER,high,data model suitability unknown
+table_tennis,people,Spieler und Verantwortliche,-,-,REQUIRES_DECISION,department_and_team,none,table_tennis_menu,hidden,accordion_link,NEW_LATER,high,no admin model verified
+table_tennis,competition,Turniere Tabellen Spielpläne,-,-,REQUIRES_DECISION,department,none,table_tennis_menu,hidden,accordion_link,NEW_LATER,high,provider and data source undecided
+disabled_sports,content,Übersicht und Inhalte,-,-,REQUIRES_DECISION,department_content,none,disabled_sports_menu,hidden,accordion_link,NEW_LATER,medium,pages and contacts may suffice
+disabled_sports,content,Training Kontakt Medien,-,-,REQUIRES_DECISION,department_content,none,disabled_sports_menu,hidden,accordion_link,NEW_LATER,medium,gallery model unverified
+gymnastics,content,Übersicht und Inhalte,-,-,REQUIRES_DECISION,department_content,none,gymnastics_menu,hidden,accordion_link,NEW_LATER,medium,public /damen-gymnastik exists
+gymnastics,content,Training Kontakt Medien,-,-,REQUIRES_DECISION,department_content,none,gymnastics_menu,hidden,accordion_link,NEW_LATER,medium,pages and contacts may suffice
+system,administration,Benutzer,/admin/users,/admin/users,users.view,global_system,sidebar_system,club_or_system_group,mega_menu,accordion_link,MOVE,high,should remain restricted
+system,administration,Rollen,/admin/roles,/admin/roles,roles.view,global_system,sidebar_system,club_or_system_group,mega_menu,accordion_link,MOVE,high,superadmin webmaster only per current proposal
+system,administration,Rechte,/admin/permissions,/admin/permissions,permissions.view,global_system,sidebar_system,club_or_system_group,mega_menu,accordion_link,MOVE,high,permission editor especially sensitive
+system,administration,Einstellungen,/admin/settings,/admin/settings,settings.view,permission_only,sidebar_system,club_menu,mega_menu,accordion_link,MOVE,high,mixed content and system responsibilities
+profile,account,Profil,/admin/profile,/admin/profile,dashboard.view,own_profile,profile_menu,profile_menu,profile_menu,profile_menu,EXISTING,low,keep outside main navigation

@@ -1,0 +1,16 @@
+surface,current_pattern,target_pattern,shared_component_candidate,responsive_strategy,priority,status,notes
+Admin Shell,sticky header plus desktop and mobile sidebar,header plus horizontal navigation and wide content,AdminShell and AdminNavigation,stacked header nav then content,high,REDESIGN,remove sidebar only after parity
+Header,brand search clock website bell profile,retain and consolidate one implementation,AdminHeader,progressively compact controls without losing access,high,EXISTING,duplicate AdminTopbar branch must be resolved
+Navigation,flat permission-filtered sidebar,hierarchical permission and scope aware navigation,AdminNavigation config and visibility resolver,desktop mega menu mobile drawer accordion,high,NEW_LATER,keyboard support mandatory
+Dashboard,large stat grid and many panels,compact greeting work overview and quick links,DashboardSection and SummaryStrip,one column mobile two columns desktop,high,REDESIGN,avoid card flood
+Lists,mixed cards tables and bespoke layouts,common page header toolbar summary list pagination,AdminListPage,table desktop reduced cards mobile,high,REDESIGN,lists are primary workspace
+Filter,mixed inline and dialogs,compact collapsible filter shell,AdminFilterPanel,drawer or dialog on small screens,high,REDESIGN,URL state preferred
+Detail pages,mixed bespoke cards,common header meta summary sections history danger area,AdminDetailPage,stacked mobile and wide sections desktop,high,REDESIGN,team player contribution are references
+Dialogs,multiple bespoke modal shells,accessible shared dialog primitives,AdminDialog,full width inset mobile centered desktop,medium,REDESIGN,focus trap escape and return
+Forms,tabs and bespoke save bars,consistent sections validation and sticky action bar,AdminFormShell,one column mobile grouped desktop,medium,REDESIGN,avoid nested scrolling
+Tables,mixed custom grids and semantic tables,semantic sortable paginated table,AdminDataTable,horizontal fallback only when unavoidable,high,REDESIGN,preserve keyboard and screen reader semantics
+Mobile cards,several module-specific cards,reduced essential row card,AdminMobileListItem,full width no hidden primary actions,medium,REDESIGN,not a duplicate detail page
+Status displays,several badge components,shared tokens with domain labels,StatusBadge,wrap safely and retain text labels,medium,REDESIGN,color never sole signal
+Danger areas,delete and archive actions vary,consistent final detail section with explicit effects,DangerZone,stack actions and confirmations on mobile,high,REDESIGN,use archive terminology where applicable
+Global search,two component branches and client-side queries,server-side permission and scope filtered command search,AdminGlobalSearch,full panel desktop dedicated overlay mobile,high,BLOCKED,current service lacks visible scope filtering
+Notifications,static bell and red dot,permission filtered computed inbox then optional persistence,NotificationCenter,popover desktop sheet mobile,medium,NEW_LATER,no indicator without real unread items

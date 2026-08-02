@@ -1,44 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useRef, useState } from "react";
 import { AdminUiContextProvider } from "@/components/admin/auth/AdminUiContext";
 import AdminHeader from "./AdminHeader";
-import AdminSidebar from "./AdminSidebar";
 import AdminContent from "./AdminContent";
+import AdminNavigationExperience from "@/components/admin/navigation/AdminNavigationExperience";
 
 export default function AdminShell({
   children,
   title,
   subtitle,
   showHeader = true,
+  navigation = null,
 }) {
-  const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-
-  useEffect(() => {
-    setMobileNavOpen(false);
-  }, [pathname]);
+  const mobileMenuButtonRef = useRef(null);
+  const hasNavigation = Boolean(navigation?.sections?.length);
 
   return (
     <AdminUiContextProvider>
       <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.14),transparent_35%),radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent_28%),#101014] text-white">
-        <div className="[--admin-header-height:88px]">
+        <div className="[--admin-header-height:88px] [--admin-navigation-height:56px]">
           <AdminHeader
-            onMenuClick={() => setMobileNavOpen((current) => !current)}
+            menuButtonRef={mobileMenuButtonRef}
+            navigationOpen={mobileNavOpen}
+            onMenuClick={() => setMobileNavOpen(true)}
+            showNavigationButton={hasNavigation}
           />
 
-          {mobileNavOpen && (
-            <div className="border-b border-white/10 bg-[#101014] px-4 py-4 lg:hidden">
-              <AdminSidebar mobile onNavigate={() => setMobileNavOpen(false)} />
-            </div>
-          )}
+          {hasNavigation ? (
+            <AdminNavigationExperience
+              navigation={navigation}
+              mobileOpen={mobileNavOpen}
+              onMobileOpenChange={setMobileNavOpen}
+              mobileOpenerRef={mobileMenuButtonRef}
+            />
+          ) : null}
 
-          <div className="mx-auto grid max-w-7xl gap-4 px-4 pb-10 pt-4 sm:px-6 sm:pt-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-8 lg:px-8 lg:pt-8">
-            <div className="hidden lg:block lg:sticky lg:top-[var(--admin-header-height)] lg:h-[calc(100vh-var(--admin-header-height))] lg:self-start">
-              <AdminSidebar />
-            </div>
-
+          <div className="mx-auto w-full max-w-7xl px-4 pb-10 pt-4 sm:px-6 sm:pt-5 lg:px-8 lg:pt-8">
             <AdminContent className="pt-0 lg:pt-0">
               {showHeader && (title || subtitle) && (
                 <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_20px_70px_rgba(0,0,0,0.18)] md:p-8">

@@ -195,7 +195,7 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "prefix",
     priority: 300,
   }),
-  buildRule("/admin/department", "system.view", {
+  buildRule("/admin/department", "settings.view", {
     matchType: "prefix",
     priority: 300,
   }),
@@ -326,7 +326,7 @@ export const ADMIN_PUBLIC_ROUTE_PATTERNS = [
 export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin": "dashboard.view",
   "/admin/news": "news.view",
-  "/admin/department": "system.view",
+  "/admin/department": "settings.view",
   "/admin/sponsors": "sponsors.view",
   "/admin/teams": "teams.view",
   "/admin/coaches": "coaches.view",

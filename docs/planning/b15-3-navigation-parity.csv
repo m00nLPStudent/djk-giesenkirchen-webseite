@@ -1,0 +1,20 @@
+label,href,sidebar_visible,horizontal_visible,mobile_visible,permission_key,scope_type,feature_status,parity,notes
+Übersicht,/admin,yes,when_allowed,when_allowed,dashboard.view,permission_only,active,MATCH,
+News,/admin/news,yes,when_allowed,when_allowed,news.view,permission_only,active,MATCH,
+Termine,/admin/events,yes,when_allowed,when_allowed,events.view,permission_only,active,MATCH,
+Abteilung,/admin/department,yes,when_allowed,when_allowed,settings.view,board_access,active,INTENTIONAL_DIFFERENCE,new navigation also checks scope
+Sponsoren,/admin/sponsors,yes,when_allowed,when_allowed,sponsors.view,permission_only,active,MATCH,
+Mannschaften,/admin/teams,yes,when_allowed,when_allowed,teams.view,team_access,active,INTENTIONAL_DIFFERENCE,new navigation prevents scope-less link
+Trainer,/admin/coaches,yes,when_allowed,when_allowed,coaches.view,staff_access,active,INTENTIONAL_DIFFERENCE,new navigation checks staff/team scope
+Spieler,/admin/players,yes,when_allowed,when_allowed,players.view,team_access,active,INTENTIONAL_DIFFERENCE,new navigation prevents scope-less link
+Vereinsbeiträge,/admin/contributions,yes,when_allowed,when_allowed,contributions.view,permission_only,active,MATCH,read-only remains metadata
+Vereinsgeschichte,/admin/club-history,yes,when_allowed,when_allowed,club_history.view,permission_only,active,MATCH,
+Benutzer,/admin/users,yes,when_allowed,when_allowed,users.view,permission_only,active,MATCH,
+Rollen,/admin/roles,yes,when_allowed,when_allowed,roles.view,permission_only,active,MATCH,
+Rechte,/admin/permissions,yes,when_allowed,when_allowed,permissions.view,permission_only,active,MATCH,
+Einstellungen,/admin/settings,yes,when_allowed,when_allowed,settings.view,permission_only,active,MATCH,label combines pages contacts and settings
+Medien,/admin/media,yes,no,no,system.view,permission_only,planned,INTENTIONAL_DIFFERENCE,no admin route and no 404 link
+Turniere,/admin/tournaments,yes,no,no,system.view,team_access,planned,INTENTIONAL_DIFFERENCE,no admin route and no 404 link
+Tischtennis,,no,no,no,none,department_unavailable,planned,MATCH,no active items
+Behindertensport,,no,no,no,none,department_unavailable,planned,MATCH,no active items
+Gymnastikdamen,,no,no,no,none,department_unavailable,planned,MATCH,no active items

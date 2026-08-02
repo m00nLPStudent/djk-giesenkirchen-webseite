@@ -1,0 +1,15 @@
+role,overview,club,football,table_tennis,disabled_sports,gymnastics,contributions,settings,user_management,scope_notes,status
+superadmin,dashboard.view,existing_permissions,existing_permissions,REQUIRES_DECISION,REQUIRES_DECISION,REQUIRES_DECISION,full,settings.view_and_edit,full,global,EXISTING
+vorstand,dashboard.view,broad_existing_permissions,broad_existing_permissions,REQUIRES_DECISION,REQUIRES_DECISION,REQUIRES_DECISION,view_and_export,settings.view,none,own_board_plus_module_exceptions,EXISTING
+fussball-vorstand,dashboard.view,limited_existing_permissions,football_existing_permissions,none,none,none,REQUIRES_DECISION,settings.view_proposed,none,football module treated globally in helpers,EXISTING
+jugendleiter,dashboard.view,news_and_events_limited,youth_teams_players_coaches,none,none,none,scoped_status_only,settings.view_proposed,none,youth_all plus own board profile,EXISTING
+jugendkoordinator,REQUIRES_DECISION,REQUIRES_DECISION,scope_alias_seen_in_contribution_helper,none,none,none,scoped_status_only,REQUIRES_DECISION,none,not present in canonical role key list,REQUIRES_DECISION
+trainer,dashboard.view,events_limited,assigned_team_players_and_own_staff,none,none,none,scoped_status_only,none,none,assigned_teams own_staff own_content,EXISTING
+betreuer,dashboard.view,events_read,assigned_team_read_and_player_edit,none,none,none,none,none,none,assigned_teams own_staff own_content,EXISTING
+kassierer,dashboard.view,membership_and_settings,none,none,none,none,full,settings.view_and_edit,none,own_board read_only but contribution service grants full,EXISTING
+redakteur,dashboard.view,news_events_history_and_sponsors,none,none,none,none,none,none,none,own_content read_only,EXISTING
+webmaster,dashboard.view,broad_read_and_settings,football_read,REQUIRES_DECISION,REQUIRES_DECISION,REQUIRES_DECISION,REQUIRES_DECISION,settings.view_and_edit,users_edit_roles_and_permissions_read,own_profile read_only with module permissions,EXISTING
+gast,dashboard.view,news_events_history_read,none,none,none,none,none,none,none,read_only,EXISTING
+table_tennis_responsible,REQUIRES_DECISION,REQUIRES_DECISION,none,REQUIRES_DECISION,none,none,none,none,none,no canonical role permission or department scope,NEW_LATER
+disabled_sports_responsible,REQUIRES_DECISION,REQUIRES_DECISION,none,none,REQUIRES_DECISION,none,none,none,none,no canonical role permission or department scope,NEW_LATER
+gymnastics_responsible,REQUIRES_DECISION,REQUIRES_DECISION,none,none,none,REQUIRES_DECISION,none,none,none,no canonical role permission or department scope,NEW_LATER

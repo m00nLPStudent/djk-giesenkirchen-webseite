@@ -1,0 +1,10 @@
+surface,old_behavior,new_behavior,component,desktop,mobile,permission_aware,scope_aware,accessibility,legacy_removed,test_status,status,notes
+navigation,flagged parallel navigation,canonical horizontal navigation,AdminNavigationExperience,yes,drawer,yes,yes,labels and active state,yes,PASS,DONE,single DTO source
+sidebar,desktop and mobile sidebar,not rendered,AdminShell,no,no,legacy only,legacy only,absent from tree,yes,PASS,DONE,file removed
+content,260px sidebar grid,centered full-width wrapper,AdminShell,yes,yes,not_applicable,not_applicable,main retained,yes,PASS,DONE,max-w-7xl
+mobile_trigger,two menu triggers,one header trigger,AdminHeader,no,yes,yes,yes,44px aria expanded controls,yes,PASS,DONE,xl breakpoint
+mobile_drawer,secondary trigger and drawer,only mobile navigation,AdminMobileNavigationDrawer,no,yes,yes,yes,trap escape return body lock,yes,PASS,DONE,controlled by shell
+header,legacy sidebar trigger,canonical drawer trigger,AdminHeader,yes,yes,not_applicable,not_applicable,header semantics retained,yes,PASS,DONE,no redesign
+department,system.view route-map mismatch,settings.view aligned to page guard,adminPermissionConfig.js,yes,yes,yes,yes,no false link tested,not_applicable,PASS,DONE,no permission grant changed
+planned,hidden by resolver,hidden by resolver,adminNavigation.resolver.js,yes,yes,yes,yes,no empty sections,not_applicable,PASS,DONE,no route links
+browser_regression,manual B15.3 acceptance,new cutover needs smoke test,manual,planned,planned,planned,planned,planned,yes,NOT_RUN,DEFERRED,no browser session in automated run

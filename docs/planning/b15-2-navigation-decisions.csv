@@ -1,0 +1,11 @@
+decision,current_state,recommended_state,implemented_now,reason,risk,next_phase,status,notes
+Overview eigener Hauptpunkt,Dashboard in Sidebar Inhalte,eigener Hauptpunkt overview,yes,cross-domain personal entry,low,B15.3,DONE,
+Systemverwaltung unter Gesamtverein oder separat,Sidebar group System,separate subsection inside club section,yes,only six approved main sections,medium,B15.3,DONE,users roles permissions remain permission restricted
+AdminHeader vs AdminTopbar,two component branches,AdminHeader remains canonical,no,no visible header change allowed,medium,B15.3,DEFERRED,remove duplicate only after usage audit
+planned entries sichtbar oder verborgen,some current dead sidebar links,hidden by default and null href,yes,no 404 links,low,B15.3,DONE,internal includePlanned flag remains non-clickable
+Icon-Key vs Component,sidebar stores components,string icon keys in domain and DTO,yes,DTO must serialize,low,B15.3,DONE,client icon map later
+request-local caching,repeated future consumers possible,React cache plus auth-context reuse,yes,no cross-user caching,medium,B15.3,DONE,no use cache directive
+Search-Visibility-Integration,current search lacks clear permission scope filter,server search should reuse resource visibility,no,large search rewrite excluded,high,future search phase,DEFERRED,navigation resolver alone cannot filter entity scope
+Department-Scope,no generic department scope,do not invent in B15.2,yes,preserve scope architecture,high,B15.10,DEFERRED,planned sections use department_unavailable
+Department permission mismatch,sidebar and page use settings.view but route map uses system.view,decide one canonical existing permission,no,permission changes forbidden,high,B15.3,REQUIRES_DECISION,new config follows visible page behavior
+Mitgliedsanfragen route,settings tab shares /admin/settings,dedicated unambiguous route or supported deep link,no,active href uniqueness,medium,B15.3,REQUIRES_DECISION,planned until resolved

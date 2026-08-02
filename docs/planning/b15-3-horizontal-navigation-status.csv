@@ -1,0 +1,14 @@
+surface,component,feature_flag,data_source,permission_aware,scope_aware,desktop,mobile,accessibility,test_status,status,notes
+server_flag,adminNavigation.flags.js,ADMIN_HORIZONTAL_NAVIGATION_ENABLED,environment,not_applicable,not_applicable,no,no,not_applicable,PASS,DONE,default false and invalid false
+server_wrapper,AdminLayout.js,required,B15.2 loader,yes,yes,yes,yes,not_applicable,BUILD_PASS,DONE,loads DTO only when enabled
+shell,AdminShell.js,required,DTO prop,yes,yes,yes,yes,existing semantics,ESLINT_PASS,DONE,sidebar remains rendered
+desktop_navigation,AdminHorizontalNavigation.js,required,B15.2 DTO,yes,yes,yes,no,keyboard and aria,PASS,DONE,xl breakpoint
+mega_menu,AdminHorizontalNavigation.js,required,B15.2 DTO,yes,yes,yes,no,escape outside arrows focus return,PASS,DONE,compact two-column panel
+mobile_trigger,AdminMobileNavigationDrawer.js,required,B15.2 DTO,yes,yes,no,yes,44px target,PASS,DONE,separate from legacy sidebar button
+mobile_drawer,AdminMobileNavigationDrawer.js,required,B15.2 DTO,yes,yes,no,yes,focus trap escape backdrop body lock,PASS,DONE,right-side drawer
+mobile_accordion,AdminMobileNavigationDrawer.js,required,B15.2 DTO,yes,yes,no,yes,aria expanded controls,PASS,DONE,active section initially open
+active_state,AdminNavigationExperience.js,required,B15.2 matcher,yes,yes,yes,yes,aria current,PASS,DONE,does not mutate DTO
+icons,adminNavigation.icons.js,required,icon keys,not_applicable,not_applicable,yes,yes,fallback icon,PASS,DONE,Lucide only
+legacy_sidebar,AdminSidebar.js,not_applicable,legacy config,legacy_flag_dependent,no,yes,yes,existing,STRUCTURAL_PASS,PARTIAL,unchanged but not scope aware
+header,AdminHeader.js,not_applicable,existing,existing,existing,yes,yes,existing,STRUCTURAL_PASS,DONE,unchanged
+browser_regression,manual,required,runtime DTO,yes,yes,planned,planned,manual,NOT_RUN,DEFERRED,requires browser and role sessions

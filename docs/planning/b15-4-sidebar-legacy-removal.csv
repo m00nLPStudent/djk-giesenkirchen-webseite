@@ -1,0 +1,9 @@
+file_or_symbol,old_purpose,still_used,removed,replacement,rollback_dependency,test_status,status,notes
+AdminSidebar.js,desktop and mobile primary navigation,no,yes,AdminNavigationExperience,git revert,PASS,REMOVED,no remaining imports
+adminNavigation.flags.js,parallel rollout switch,no,yes,canonical loading,git revert,PASS,REMOVED,variant A
+AdminShell.mobileNavOpen,legacy mobile sidebar state,yes,no,canonical drawer state,git revert,PASS,SHARED_COMPONENT,state now controls drawer only
+AdminHeader.onMenuClick,legacy mobile toggle,yes,no,canonical drawer trigger,git revert,PASS,SHARED_COMPONENT,aria state added
+admin-sidebar-scrollbar,hidden sidebar scrollbar,no,yes,not required,git revert,PASS,REMOVED,CSS removed
+260px_shell_grid,reserved desktop sidebar width,no,yes,w-full max-w-7xl wrapper,git revert,PASS,REMOVED,no left offset
+AdminUiContextProvider,generic admin UI permission context,yes,no,unchanged,none,BUILD,SHARED_COMPONENT,used beyond sidebar
+AdminContent,generic content wrapper,yes,no,unchanged,none,BUILD,SHARED_COMPONENT,local module widths retained
