@@ -1,0 +1,11 @@
+surface,old_component,new_component,design_system_used,desktop,mobile,permission_unchanged,scope_unchanged,test_status,status,notes
+overview,AdminPageHeader/EntityCard,AdminModuleHeader/AdminModuleList,yes,table,cards,yes,yes,covered,DONE,"Search, summary and status filter"
+logo,EntityCard image,SponsorLogo,yes,object-contain,object-contain,yes,yes,covered,DONE,"Initial fallback on empty or failed URL"
+empty_state,custom panel,AdminModuleEmptyState,yes,yes,yes,yes,yes,covered,DONE,"Separate no-data and no-result copy"
+create,plain form page,AdminDetailLayout/AdminDetailHeader,yes,yes,yes,yes,yes,covered,DONE,"Existing form and writes unchanged"
+edit_detail,plain form page,AdminDetailLayout/AdminDetailHeader,yes,yes,yes,yes,yes,covered,DONE,"Combined detail and work page"
+information,none,AdminInformationSection/AdminInformationRow,yes,yes,yes,yes,yes,covered,DONE,"Only existing values"
+image_preview,AdminImageUpload,AdminImageUpload/AdminImagePreview,yes,yes,yes,yes,yes,covered,DONE,"Upload path unchanged"
+danger,overview delete,AdminDangerZone,yes,yes,yes,yes,yes,covered,DONE,"Existing hard delete only at page bottom"
+public_sponsors,unchanged,unchanged,no,yes,yes,yes,yes,regression anchor,DONE,"No public redesign"
+manual_browser,not run,authenticated review required,yes,pending,pending,yes,yes,pending,DEFERRED,"No authenticated browser session available"

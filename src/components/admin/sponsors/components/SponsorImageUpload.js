@@ -2,6 +2,7 @@ import { AdminImageUpload } from "@/components/admin/media";
 
 export default function SponsorImageUpload(props) {
   return (
+    <div className="[&_img]:object-contain">
     <AdminImageUpload
       {...props}
       placeholderUrl=""
@@ -10,5 +11,6 @@ export default function SponsorImageUpload(props) {
       uploadLabel="Banner auswählen"
       removeLabel="Banner entfernen"
     />
+    </div>
   );
 }

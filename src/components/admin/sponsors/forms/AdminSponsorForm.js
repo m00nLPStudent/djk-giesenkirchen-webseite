@@ -90,7 +90,7 @@ export default function AdminSponsorForm({ sponsor, categories = [] }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+    <form id="sponsor-editor-form" onSubmit={handleSubmit} className="space-y-6">
       <FormSection eyebrow="Sponsor" title="Grunddaten">
         <FormGrid>
           <InputField

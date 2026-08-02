@@ -1,0 +1,11 @@
+import { AdminImagePreview, AdminInformationRow, AdminInformationSection } from "@/components/admin/design-system";
+import { getSafeSponsorWebsiteUrl } from "../sponsorUi.helpers";
+
+function ExternalLink({ value, label }) {
+  const href = getSafeSponsorWebsiteUrl(value);
+  return href ? <a href={href} target="_blank" rel="noopener noreferrer" className="break-all font-bold text-red-300 hover:text-red-200">{label || value}</a> : value || null;
+}
+
+export default function SponsorDetailOverview({ sponsor, categoryName }) {
+  return <div className="grid gap-5 lg:grid-cols-2"><AdminInformationSection title="Sponsor"><AdminInformationRow label="Name">{sponsor.name}</AdminInformationRow><AdminInformationRow label="Kategorie">{categoryName}</AdminInformationRow><AdminInformationRow label="Status">{sponsor.is_active === false ? "Inaktiv" : "Aktiv"}</AdminInformationRow><AdminInformationRow label="Sortierung">{String(sponsor.sort_order ?? 0)}</AdminInformationRow></AdminInformationSection><AdminInformationSection title="Verlinkungen"><AdminInformationRow label="Website"><ExternalLink value={sponsor.website_url} /></AdminInformationRow><AdminInformationRow label="Facebook"><ExternalLink value={sponsor.facebook_url} /></AdminInformationRow><AdminInformationRow label="Instagram"><ExternalLink value={sponsor.instagram_url} /></AdminInformationRow><AdminInformationRow label="TikTok"><ExternalLink value={sponsor.tiktok_url} /></AdminInformationRow></AdminInformationSection><AdminInformationSection title="Beschreibungen"><AdminInformationRow label="Deutsch">{sponsor.description_de}</AdminInformationRow><AdminInformationRow label="Englisch">{sponsor.description_en}</AdminInformationRow></AdminInformationSection><AdminInformationSection title="Logo und Historie"><AdminInformationRow label="Logo"><AdminImagePreview src={sponsor.image_url} alt={`Logo von ${sponsor.name}`} fileName={sponsor.name} /></AdminInformationRow><AdminInformationRow label="Erstellt">{sponsor.created_at ? new Date(sponsor.created_at).toLocaleString("de-DE") : null}</AdminInformationRow><AdminInformationRow label="Geändert">{sponsor.updated_at ? new Date(sponsor.updated_at).toLocaleString("de-DE") : null}</AdminInformationRow></AdminInformationSection></div>;
+}
