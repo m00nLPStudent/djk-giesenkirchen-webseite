@@ -16,11 +16,13 @@ export function AdminListHeader({ columns, template, className = "" }) {
 }
 
 export function AdminListRow({ href, label, template, children, className = "" }) {
-  return <Link href={href} aria-label={label} style={{ gridTemplateColumns: template }} className={`grid items-center gap-4 border-t border-white/10 px-5 py-3 text-sm transition hover:bg-white/[0.05] ${adminUi.focusRing} focus-visible:outline-offset-[-2px] ${className}`}>{children}</Link>;
+  const classes = `grid items-center gap-4 border-t border-white/10 px-5 py-3 text-sm ${href ? `transition hover:bg-white/[0.05] ${adminUi.focusRing} focus-visible:outline-offset-[-2px]` : ""} ${className}`;
+  return href ? <Link href={href} aria-label={label} style={{ gridTemplateColumns: template }} className={classes}>{children}</Link> : <div style={{ gridTemplateColumns: template }} className={classes}>{children}</div>;
 }
 
 export function AdminListMobileCard({ href, label, children, className = "" }) {
-  return <Link href={href} aria-label={label} className={`block transition hover:border-red-500/40 hover:bg-white/[0.06] ${adminUi.mobileCard} ${adminUi.focusRing} ${className}`}>{children}</Link>;
+  const classes = `block ${adminUi.mobileCard} ${href ? `transition hover:border-red-500/40 hover:bg-white/[0.06] ${adminUi.focusRing}` : ""} ${className}`;
+  return href ? <Link href={href} aria-label={label} className={classes}>{children}</Link> : <div className={classes}>{children}</div>;
 }
 
 export function AdminListChevron({ label }) {

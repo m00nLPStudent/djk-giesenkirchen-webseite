@@ -21,6 +21,8 @@ export default function ArchiveButton({
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
   const isPlayer = entity === "player";
+  const isCoach = entity === "coach";
+  const entityLabel = isPlayer ? "Spieler" : isCoach ? "Trainer" : "Mannschaft";
   const hasOutstanding = isPlayer && Number(preview?.count || 0) > 0;
 
   function openDialog() {
@@ -43,14 +45,14 @@ export default function ArchiveButton({
       const result = await action();
       if (result?.error) return setError(result.error.message || "Archivierung fehlgeschlagen.");
       dialogRef.current?.close();
-      router.push(isPlayer ? "/admin/players" : "/admin/teams");
+      router.push(isPlayer ? "/admin/players" : isCoach ? "/admin/coaches" : "/admin/teams");
       router.refresh();
     });
   }
 
   const title = hasOutstanding
     ? "Spieler mit offenen Beitraegen archivieren"
-    : `${isPlayer ? "Spieler" : "Mannschaft"} archivieren`;
+    : `${entityLabel} archivieren`;
 
   return (
     <>
@@ -60,7 +62,7 @@ export default function ArchiveButton({
         disabled={pending}
         className="rounded-full border border-red-500 px-4 py-2.5 text-sm font-bold text-red-200 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
       >
-        {pending ? "Wird geprueft ..." : `${isPlayer ? "Spieler" : "Mannschaft"} archivieren`}
+        {pending ? "Wird geprueft ..." : `${entityLabel} archivieren`}
       </button>
       {error ? <p className="basis-full text-sm font-bold text-red-300">{error}</p> : null}
       <dialog ref={dialogRef} className="m-auto w-[min(92vw,36rem)] rounded-3xl border border-red-500/35 bg-zinc-950 p-0 text-white backdrop:bg-black/75">
@@ -76,6 +78,12 @@ export default function ArchiveButton({
                 <p>Historische Daten, Beitraege und Zahlungen bleiben vollstaendig erhalten.</p>
                 {hasOutstanding ? <p>Der Spieler bleibt im Bereich Vereinsbeitraege sichtbar, bis die offenen Positionen erledigt sind.</p> : null}
               </>
+            ) : isCoach ? (
+              <>
+                <p>Der Trainer wird deaktiviert und seine aktiven Mannschaftszuordnungen der aktuellen Saison werden beendet.</p>
+                <p>Die Historie bleibt vollständig erhalten und der Trainer verschwindet aus öffentlichen Bereichen.</p>
+                <p>Eine spätere Reaktivierung stellt keine Mannschaftszuordnung automatisch wieder her.</p>
+              </>
             ) : (
               <>
                 <p>Die Mannschaft wird aus dem aktiven Vereinsbetrieb entfernt.</p>
@@ -89,13 +97,13 @@ export default function ArchiveButton({
               {preview.count} offene Position{preview.count === 1 ? "" : "en"} · {money(preview.amount)} offen
             </div>
           ) : null}
-          {!isPlayer && (playerAssignments !== null || coachAssignments !== null) ? (
+          {!isPlayer && !isCoach && (playerAssignments !== null || coachAssignments !== null) ? (
             <p className="mt-5 text-sm text-white/60">Aktiv: {playerAssignments || 0} Spielerzuordnungen, {coachAssignments || 0} Trainerzuordnungen</p>
           ) : null}
           <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button type="button" onClick={() => dialogRef.current?.close()} disabled={pending} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-bold">Abbrechen</button>
             <button type="button" onClick={confirmArchive} disabled={pending} className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-bold hover:bg-red-700 disabled:opacity-50">
-              {pending ? "Wird archiviert ..." : hasOutstanding ? "Spieler trotzdem archivieren" : `${isPlayer ? "Spieler" : "Mannschaft"} archivieren`}
+              {pending ? "Wird archiviert ..." : hasOutstanding ? "Spieler trotzdem archivieren" : `${entityLabel} archivieren`}
             </button>
           </div>
         </div>

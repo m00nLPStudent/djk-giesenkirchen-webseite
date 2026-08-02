@@ -30,8 +30,8 @@ export function AdminActionBar({ children, className = "" }) {
   return <div className={`flex flex-wrap items-center gap-2 ${className}`}>{children}</div>;
 }
 
-export function AdminModuleSearch({ value, onChange, placeholder = "Suchen …", label = "Suchen", className = "" }) {
-  return <label className={`relative block w-full max-w-xl ${className}`}><span className="sr-only">{label}</span><Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40" aria-hidden="true" /><input type="search" value={value} onChange={onChange} placeholder={placeholder} className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-red-500" /></label>;
+export function AdminModuleSearch({ value, defaultValue, onChange, name, placeholder = "Suchen …", label = "Suchen", className = "" }) {
+  return <label className={`relative block w-full max-w-xl ${className}`}><span className="sr-only">{label}</span><Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/40" aria-hidden="true" /><input type="search" name={name} value={value} defaultValue={defaultValue} onChange={onChange} placeholder={placeholder} className="h-12 w-full rounded-2xl border border-white/10 bg-black/20 pl-11 pr-4 text-sm text-white outline-none placeholder:text-white/35 focus:border-red-500" /></label>;
 }
 
 export function AdminButton({ href, variant = "secondary", children, className = "", ...props }) {

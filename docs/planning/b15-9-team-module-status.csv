@@ -1,0 +1,11 @@
+surface,old_component,new_component,design_system_used,desktop,mobile,permission_unchanged,scope_unchanged,test_status,status,notes
+overview,AdminPageHeader and large cards,AdminTeamsList,AdminModuleHeader|AdminModuleList,yes,yes,yes,yes,PASS,DONE,URL-Suche erhalten
+filters,inline status select,TeamsHeaderSearchControls,AdminModuleFilters|AdminModuleSearch,yes,yes,yes,yes,PASS,DONE,Standardmäßig geschlossen
+contribution_summary,large mini panels,ContributionSummary,AdminMetric|AdminModuleSummary,yes,yes,yes,yes,PASS,DONE,Fachwerte unverändert
+detail,custom detail,TeamContributionDetailView,AdminDetailLayout|AdminDetailHeader|AdminInformationSection,yes,yes,yes,yes,PASS,DONE,Read-only ohne Actions
+players,large contribution cards,responsive player list,AdminModuleList|AdminModuleCards|PlayerAvatar,yes,yes,yes,yes,PASS,DONE,Sortierung unverändert
+coaches,count only,count information row,AdminInformationRow,yes,yes,yes,yes,PASS,PARTIAL,Query liefert keine Coachdetails
+training,not loaded,not rendered,none,n/a,n/a,yes,yes,N/A,DEFERRED,Keine saisonalen Werte in Detailquery
+danger,header archive,danger zone,AdminDangerZone,yes,yes,yes,yes,PASS,DONE,Einziger Archivierungsort
+forms,BackButton,shared shells,AdminModulePage|AdminModuleHeader|AdminBackLink,yes,yes,yes,yes,PASS,DONE,Formlogik unverändert
+pagination,not present,not added,AdminModulePagination,n/a,n/a,yes,yes,N/A,DEFERRED,Keine Pagination erfunden

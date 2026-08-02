@@ -7,7 +7,7 @@ import {
 } from "@/components/admin/teams/serverTeamScope";
 import { loadTeamEditCoachData } from "@/components/admin/teams/teamEditCoach.repository";
 import { loadTeamEditPlayerOptions } from "@/components/admin/teams/teamEditPlayer.repository";
-import BackButton from "@/components/admin/ui/BackButton";
+import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
 
@@ -56,8 +56,10 @@ export default async function EditTeamPage({ params }) {
   const players = await loadTeamEditPlayerOptions(supabaseServer, id);
 
   return (
-    <AdminLayout title="Mannschaft bearbeiten" subtitle="Mannschaften">
-      <BackButton />
+    <AdminLayout title="Mannschaft bearbeiten" subtitle="Mannschaften" showHeader={false}>
+      <AdminModulePage>
+      <AdminBackLink href={`/admin/teams/${id}`}>Zurück zu Mannschaftsdetails</AdminBackLink>
+      <AdminModuleHeader eyebrow="Mannschaften" title="Mannschaft bearbeiten" description="Mannschaft und Saisonzuordnungen bearbeiten." />
       <TeamScopeGate team={team}>
         <AdminTeamsForm
           team={team}
@@ -74,6 +76,7 @@ export default async function EditTeamPage({ params }) {
           currentTeamSeasons={coachEditData.currentTeamSeasons || []}
         />
       </TeamScopeGate>
+      </AdminModulePage>
     </AdminLayout>
   );
 }

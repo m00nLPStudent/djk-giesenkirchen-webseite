@@ -50,13 +50,15 @@ test("coach work view exposes compact information and danger sections", async ()
     read("../design-system/AdminDetail.js"),
   ]);
 
-  for (const section of ["Persönliche Daten", "Kontakt", "Mannschaften", "Lizenzen", "Notizen", "Historie"]) {
+  for (const section of ["Persönliche Daten", "Kontakt", "Mannschaftszuordnungen", "Lizenzen", "Notizen", "Historie"]) {
     assert.ok(detail.includes(section));
   }
   assert.match(detail, /AdminDangerZone/);
   assert.match(detailSystem, /title = "Gefahrenbereich"/);
   assert.match(detail, /#coach-edit-form/);
-  assert.match(detail, /Eine Archivfunktion ist nicht vorhanden/);
+  assert.match(detail, /Trainer archivieren/);
+  assert.match(detail, /<ArchiveButton entity="coach"/);
+  assert.doesNotMatch(detail, /AdminRemoveButton|dauerhaft löschen/);
   assert.match(detail, /<CoachAvatar coach=\{coach\} sizeClassName="h-16 w-16"/);
   assert.doesNotMatch(detail, /next\/image/);
   assert.doesNotMatch(detail, /image_url|photo_url/);

@@ -15,6 +15,8 @@ import {
   resolveCoachTeamSeasonTargets,
 } from "@/components/admin/coaches/services/coachTeamSeasonOptions.repository";
 import { revalidatePath } from "next/cache";
+import { archiveCoach } from "@/components/admin/archiving/archive.service";
+import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 
 function buildError(message) {
   return { error: { message } };
@@ -186,15 +188,17 @@ export async function removeCoachWithScopeAction(coachId) {
     return buildError("Du darfst dieses Trainerprofil nicht loeschen.");
   }
 
-  const result = await supabaseServer.rpc("remove_entity", {
-    entity_type: "coach",
-    entity_uuid: coachId,
-  });
+  const result = await archiveCoach(supabaseServer, coachId);
 
-  if (!result.error) {
+  if (result.ok) {
+    revalidatePath("/admin");
     revalidatePath("/admin/coaches");
-    revalidatePublicCoachPages();
+    revalidatePath(`/admin/coaches/edit/${coachId}`);
+    revalidatePath("/admin/teams");
+    revalidatePublicContent("coaches");
+    revalidatePublicContent("teams");
+    revalidatePublicContent("contacts");
   }
 
-  return result;
+  return result.ok ? { error: null, ...result } : { error: { message: result.message }, ...result };
 }

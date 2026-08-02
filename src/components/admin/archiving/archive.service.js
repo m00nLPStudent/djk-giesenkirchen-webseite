@@ -123,3 +123,41 @@ export async function archivePlayer(db, playerId) {
     return archiveResult(ARCHIVE_CODES.DATABASE_ERROR, "Der Spieler konnte nicht archiviert werden.");
   }
 }
+
+export async function archiveCoach(db, coachId) {
+  try {
+    const coaches = await rows(db, "coaches", "id, is_active", [["id", coachId]]);
+    const coach = coaches[0];
+    if (!coach) return archiveResult(ARCHIVE_CODES.NOT_FOUND, "Trainer nicht gefunden.");
+    if (coach.is_active === false) return archiveResult(ARCHIVE_CODES.COACH_ALREADY_INACTIVE, "Der Trainer ist bereits archiviert.");
+
+    const season = await resolveCurrentSeason(db);
+    if (!season.ok) return season;
+    const teamSeasons = await rows(db, "team_seasons", "id", [["season_id", season.seasonId]]);
+    const links = teamSeasons.length
+      ? await db.from("coach_team_seasons").select("id, is_active").eq("coach_id", coachId).eq("is_active", true).in("team_season_id", teamSeasons.map((row) => row.id))
+      : { data: [], error: null };
+    if (links.error) throw links.error;
+    const snapshots = links.data || [];
+
+    const rollback = async () => {
+      await updateIds(db, "coach_team_seasons", snapshots.map((row) => row.id), { is_active: true });
+      await updateIds(db, "coaches", [coach.id], { is_active: coach.is_active });
+    };
+    const failure = await runArchiveSteps([
+      () => updateIds(db, "coach_team_seasons", snapshots.map((row) => row.id), { is_active: false }),
+      () => updateIds(db, "coaches", [coach.id], { is_active: false }),
+      async () => {
+        const post = await rows(db, "coaches", "id, is_active", [["id", coachId]]);
+        const activeLinks = teamSeasons.length
+          ? await db.from("coach_team_seasons").select("id").eq("coach_id", coachId).eq("is_active", true).in("team_season_id", teamSeasons.map((row) => row.id))
+          : { data: [], error: null };
+        if (activeLinks.error || activeLinks.data?.length || post[0]?.is_active !== false) throw new Error("postcheck");
+      },
+    ], rollback);
+
+    return failure || archiveResult(ARCHIVE_CODES.SUCCESS, "Trainer wurde archiviert.", { assignments: snapshots.length });
+  } catch {
+    return archiveResult(ARCHIVE_CODES.DATABASE_ERROR, "Der Trainer konnte nicht archiviert werden.");
+  }
+}

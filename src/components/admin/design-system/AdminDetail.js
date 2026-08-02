@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { adminUi } from "./tokens";
+import { AdminDecorativeBackgroundImage } from "./AdminDecorativeBackgroundImage";
 
 export function AdminDetailLayout({ header, children, dangerZone, className = "" }) {
   return <div className={`${adminUi.pageGap} ${className}`}>{header}{children}{dangerZone}</div>;
@@ -11,12 +12,13 @@ export function AdminBackLink({ href, children = "Zurück", variant = "text", cl
   return <Link href={href} className={`inline-flex items-center gap-2 text-sm font-bold transition hover:text-white ${adminUi.focusRing} ${variantClass} ${className}`}><ArrowLeft size={16} aria-hidden="true" />{children}</Link>;
 }
 
-export function AdminDetailHeader({ backHref, backLabel, backVariant = "text", eyebrow, title, status, statusPlacement = "inline", actions, meta, leading, variant = "panel", className = "" }) {
+export function AdminDetailHeader({ backHref, backLabel, backVariant = "text", eyebrow, title, status, statusPlacement = "inline", actions, meta, leading, variant = "panel", backgroundImageUrl, backgroundPosition = "center", className = "" }) {
   const surface = variant === "hero" ? "rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.08] via-white/[0.05] to-transparent p-5 md:p-7" : adminUi.detailPanel;
   return (
-    <section className={`${surface} ${className}`}>
-      {backHref ? <AdminBackLink href={backHref} variant={backVariant}>{backLabel}</AdminBackLink> : null}
-      <div className="mt-5 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <section className={`relative isolate overflow-hidden ${surface} ${className}`}>
+      <AdminDecorativeBackgroundImage src={backgroundImageUrl} position={backgroundPosition} />
+      {backHref ? <AdminBackLink href={backHref} variant={backVariant} className="relative z-10">{backLabel}</AdminBackLink> : null}
+      <div className="relative z-10 mt-5 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex min-w-0 items-center gap-4">{leading}<div className="min-w-0">{eyebrow ? <p className="text-xs font-black uppercase tracking-[0.3em] text-red-400">{eyebrow}</p> : null}<div className="mt-2 flex flex-wrap items-center gap-3"><h1 className="min-w-0 text-2xl font-black text-white md:text-[2rem]">{title}</h1>{statusPlacement === "inline" ? status : null}</div>{statusPlacement === "below" && status ? <div className="mt-2">{status}</div> : null}{meta ? <div className="mt-2 text-sm text-white/60 md:text-[0.95rem]">{meta}</div> : null}</div></div>
         {actions ? <div className="flex flex-wrap gap-3 lg:max-w-md lg:justify-end">{actions}</div> : null}
       </div>

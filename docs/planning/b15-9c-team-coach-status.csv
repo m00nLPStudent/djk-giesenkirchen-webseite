@@ -1,0 +1,6 @@
+surface,old_behavior,new_behavior,data_source,permission,scope,desktop,mobile,test_status,status,notes
+team_coach_list,count_only,active_people_list,coach_team_seasons_and_coaches,teams.view,team_scope,table,cards,PASS,DONE,no_sensitive_fields
+team_coach_link,none,conditional_edit_link,existing_admin_route,coaches.edit,coach_edit_scope,row_link,card_link,PASS,DONE,no_403_link
+coach_detail,compact_joined_rows,structured_sections,existing_coach_read_model,coaches.edit,coach_edit_scope,stacked_sections,stacked_sections,PASS,DONE,no_contributions
+coach_danger,hard_delete,hard_delete_correctly_named,remove_entity,coaches.delete,coach_delete_scope,bottom_zone,bottom_zone,PASS,DONE,no_archive_claim
+coach_archive,missing,unchanged,none,coaches.delete,coach_delete_scope,none,none,DOCUMENTED,DEFERRED,B15.9D

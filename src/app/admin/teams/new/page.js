@@ -8,7 +8,7 @@ import {
 } from "@/components/admin/teams/serverTeamScope";
 import { loadTeamEditPlayerOptions } from "@/components/admin/teams/teamEditPlayer.repository";
 import { isYouthTeam } from "@/components/admin/teams/teamScope";
-import BackButton from "@/components/admin/ui/BackButton";
+import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
 
@@ -76,8 +76,10 @@ export default async function NewTeamPage() {
   ]);
 
   return (
-    <AdminLayout title="Neue Mannschaft" subtitle="Mannschaften">
-      <BackButton />
+    <AdminLayout title="Neue Mannschaft" subtitle="Mannschaften" showHeader={false}>
+      <AdminModulePage>
+      <AdminBackLink href="/admin/teams">Zurück zu Mannschaften</AdminBackLink>
+      <AdminModuleHeader eyebrow="Mannschaften" title="Neue Mannschaft" description="Mannschaft und Saisonzuordnung anlegen." />
       <TeamScopeGate requireCreateScope>
         <AdminTeamsForm
           seasons={seasons || []}
@@ -86,6 +88,7 @@ export default async function NewTeamPage() {
           coaches={coaches || []}
         />
       </TeamScopeGate>
+      </AdminModulePage>
     </AdminLayout>
   );
 }

@@ -1,5 +1,6 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import { AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
+import TeamCreateButton from "@/components/admin/teams/components/TeamCreateButton";
 import { FormAlert } from "@/components/admin/forms";
 import {
   getContributionStatusVisibility,
@@ -91,13 +92,13 @@ export default async function AdminTeamsPage({ searchParams }) {
         subtitle="Adminbereich"
         showHeader={false}
       >
-        <AdminPageHeader
+        <AdminModuleHeader
           eyebrow="Mannschaften"
           title="Mannschaften verwalten"
           description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
         >
           <TeamsHeaderSearchControls searchValue={teamSearch} statusValue={teamStatus} />
-        </AdminPageHeader>
+        </AdminModuleHeader>
 
         <AdminTeamsList teams={[]} />
       </AdminLayout>
@@ -252,13 +253,15 @@ export default async function AdminTeamsPage({ searchParams }) {
       subtitle="Adminbereich"
       showHeader={false}
     >
-      <AdminPageHeader
+      <AdminModulePage>
+      <AdminModuleHeader
         eyebrow="Mannschaften"
         title="Mannschaften verwalten"
-        description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
+        description="Mannschaften, Saisonzuordnungen, Trainer und Spieler verwalten."
+        actions={<TeamCreateButton className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold transition hover:bg-red-700" label="Neue Mannschaft" />}
       >
         <TeamsHeaderSearchControls searchValue={teamSearch} statusValue={teamStatus} />
-      </AdminPageHeader>
+      </AdminModuleHeader>
 
       {contributionSeasonWarning ? (
         <FormAlert className="mb-6 border-amber-400/30 bg-amber-500/10 text-amber-50" tone="warning">
@@ -272,6 +275,7 @@ export default async function AdminTeamsPage({ searchParams }) {
           canShowContributionSummary && !contributionSeasonWarning
         }
       />
+      </AdminModulePage>
     </AdminLayout>
   );
 }

@@ -56,7 +56,7 @@ export default async function EditCoachPage({ params }) {
     scopeContext,
     supabaseServer,
   );
-  const canRemove = canDeleteCoachOnServer(
+  const canArchive = canDeleteCoachOnServer(
     scopeContext,
     coach,
     coachTeamIds,
@@ -69,7 +69,7 @@ export default async function EditCoachPage({ params }) {
       <CoachDetailOverview
         coach={coachDetail}
         notes={coach.notes || coach.bio_de || coach.bio_en || ""}
-        canRemove={canRemove}
+        canArchive={canArchive}
       />
       <AdminCoachesForm
         coach={coach}

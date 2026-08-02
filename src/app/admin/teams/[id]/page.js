@@ -6,6 +6,7 @@ import {
   loadServerTeamScopeContext,
 } from "@/components/admin/teams/serverTeamScope";
 import { createPlayerReadDto } from "@/components/admin/persons/playerReadDto";
+import { createTeamCoachListDto } from "@/components/admin/persons/coachReadDto";
 import { getPlayerSeasonalReadModelsMap } from "@/components/admin/persons/playerSeasonalReadModelRepository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
@@ -22,6 +23,8 @@ import {
   loadTeamPlayerAssignmentsBySeason,
 } from "@/components/admin/contributions/repositories/contributionStatus.repository";
 import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
+import { loadActiveTeamSeasonCoaches } from "@/components/admin/teams/teamCoachList.repository";
+import { canEditCoachOnServer, getCoachTeamIdsMap, loadServerPersonScopeContext } from "@/components/admin/persons/serverPersonScope";
 
 export const dynamic = "force-dynamic";
 
@@ -141,23 +144,28 @@ export default async function AdminTeamDetailPage({ params }) {
   const canArchive =
     permissionResult.permissions.includes("teams.delete") &&
     canAccessTeamOnServer(scopeContext, team);
-  let activeCoachAssignments = 0;
+  let currentTeamSeason = null;
   if (contributionSeasonResolution?.activeSeasonId) {
-    const { data: currentTeamSeason } = await supabaseServer
+    const { data } = await supabaseServer
       .from("team_seasons")
       .select("id")
       .eq("team_id", id)
       .eq("season_id", contributionSeasonResolution.activeSeasonId)
       .maybeSingle();
-    if (currentTeamSeason?.id) {
-      const { count } = await supabaseServer
-        .from("coach_team_seasons")
-        .select("id", { count: "exact", head: true })
-        .eq("team_season_id", currentTeamSeason.id)
-        .eq("is_active", true);
-      activeCoachAssignments = Number(count || 0);
-    }
+    currentTeamSeason = data || null;
   }
+  const coachResults = await loadActiveTeamSeasonCoaches(supabaseServer, currentTeamSeason?.id);
+  const coachIds = coachResults.map(({ coach }) => coach.id);
+  const mayOpenCoachDetails = permissionResult.permissions.includes("coaches.edit");
+  const coachScopeContext = mayOpenCoachDetails ? await loadServerPersonScopeContext(permissionResult) : null;
+  const coachScopeData = mayOpenCoachDetails && coachIds.length
+    ? await getCoachTeamIdsMap(supabaseServer, coachIds)
+    : { teamIdsByCoachId: new Map(), teamById: new Map() };
+  const coachRows = coachResults.map(({ coach, assignment }) => createTeamCoachListDto(coach, assignment, {
+    teamName: team.name_de,
+    seasonLabel: contributionSeasonResolution?.activeSeasonName || "Keine Saison",
+    canOpen: mayOpenCoachDetails && canEditCoachOnServer(coachScopeContext, coach, coachScopeData.teamIdsByCoachId.get(coach.id) || [], coachScopeData.teamById),
+  }));
 
   return (
     <AdminLayout title="Mannschaftsdetails" subtitle="Mannschaften" showHeader={false}>
@@ -170,7 +178,8 @@ export default async function AdminTeamDetailPage({ params }) {
           }}
           canEdit={canEdit}
           canArchive={canArchive}
-          activeCoachAssignments={activeCoachAssignments}
+          activeCoachAssignments={coachRows.length}
+          coaches={coachRows}
           contributionVisibility={contributionVisibility}
           contributionSeasonWarning={contributionSeasonWarning}
           teamSummary={teamSummary}

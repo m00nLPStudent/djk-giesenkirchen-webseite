@@ -38,6 +38,9 @@ function mapCoachAssignment(assignment = {}) {
     teamSlug: assignment.teamSlug || null,
     roleDe: assignment.roleDe || null,
     roleEn: assignment.roleEn || null,
+    seasonId: assignment.seasonId || null,
+    seasonName: assignment.seasonName || null,
+    isActive: assignment.isActive ?? true,
     sortOrder: assignment.sortOrder ?? null,
   };
 }
@@ -138,6 +141,10 @@ export function createCoachReadDto(
     whatsapp: coach.whatsapp || "",
     license: coach.license || "",
     nationality: coach.nationality || "",
+    birthDate: coach.birthdate || "",
+    joinedAt: coach.joined_at || "",
+    createdAt: coach.created_at || "",
+    updatedAt: coach.updated_at || "",
     sortOrder: coach.sort_order ?? primaryAssignment?.sortOrder ?? 0,
     roleLabels,
     primaryRoleLabel: roleSummary.primaryRoleLabel,
@@ -161,6 +168,29 @@ export function createCoachReadDto(
   }
 
   return dto;
+}
+
+export function createTeamCoachListDto(coach = {}, assignment = {}, { teamName = "", seasonLabel = "", canOpen = false } = {}) {
+  const assignmentRole = assignment.role_de || assignment.role_en || null;
+  const assignmentRoleLabel = createCoachRoleSummary(
+    [{ roleDe: assignment.role_de, roleEn: assignment.role_en }],
+    {},
+    { defaultRoleLabel: "Trainer" },
+  ).primaryRoleLabel;
+
+  return {
+    id: coach.id,
+    slug: coach.slug || null,
+    displayName: getCoachDisplayName(coach),
+    imageUrl: getCoachImageUrl(coach),
+    assignmentRole,
+    assignmentRoleLabel,
+    isActive: coach.is_active !== false && assignment.is_active !== false,
+    licenseLabel: coach.license || "–",
+    teamName,
+    seasonLabel,
+    detailHref: canOpen ? `/admin/coaches/edit/${coach.id}` : null,
+  };
 }
 
 export function filterCoachAssignmentsByTeamId(assignments = [], teamId) {

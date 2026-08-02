@@ -1,45 +1,18 @@
 "use client";
 
-import TeamCreateButton from "./TeamCreateButton";
+import { AdminButton, AdminModuleFilters, AdminModuleSearch } from "@/components/admin/design-system";
 
 export default function TeamsHeaderSearchControls({ searchValue = "", statusValue = "active" }) {
   return (
-    <form
-      method="get"
-      action="/admin/teams"
-      className="grid gap-3 pt-1 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-center"
-    >
-      <input
-        type="text"
-        name="q"
-        defaultValue={searchValue}
-        placeholder="Mannschaft suchen..."
-        className="h-12 w-full rounded-full border border-white/15 bg-black/20 px-5 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-red-500/60"
-      />
-
-      <select
-        name="status"
-        defaultValue={statusValue}
-        aria-label="Mannschaftsstatus"
-        className="h-12 rounded-full border border-white/15 bg-zinc-950 px-5 text-sm text-white"
-      >
-        <option value="active">Aktive</option>
-        <option value="inactive">Inaktive</option>
-        <option value="all">Alle</option>
-      </select>
-
-      <div className="flex items-center justify-end gap-2">
-        <button
-          type="submit"
-          className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-bold text-white/80 transition hover:border-red-500/50 hover:text-white"
-        >
-          Suchen
-        </button>
-        <TeamCreateButton
-          className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold transition hover:bg-red-700"
-          label="Neue Mannschaft"
-        />
-      </div>
-    </form>
+    <div className="space-y-4">
+      <form method="get" action="/admin/teams" className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <AdminModuleSearch name="q" defaultValue={searchValue} label="Mannschaft suchen" placeholder="Mannschaft suchen …" />
+        {statusValue !== "active" ? <input type="hidden" name="status" value={statusValue} /> : null}
+        <AdminButton type="submit">Suchen</AdminButton>
+      </form>
+      <AdminModuleFilters title="Mannschaftsliste eingrenzen" panelId="team-filter-panel" badge={statusValue !== "active" ? <span className="rounded-full border border-red-400/35 bg-red-500/10 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-red-200">Status aktiv</span> : null}>
+        <form method="get" action="/admin/teams" className="flex flex-col gap-3 sm:flex-row sm:items-end"><input type="hidden" name="q" value={searchValue} /><label className="space-y-2"><span className="block text-xs font-bold uppercase tracking-[0.15em] text-white/40">Aktivstatus</span><select name="status" defaultValue={statusValue} className="h-12 rounded-2xl border border-white/10 bg-neutral-950 px-4 text-white"><option value="active">Aktive</option><option value="inactive">Inaktive</option><option value="all">Alle</option></select></label><AdminButton type="submit" variant="primary">Filter anwenden</AdminButton></form>
+      </AdminModuleFilters>
+    </div>
   );
 }
