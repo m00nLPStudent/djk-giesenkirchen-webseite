@@ -2,6 +2,7 @@ import EntityBadge from "@/components/admin/ui/EntityBadge";
 import { getContributionStatusLabel } from "../helpers/contributionFormatters.js";
 
 const STATUS_VARIANTS = {
+  none: "neutral",
   open: "warning",
   partially_paid: "blue",
   paid: "success",

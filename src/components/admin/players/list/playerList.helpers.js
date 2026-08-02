@@ -106,6 +106,25 @@ function isCaptain(player = {}) {
   return getAssignments(player).some((assignment) => assignment?.isCaptain);
 }
 
+function matchesContributionStatus(player = {}, filter = "all") {
+  if (filter === "all") return true;
+
+  const status = player.contributionStatus || null;
+  if (!status) return false;
+
+  if (filter === "open_cases") {
+    return (
+      Boolean(status.isOverdue) ||
+      status.status === "open" ||
+      status.status === "partially_paid"
+    );
+  }
+
+  if (filter === "overdue") return Boolean(status.isOverdue);
+
+  return status.status === filter;
+}
+
 export function getPlayerTeams(players = []) {
   const teamOptions = new Map();
 
@@ -142,6 +161,7 @@ export function filterPlayers(players = [], filters = {}) {
     teamFilter = "all",
     genderFilter = "all",
     nationalityFilter = "all",
+    contributionFilter = "all",
     positionFilter = "all",
     captainFilter = "all",
     sortBy = "name_asc",
@@ -171,6 +191,7 @@ export function filterPlayers(players = [], filters = {}) {
     }
     if (genderFilter !== "all" && player.gender !== genderFilter) return false;
     if (nationalityFilter !== "all" && player.nationality !== nationalityFilter) return false;
+    if (!matchesContributionStatus(player, contributionFilter)) return false;
     if (
       positionFilter !== "all" &&
       !getPlayerPositionsForFilter(player).includes(positionFilter)

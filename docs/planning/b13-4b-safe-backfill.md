@@ -3,6 +3,7 @@
 ## Scope
 
 B13.4B covers only safe backfill preparation for:
+
 - public.players -> public.player_team_seasons
 - public.coaches -> public.coach_team_seasons
 - public.players.photo_url -> public.players.image_url
@@ -34,12 +35,15 @@ No schema changes and no policy changes are part of B13.4B.
 ### Players
 
 Legacy source:
+
 - players.team_id
 
 Target:
+
 - player_team_seasons
 
 Insert only when all conditions are true:
+
 - exactly one current season exists
 - player has a non-null legacy team_id
 - exactly one matching team_seasons row for that team and current season
@@ -47,6 +51,7 @@ Insert only when all conditions are true:
 - no existing player_id + team_season_id pair exists
 
 Data mapping priority:
+
 - shirt_number: players.shirt_number, fallback players.jersey_number
 - position_de: players.position_de, fallback players.position
 - position_en: players.position_en, fallback players.position
@@ -55,12 +60,15 @@ Data mapping priority:
 ### Coaches
 
 Legacy source:
+
 - coaches.team_id
 
 Target:
+
 - coach_team_seasons
 
 Insert only when all conditions are true:
+
 - exactly one current season exists
 - coach has a non-null legacy team_id
 - exactly one matching team_seasons row for that team and current season
@@ -68,6 +76,7 @@ Insert only when all conditions are true:
 - no existing coach_id + team_season_id pair exists
 
 Data mapping priority:
+
 - role_de: coaches.role_de, fallback coaches.role, fallback Trainer
 - role_en: coaches.role_en, fallback coaches.role, fallback Coach
 - sort_order copied with default 0
@@ -80,6 +89,7 @@ Data mapping priority:
 ## Counts and Reporting Flow
 
 The safe backfill SQL is structured in three phases:
+
 1. Pre-counts (eligibility, skip reasons, max possible inserts/updates)
 2. DML with per-step affected-row counts
 3. Inline postcheck summary
@@ -89,12 +99,14 @@ The standalone postcheck SQL provides expanded diagnostics after execution.
 ## Tables Affected
 
 Direct write targets:
+
 - public.players
 - public.coaches
 - public.player_team_seasons
 - public.coach_team_seasons
 
 Read dependencies:
+
 - public.seasons
 - public.team_seasons
 - public.teams
@@ -103,6 +115,7 @@ Read dependencies:
 
 Maximal values are emitted by pre-count queries in docs/sql/b13-4b-safe-backfill.sql.
 Additional static upper bounds from current inventory cardinalities:
+
 - players total rows: 15 -> theoretical max player inserts <= 15
 - coaches total rows: 5 -> theoretical max coach inserts <= 5
 - theoretical max player image updates <= 15
@@ -138,6 +151,7 @@ Real applied counts are expected to be lower, because conflict-free filters inte
 ## Why skips are required
 
 Skips are by design to guarantee:
+
 - no accidental overwrite
 - no automatic resolution of ambiguous season mapping
 - no duplicate active assignments

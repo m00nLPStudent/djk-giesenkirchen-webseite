@@ -48,7 +48,16 @@ const COMPACT_STATUS_LABELS = {
   partially_paid: "Teilbezahlt",
 };
 
+const EXTRA_STATUS_LABELS = {
+  none: "Kein Beitrag",
+  overdue: "Ueberfaellig",
+};
+
 export function getContributionStatusLabel(value = "", options = {}) {
+  if (EXTRA_STATUS_LABELS[value]) {
+    return EXTRA_STATUS_LABELS[value];
+  }
+
   if (options.compact && COMPACT_STATUS_LABELS[value]) {
     return COMPACT_STATUS_LABELS[value];
   }

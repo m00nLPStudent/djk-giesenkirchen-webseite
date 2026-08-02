@@ -1,16 +1,47 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
+import { FormAlert } from "@/components/admin/forms";
+import {
+  getContributionStatusVisibility,
+} from "@/components/admin/contributions/helpers/contributionStatusScope";
+import {
+  buildPlayerContributionStatusMap,
+  createTeamContributionSummary,
+  getContributionSeasonWarning,
+} from "@/components/admin/contributions/helpers/contributionStatusSummary";
+import {
+  loadContributionStatusRowsByPlayerIds,
+  loadTeamPlayerAssignmentsBySeason,
+} from "@/components/admin/contributions/repositories/contributionStatus.repository";
 import { AdminTeamsList } from "@/components/admin/teams";
-import TeamCreateButton from "@/components/admin/teams/components/TeamCreateButton";
+import TeamsHeaderSearchControls from "@/components/admin/teams/components/TeamsHeaderSearchControls";
 import {
   filterScopedTeamsOnServer,
   loadServerTeamScopeContext,
   resolveTeamScopeType,
 } from "@/components/admin/teams/serverTeamScope";
+import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
+
+function matchesTeamSearch(team, search = "") {
+  const normalizedSearch = String(search || "").trim().toLowerCase();
+  if (!normalizedSearch) return true;
+
+  return [
+    team.name_de,
+    team.name_en,
+    team.age_group,
+    team.public_season_name,
+    team.training_times_de,
+    team.contact_name,
+  ]
+    .filter(Boolean)
+    .some((value) => String(value).toLowerCase().includes(normalizedSearch));
+}
 
 function mergeTeamSeason(team, teamSeason, season) {
   const seasonName = season?.name || null;
@@ -35,7 +66,12 @@ function mergeTeamSeason(team, teamSeason, season) {
   };
 }
 
-export default async function AdminTeamsPage() {
+export default async function AdminTeamsPage({ searchParams }) {
+  const params = await searchParams;
+  const teamSearch = String(params?.q || "");
+  const teamStatus = ["active", "inactive", "all"].includes(params?.status)
+    ? params.status
+    : "active";
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: "teams.view",
   });
@@ -59,13 +95,9 @@ export default async function AdminTeamsPage() {
           eyebrow="Mannschaften"
           title="Mannschaften verwalten"
           description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
-          actions={
-            <TeamCreateButton
-              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-              label="Neue Mannschaft"
-            />
-          }
-        />
+        >
+          <TeamsHeaderSearchControls searchValue={teamSearch} statusValue={teamStatus} />
+        </AdminPageHeader>
 
         <AdminTeamsList teams={[]} />
       </AdminLayout>
@@ -145,6 +177,75 @@ export default async function AdminTeamsPage() {
     };
   });
 
+  const contributionVisibility = getContributionStatusVisibility(scopeContext);
+  const canShowContributionSummary = contributionVisibility !== "none";
+  const contributionAdminClient = canShowContributionSummary
+    ? createSupabaseAdminClient()
+    : null;
+  const contributionSeasonResolution = contributionAdminClient
+    ? await loadCurrentSeasonResolution(contributionAdminClient)
+    : null;
+  const contributionSeasonWarning = getContributionSeasonWarning(
+    contributionSeasonResolution,
+  );
+  const contributionAssignments =
+    canShowContributionSummary &&
+    contributionSeasonResolution?.activeSeasonId
+      ? await loadTeamPlayerAssignmentsBySeason(
+          supabaseServer,
+          teamList.map((team) => team.id),
+          contributionSeasonResolution.activeSeasonId,
+        )
+      : [];
+  const playerIdsForContribution = Array.from(
+    new Set(
+      contributionAssignments.map((assignment) => assignment.player_id).filter(Boolean),
+    ),
+  );
+  const contributionRows =
+    contributionAdminClient &&
+    contributionSeasonResolution?.activeSeasonId &&
+    playerIdsForContribution.length
+      ? await loadContributionStatusRowsByPlayerIds(
+          contributionAdminClient,
+          playerIdsForContribution,
+          contributionSeasonResolution.activeSeasonId,
+        )
+      : [];
+  const contributionStatusByPlayerId =
+    contributionSeasonResolution?.activeSeasonId
+      ? buildPlayerContributionStatusMap(
+          playerIdsForContribution,
+          contributionSeasonResolution.activeSeasonId,
+          contributionRows,
+        )
+      : new Map();
+  const playerIdsByTeamId = contributionAssignments.reduce((map, assignment) => {
+    const current = map.get(assignment.team_id) || [];
+    current.push(assignment.player_id);
+    map.set(assignment.team_id, current);
+    return map;
+  }, new Map());
+  const teamsWithContributionSummary = teamsWithCounts.map((team) => ({
+    ...team,
+    contributionSummary:
+      canShowContributionSummary &&
+      contributionSeasonResolution?.activeSeasonId &&
+      !contributionSeasonWarning
+        ? createTeamContributionSummary(
+            team.id,
+            contributionSeasonResolution.activeSeasonId,
+            playerIdsByTeamId.get(team.id) || [],
+            contributionStatusByPlayerId,
+          )
+        : null,
+  }));
+  const visibleTeams = teamsWithContributionSummary.filter((team) => {
+    const matchesStatus = teamStatus === "all" ||
+      (teamStatus === "active" ? team.is_active !== false : team.is_active === false);
+    return matchesStatus && matchesTeamSearch(team, teamSearch);
+  });
+
   return (
     <AdminLayout
       title="Mannschaften verwalten"
@@ -155,15 +256,22 @@ export default async function AdminTeamsPage() {
         eyebrow="Mannschaften"
         title="Mannschaften verwalten"
         description="Teams, Saisonzuordnung und öffentliche Widgets zentral steuern."
-        actions={
-          <TeamCreateButton
-            className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-            label="Neue Mannschaft"
-          />
+      >
+        <TeamsHeaderSearchControls searchValue={teamSearch} statusValue={teamStatus} />
+      </AdminPageHeader>
+
+      {contributionSeasonWarning ? (
+        <FormAlert className="mb-6 border-amber-400/30 bg-amber-500/10 text-amber-50" tone="warning">
+          {contributionSeasonWarning}
+        </FormAlert>
+      ) : null}
+
+      <AdminTeamsList
+        teams={visibleTeams}
+        showContributionSummary={
+          canShowContributionSummary && !contributionSeasonWarning
         }
       />
-
-      <AdminTeamsList teams={teamsWithCounts} />
     </AdminLayout>
   );
 }

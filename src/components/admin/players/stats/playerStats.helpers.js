@@ -40,12 +40,18 @@ export function getPlayerNationalityStats(players = []) {
 export function getPlayerStats(players = []) {
   const inactive = players.filter((player) => !player.is_active).length;
   const nationalities = getPlayerNationalityStats(players);
+  const openContributions = players.filter((player) => {
+    const status = player.contributionStatus;
+    if (!status?.hasContribution) return false;
+    if (status.isOverdue) return true;
+    return ["open", "partially_paid"].includes(status.status);
+  }).length;
 
   return {
     total: players.length,
     inactive,
     nationalityCount: nationalities.filter((item) => item.iso !== "UNKNOWN").length,
-    openContributions: 0,
+    openContributions,
     nationalities,
   };
 }

@@ -8,7 +8,7 @@ import {
 } from "@/components/admin/teams/serverTeamScope";
 import { canCreateTeamInScope } from "@/components/admin/teams/teamScope";
 import { saveTeamWithSeason } from "@/components/admin/teams/services/teams.service";
-import { executeSafeTeamDeleteOrArchive } from "@/components/admin/teams/services/teamDelete.service";
+import { archiveTeam } from "@/components/admin/archiving/archive.service";
 import { revalidatePath } from "next/cache";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 
@@ -107,16 +107,15 @@ export async function removeTeamWithScopeAction(teamId) {
     return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
   }
 
-  const result = await executeSafeTeamDeleteOrArchive(
-    supabaseServer,
-    existingTeam,
-  );
+  const result = await archiveTeam(supabaseServer, teamId);
 
-  if (!result?.error) {
+  if (result?.ok) {
     revalidatePath("/admin");
     revalidatePath("/admin/teams");
+    revalidatePath(`/admin/teams/${teamId}`);
+    revalidatePath("/admin/players");
     revalidatePublicContent("teams");
   }
 
-  return result;
+  return result?.ok ? { error: null, ...result } : { error: { message: result.message }, ...result };
 }

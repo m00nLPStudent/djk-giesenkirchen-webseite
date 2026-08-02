@@ -14,6 +14,11 @@ import {
   resolvePlayerTeamSeasonTarget,
 } from "@/components/admin/players/services/playerTeamSeasonOptions.repository";
 import { savePlayer } from "@/components/admin/players/services/playerWrite.service";
+import {
+  archivePlayer,
+  loadPlayerArchivePreview,
+} from "@/components/admin/archiving/archive.service";
+import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 import { revalidatePath } from "next/cache";
 
 function buildError(message) {
@@ -178,17 +183,35 @@ export async function removePlayerWithScopeAction(playerId) {
   const existingTeamIds = teamIdsByPlayerId.get(playerId) || [];
 
   if (!canDeletePlayerOnServer(scopeContext, existingTeamIds, teamById)) {
-    return buildError("Du darfst diesen Spieler nicht loeschen.");
+    return buildError("Du darfst diesen Spieler nicht archivieren.");
   }
 
-  const result = await supabaseServer.rpc("remove_entity", {
-    entity_type: "player",
-    entity_uuid: playerId,
-  });
+  const result = await archivePlayer(supabaseServer, playerId);
 
-  if (!result.error) {
+  if (result.ok) {
     revalidatePath("/admin/players");
+    revalidatePath(`/admin/players/${playerId}`);
+    revalidatePath("/admin/teams");
+    revalidatePath("/admin/contributions");
+    revalidatePublicContent("teams");
   }
 
-  return result;
+  return result.ok ? { error: null, ...result } : { error: { message: result.message }, ...result };
+}
+
+export async function loadPlayerArchivePreviewAction(playerId) {
+  const permissionResult = await assertAdminActionPermission({
+    requiredPermission: "players.delete",
+  });
+  if (!permissionResult.ok) return buildError(permissionResult.message || "Berechtigung fehlt.");
+  const scopeContext = await loadServerPersonScopeContext(permissionResult);
+  const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(permissionResult.supabaseServer, [playerId]);
+  if (!canDeletePlayerOnServer(scopeContext, teamIdsByPlayerId.get(playerId) || [], teamById)) {
+    return buildError("Du darfst diesen Spieler nicht archivieren.");
+  }
+  try {
+    return { error: null, ...(await loadPlayerArchivePreview(permissionResult.supabaseServer, playerId)) };
+  } catch {
+    return buildError("Die offenen Beitraege konnten nicht geprueft werden.");
+  }
 }

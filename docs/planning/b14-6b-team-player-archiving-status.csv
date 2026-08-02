@@ -1,0 +1,10 @@
+entity,operation,role,scope_required,hard_delete,active_relations_deactivated,historical_data_preserved,contributions_preserved,payments_preserved,rollback_strategy,test_status,status,notes
+team,archive,superadmin,no,no,player_and_coach,true,true,true,exact_snapshots,core_passed,DONE,current team season and team master inactive
+team,archive,vorstand/no_fussball_vorstand,no,no,player_and_coach,true,true,true,exact_snapshots,core_passed,DONE,existing global module scope
+team,archive,jugendleiter,yes,no,player_and_coach,true,true,true,exact_snapshots,staging_required,PARTIAL,existing youth/team scope
+team,archive,trainer/betreuer/kassierer/gast,not_applicable,no,none,true,true,true,not_applicable,staging_required,DONE,no permission rendered or accepted
+player,archive,superadmin,no,no,current_player_team_seasons,true,true,true,exact_snapshots,core_passed,DONE,player master inactive
+player,archive,vorstand/no_fussball_vorstand,no,no,current_player_team_seasons,true,true,true,exact_snapshots,core_passed,DONE,existing global person scope
+player,archive,jugendleiter,yes,no,current_player_team_seasons,true,true,true,exact_snapshots,staging_required,PARTIAL,existing youth/team scope
+player,archive_with_outstanding_contributions,authorized_role,role_dependent,no,current_player_team_seasons,true,true,true,exact_snapshots,core_passed,DONE,outstanding positions warn but do not block
+player,archive,trainer/betreuer/kassierer/gast,not_applicable,no,none,true,true,true,not_applicable,staging_required,DONE,no added permission

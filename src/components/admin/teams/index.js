@@ -7,6 +7,7 @@ export { default as TeamFilters } from "./components/TeamFilters";
 export { default as TeamEmptyState } from "./components/TeamEmptyState";
 export { default as TeamLogoUpload } from "./components/TeamLogoUpload";
 export { default as TeamStatusBadge } from "./components/TeamStatusBadge";
+export { default as TeamContributionDetailView } from "./components/TeamContributionDetailView";
 export { default as TeamCoachCard } from "./components/TeamCoachCard";
 export { default as TeamTrainingCard } from "./components/TeamTrainingCard";
 export { default as TeamFootballDeCard } from "./components/TeamFootballDeCard";

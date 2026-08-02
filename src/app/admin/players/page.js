@@ -1,15 +1,29 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Can from "@/components/admin/auth/Can";
+import { FormAlert } from "@/components/admin/forms";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
 import { AdminPlayersList, PlayerStats } from "@/components/admin/players";
-import { sortPlayersByIdentity } from "@/components/admin/players/list/playerList.helpers";
+import {
+  getContributionStatusVisibility,
+} from "@/components/admin/contributions/helpers/contributionStatusScope";
+import {
+  buildPlayerContributionStatusMap,
+  getContributionSeasonWarning,
+} from "@/components/admin/contributions/helpers/contributionStatusSummary";
+import { loadContributionStatusRowsByPlayerIds } from "@/components/admin/contributions/repositories/contributionStatus.repository";
+import {
+  filterPlayers,
+  sortPlayersByIdentity,
+} from "@/components/admin/players/list/playerList.helpers";
 import { createPlayerReadDto } from "@/components/admin/persons/playerReadDto";
+import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 import { getPlayerSeasonalReadModelsMap } from "@/components/admin/persons/playerSeasonalReadModelRepository";
 import PlayerNationalityList from "@/components/admin/players/stats/PlayerNationalityList";
 import { getPlayerStats } from "@/components/admin/players/stats/playerStats.helpers";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import {
   canDeletePlayerOnServer,
   canEditPlayerOnServer,
@@ -84,8 +98,8 @@ export default async function AdminPlayersPage({ searchParams }) {
   const playerList = sortPlayersByIdentity(
     playerListRaw
       .filter((player) => {
-      const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
-      return canViewPlayerOnServer(scopeContext, playerTeamIds, teamById);
+        const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
+        return canViewPlayerOnServer(scopeContext, playerTeamIds, teamById);
       })
       .map((player) => {
         const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
@@ -127,12 +141,60 @@ export default async function AdminPlayersPage({ searchParams }) {
       }),
   );
 
-  const stats = getPlayerStats(playerList);
+  const contributionVisibility = getContributionStatusVisibility(scopeContext);
+  const canShowContributionStatus = contributionVisibility !== "none";
+  const contributionAdminClient = canShowContributionStatus
+    ? createSupabaseAdminClient()
+    : null;
+  const currentSeasonResolution = canShowContributionStatus && contributionAdminClient
+    ? await loadCurrentSeasonResolution(contributionAdminClient)
+    : null;
+  const contributionSeasonWarning = getContributionSeasonWarning(
+    currentSeasonResolution,
+  );
+  const contributionRows =
+    canShowContributionStatus &&
+    contributionAdminClient &&
+    currentSeasonResolution?.activeSeasonId
+      ? await loadContributionStatusRowsByPlayerIds(
+          contributionAdminClient,
+          playerList.map((player) => player.id),
+          currentSeasonResolution.activeSeasonId,
+        )
+      : [];
+  const contributionStatusByPlayerId =
+    canShowContributionStatus && currentSeasonResolution?.activeSeasonId
+      ? buildPlayerContributionStatusMap(
+          playerList.map((player) => player.id),
+          currentSeasonResolution.activeSeasonId,
+          contributionRows,
+        )
+      : new Map();
+  const playerListWithContributionStatus = playerList.map((player) => ({
+    ...player,
+    contributionStatus: contributionStatusByPlayerId.get(player.id) || null,
+  }));
+
+  const stats = getPlayerStats(playerListWithContributionStatus);
+  const canFilterByContribution =
+    canShowContributionStatus && !contributionSeasonWarning;
 
   const initialFilters = {
-    statusFilter: params?.status || "all",
+    sortBy: params?.sort || "name_asc",
+    statusFilter: params?.status || "active",
+    teamFilter: params?.team || "all",
+    genderFilter: params?.gender || "all",
     nationalityFilter: params?.nationality || "all",
+    positionFilter: params?.position || "all",
+    captainFilter: params?.captain || "all",
+    contributionFilter: canFilterByContribution
+      ? params?.contribution || "all"
+      : "all",
   };
+  const visiblePlayers = filterPlayers(playerListWithContributionStatus, {
+    ...initialFilters,
+    search: "",
+  });
 
   const showNationalities = params?.view === "nationalities";
 
@@ -163,13 +225,29 @@ export default async function AdminPlayersPage({ searchParams }) {
         inactive={stats.inactive}
         nationalityCount={stats.nationalityCount}
         openContributions={stats.openContributions}
+        nationalities={stats.nationalities}
+        enableContributionFilter={canFilterByContribution}
       />
+
+      {contributionSeasonWarning ? (
+        <FormAlert className="mb-6 border-amber-400/30 bg-amber-500/10 text-amber-50" tone="warning">
+          {contributionSeasonWarning}
+        </FormAlert>
+      ) : null}
 
       {showNationalities && (
         <PlayerNationalityList nationalities={stats.nationalities} />
       )}
 
-      <AdminPlayersList players={playerList} initialFilters={initialFilters} />
+      <AdminPlayersList
+        key={JSON.stringify(initialFilters)}
+        players={visiblePlayers}
+        initialFilters={initialFilters}
+        showContributionStatus={
+          canShowContributionStatus &&
+          !contributionSeasonWarning
+        }
+      />
     </AdminLayout>
   );
 }

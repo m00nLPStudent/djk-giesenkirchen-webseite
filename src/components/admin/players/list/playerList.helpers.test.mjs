@@ -73,6 +73,38 @@ test("filterPlayers matches seasonal team filters and team-name search", () => {
   );
 });
 
+test("filterPlayers can filter by contribution status and overdue state", () => {
+  const contributionPlayers = [
+    {
+      ...players[0],
+      contributionStatus: {
+        status: "partially_paid",
+        isOverdue: false,
+      },
+    },
+    {
+      ...players[1],
+      contributionStatus: {
+        status: "open",
+        isOverdue: true,
+      },
+    },
+  ];
+
+  assert.deepEqual(
+    filterPlayers(contributionPlayers, { contributionFilter: "partially_paid" }).map((player) => player.id),
+    ["player-1"],
+  );
+  assert.deepEqual(
+    filterPlayers(contributionPlayers, { contributionFilter: "overdue" }).map((player) => player.id),
+    ["player-2"],
+  );
+  assert.deepEqual(
+    filterPlayers(contributionPlayers, { contributionFilter: "open_cases" }).map((player) => player.id),
+    ["player-1", "player-2"],
+  );
+});
+
 test("sortPlayersByIdentity uses a stable natural global player order without master sort_order", () => {
   const sorted = sortPlayersByIdentity([
     { id: "player-3", first_name: "Ben", last_name: "Alpha" },

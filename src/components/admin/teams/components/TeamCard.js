@@ -2,7 +2,7 @@
 
 import Can from "@/components/admin/auth/Can";
 import { removeTeamWithScopeAction } from "@/app/admin/teams/actions";
-import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
+import ArchiveButton from "@/components/admin/archiving/ArchiveButton";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
   EntityActionLink,
@@ -91,25 +91,12 @@ export default function TeamCard({ team }) {
         </EntityActionLink>
         {canManageTeam ? (
           <Can permission="teams.delete" uiOnly>
-            <AdminRemoveButton
-              label="Mannschaft"
+            <ArchiveButton
+              entity="team"
               name={team.name_de || "Unbekannte Mannschaft"}
-              action={() => removeTeamWithScopeAction(team.id)}
-              inlineError
-              hint="Teams mit bestehenden Zuordnungen werden nicht endgueltig geloescht, sondern archiviert (is_active = false)."
-              affected={[
-                "Bei unbenutzten Teams: Teamdatensatz und Teambilder",
-                "Bei Teams mit Zuordnungen: Status wird auf inaktiv gesetzt",
-              ]}
-              preserved={[
-                "Spielerprofile",
-                "Trainerprofile",
-                "News-Beitraege",
-                "Saisons",
-                "Termine",
-                "Mitgliedsanfragen",
-                "Abteilungen",
-              ]}
+              action={removeTeamWithScopeAction.bind(null, team.id)}
+              playerAssignments={team.players_count}
+              coachAssignments={team.coaches_count}
             />
           </Can>
         ) : null}

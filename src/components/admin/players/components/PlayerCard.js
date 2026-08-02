@@ -3,8 +3,8 @@
 import Can from "@/components/admin/auth/Can";
 import { getGenderLabel } from "@/constants";
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
-import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
-import { removePlayerRecord } from "@/components/admin/delete/removeActions";
+import ArchiveButton from "@/components/admin/archiving/ArchiveButton";
+import { loadPlayerArchivePreviewAction, removePlayerWithScopeAction } from "@/app/admin/players/actions";
 import EntityBadge from "@/components/admin/ui/EntityBadge";
 import {
   EntityActionLink,
@@ -90,16 +90,11 @@ export default function PlayerCard({ player }) {
         </EntityActionLink>
         <Can permission="players.delete" uiOnly fallback={null}>
           {player._canDeleteInScope === false ? null : (
-            <AdminRemoveButton
-              label="Spieler"
+            <ArchiveButton
+              entity="player"
               name={fullName}
-              action={() => removePlayerRecord(player)}
-              affected={[
-                "Spielerprofil",
-                "Kader-Zuordnungen",
-                "Spielerbild, sofern vorhanden",
-              ]}
-              preserved={["Mannschaften", "Trainer", "News", "Saisons"]}
+              action={removePlayerWithScopeAction.bind(null, player.id)}
+              previewAction={loadPlayerArchivePreviewAction.bind(null, player.id)}
             />
           )}
         </Can>
