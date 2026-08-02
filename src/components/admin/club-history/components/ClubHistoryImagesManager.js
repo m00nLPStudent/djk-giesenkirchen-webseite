@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { InputField, TextareaField } from "@/components/admin/forms";
+import { AdminDangerZone, AdminImagePreview, AdminModuleEmptyState } from "@/components/admin/design-system";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
   createClubHistoryImage,
@@ -114,10 +115,7 @@ export default function ClubHistoryImagesManager({
   return (
     <div className="space-y-6">
       {!pageId && (
-        <div className="rounded-3xl border border-dashed border-white/15 bg-black/20 p-6 text-sm text-white/60">
-          Speichere zuerst die Grunddaten, damit Bilder der Vereinsgeschichte
-          zugeordnet werden können.
-        </div>
+        <AdminModuleEmptyState title="Grunddaten zuerst speichern" description="Speichere zuerst die Grunddaten, damit Bilder der Vereinsgeschichte zugeordnet werden können." />
       )}
 
       <div className="rounded-3xl border border-white/10 bg-black/20 p-6">
@@ -147,9 +145,7 @@ export default function ClubHistoryImagesManager({
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-white/15 bg-black/20 p-8 text-center text-sm text-white/60">
-          Noch keine Bilder hinterlegt.
-        </div>
+        <AdminModuleEmptyState title="Noch keine Bilder hinterlegt" description="Nach dem Speichern der Grunddaten kann das erste Bild hochgeladen werden." />
       ) : (
         <div className="space-y-5">
           {sortByOrder(items).map((item) => {
@@ -162,16 +158,14 @@ export default function ClubHistoryImagesManager({
                 className="rounded-3xl border border-white/10 bg-white/5 p-6"
               >
                 <div className="grid gap-5 lg:grid-cols-[260px_1fr]">
-                  <div className="overflow-hidden rounded-2xl bg-black/30 ring-1 ring-white/10">
-                    <img
-                      src={item.image_url}
-                      alt={item.alt_text_de || "Vereinsgeschichte"}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
+                  <AdminImagePreview
+                    src={item.image_url}
+                    alt={item.alt_text_de || "Vereinsgeschichte"}
+                    fileName={item.caption_de || "Bild der Vereinsgeschichte"}
+                  />
 
                   <div className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div>
                       <InputField
                         label="Alternativtext (DE)"
                         value={item.alt_text_de || ""}
@@ -183,20 +177,9 @@ export default function ClubHistoryImagesManager({
                           )
                         }
                       />
-                      <InputField
-                        label="Alt Text (EN)"
-                        value={item.alt_text_en || ""}
-                        onChange={(event) =>
-                          updateLocalItem(
-                            item.id,
-                            "alt_text_en",
-                            event.target.value,
-                          )
-                        }
-                      />
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div>
                       <TextareaField
                         label="Bildunterschrift (DE)"
                         rows={3}
@@ -205,18 +188,6 @@ export default function ClubHistoryImagesManager({
                           updateLocalItem(
                             item.id,
                             "caption_de",
-                            event.target.value,
-                          )
-                        }
-                      />
-                      <TextareaField
-                        label="Caption (EN)"
-                        rows={3}
-                        value={item.caption_en || ""}
-                        onChange={(event) =>
-                          updateLocalItem(
-                            item.id,
-                            "caption_en",
                             event.target.value,
                           )
                         }
@@ -264,15 +235,12 @@ export default function ClubHistoryImagesManager({
                           {saving ? "Speichert..." : "Bild speichern"}
                         </button>
 
-                        <button
-                          type="button"
-                          onClick={() => void handleDelete(item)}
-                          disabled={saving || deleting}
-                          className="rounded-full border border-red-500/35 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
-                        >
-                          {deleting ? "Löscht..." : "Bild löschen"}
-                        </button>
                       </div>
+                    ) : null}
+                    {canManage ? (
+                      <AdminDangerZone title="Bild dauerhaft löschen" description="Das Bild wird mit der bestehenden Medien-Löschlogik dauerhaft entfernt.">
+                        <button type="button" onClick={() => void handleDelete(item)} disabled={saving || deleting} className="min-h-11 rounded-full border border-red-500/35 px-5 py-2.5 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50">{deleting ? "Löscht..." : "Bild löschen"}</button>
+                      </AdminDangerZone>
                     ) : null}
                   </div>
                 </div>

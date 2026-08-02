@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { InputField, TextareaField } from "@/components/admin/forms";
+import { AdminDangerZone, AdminModuleEmptyState } from "@/components/admin/design-system";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
   createClubHistoryMilestone,
   deleteClubHistoryMilestone,
   updateClubHistoryMilestone,
 } from "../services/clubHistory.service";
-
 function sortMilestones(items) {
   return [...items].sort((a, b) => {
     const yearA = Number(a.milestone_year || 0);
@@ -128,10 +128,7 @@ export default function ClubHistoryMilestonesManager({
   return (
     <div className="space-y-6">
       {!pageId && (
-        <div className="rounded-3xl border border-dashed border-white/15 bg-black/20 p-6 text-sm text-white/60">
-          Speichere zuerst die Grunddaten, damit Meilensteine angelegt werden
-          können.
-        </div>
+        <AdminModuleEmptyState title="Grunddaten zuerst speichern" description="Speichere zuerst die Grunddaten, damit Meilensteine angelegt werden können." />
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-white/10 bg-black/20 p-6">
@@ -157,9 +154,7 @@ export default function ClubHistoryMilestonesManager({
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-white/15 bg-black/20 p-8 text-center text-sm text-white/60">
-          Noch keine Meilensteine hinterlegt.
-        </div>
+        <AdminModuleEmptyState title="Noch keine Meilensteine hinterlegt" description="Ergänze den ersten historischen Zeitraum über die vorhandene Aktion." />
       ) : (
         <div className="space-y-3">
           {sortMilestones(items).map((item) => {
@@ -242,7 +237,7 @@ export default function ClubHistoryMilestonesManager({
                       />
                     </div>
 
-                    <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div className="mt-4">
                       <TextareaField
                         label="Beschreibung (DE)"
                         rows={4}
@@ -256,18 +251,6 @@ export default function ClubHistoryMilestonesManager({
                         }
                       />
 
-                      <TextareaField
-                        label="Description (EN)"
-                        rows={4}
-                        value={item.description_en || ""}
-                        onChange={(event) =>
-                          updateLocalItem(
-                            item.id,
-                            "description_en",
-                            event.target.value,
-                          )
-                        }
-                      />
                     </div>
 
                     <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -297,17 +280,14 @@ export default function ClubHistoryMilestonesManager({
                             {saving ? "Speichert..." : "Meilenstein speichern"}
                           </button>
 
-                          <button
-                            type="button"
-                            onClick={() => void handleDelete(item)}
-                            disabled={saving || deleting}
-                            className="rounded-full border border-red-500/35 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50"
-                          >
-                            {deleting ? "Löscht..." : "Meilenstein löschen"}
-                          </button>
                         </>
                       ) : null}
                     </div>
+                    {canManage ? (
+                      <AdminDangerZone title="Meilenstein dauerhaft löschen" description="Dieser historische Eintrag wird mit der bestehenden Löschfunktion dauerhaft entfernt.">
+                        <button type="button" onClick={() => void handleDelete(item)} disabled={saving || deleting} className="min-h-11 rounded-full border border-red-500/35 px-5 py-2.5 text-sm font-bold text-red-300 transition hover:bg-red-500/10 disabled:opacity-50">{deleting ? "Löscht..." : "Meilenstein löschen"}</button>
+                      </AdminDangerZone>
+                    ) : null}
                   </div>
                 )}
               </article>

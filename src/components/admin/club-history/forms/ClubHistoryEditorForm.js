@@ -130,7 +130,7 @@ export default function ClubHistoryEditorForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+    <form id="club-history-editor" onSubmit={handleSubmit} className="space-y-6">
       <TabNavigation
         tabs={TABS}
         activeTab={activeTab}
@@ -143,48 +143,31 @@ export default function ClubHistoryEditorForm({
           title="Grunddaten"
           description="Pflege Titel, Einleitung und ausführlichen Haupttext der öffentlichen Seite."
         >
-          <FormGrid>
+          <FormGrid columns={1}>
             <InputField
               label="Überschrift (DE)"
               required
               value={form.title_de}
               onChange={(event) => updateField("title_de", event.target.value)}
             />
-            <InputField
-              label="Title (EN)"
-              value={form.title_en}
-              onChange={(event) => updateField("title_en", event.target.value)}
-            />
           </FormGrid>
 
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+          <div className="mt-5">
             <TextareaField
               label="Einleitung / Teaser (DE)"
               rows={4}
               value={form.teaser_de}
               onChange={(event) => updateField("teaser_de", event.target.value)}
             />
-            <TextareaField
-              label="Teaser (EN)"
-              rows={4}
-              value={form.teaser_en}
-              onChange={(event) => updateField("teaser_en", event.target.value)}
-            />
           </div>
 
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+          <div className="mt-5">
             <AdminRichTextEditor
               label="Haupttext (DE)"
               required
               value={form.content_de}
               placeholder="Hier den Haupttext der Vereinsgeschichte schreiben..."
               onChange={(nextValue) => updateField("content_de", nextValue)}
-            />
-            <AdminRichTextEditor
-              label="Content (EN)"
-              value={form.content_en}
-              placeholder="Add the English history content here..."
-              onChange={(nextValue) => updateField("content_en", nextValue)}
             />
           </div>
         </FormSection>
