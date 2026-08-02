@@ -1,49 +1,7 @@
+import Can from "@/components/admin/auth/Can";
+import { AdminActionBar, AdminButton, AdminSectionTitle } from "@/components/admin/design-system";
 import ContactList from "../components/ContactList";
-import ClubContactEditor from "../panels/ClubContactEditor";
 
-export default function ClubContactsTab({
-  contacts,
-  selectedContactId,
-  selectedContact,
-  contactForm,
-  contactLoading,
-  roleTemplates,
-  contactCategoryOptions,
-  placeholderUrl,
-  onSelectContact,
-  onContactSubmit,
-  onContactFieldChange,
-  onContactRoleTemplateChange,
-  onContactImageUpload,
-  onContactImageRemove,
-  onResetContactForm,
-  onDeleteContact,
-  getCategoryLabel,
-}) {
-  return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_1.4fr]">
-      <ContactList
-        contacts={contacts}
-        selectedContactId={selectedContactId}
-        onSelectContact={onSelectContact}
-        getCategoryLabel={getCategoryLabel}
-      />
-
-      <ClubContactEditor
-        selectedContact={selectedContact}
-        contactForm={contactForm}
-        contactLoading={contactLoading}
-        roleTemplates={roleTemplates}
-        contactCategoryOptions={contactCategoryOptions}
-        placeholderUrl={placeholderUrl}
-        onSubmit={onContactSubmit}
-        onFieldChange={onContactFieldChange}
-        onRoleTemplateChange={onContactRoleTemplateChange}
-        onUploadImage={onContactImageUpload}
-        onRemoveImage={onContactImageRemove}
-        onReset={onResetContactForm}
-        onDelete={onDeleteContact}
-      />
-    </div>
-  );
+export default function ClubContactsTab({ contacts, getCategoryLabel }) {
+  return <section className="space-y-5"><AdminSectionTitle eyebrow="Kontakte" title="Allgemeine Kontakte" description="Ansprechpartner, Funktionen und öffentliche Kontaktdaten verwalten." actions={<Can permission="settings.edit" uiOnly><AdminActionBar><AdminButton href="/admin/settings/contacts/new" variant="primary">Neuer Kontakt</AdminButton></AdminActionBar></Can>} /><ContactList contacts={contacts} getCategoryLabel={getCategoryLabel} /></section>;
 }

@@ -20,6 +20,8 @@ export function createContactHandlers({
   setSelectedContactId,
   setContactForm,
   setContactLoading,
+  onSaved,
+  onDeleted,
 }) {
   const updateContactField = createFieldUpdater(setContactForm);
 
@@ -89,7 +91,8 @@ export function createContactHandlers({
 
     selectContact(saved);
     alert("Kontakt gespeichert.");
-    router.refresh();
+    if (onSaved) onSaved(saved);
+    else router.refresh();
   }
 
   async function handleContactDelete() {
@@ -112,7 +115,8 @@ export function createContactHandlers({
     await revalidatePublicContentAction("contacts");
     resetContactForm();
     alert("Kontakt gelöscht.");
-    router.refresh();
+    if (onDeleted) onDeleted();
+    else router.refresh();
   }
 
   return {

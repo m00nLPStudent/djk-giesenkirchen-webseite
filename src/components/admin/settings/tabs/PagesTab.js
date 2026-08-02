@@ -1,39 +1,7 @@
+import Can from "@/components/admin/auth/Can";
+import { AdminActionBar, AdminButton, AdminSectionTitle } from "@/components/admin/design-system";
 import PageList from "../components/PageList";
-import PageEditor from "../panels/PageEditor";
 
-export default function PagesTab({
-  pages,
-  selectedPageId,
-  selectedPage,
-  pageForm,
-  pageLoading,
-  onSelectPage,
-  onPageSubmit,
-  onPageFieldChange,
-  onPageSlugChange,
-  onResetPageForm,
-  onDeletePage,
-  onAutoSlug,
-}) {
-  return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_1.5fr]">
-      <PageList
-        pages={pages}
-        selectedPageId={selectedPageId}
-        onSelectPage={onSelectPage}
-      />
-
-      <PageEditor
-        selectedPage={selectedPage}
-        pageForm={pageForm}
-        pageLoading={pageLoading}
-        onSubmit={onPageSubmit}
-        onFieldChange={onPageFieldChange}
-        onSlugChange={onPageSlugChange}
-        onReset={onResetPageForm}
-        onDelete={onDeletePage}
-        onAutoSlug={onAutoSlug}
-      />
-    </div>
-  );
+export default function PagesTab({ pages }) {
+  return <section className="space-y-5"><AdminSectionTitle eyebrow="CMS" title="Statische Seiten" description="Deutsche Inhalte, Sichtbarkeit und Sortierung verwalten." actions={<Can permission="settings.edit" uiOnly><AdminActionBar><AdminButton href="/admin/settings/pages/new" variant="primary">Neue Seite</AdminButton></AdminActionBar></Can>} /><PageList pages={pages} /></section>;
 }

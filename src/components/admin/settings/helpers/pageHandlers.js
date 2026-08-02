@@ -13,6 +13,8 @@ export function createPageHandlers({
   setSelectedPageId,
   setPageForm,
   setPageLoading,
+  onSaved,
+  onDeleted,
 }) {
   const updatePageField = createFieldUpdater(setPageForm);
 
@@ -74,7 +76,8 @@ export function createPageHandlers({
 
     selectPage(saved);
     alert("Seite gespeichert.");
-    router.refresh();
+    if (onSaved) onSaved(saved);
+    else router.refresh();
   }
 
   async function handlePageDelete() {
@@ -97,7 +100,8 @@ export function createPageHandlers({
     await revalidatePublicContentAction("pages/settings");
     resetPageForm();
     alert("Seite gelöscht.");
-    router.refresh();
+    if (onDeleted) onDeleted();
+    else router.refresh();
   }
 
   return {

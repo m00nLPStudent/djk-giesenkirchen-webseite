@@ -1,49 +1,10 @@
-import { FormSection } from "@/components/admin/forms";
-import EntityBadge, {
-  EntityStatusBadge,
-} from "@/components/admin/ui/EntityBadge";
-import SettingsSelectionList from "./SettingsSelectionList";
+import { AdminListChevron, AdminListHeader, AdminListMobileCard, AdminListRow, AdminModuleCards, AdminModuleEmptyState, AdminModuleList, AdminStatusChip } from "@/components/admin/design-system";
 
-export default function PageList({ pages, selectedPageId, onSelectPage }) {
-  return (
-    <FormSection
-      eyebrow="Seiten"
-      title="Statische Seiten"
-      description="Impressum, Datenschutz und weitere CMS-Seiten verwalten."
-    >
-      <SettingsSelectionList
-        items={pages}
-        emptyText="Noch keine Seiten angelegt."
-        renderItem={(page) => {
-          const active = selectedPageId === page.id;
-          return (
-            <button
-              key={page.id}
-              type="button"
-              onClick={() => onSelectPage(page)}
-              className={`w-full rounded-2xl border p-4 text-left transition ${active ? "border-red-500/70 bg-red-600/10" : "border-white/10 bg-black/20 hover:border-red-500/40"}`}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <EntityStatusBadge
-                  active={page.is_published}
-                  activeLabel="Veröffentlicht"
-                  inactiveLabel="Entwurf"
-                />
-                <EntityBadge variant={page.show_in_footer ? "blue" : "neutral"}>
-                  {page.show_in_footer ? "Im Footer" : "Nicht im Footer"}
-                </EntityBadge>
-              </div>
-              <p className="mt-3 text-lg font-black">
-                {page.title_de || page.slug}
-              </p>
-              <p className="mt-1 text-sm text-white/60">/{page.slug}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/40">
-                Sortierung {page.sort_order || 0}
-              </p>
-            </button>
-          );
-        }}
-      />
-    </FormSection>
-  );
+const template = "minmax(0,1.4fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,.9fr) minmax(0,.55fr) 2rem";
+const columns = ["Titel", "Slug", "Status", "Footer", "Sortierung", ""].map((label) => ({ key: label || "overview", label }));
+
+export default function PageList({ pages }) {
+  if (!pages.length) return <AdminModuleEmptyState title="Keine Seiten" description="Es wurden noch keine statischen Seiten angelegt." />;
+  const cards = <AdminModuleCards className="xl:hidden">{pages.map((page) => <AdminListMobileCard key={page.id} href={`/admin/settings/pages/edit/${page.id}`} label={`${page.title_de || page.slug} bearbeiten`}><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="break-words font-black text-white">{page.title_de || page.slug}</p><p className="mt-1 break-all text-sm text-white/55">/{page.slug}</p></div><AdminListChevron label="Seite öffnen" /></div><div className="mt-3 flex flex-wrap gap-2"><AdminStatusChip compact variant={page.is_published ? "success" : "warning"}>{page.is_published ? "Veröffentlicht" : "Entwurf"}</AdminStatusChip><AdminStatusChip compact variant={page.show_in_footer ? "info" : "neutral"}>{page.show_in_footer ? "Im Footer" : "Nicht im Footer"}</AdminStatusChip></div></AdminListMobileCard>)}</AdminModuleCards>;
+  return <AdminModuleList mobile={cards} desktopClassName="hidden overflow-hidden xl:block"><AdminListHeader columns={columns} template={template} />{pages.map((page) => <AdminListRow key={page.id} href={`/admin/settings/pages/edit/${page.id}`} label={`${page.title_de || page.slug} bearbeiten`} template={template}><span className="min-w-0 break-words font-bold text-white">{page.title_de || page.slug}</span><span className="min-w-0 break-all text-white/60">/{page.slug}</span><AdminStatusChip compact variant={page.is_published ? "success" : "warning"}>{page.is_published ? "Veröffentlicht" : "Entwurf"}</AdminStatusChip><span className="text-white/60">{page.show_in_footer ? "Sichtbar" : "Ausgeblendet"}</span><span className="text-white/60">{page.sort_order || 0}</span><AdminListChevron label="Seite öffnen" /></AdminListRow>)}</AdminModuleList>;
 }

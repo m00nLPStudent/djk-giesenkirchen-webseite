@@ -7,19 +7,20 @@ export default function AdminImageUpload({
   removeLabel = "Eigenes Bild entfernen",
   onUpload,
   onRemove,
+  showPreview = true,
 }) {
   const previewUrl = imageUrl || placeholderUrl;
   const isPlaceholder = previewUrl === placeholderUrl;
 
   return (
-    <div className="grid gap-6 md:grid-cols-[180px_1fr] md:items-center">
-      <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl bg-black/20 ring-1 ring-white/10">
+    <div className={showPreview ? "grid gap-6 md:grid-cols-[180px_1fr] md:items-center" : "space-y-3"}>
+      {showPreview ? <div className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl bg-black/20 ring-1 ring-white/10">
         {previewUrl ? (
           <img src={previewUrl} alt={alt} className="h-full w-full object-cover" />
         ) : (
           <span className="text-sm text-white/40">Kein Bild</span>
         )}
-      </div>
+      </div> : null}
 
       <div>
         <p className="text-sm leading-6 text-white/50">{description}</p>

@@ -1,173 +1,20 @@
-import {
-  FormGrid,
-  FormSection,
-  InputField,
-  SelectField,
-} from "@/components/admin/forms";
+import { InputField, SelectField } from "@/components/admin/forms";
 import Can from "@/components/admin/auth/Can";
+import CoachAvatar from "@/components/admin/coaches/components/CoachAvatar";
 import { AdminImageUpload } from "@/components/admin/media";
-import { AdminDangerZone } from "@/components/admin/design-system";
+import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminDetailLayout, AdminImagePreview, AdminInformationRow, AdminInformationSection, AdminStatusChip } from "@/components/admin/design-system";
 
-export default function ContactForm({
-  selectedContact,
-  contactForm,
-  contactLoading,
-  roleTemplates,
-  contactCategoryOptions,
-  placeholderUrl,
-  onSubmit,
-  onFieldChange,
-  onRoleTemplateChange,
-  onUploadImage,
-  onRemoveImage,
-  onReset,
-  onDelete,
-}) {
-  return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <FormSection
-        eyebrow="Kontakt"
-        title={selectedContact ? "Kontakt bearbeiten" : "Neuer Kontakt"}
-        description="Allgemeine Ansprechpartner wie Jugendschutz, Platzwart, Webmaster oder Presse."
-      >
-        <FormGrid>
-          <SelectField
-            label="Kategorie"
-            required
-            value={contactForm.category}
-            onChange={(event) => onFieldChange("category", event.target.value)}
-          >
-            {contactCategoryOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </SelectField>
-          <SelectField
-            label="Rollen-Vorlage"
-            required
-            value={contactForm.role_template}
-            onChange={(event) => onRoleTemplateChange(event.target.value)}
-          >
-            {roleTemplates.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.value === "sonstiges" ? "Sonstiges" : option.role_de}
-              </option>
-            ))}
-          </SelectField>
-          <InputField
-            label="Rolle (DE)"
-            required
-            value={contactForm.role_de}
-            onChange={(event) => onFieldChange("role_de", event.target.value)}
-          />
-          <InputField
-            label="Rolle (EN)"
-            value={contactForm.role_en}
-            onChange={(event) => onFieldChange("role_en", event.target.value)}
-          />
-          <InputField
-            label="Name"
-            required
-            value={contactForm.contact_name}
-            onChange={(event) =>
-              onFieldChange("contact_name", event.target.value)
-            }
-          />
-          <InputField
-            label="E-Mail"
-            type="email"
-            value={contactForm.email}
-            onChange={(event) => onFieldChange("email", event.target.value)}
-          />
-          <InputField
-            label="Telefon"
-            value={contactForm.phone}
-            onChange={(event) => onFieldChange("phone", event.target.value)}
-          />
-          <InputField
-            label="Sortierung"
-            type="number"
-            value={contactForm.sort_order}
-            onChange={(event) =>
-              onFieldChange("sort_order", Number(event.target.value || 0))
-            }
-          />
-        </FormGrid>
+const fieldClass = "h-11";
+const Fields = ({ children }) => <div className="grid gap-4 xl:grid-cols-2">{children}</div>;
 
-        {contactForm.role_template === "sonstiges" && (
-          <p className="mt-4 text-sm text-white/55">
-            Für Sonstiges kannst du die Rolle frei über die Felder Rolle (DE/EN)
-            definieren.
-          </p>
-        )}
-
-        <div className="mt-5">
-          <AdminImageUpload
-            imageUrl={contactForm.image_url}
-            placeholderUrl={placeholderUrl}
-            alt="Kontaktbild"
-            description="Kontaktbild für die interne Verwaltung und spätere öffentliche Kontaktdarstellung."
-            uploadLabel="Bild auswählen"
-            removeLabel="Bild entfernen"
-            onUpload={onUploadImage}
-            onRemove={onRemoveImage}
-          />
-        </div>
-
-        <div className="mt-5 grid gap-3 md:grid-cols-2">
-          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-white/75">
-            <input
-              type="checkbox"
-              checked={contactForm.is_public}
-              onChange={(event) =>
-                onFieldChange("is_public", event.target.checked)
-              }
-            />
-            Öffentlich anzeigen
-          </label>
-          <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 py-4 text-sm text-white/75">
-            <input
-              type="checkbox"
-              checked={contactForm.is_active}
-              onChange={(event) =>
-                onFieldChange("is_active", event.target.checked)
-              }
-            />
-            Aktiv
-          </label>
-        </div>
-      </FormSection>
-
-      <Can permission="settings.edit" uiOnly>
-        <div className="flex flex-wrap justify-end gap-3">
-          <button
-            type="button"
-            onClick={onReset}
-            className="rounded-full border border-white/10 px-6 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:text-white"
-          >
-            Neuer Kontakt
-          </button>
-          {selectedContact && (
-            <AdminDangerZone title="Kontakt löschen" description="Der bestehende Kontakt wird dauerhaft entfernt.">
-            <button
-              type="button"
-              onClick={onDelete}
-              className="rounded-full border border-red-500/60 px-6 py-3 text-sm font-bold text-red-300 transition hover:bg-red-600 hover:text-white"
-            >
-              Kontakt löschen
-            </button>
-            </AdminDangerZone>
-          )}
-          <button
-            type="submit"
-            disabled={contactLoading}
-            className="rounded-full bg-red-600 px-8 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:opacity-50"
-          >
-            {contactLoading ? "Speichert..." : "Kontakt speichern"}
-          </button>
-        </div>
-      </Can>
-    </form>
-  );
+export default function ContactForm({ selectedContact, contactForm: form, contactLoading: loading, roleTemplates, contactCategoryOptions, placeholderUrl, onSubmit, onFieldChange, onRoleTemplateChange, onUploadImage, onRemoveImage, onReset, onDelete }) {
+  const title = selectedContact ? (form.contact_name || form.role_de || "Kontakt bearbeiten") : "Neuer Kontakt";
+  return <form onSubmit={onSubmit} className="min-w-0">
+    <AdminDetailLayout header={<AdminDetailHeader backHref="/admin/settings?tab=contacts" backLabel="Zurück zu Kontakte" backVariant="pill" eyebrow="Allgemeiner Kontakt" title={title} leading={<CoachAvatar coach={{ displayName: title, imageUrl: form.image_url }} sizeClassName="h-16 w-16" />} status={<div className="flex flex-wrap gap-2"><AdminStatusChip variant={form.is_active ? "success" : "warning"}>{form.is_active ? "Aktiv" : "Inaktiv"}</AdminStatusChip><AdminStatusChip variant={form.is_public ? "info" : "neutral"}>{form.is_public ? "Öffentlich" : "Intern"}</AdminStatusChip></div>} meta={form.role_de || "Funktion noch nicht festgelegt"} />} dangerZone={selectedContact ? <Can permission="settings.edit" uiOnly><AdminDangerZone title="Kontakt löschen" description="Der bestehende Kontakt wird dauerhaft entfernt."><AdminButton variant="danger" onClick={onDelete}>Kontakt löschen</AdminButton></AdminDangerZone></Can> : null}>
+      <AdminInformationSection title="Funktion und Zuordnung"><AdminInformationRow label="Einordnung"><Fields><SelectField label="Kategorie" required value={form.category} onChange={(event) => onFieldChange("category", event.target.value)} className={fieldClass}>{contactCategoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</SelectField><SelectField label="Rollen-Vorlage" required value={form.role_template} onChange={(event) => onRoleTemplateChange(event.target.value)} className={fieldClass}>{roleTemplates.map((option) => <option key={option.value} value={option.value}>{option.value === "sonstiges" ? "Sonstiges" : option.role_de}</option>)}</SelectField><InputField label="Rolle (DE)" required value={form.role_de} onChange={(event) => onFieldChange("role_de", event.target.value)} className={fieldClass} /><InputField label="Rolle (EN)" value={form.role_en} onChange={(event) => onFieldChange("role_en", event.target.value)} className={fieldClass} /></Fields></AdminInformationRow></AdminInformationSection>
+      <AdminInformationSection title="Kontaktdaten"><AdminInformationRow label="Person"><Fields><InputField label="Name" required value={form.contact_name} onChange={(event) => onFieldChange("contact_name", event.target.value)} className={fieldClass} /><InputField label="Sortierung" type="number" value={form.sort_order} onChange={(event) => onFieldChange("sort_order", Number(event.target.value || 0))} className={fieldClass} /><InputField label="E-Mail" type="email" value={form.email} onChange={(event) => onFieldChange("email", event.target.value)} className={fieldClass} /><InputField label="Telefon" value={form.phone} onChange={(event) => onFieldChange("phone", event.target.value)} className={fieldClass} /></Fields></AdminInformationRow><AdminInformationRow label="Sichtbarkeit"><div className="grid gap-3 sm:grid-cols-2"><label className="flex min-h-11 items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white/75"><input type="checkbox" checked={form.is_public} onChange={(event) => onFieldChange("is_public", event.target.checked)} />Öffentlich anzeigen</label><label className="flex min-h-11 items-center gap-3 rounded-2xl border border-white/10 bg-black/20 px-4 text-sm text-white/75"><input type="checkbox" checked={form.is_active} onChange={(event) => onFieldChange("is_active", event.target.checked)} />Aktiv</label></div></AdminInformationRow></AdminInformationSection>
+      <AdminInformationSection title="Kontaktbild"><AdminInformationRow label="Vorschau"><div className="max-w-xs"><AdminImagePreview src={form.image_url || placeholderUrl} alt={`Kontaktbild von ${form.contact_name || form.role_de || "Kontakt"}`} fileName={form.contact_name || "Kontaktbild"} /></div></AdminInformationRow><AdminInformationRow label="Bild verwalten"><AdminImageUpload imageUrl={form.image_url} placeholderUrl={placeholderUrl} alt="Kontaktbild" description="Kontaktbild für die interne Verwaltung und öffentliche Kontaktdarstellung." uploadLabel="Bild auswählen" removeLabel="Bild entfernen" onUpload={onUploadImage} onRemove={onRemoveImage} showPreview={false} /></AdminInformationRow></AdminInformationSection>
+      <Can permission="settings.edit" uiOnly><AdminActionBar className="justify-end"><AdminButton onClick={onReset}>Neuer Kontakt</AdminButton><AdminButton type="submit" variant="primary" disabled={loading}>{loading ? "Speichert..." : "Kontakt speichern"}</AdminButton></AdminActionBar></Can>
+    </AdminDetailLayout>
+  </form>;
 }

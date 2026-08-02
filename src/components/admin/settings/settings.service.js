@@ -141,9 +141,7 @@ export function normalizePagePayload(form = {}) {
       .trim()
       .toLowerCase(),
     title_de: String(form.title_de || "").trim(),
-    title_en: normalizeText(form.title_en),
     content_de: form.content_de || "",
-    content_en: form.content_en || "",
     is_published: Boolean(form.is_published),
     show_in_footer: Boolean(form.show_in_footer),
     sort_order: Number(form.sort_order || 0),

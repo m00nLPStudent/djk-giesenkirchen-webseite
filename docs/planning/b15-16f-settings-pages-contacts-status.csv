@@ -1,0 +1,7 @@
+surface,old_behavior,new_behavior,route,permission,scope,desktop,mobile,test_status,status,notes
+pages_overview,master-detail,list-only,/admin/settings?tab=pages,settings.view,unchanged,table,cards,PASS,DONE,No editor in overview
+page_create,embedded form,standalone form,/admin/settings/pages/new,settings.view plus existing edit gate,unchanged,single detail,single detail,PASS,DONE,German fields only
+page_edit,embedded form,standalone form,/admin/settings/pages/edit/[id],settings.view plus existing edit gate,unchanged,single detail,single detail,PASS,DONE,English writes omitted
+contacts_overview,master-detail,list-only,/admin/settings?tab=contacts,settings.view,unchanged,table,cards,PASS,DONE,Avatar and contact columns
+contact_create,embedded form,standalone form,/admin/settings/contacts/new,settings.view plus existing edit gate,unchanged,single detail,single detail,PASS,DONE,Existing upload reused
+contact_edit,embedded form,standalone form,/admin/settings/contacts/edit/[id],settings.view plus existing edit gate,unchanged,single detail,single detail,PASS,DONE,Danger zone retained

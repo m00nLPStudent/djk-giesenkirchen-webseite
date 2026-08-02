@@ -43,3 +43,28 @@ test("settings keeps its guard and no longer loads membership data", () => {
   assert.doesNotMatch(page, /membership_requests|membership_request_recipients/);
   assert.match(page, /Promise\.all/);
 });
+
+test("club data colors and social links use compact shared detail sections", () => {
+  const source = read("./panels/ClubSettingsPanel.js");
+  for (const component of ["AdminDetailLayout", "AdminDetailHeader", "AdminInformationSection", "AdminInformationRow", "AdminActionBar", "AdminButton"]) assert.match(source, new RegExp(component));
+  for (const field of ["club_name", "color_primary", "color_secondary", "color_accent", "website_url", "social_facebook", "social_instagram", "social_youtube", "social_tiktok"]) assert.match(source, new RegExp(field));
+  assert.match(source, /xl:grid-cols-2/);
+  assert.doesNotMatch(source, /FormSection|columns=\{3\}/);
+});
+
+test("contacts use responsive shared lists and standalone editor routes", () => {
+  const list = read("./components/ContactList.js");
+  const tab = read("./tabs/ClubContactsTab.js");
+  for (const component of ["AdminModuleList", "AdminModuleCards", "AdminListHeader", "AdminListRow", "AdminListMobileCard", "AdminListChevron", "AdminModuleEmptyState", "AdminStatusChip"]) assert.match(list, new RegExp(component));
+  assert.match(tab, /\/admin\/settings\/contacts\/new/);
+  assert.doesNotMatch(tab, /ClubContactEditor|ContactForm|grid-cols/);
+  assert.match(list, /\/admin\/settings\/contacts\/edit\/\$\{contact\.id\}/);
+});
+
+test("contact detail uses shared information image action and danger primitives", () => {
+  const source = read("./components/ContactForm.js");
+  for (const component of ["AdminDetailLayout", "AdminDetailHeader", "AdminInformationSection", "AdminInformationRow", "AdminImagePreview", "AdminActionBar", "AdminButton", "AdminDangerZone", "AdminStatusChip"]) assert.match(source, new RegExp(component));
+  assert.match(source, /xl:grid-cols-2/);
+  assert.match(source, /showPreview=\{false\}/);
+  assert.doesNotMatch(source, /FormSection/);
+});

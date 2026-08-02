@@ -1,51 +1,12 @@
-import { FormSection } from "@/components/admin/forms";
-import EntityBadge, {
-  EntityStatusBadge,
-} from "@/components/admin/ui/EntityBadge";
-import SettingsSelectionList from "./SettingsSelectionList";
+import { AdminListChevron, AdminListHeader, AdminListMobileCard, AdminListRow, AdminModuleCards, AdminModuleEmptyState, AdminModuleList, AdminStatusChip } from "@/components/admin/design-system";
+import CoachAvatar from "@/components/admin/coaches/components/CoachAvatar";
 
-export default function ContactList({
-  contacts,
-  selectedContactId,
-  onSelectContact,
-  getCategoryLabel,
-}) {
-  return (
-    <FormSection
-      eyebrow="Kontakte"
-      title="Vorhandene Kontakte"
-      description="Wähle einen Eintrag zum Bearbeiten oder lege einen neuen Kontakt an."
-    >
-      <SettingsSelectionList
-        items={contacts}
-        emptyText="Noch keine allgemeinen Kontakte angelegt."
-        renderItem={(contact) => {
-          const active = selectedContactId === contact.id;
-          return (
-            <button
-              key={contact.id}
-              type="button"
-              onClick={() => onSelectContact(contact)}
-              className={`w-full rounded-2xl border p-4 text-left transition ${active ? "border-red-500/70 bg-red-600/10" : "border-white/10 bg-black/20 hover:border-red-500/40"}`}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <EntityStatusBadge active={contact.is_active} />
-                <EntityBadge variant={contact.is_public ? "blue" : "neutral"}>
-                  {contact.is_public ? "Öffentlich" : "Intern"}
-                </EntityBadge>
-              </div>
-              <p className="mt-3 text-lg font-black">{contact.role_de}</p>
-              <p className="mt-1 text-sm text-white/60">
-                {contact.contact_name}
-              </p>
-              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/40">
-                {getCategoryLabel(contact.category)} · Sortierung{" "}
-                {contact.sort_order || 0}
-              </p>
-            </button>
-          );
-        }}
-      />
-    </FormSection>
-  );
+const avatar = (contact) => <CoachAvatar coach={{ displayName: contact.contact_name || contact.role_de || "Kontakt", imageUrl: contact.image_url }} sizeClassName="h-10 w-10" />;
+
+export default function ContactList({ contacts, getCategoryLabel }) {
+  if (!contacts.length) return <AdminModuleEmptyState title="Keine Kontakte" description="Es wurden noch keine allgemeinen Kontakte angelegt." />;
+  const cards = <AdminModuleCards className="xl:hidden">{contacts.map((contact) => <AdminListMobileCard key={contact.id} href={`/admin/settings/contacts/edit/${contact.id}`} label={`${contact.role_de || contact.contact_name} bearbeiten`}><div className="flex items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3">{avatar(contact)}<div className="min-w-0"><p className="break-words font-black text-white">{contact.contact_name || "Name nicht hinterlegt"}</p><p className="mt-1 break-words text-sm text-white/60">{contact.role_de || "Funktion offen"}</p></div></div><AdminListChevron label="Kontakt öffnen" /></div><div className="mt-3 flex flex-wrap gap-2"><AdminStatusChip compact variant={contact.is_active ? "success" : "warning"}>{contact.is_active ? "Aktiv" : "Inaktiv"}</AdminStatusChip></div></AdminListMobileCard>)}</AdminModuleCards>;
+  const contactTemplate = "3rem minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,.7fr) 2rem";
+  const contactColumns = ["Bild", "Name", "Funktion", "E-Mail", "Telefon", "Status", ""].map((label) => ({ key: label || "overview", label }));
+  return <AdminModuleList mobile={cards} desktopClassName="hidden overflow-hidden xl:block"><AdminListHeader columns={contactColumns} template={contactTemplate} />{contacts.map((contact) => <AdminListRow key={contact.id} href={`/admin/settings/contacts/edit/${contact.id}`} label={`${contact.role_de || contact.contact_name} bearbeiten`} template={contactTemplate}>{avatar(contact)}<span className="min-w-0 break-words font-bold text-white">{contact.contact_name || "–"}</span><span className="min-w-0 break-words text-white/65">{contact.role_de || "–"}</span><span className="min-w-0 break-all text-white/60">{contact.email || "–"}</span><span className="text-white/60">{contact.phone || "–"}</span><AdminStatusChip compact variant={contact.is_active ? "success" : "warning"}>{contact.is_active ? "Aktiv" : "Inaktiv"}</AdminStatusChip><AdminListChevron label="Kontakt öffnen" /></AdminListRow>)}</AdminModuleList>;
 }
