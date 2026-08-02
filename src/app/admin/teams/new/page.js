@@ -10,6 +10,7 @@ import { loadTeamEditPlayerOptions } from "@/components/admin/teams/teamEditPlay
 import { isYouthTeam } from "@/components/admin/teams/teamScope";
 import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { loadTeamTypes } from "@/components/admin/settings/team-types/teamTypes.repository";
 import { redirect } from "next/navigation";
 
 export default async function NewTeamPage() {
@@ -42,11 +43,7 @@ export default async function NewTeamPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  const { data: teamTemplates } = await supabaseServer
-    .from("team_templates")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+  const { data: teamTemplates } = await loadTeamTypes(supabaseServer, { activeOnly: true });
 
   const filteredTeamTemplates = canReachTeamCreateOnServer(scopeContext)
     ? (teamTemplates || []).filter((template) => {

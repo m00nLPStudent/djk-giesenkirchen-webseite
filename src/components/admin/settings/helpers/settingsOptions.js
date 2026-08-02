@@ -2,6 +2,7 @@ export const SETTINGS_TABS = [
   { id: "club", label: "Vereinsdaten" },
   { id: "contacts", label: "Allgemeine Kontakte" },
   { id: "pages", label: "Seiten" },
+  { id: "team-types", label: "Mannschaftsvorlagen", href: "/admin/settings/team-types", permission: "settings.edit" },
 ];
 
 export const MEMBERSHIP_SUBVIEWS = [

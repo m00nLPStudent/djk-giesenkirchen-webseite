@@ -1,0 +1,8 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import test from "node:test";
+const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+test("team type overview uses shared module list summary filters and routes", () => { const source = read("./TeamTypesModule.js"); for (const component of ["AdminModuleHeader", "AdminModuleSummary", "AdminMetric", "AdminModuleFilters", "AdminModuleList", "AdminModuleCards", "AdminStatusChip", "AdminModuleEmptyState"]) assert.match(source, new RegExp(component)); assert.match(source, /team-types\/new/); assert.match(source, /team-types\/edit/); });
+test("team type editor uses existing fields and guarded danger zone", () => { const source = read("./TeamTypeEditor.js"); for (const field of ["name_de", "slug", "age_group", "sort_order", "is_active"]) assert.match(source, new RegExp(field)); assert.match(source, /AdminDangerZone/); assert.match(source, /wird bereits verwendet und kann nicht gelöscht werden/); assert.doesNotMatch(source, /name_en|Sportart|Geschlecht|Farbe/); });
+test("all team type routes require settings edit and team creation shares repository", () => { for (const path of ["../../../../app/admin/settings/team-types/page.js", "../../../../app/admin/settings/team-types/new/page.js", "../../../../app/admin/settings/team-types/edit/[id]/page.js"]) assert.match(read(path), /requiredPermission: "settings\.edit"/); assert.match(read("../../../../app/admin/teams/new/page.js"), /loadTeamTypes/); });
+test("delete service rechecks usage before hard delete", () => { const source = read("./teamTypes.service.js"); assert.ok(source.indexOf("isTeamTypeUsed") < source.indexOf('.from("team_templates").delete()')); });
