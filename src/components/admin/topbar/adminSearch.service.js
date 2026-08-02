@@ -6,6 +6,8 @@ import {
   buildPlayerAssignments,
 } from "@/components/admin/persons/seasonalReadModelCore.mjs";
 import { supabase } from "@/lib/supabase";
+import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
+import { resolveNewsCategoryLabel } from "@/components/admin/news/helpers/newsCategories.core";
 
 function normalize(value) {
   if (value === null || value === undefined) return "";
@@ -174,9 +176,10 @@ export async function searchAdminEntities(query) {
   const search = normalize(query);
   if (search.length < 2) return [];
 
-  const [news, teams, players, coaches, sponsors, boardMembers] =
+  const [news, newsCategories, teams, players, coaches, sponsors, boardMembers] =
     await Promise.all([
-      supabase.from("news").select("id, title_de, category").limit(20),
+      supabase.from("news").select("id, title_de, category_key").limit(20),
+      loadNewsCategories(supabase),
       supabase.from("teams").select("id, name_de, age_group").limit(20),
       supabase
         .from("players")
@@ -196,17 +199,18 @@ export async function searchAdminEntities(query) {
   const results = [];
   const playerDtos = await loadPlayerSearchDtos(players.data || []);
   const coachDtos = await loadCoachSearchDtos(coaches.data || []);
+  const categoryLabel = (item) => resolveNewsCategoryLabel(newsCategories.data || [], item.category_key);
 
   (news.data || [])
     .filter(
-      (item) => matches(item.title_de, search) || matches(item.category, search),
+      (item) => matches(item.title_de, search) || matches(categoryLabel(item), search),
     )
     .forEach((item) =>
       results.push(
         mapResult({
           type: "News",
           title: item.title_de || "Ohne Titel",
-          subtitle: item.category || "News",
+          subtitle: categoryLabel(item),
           href: `/admin/news/edit/${item.id}`,
         }),
       ),

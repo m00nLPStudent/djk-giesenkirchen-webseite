@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
+import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
+import { createPublicNewsCardDto } from "@/components/admin/news/helpers/newsCategories.core";
 import { HomeEventsSection } from "@/components/website/events";
 import {
   expandRecurringEvents,
@@ -8,6 +10,7 @@ import {
 } from "@/lib/events";
 
 export default async function Home() {
+  const { data: categories } = await loadNewsCategories(supabase, { activeOnly: false });
   const { data: latestNews } = await supabase
     .from("news")
     .select("*, football_team:football_team_id(name_de)")
@@ -16,8 +19,9 @@ export default async function Home() {
     .order("published_at", { ascending: false })
     .limit(4);
 
-  const featuredNews = latestNews?.[0];
-  const secondaryNews = latestNews?.slice(1, 4) || [];
+  const newsCards = (latestNews || []).map((item) => createPublicNewsCardDto(item, categories || []));
+  const featuredNews = newsCards[0];
+  const secondaryNews = newsCards.slice(1, 4);
 
   const { data: publishedEvents } = await supabase
     .from("events")

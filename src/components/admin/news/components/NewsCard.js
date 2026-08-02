@@ -1,9 +1,4 @@
 import NewsStatusBadge from "./NewsStatusBadge";
-import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
+import { getNewsCategoryDisplay } from "@/components/admin/news/helpers/newsCategories.core";
 import { AdminListChevron, AdminListMobileCard } from "@/components/admin/design-system";
-
-export default function NewsCard({ item, href = null }) {
-  return (
-    <AdminListMobileCard href={href} label={href ? `News ${item.title_de} bearbeiten` : undefined}><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="font-black text-white">{item.title_de}</p><p className="mt-1 text-sm text-white/55">{getNewsCategoryDisplay(item)}</p></div>{href ? <AdminListChevron label={`News ${item.title_de} bearbeiten`} /> : null}</div><div className="mt-3 flex flex-wrap items-center gap-2"><NewsStatusBadge isPublished={item.is_published} publishedAt={item.published_at} /><span className="text-sm text-white/50">{item.published_at ? new Date(item.published_at).toLocaleString("de-DE") : "Kein Veröffentlichungsdatum"}</span></div></AdminListMobileCard>
-  );
-}
+export default function NewsCard({ item, categories = [], href = null }) { return <AdminListMobileCard href={href} label={href ? `News ${item.title_de} bearbeiten` : undefined}><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="font-black text-white">{item.title_de}</p><p className="mt-1 text-sm text-white/55">{getNewsCategoryDisplay(item, categories)}</p></div>{href ? <AdminListChevron label={`News ${item.title_de} bearbeiten`} /> : null}</div><div className="mt-3 flex flex-wrap items-center gap-2"><NewsStatusBadge isPublished={item.is_published} publishedAt={item.published_at} /><span className="text-sm text-white/50">{item.published_at ? new Date(item.published_at).toLocaleString("de-DE") : "Kein Veröffentlichungsdatum"}</span></div></AdminListMobileCard>; }

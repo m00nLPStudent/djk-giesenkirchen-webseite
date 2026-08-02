@@ -1,0 +1,1 @@
+export function loadNewsCategories(db, { activeOnly = true } = {}) { let query = db.from("news_categories").select("id, name_de, name_en, slug, is_active, sort_order").order("sort_order", { ascending: true }); if (activeOnly) query = query.eq("is_active", true); return query; }

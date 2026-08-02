@@ -5,6 +5,8 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import { loadAdminProfileScopeContext } from "@/lib/admin-auth/scopes";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { loadContributionStats } from "@/components/admin/contributions/services/contributionStats.service";
+import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
+import { resolveNewsCategoryLabel } from "@/components/admin/news/helpers/newsCategories.core";
 import { ADMIN_NAVIGATION_SECTIONS } from "@/components/admin/navigation/adminNavigation.config";
 import { resolveAdminNavigation } from "@/components/admin/navigation/adminNavigation.resolver";
 import {
@@ -34,10 +36,11 @@ async function loadEvents(db, nowIso, canEdit) {
 }
 
 async function loadNews(db, canEdit) {
-  const { data } = await db.from("news")
-    .select("id, title_de, is_published, published_at, created_at")
-    .order("created_at", { ascending: false }).limit(5);
-  return (data || []).map((item) => ({ id: item.id, title: item.title_de || "Unbenannte News", status: item.is_published ? "Veröffentlicht" : "Entwurf", publishedAt: item.published_at || item.created_at, updatedAt: item.created_at, href: canEdit ? `/admin/news/edit/${item.id}` : "/admin/news" }));
+  const [{ data }, { data: categories }] = await Promise.all([
+    db.from("news").select("id, title_de, category_key, is_published, published_at, created_at").order("created_at", { ascending: false }).limit(5),
+    loadNewsCategories(db, { activeOnly: false }),
+  ]);
+  return (data || []).map((item) => ({ id: item.id, title: item.title_de || "Unbenannte News", categoryKey: item.category_key, categoryLabel: resolveNewsCategoryLabel(categories || [], item.category_key), status: item.is_published ? "Veröffentlicht" : "Entwurf", publishedAt: item.published_at || item.created_at, updatedAt: item.created_at, href: canEdit ? `/admin/news/edit/${item.id}` : "/admin/news" }));
 }
 
 async function loadMembershipCount(db) {

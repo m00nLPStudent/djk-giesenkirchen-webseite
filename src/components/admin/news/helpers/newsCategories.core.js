@@ -1,0 +1,5 @@
+export const UNKNOWN_NEWS_CATEGORY = "Unbekannte Kategorie";
+export function resolveNewsCategory(categories = [], categoryKey = "") { return categories.find((category) => category.slug === categoryKey) || null; }
+export function resolveNewsCategoryLabel(categories = [], categoryKey = "") { return resolveNewsCategory(categories, categoryKey)?.name_de || UNKNOWN_NEWS_CATEGORY; }
+export function getNewsCategoryDisplay(item = {}, categories = []) { const label = resolveNewsCategoryLabel(categories, item.category_key); const teamName = item.football_team?.name_de || item.teams?.name_de || (Array.isArray(item.teams) ? item.teams[0]?.name_de : ""); return item.category_key === "fussball" && teamName ? `${label} · ${teamName}` : label; }
+export function createPublicNewsCardDto(item = {}, categories = []) { return { id: item.id, slug: item.slug, title: item.title_de || "", teaser: item.teaser_de || "", imageUrl: item.image_url || "", publishedAt: item.published_at || null, author: item.author || "", categoryKey: item.category_key || "", categoryLabel: getNewsCategoryDisplay(item, categories) }; }

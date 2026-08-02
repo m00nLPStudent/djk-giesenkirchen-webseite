@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
+import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
+import { createPublicNewsCardDto } from "@/components/admin/news/helpers/newsCategories.core";
 
 const PAGE_SIZE = 6;
 
@@ -19,6 +21,7 @@ function buildPageHref(page, search) {
 }
 
 export default async function NewsOverviewPage({ searchParams }) {
+  const { data: categories } = await loadNewsCategories(supabase, { activeOnly: false });
   const query = await searchParams;
   const search = String(query?.suche || "").trim();
   const page = getSafePage(query?.seite);
@@ -34,12 +37,15 @@ export default async function NewsOverviewPage({ searchParams }) {
     .range(from, to);
 
   if (search) {
+    const matchingCategorySlugs = (categories || []).filter((category) => category.name_de.toLowerCase().includes(search.toLowerCase())).map((category) => category.slug);
+    const categoryClauses = matchingCategorySlugs.map((slug) => `category_key.eq.${slug}`);
     newsQuery = newsQuery.or(
-      `title_de.ilike.%${search}%,teaser_de.ilike.%${search}%,content_de.ilike.%${search}%,category.ilike.%${search}%`,
+      [`title_de.ilike.%${search}%`, `teaser_de.ilike.%${search}%`, `content_de.ilike.%${search}%`, ...categoryClauses].join(","),
     );
   }
 
   const { data: news, count } = await newsQuery;
+  const newsCards = (news || []).map((item) => createPublicNewsCardDto(item, categories || []));
   const totalPages = Math.max(1, Math.ceil((count || 0) / PAGE_SIZE));
 
   return (
@@ -86,10 +92,10 @@ export default async function NewsOverviewPage({ searchParams }) {
           </div>
         )}
 
-        {news?.length ? (
+        {newsCards.length ? (
           <>
             <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {news.map((item) => (
+              {newsCards.map((item) => (
                 <NewsCard item={item} key={item.id} compactMeta />
               ))}
             </div>

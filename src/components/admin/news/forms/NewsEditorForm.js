@@ -11,7 +11,7 @@ import NewsContentTab from "../tabs/NewsContentTab";
 import NewsImagesTab from "../tabs/NewsImagesTab";
 import NewsSettingsTab from "../tabs/NewsSettingsTab";
 
-export default function NewsEditorForm({ news = null, teams = [] }) {
+export default function NewsEditorForm({ news = null, teams = [], categories = [] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
   const [form, setForm] = useState(() => createInitialNewsForm(news));
@@ -50,6 +50,7 @@ export default function NewsEditorForm({ news = null, teams = [] }) {
         activeTab={activeTab}
         form={form}
         teams={teams}
+        categories={categories}
         updateField={handlers.updateField}
       />
 

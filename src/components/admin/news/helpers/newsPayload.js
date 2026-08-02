@@ -11,7 +11,6 @@ export function createNewsPayload(form, news) {
     title_de: form.title_de,
     teaser_de: form.teaser_de,
     content_de: form.content_de,
-    category: form.category,
     category_key: form.category_key,
     image_url: form.image_url,
     slug: news?.slug || createSlug(form.title_de),

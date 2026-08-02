@@ -6,6 +6,7 @@ export default function NewsContentTab({
   activeTab,
   form,
   teams,
+  categories,
   updateField,
 }) {
   if (activeTab === "basic") {
@@ -14,7 +15,7 @@ export default function NewsContentTab({
 
   if (activeTab === "category") {
     return (
-      <NewsAuthorPanel form={form} teams={teams} updateField={updateField} />
+      <NewsAuthorPanel form={form} teams={teams} categories={categories} updateField={updateField} />
     );
   }
 

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { formatFileSize } from "@/lib/files";
 import { formatGermanDate } from "@/lib/dates";
-import { getNewsCategoryDisplay } from "@/components/website/news/NewsCard";
+import { getNewsCategoryDisplay } from "@/components/admin/news/helpers/newsCategories.core";
+import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 
 export default async function NewsDetailPage({ params }) {
   const { slug } = await params;
@@ -14,6 +15,7 @@ export default async function NewsDetailPage({ params }) {
     .eq("is_published", true)
     .lte("published_at", new Date().toISOString())
     .single();
+  const { data: categories } = await loadNewsCategories(supabase, { activeOnly: false });
 
   if (!article) {
     return (
@@ -44,7 +46,7 @@ export default async function NewsDetailPage({ params }) {
           )}
 
           <p className="text-sm uppercase tracking-[0.35em] text-red-400">
-            {getNewsCategoryDisplay(article)}
+            {getNewsCategoryDisplay(article, categories || [])}
           </p>
 
           <h1 className="mt-4 text-3xl font-black leading-tight sm:text-5xl md:text-6xl">

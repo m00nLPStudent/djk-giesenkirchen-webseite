@@ -2,6 +2,6 @@
 
 import NewsEditorForm from "./NewsEditorForm";
 
-export default function AdminNewsEditForm({ news, teams = [] }) {
-  return <NewsEditorForm news={news} teams={teams} />;
+export default function AdminNewsEditForm({ news, teams = [], categories = [] }) {
+  return <NewsEditorForm news={news} teams={teams} categories={categories} />;
 }

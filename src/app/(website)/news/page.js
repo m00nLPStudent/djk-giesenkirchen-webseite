@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
+import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
+import { createPublicNewsCardDto } from "@/components/admin/news/helpers/newsCategories.core";
 
 export default async function NewsPage() {
+  const { data: categories } = await loadNewsCategories(supabase, { activeOnly: false });
   const { data: latestNews } = await supabase
     .from("news")
     .select("*, football_team:football_team_id(name_de)")
@@ -11,8 +14,9 @@ export default async function NewsPage() {
     .order("published_at", { ascending: false })
     .limit(6);
 
-  const featuredNews = latestNews?.[0];
-  const secondaryNews = latestNews?.slice(1) || [];
+  const newsCards = (latestNews || []).map((item) => createPublicNewsCardDto(item, categories || []));
+  const featuredNews = newsCards[0];
+  const secondaryNews = newsCards.slice(1);
 
   return (
     <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">

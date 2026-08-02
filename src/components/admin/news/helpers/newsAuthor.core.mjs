@@ -1,4 +1,4 @@
-const protectedFields = new Set(["author", "title_en", "teaser_en", "content_en"]);
+const protectedFields = new Set(["author", "category", "title_en", "teaser_en", "content_en"]);
 
 export function sanitizeNewsWritePayload(payload = {}) {
   return Object.fromEntries(Object.entries(payload).filter(([key]) => !protectedFields.has(key)));
