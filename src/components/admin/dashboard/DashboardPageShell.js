@@ -1,44 +1,28 @@
-import DashboardHeader from "./DashboardHeader";
-import DashboardStatGrid from "./DashboardStatGrid";
-import DashboardQuickActions from "./DashboardQuickActions";
-import DashboardMembershipRequests from "./DashboardMembershipRequests";
-import DashboardUpcomingEvents from "./DashboardUpcomingEvents";
-import DashboardNewsOverview from "./DashboardNewsOverview";
-import DashboardSystemStatus from "./DashboardSystemStatus";
-import ContributionDashboardPanel from "@/components/admin/contributions/components/ContributionDashboardPanel";
+import DashboardGreeting from "./DashboardGreeting";
+import DashboardNoticeList from "./DashboardNoticeList";
+import DashboardQuickLinks from "./DashboardQuickLinks";
+import DashboardUpcomingList from "./DashboardUpcomingList";
+import DashboardRecentNewsList from "./DashboardRecentNewsList";
+import DashboardContributionSummary from "./DashboardContributionSummary";
+import DashboardRecentItems from "./DashboardRecentItems";
 
-export default function DashboardPageShell({
-  now,
-  stats,
-  openMembershipRequests,
-  upcomingEvents,
-  latestNews,
-  draftOrPlannedNews,
-  statusSignals,
-  contributionStats,
-}) {
+export default function DashboardPageShell({ dashboard }) {
+  const hasMainContent = dashboard.upcomingEvents.length || dashboard.recentNews.length;
   return (
-    <div className="space-y-8">
-      <DashboardHeader now={now} />
-
-      <DashboardStatGrid stats={stats} />
-
-      <ContributionDashboardPanel stats={contributionStats} />
-
-      <DashboardQuickActions />
-
-      <div className="grid gap-6 xl:grid-cols-2">
-        <DashboardMembershipRequests requests={openMembershipRequests} />
-        <DashboardUpcomingEvents events={upcomingEvents} now={now} />
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-2">
-        <DashboardNewsOverview
-          latestNews={latestNews}
-          draftOrPlannedNews={draftOrPlannedNews}
-          now={now}
-        />
-        <DashboardSystemStatus statusSignals={statusSignals} />
+    <div className="space-y-5" data-dashboard-layout="compact-workspace">
+      <DashboardGreeting greeting={dashboard.greeting} generatedAt={dashboard.generatedAt} />
+      <DashboardNoticeList notices={dashboard.notices} />
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,0.85fr)]">
+        <div className="min-w-0 space-y-5">
+          {dashboard.upcomingEvents.length ? <DashboardUpcomingList events={dashboard.upcomingEvents} /> : null}
+          {dashboard.recentNews.length ? <DashboardRecentNewsList news={dashboard.recentNews} /> : null}
+          {!hasMainContent ? <p className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 text-sm text-white/55">Aktuell sind keine Termine oder Inhalte für deinen Zugriff vorhanden.</p> : null}
+        </div>
+        <aside className="min-w-0 space-y-5" aria-label="Persönliche Dashboard-Bereiche">
+          <DashboardQuickLinks links={dashboard.quickLinks} />
+          {dashboard.contributionSummary ? <DashboardContributionSummary summary={dashboard.contributionSummary} /> : null}
+          {dashboard.recentItems.length ? <DashboardRecentItems items={dashboard.recentItems} /> : null}
+        </aside>
       </div>
     </div>
   );

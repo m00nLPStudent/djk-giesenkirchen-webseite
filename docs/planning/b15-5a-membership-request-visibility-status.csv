@@ -1,0 +1,11 @@
+role_or_context,visible,query_executed,notice_rendered,target_link,permission_source,scope_source,test_status,status,notes
+superadmin,yes,yes,when_count_positive,/admin/settings,global bypass,global,PASS,DONE,no applicant data
+vorstand,yes,yes,when_count_positive,/admin/settings,membership_requests.view,technical vorstand context,PASS,DONE,no edit grant
+jugendleiter,yes,yes,when_count_positive,only_with_settings.view,youth compatibility,youth_all,PASS,DONE,notice may be non-link
+jugendkoordinator_compatibility,yes,yes,when_count_positive,only_with_settings.view,central compatibility rule,technical role metadata,PASS,PARTIAL,not a canonical role key
+kassierer,no,no,no,none,broad keys explicitly insufficient,own_board_card insufficient,PASS,DONE,contributions unchanged
+trainer,no,no,no,none,none,staff or team scope insufficient,PASS,DONE,
+betreuer,no,no,no,none,none,staff or team scope insufficient,PASS,DONE,
+gast,no,no,no,none,none,read_only insufficient,PASS,DONE,
+zero_open_requests,no_notice,yes,no,none,eligible context,eligible context,PASS,DONE,positive dashboard empty state remains
+future_roles,deferred,deferred,deferred,deferred,central policy extension,existing scope metadata,NOT_RUN,DEFERRED,requires separate policy audit

@@ -1,0 +1,9 @@
+role_or_case,auth_queries,scope_queries,navigation_queries,contribution_queries,event_queries,news_queries,team_queries,total_expected,notes
+superadmin,7,3,0,2,1,1,0,14,includes one profile-name query and one membership count
+kassierer,7,3,0,2,0,0,0,12,no membership query despite broad legacy settings and membership keys
+vorstand,7,3,0,2,1,1,0,15,includes one membership count when settings.view exists
+trainer_assigned,7,5,0,0,1,0,0,13,scope adds coach-season and team resolution
+jugendleitung,7,3,0,0,1,1,0,13,includes one membership count through youth compatibility policy
+betreuer_or_guest,7,3,0,0,1,1,0,12,actual domain calls depend on assigned view permissions
+no_domain_permissions,7,3,0,0,0,0,0,10,auth count includes profile-name query
+notes,0,0,0,0,0,0,0,0,counts are expected logical database calls; contribution repository internals may vary with season resolution

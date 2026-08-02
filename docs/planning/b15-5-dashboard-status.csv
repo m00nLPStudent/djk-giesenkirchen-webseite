@@ -1,0 +1,10 @@
+section,data_source,permission,scope,desktop,mobile,empty_state,test_status,status,notes
+greeting,admin_profiles,dashboard.view,own_profile,compact header,stacked,neutral without name,PASS,DONE,Europe/Berlin
+notices,computed DTO,domain-specific,resolver context,wide compact rows,stacked rows,positive status,PASS,DONE,no persistence
+contributions,existing contribution stats service,contributions.view,existing contribution access,right summary,stacked,section omitted,PASS,DONE,no payment history
+events,events,events.view,permission_only,left list,stacked,shared quiet state,PASS,DONE,limit 5 and edit link gated
+news,news,news.view,permission_only,left list,stacked,shared quiet state,PASS,DONE,limit 5 and edit link gated
+quick_links,navigation DTO,item permission,item scope,right list,stacked,section omitted,PASS,DONE,no duplicate config
+recent_items,already loaded news and events,source permission,source scope,right list,stacked,section omitted,PASS,PARTIAL,other modules deferred
+team_tasks,none,teams.view,team scope,not rendered,not rendered,not rendered,PASS,DEFERRED,no safe low-cost completeness source
+notification_bell,existing header,unchanged,unchanged,unchanged,unchanged,not_applicable,REGRESSION,DONE,no popover or persistence

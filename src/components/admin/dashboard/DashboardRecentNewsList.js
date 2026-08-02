@@ -1,0 +1,8 @@
+import Link from "next/link";
+
+export default function DashboardRecentNewsList({ news }) {
+  return <section aria-labelledby="dashboard-news" className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 sm:p-5">
+    <div className="flex items-center justify-between"><h2 id="dashboard-news" className="font-black">Aktuelle News</h2><Link href="/admin/news" className="text-xs font-bold text-red-300">Alle News</Link></div>
+    <div className="mt-3 divide-y divide-white/10">{news.map((item) => <Link key={item.id} href={item.href} className="flex min-h-12 items-center gap-3 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"><span className={`h-2 w-2 shrink-0 rounded-full ${item.status === "Veröffentlicht" ? "bg-emerald-400" : "bg-amber-400"}`} /><span className="min-w-0 flex-1 truncate text-sm font-bold">{item.title}</span><span className="shrink-0 text-xs text-white/40">{item.status}</span></Link>)}</div>
+  </section>;
+}

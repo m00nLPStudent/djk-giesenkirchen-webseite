@@ -6,8 +6,9 @@ export default async function AdminLayout({
   title,
   subtitle,
   showHeader = true,
+  navigation: providedNavigation = null,
 }) {
-  const navigation = await loadAdminNavigation("/admin");
+  const navigation = providedNavigation || await loadAdminNavigation("/admin");
 
   return (
     <AdminShell
