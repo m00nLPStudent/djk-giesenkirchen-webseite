@@ -1,38 +1,27 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
-import AdminPageHeader from "@/components/admin/layout/AdminPageHeader";
-import Can from "@/components/admin/auth/Can";
 import { AdminEventsList } from "@/components/admin/events";
+import { getNextCalendarDayWindow, prepareAdminEventList } from "@/components/admin/events/eventList.helpers";
 import { getAdminEvents } from "@/components/admin/events/services/events.service";
-import Link from "next/link";
+import { canAccessTeamOnServer, loadServerTeamScopeContext } from "@/components/admin/teams/serverTeamScope";
+import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { getVirtualTrainingEvents } from "@/lib/events";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminEventsPage() {
-  const { data: events } = await getAdminEvents();
+  const permissionResult = await assertAdminActionPermission({ requiredPermission: "events.view" });
+  if (!permissionResult.ok) redirect("/admin/unauthorized?reason=missing-events-permission");
 
-  return (
-    <AdminLayout
-      title="Termine verwalten"
-      subtitle="Adminbereich"
-      showHeader={false}
-    >
-      <AdminPageHeader
-        eyebrow="Termine"
-        title="Termine verwalten"
-        description="Öffentliche Veranstaltungen, Trainingseinträge und wiederkehrende Termine pflegen."
-        actions={
-          <Can permission="events.create" uiOnly>
-            <Link
-              href="/admin/events/new"
-              className="rounded-full bg-red-600 px-6 py-3 font-bold transition hover:bg-red-700"
-            >
-              Neuer Termin
-            </Link>
-          </Can>
-        }
-      />
+  const now = new Date();
+  const tomorrow = getNextCalendarDayWindow(now);
+  const [{ data: events }, virtualTrainings, scopeContext] = await Promise.all([
+    getAdminEvents(),
+    getVirtualTrainingEvents({ ...tomorrow, maxOccurrencesPerTraining: 1, supabaseClient: permissionResult.supabaseServer }),
+    loadServerTeamScopeContext(permissionResult),
+  ]);
+  const scopedTrainings = virtualTrainings.filter((event) => canAccessTeamOnServer(scopeContext, event));
+  const eventList = prepareAdminEventList(events || [], scopedTrainings, now);
 
-      <AdminEventsList events={events || []} />
-    </AdminLayout>
-  );
+  return <AdminLayout title="Termine verwalten" subtitle="Adminbereich" showHeader={false}><AdminEventsList events={eventList} /></AdminLayout>;
 }

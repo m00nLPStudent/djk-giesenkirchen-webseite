@@ -72,6 +72,8 @@ function toOccurrenceLikeEvent(slot, startDate, endDate, occurrenceIndex) {
     team_slug: teamSlug,
     team_season_slug: teamSeasonSlug,
     team_name_de: teamName,
+    team_season_name: slot.team_seasons?.name_de || null,
+    age_group: slot.teams?.age_group || null,
     training_type: trainingType,
 
     title_de: `${getTrainingTypeLabel(trainingType)} ${teamName}`,

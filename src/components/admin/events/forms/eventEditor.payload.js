@@ -8,11 +8,8 @@ function toIsoOrNull(value) {
 export function buildEventPayload({ form, publicSlug, hasRecurrence }) {
   return {
     title_de: form.title_de.trim(),
-    title_en: form.title_en.trim() || null,
     teaser_de: form.teaser_de.trim() || null,
-    teaser_en: form.teaser_en.trim() || null,
     description_de: form.description_de.trim() || null,
-    description_en: form.description_en.trim() || null,
     event_type: form.event_type,
     starts_at: toIsoOrNull(form.starts_at),
     ends_at: toIsoOrNull(form.ends_at),

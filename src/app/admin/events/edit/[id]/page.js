@@ -1,27 +1,22 @@
+import { notFound } from "next/navigation";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminEventsForm } from "@/components/admin/events";
-import BackButton from "@/components/admin/ui/BackButton";
+import EventDetailSummary from "@/components/admin/events/components/EventDetailSummary";
+import { AdminActionBar, AdminButton, AdminDetailHeader, AdminDetailLayout, AdminStatusChip } from "@/components/admin/design-system";
+import { formatEventDate, formatEventTime, getEventStatusKey } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 
 export default async function EditEventPage({ params }) {
   const { id } = await params;
+  const [{ data: event }, { data: teams }] = await Promise.all([
+    supabase.from("events").select("*, event_documents(*)").eq("id", id).single(),
+    supabase.from("teams").select("id, name_de, is_active, sort_order").eq("is_active", true).order("sort_order", { ascending: true }),
+  ]);
+  if (!event) notFound();
+  const status = getEventStatusKey(event);
+  const statusLabel = status === "entwurf" ? "Entwurf" : status === "geplant" ? "Geplant" : "Veröffentlicht";
+  const statusVariant = status === "entwurf" ? "default" : status === "geplant" ? "warning" : "success";
+  const meta = `${formatEventDate(event.starts_at)} · ${formatEventTime(event.starts_at, { isAllDay: event.is_all_day })}`;
 
-  const { data: event } = await supabase
-    .from("events")
-    .select("*, event_documents(*)")
-    .eq("id", id)
-    .single();
-
-  const { data: teams } = await supabase
-    .from("teams")
-    .select("id, name_de, is_active, sort_order")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
-
-  return (
-    <AdminLayout title="Termin bearbeiten" subtitle="Termine">
-      <BackButton />
-      <AdminEventsForm event={event} teams={teams || []} />
-    </AdminLayout>
-  );
+  return <AdminLayout title="Termin bearbeiten" subtitle="Termine" showHeader={false}><AdminDetailLayout header={<AdminDetailHeader backHref="/admin/events" backLabel="Zurück zu Termine" backVariant="pill" eyebrow="Vereinstermin" title={event.title_de} status={<AdminStatusChip compact variant={statusVariant}>{statusLabel}</AdminStatusChip>} meta={meta} actions={<AdminActionBar><AdminButton href="#event-editor-form" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />}><EventDetailSummary event={event} /><AdminEventsForm event={event} teams={teams || []} /></AdminDetailLayout></AdminLayout>;
 }

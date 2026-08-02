@@ -163,7 +163,7 @@ export default function EventEditorForm({ event = null, teams = [] }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+    <form id="event-editor-form" onSubmit={handleSubmit} className="space-y-6">
       <TabNavigation
         tabs={EVENT_FORM_TABS}
         activeTab={activeTab}

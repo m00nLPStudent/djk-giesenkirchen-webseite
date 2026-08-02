@@ -13,7 +13,7 @@ export default function EventBasicTab({ form, isEdit, event, updateField }) {
       title="Grunddaten"
       description="Titel, Teaser und Beschreibung für den Termin oder die Veranstaltung."
     >
-      <FormGrid>
+      <FormGrid columns={1}>
         <InputField
           label="Titel Deutsch"
           required
@@ -26,16 +26,9 @@ export default function EventBasicTab({ form, isEdit, event, updateField }) {
             }
           }}
         />
-        <InputField
-          label="Titel Englisch"
-          value={form.title_en}
-          onChange={(eventValue) =>
-            updateField("title_en", eventValue.target.value)
-          }
-        />
       </FormGrid>
 
-      <div className="mt-5 grid gap-5 md:grid-cols-2">
+      <div className="mt-5">
         <TextareaField
           label="Teaser Deutsch"
           rows={4}
@@ -44,31 +37,15 @@ export default function EventBasicTab({ form, isEdit, event, updateField }) {
             updateField("teaser_de", eventValue.target.value)
           }
         />
-        <TextareaField
-          label="Teaser Englisch"
-          rows={4}
-          value={form.teaser_en}
-          onChange={(eventValue) =>
-            updateField("teaser_en", eventValue.target.value)
-          }
-        />
       </div>
 
-      <div className="mt-5 grid gap-5 md:grid-cols-2">
+      <div className="mt-5">
         <TextareaField
           label="Beschreibung Deutsch"
           rows={8}
           value={form.description_de}
           onChange={(eventValue) =>
             updateField("description_de", eventValue.target.value)
-          }
-        />
-        <TextareaField
-          label="Beschreibung Englisch"
-          rows={8}
-          value={form.description_en}
-          onChange={(eventValue) =>
-            updateField("description_en", eventValue.target.value)
           }
         />
       </div>

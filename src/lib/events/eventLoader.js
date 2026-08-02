@@ -13,6 +13,7 @@ export async function getVirtualTrainingEvents({
   from,
   to,
   maxOccurrencesPerTraining,
+  supabaseClient = supabase,
 } = {}) {
   const now = new Date();
   const fromDate = parseDateOnlyLocal(from || now) || parseDateOnlyLocal(now);
@@ -24,13 +25,13 @@ export async function getVirtualTrainingEvents({
 
   const [trainingTimesResult, exceptionsResult, closuresResult] =
     await Promise.all([
-      supabase.from("team_training_times").select("*"),
-      supabase
+      supabaseClient.from("team_training_times").select("*"),
+      supabaseClient
         .from("team_training_exceptions")
         .select("*")
         .gte("exception_date", fromKey)
         .lte("exception_date", toKey),
-      supabase
+      supabaseClient
         .from("club_closure_periods")
         .select("*")
         .lte("starts_on", toKey)
@@ -77,7 +78,7 @@ export async function getVirtualTrainingEvents({
   const teamMap = new Map();
 
   if (teamSeasonIds.length > 0) {
-    const seasonsResult = await supabase
+    const seasonsResult = await supabaseClient
       .from("team_seasons")
       .select("id, team_id, name_de, slug")
       .in("id", teamSeasonIds);
@@ -102,9 +103,9 @@ export async function getVirtualTrainingEvents({
     ];
 
     if (teamIds.length > 0) {
-      const teamsResult = await supabase
+      const teamsResult = await supabaseClient
         .from("teams")
-        .select("id, name_de, slug")
+        .select("id, name_de, slug, age_group")
         .in("id", teamIds);
 
       if (teamsResult.error) {

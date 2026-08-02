@@ -6,11 +6,8 @@ export function createInitialEventForm(event) {
 
   return {
     title_de: event?.title_de || "",
-    title_en: event?.title_en || "",
     teaser_de: event?.teaser_de || "",
-    teaser_en: event?.teaser_en || "",
     description_de: event?.description_de || "",
-    description_en: event?.description_en || "",
     event_type: event?.event_type || "vereinstermin",
     starts_at: formatDateTimeLocalInput(event?.starts_at),
     ends_at: formatDateTimeLocalInput(event?.ends_at),

@@ -1,37 +1,13 @@
-export default function EventFilters({ filter, setFilter, search, setSearch }) {
-  const filters = [
-    ["alle", "Alle"],
-    ["veroeffentlicht", "Veröffentlicht"],
-    ["geplant", "Geplant"],
-    ["entwurf", "Entwürfe"],
-  ];
+import { AdminModuleFilters, AdminStatusChip } from "@/components/admin/design-system";
 
-  return (
-    <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-      <div className="flex flex-wrap gap-3">
-        {filters.map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setFilter(value)}
-            className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-              filter === value
-                ? "bg-red-600 text-white"
-                : "border border-white/10 text-white/60 hover:text-white"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+const STATUS_OPTIONS = [["alle", "Alle Status"], ["geplant", "Geplant"], ["veroeffentlicht", "Veröffentlicht"], ["entwurf", "Entwurf"], ["vergangen", "Vergangen"]];
+const SOURCE_OPTIONS = [["alle", "Alle Quellen"], ["verein", "Verein"], ["mannschaft", "Mannschaft"]];
 
-      <input
-        type="text"
-        placeholder="Termine suchen..."
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        className="w-full rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm text-white lg:w-80"
-      />
-    </div>
-  );
+function FilterSelect({ label, value, onChange, options }) {
+  return <label className="grid gap-2 text-sm font-bold text-white/65">{label}<select value={value} onChange={onChange} className="h-11 rounded-xl border border-white/10 bg-[#17171d] px-3 text-white outline-none focus:border-red-500">{options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}</select></label>;
+}
+
+export default function EventFilters({ status, setStatus, source, setSource }) {
+  const activeCount = Number(status !== "alle") + Number(source !== "alle");
+  return <AdminModuleFilters title="Termine filtern" panelId="event-filter-panel" badge={activeCount ? <AdminStatusChip compact variant="blue">{activeCount} aktiv</AdminStatusChip> : null}><div className="grid gap-4 md:grid-cols-2"><FilterSelect label="Status" value={status} onChange={(event) => setStatus(event.target.value)} options={STATUS_OPTIONS} /><FilterSelect label="Quelle" value={source} onChange={(event) => setSource(event.target.value)} options={SOURCE_OPTIONS} /></div></AdminModuleFilters>;
 }
