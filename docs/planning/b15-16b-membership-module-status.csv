@@ -1,0 +1,10 @@
+surface,old_location,new_location,policy,permission,scope,query_gated,desktop,mobile,test_status,status,notes
+route,/admin/settings,/admin/membership-requests,canAccessMembershipRequests,dashboard.view transport,central membership policy,yes,own page,own page,PASS,DONE,Unauthorized redirect before domain queries
+requests_loader,settings page,membershipRequests.loader,canAccessMembershipRequests,membership_requests.view,global board youth,yes,n/a,n/a,PASS,DONE,No query for denied context
+requests_list,settings membership tab,membership module,route policy,membership_requests.view,central policy,yes,table xl,cards below xl,PASS,DONE,No email phone or notes in overview
+request_detail,settings membership tab,membership module,route policy,membership_requests.edit,central policy,yes,stacked editor,stacked editor,PASS,DONE,Existing fields and handlers retained
+recipients,settings membership tab,membership module,route policy,membership_requests.edit,central policy,yes,table xl,cards below xl,PASS,DONE,Existing persistence retained
+forwarding,settings membership tab,membership module,route policy,membership_requests.forward,central policy,yes,detail action,detail action,PASS,DONE,No workflow changes
+settings_loader,/admin/settings,/admin/settings,settings.view,settings.view,permission_only,yes,unchanged,unchanged,PASS,DONE,No Membership Coach or Board query
+navigation,planned Gesamtverein item,active Gesamtverein item,canAccessMembershipRequests,membership_requests.view,central policy,yes,dropdown,drawer,PASS,DONE,No item for denied roles
+dashboard_link,/admin/settings,/admin/membership-requests,canAccessMembershipRequests,membership_requests.view,central policy,yes,notice,notice,PASS,DONE,Count remains aggregated

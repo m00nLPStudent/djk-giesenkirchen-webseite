@@ -1,4 +1,5 @@
 import { findActiveNavigationEntry } from "./adminNavigation.matching.js";
+import { canAccessMembershipRequests } from "../../../lib/admin-auth/membershipAccess.js";
 
 function unique(values = []) {
   return new Set((values || []).map((value) => value?.key || value).filter(Boolean));
@@ -44,7 +45,7 @@ function itemDto(item, activeItemKey, permissionSet) {
 }
 
 export function resolveAdminNavigation({
-  sections = [], permissionKeys = [], scopeContext = {}, currentPath = "/admin",
+  sections = [], permissionKeys = [], roleKeys = [], scopeContext = {}, currentPath = "/admin",
   featureFlags = {},
 } = {}) {
   const permissionSet = unique(permissionKeys);
@@ -54,7 +55,8 @@ export function resolveAdminNavigation({
     items: [...(section.items || [])]
       .sort((a, b) => a.order - b.order)
       .filter((item) => isRuntimeCandidate(item, includePlanned))
-      .filter((item) => item.implementationStatus !== "active" || hasPermission(item, permissionSet))
+      .filter((item) => item.implementationStatus !== "active" || item.accessPolicy === "membership_requests" || hasPermission(item, permissionSet))
+      .filter((item) => item.accessPolicy !== "membership_requests" || canAccessMembershipRequests({ roleKeys, permissionKeys, scopeContext }))
       .filter((item) => item.implementationStatus !== "active" || hasScope(item.scopeType, scopeContext)),
   })).filter((section) => section.items.length > 0);
   const active = findActiveNavigationEntry(allowed, currentPath);

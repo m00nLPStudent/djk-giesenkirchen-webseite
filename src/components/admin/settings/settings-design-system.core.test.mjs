@@ -37,9 +37,9 @@ test("membership request permission gates and handlers remain wired", () => {
   assert.match(source, /onMarkDone/);
 });
 
-test("no settings data or action layer was changed by the UI migration", () => {
+test("settings keeps its guard and no longer loads membership data", () => {
   const page = read("../../../app/admin/settings/page.js");
   assert.match(page, /requiredPermission: "settings\.view"/);
-  assert.match(page, /membership_requests/);
+  assert.doesNotMatch(page, /membership_requests|membership_request_recipients/);
   assert.match(page, /Promise\.all/);
 });

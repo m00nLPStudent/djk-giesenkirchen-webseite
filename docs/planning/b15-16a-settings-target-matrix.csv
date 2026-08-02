@@ -1,0 +1,14 @@
+area,target_module,target_route,target_table,target_permission,target_scope,create,edit,deactivate,hard_delete,sort_order,used_records_protected,sql_required,status,notes
+club_data,settings,/admin/settings,club_settings,settings.edit,permission_only,no,yes,no,no,no,yes,no,READY,Existing singleton remains
+club_colors,settings,/admin/settings,club_settings.club_colors,settings.edit,permission_only,no,yes,no,no,no,yes,no,READY,Existing JSON storage remains
+social_links,settings,/admin/settings,club_settings.social_links,settings.edit,permission_only,no,yes,no,no,no,yes,no,READY,Existing JSON storage remains
+contacts,settings,/admin/settings,club_contacts,settings.edit,permission_only,yes,yes,yes,conditional,yes,yes,no,PARTIAL,Prefer deactivate when publicly referenced
+pages,settings,/admin/settings,pages,settings.edit,permission_only,yes,yes,yes,conditional,yes,yes,no,PARTIAL,Existing delete needs later usage review
+membership_requests,membership requests,/admin/membership-requests,membership_requests,membership_requests.view/edit/forward,B15.5A server policy,no,yes,status only,no,no,yes,no,PARTIAL,Route and loader extraction required
+membership_recipients,membership requests,/admin/membership-requests,membership_request_recipients,membership_requests.edit,B15.5A server policy,yes,yes,yes,conditional,yes,yes,no,PARTIAL,Use existing table
+team_masterdata,settings,/admin/settings,team_templates,teams.create/edit,team_access,yes,yes,yes,no,yes,yes,possibly,PARTIAL,Harden existing table and add management UI
+news_categories,settings,/admin/settings,news_categories,news.edit,permission_only,yes,yes,yes,no,yes,yes,yes,BLOCKED,Inventory and backfill required
+event_categories,settings,/admin/settings,event_categories,events.edit,permission_only,yes,label only,non-system only,no,yes,yes,yes,BLOCKED,System keys require explicit protection
+download_categories,settings,/admin/settings,download_categories,deferred,permission_only,yes,yes,yes,no,yes,yes,yes,DEFERRED,No download module or consuming FK yet
+settings_access,settings,/admin/settings,admin_role_permissions,settings.view/edit,permission_only,no,no,no,no,no,yes,yes,BLOCKED,First decouple department and membership routes
+membership_navigation,membership requests,/admin/membership-requests,none,membership_requests.view,B15.5A server policy,no,no,no,no,no,yes,no,PARTIAL,Activate existing planned navigation item later

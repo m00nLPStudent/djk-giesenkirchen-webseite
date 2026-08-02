@@ -1,50 +1,11 @@
-import { FormSection } from "@/components/admin/forms";
-import EntityBadge, {
-  EntityStatusBadge,
-} from "@/components/admin/ui/EntityBadge";
-import SettingsSelectionList from "./SettingsSelectionList";
+import { AdminListChevron, AdminListHeader, AdminListMobileCard, AdminListRow, AdminModuleCards, AdminModuleEmptyState, AdminModuleList, AdminStatusChip } from "@/components/admin/design-system";
 
-export default function MembershipRecipientList({
-  membershipRecipients,
-  selectedMembershipRecipientId,
-  onSelectRecipient,
-  getMembershipRequestTypeLabel,
-}) {
-  return (
-    <FormSection
-      eyebrow="Mitglied werden"
-      title="Empfänger"
-      description="Verwalte, an welche E-Mail-Adressen spätere Mitgliedsanfragen je nach Anfrageart gesendet werden sollen."
-    >
-      <SettingsSelectionList
-        items={membershipRecipients}
-        emptyText="Noch keine Empfänger angelegt."
-        renderItem={(item) => {
-          const active = selectedMembershipRecipientId === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onSelectRecipient(item)}
-              className={`w-full rounded-2xl border p-4 text-left transition ${active ? "border-red-500/70 bg-red-600/10" : "border-white/10 bg-black/20 hover:border-red-500/40"}`}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <EntityStatusBadge active={item.is_active} />
-                <EntityBadge variant="blue">
-                  {getMembershipRequestTypeLabel(item.request_type)}
-                </EntityBadge>
-              </div>
-              <p className="mt-3 text-lg font-black">
-                {item.label || item.email}
-              </p>
-              <p className="mt-1 text-sm text-white/60">{item.email}</p>
-              <p className="mt-1 text-xs uppercase tracking-[0.18em] text-white/40">
-                Sortierung {item.sort_order || 0}
-              </p>
-            </button>
-          );
-        }}
-      />
-    </FormSection>
-  );
+const template = "minmax(0,1.4fr) minmax(0,1fr) minmax(0,.7fr) 2rem";
+const columns = ["Empfänger", "Anfrageart", "Status", ""].map((label) => ({ key: label || "overview", label }));
+
+export default function MembershipRecipientList({ membershipRecipients, selectedMembershipRecipientId, onSelectRecipient, getMembershipRequestTypeLabel }) {
+  if (!membershipRecipients.length) return <AdminModuleEmptyState title="Keine Empfänger" description="Es wurden noch keine Empfänger für Mitgliedsanfragen angelegt." />;
+  const status = (item) => <AdminStatusChip variant={item.is_active ? "success" : "warning"}>{item.is_active ? "Aktiv" : "Inaktiv"}</AdminStatusChip>;
+  const mobile = <AdminModuleCards className="xl:hidden">{membershipRecipients.map((item) => <AdminListMobileCard key={item.id} onClick={() => onSelectRecipient(item)} label={`${item.label || item.email} bearbeiten`} className={selectedMembershipRecipientId === item.id ? "border-red-500/70 bg-red-600/10" : ""}><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="truncate font-black text-white">{item.label || item.email}</p><p className="mt-1 break-all text-sm text-white/55">{item.email}</p></div><AdminListChevron label="Übersicht" /></div><div className="mt-3 flex flex-wrap gap-2">{status(item)}<span className="text-sm text-white/60">{getMembershipRequestTypeLabel(item.request_type)}</span></div></AdminListMobileCard>)}</AdminModuleCards>;
+  return <AdminModuleList mobile={mobile} desktopClassName="hidden overflow-hidden xl:block"><AdminListHeader columns={columns} template={template} />{membershipRecipients.map((item) => <AdminListRow key={item.id} onClick={() => onSelectRecipient(item)} label={`${item.label || item.email} bearbeiten`} template={template} className={selectedMembershipRecipientId === item.id ? "bg-red-600/10" : ""}><span className="min-w-0"><strong className="block truncate text-white">{item.label || item.email}</strong><span className="block truncate text-xs text-white/50">{item.email}</span></span><span className="truncate text-white/65">{getMembershipRequestTypeLabel(item.request_type)}</span>{status(item)}<AdminListChevron label="Übersicht" /></AdminListRow>)}</AdminModuleList>;
 }

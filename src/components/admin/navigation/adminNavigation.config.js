@@ -43,7 +43,7 @@ export const ADMIN_NAVIGATION_SECTIONS = [
       active("users", "Benutzer", "/admin/users", "users", "users.view", "permission_only", 70, "Administrationskonten verwalten."),
       active("roles", "Rollen", "/admin/roles", "key-round", "roles.view", "permission_only", 80, "Rollen verwalten."),
       active("permissions", "Rechte", "/admin/permissions", "lock-keyhole", "permissions.view", "permission_only", 90, "Permission-Matrix verwalten."),
-      planned("membership-requests", "Mitgliedsanfragen", "inbox", "permission_only", 100, "Benötigt eine eindeutige Unterroute statt eines geteilten Settings-Links."),
+      { ...active("membership-requests", "Mitgliedsanfragen", "/admin/membership-requests", "inbox", "membership_requests.view", "permission_only", 55, "Mitgliedsanfragen, Empfänger und Weiterleitungen verwalten."), accessPolicy: "membership_requests" },
       planned("media", "Medien", "image", "permission_only", 110, "Eine Adminroute ist noch nicht vorhanden."),
     ],
   },

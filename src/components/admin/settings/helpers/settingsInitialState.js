@@ -1,4 +1,5 @@
 import { ROLE_TEMPLATES } from "./settingsOptions.js";
+import { resolvePersonDisplayName } from "../../../../lib/people/displayName.js";
 
 function parseJsonObject(source, fallback = {}) {
   if (!source) return fallback;
@@ -99,16 +100,8 @@ export function createInitialMembershipRequestForm(item = null) {
   };
 }
 
-function getPersonDisplayName(person = {}) {
-  return (
-    `${person.first_name || ""} ${person.last_name || ""}`.trim() ||
-    person.name ||
-    "Unbekannte Person"
-  );
-}
-
 function getCoachOptionLabel(coach) {
-  const name = getPersonDisplayName(coach);
+  const name = resolvePersonDisplayName(coach);
   const role =
     coach?.roleLabels?.join(", ") ||
     coach?.primaryRoleLabel ||
@@ -122,7 +115,7 @@ function getCoachOptionLabel(coach) {
 }
 
 function getBoardOptionLabel(member) {
-  const name = getPersonDisplayName(member);
+  const name = resolvePersonDisplayName(member);
   const role = member?.role_de || "Vorstand";
   return `${name} - ${role}`;
 }
@@ -131,18 +124,28 @@ export function getForwardTargets(type, coaches = [], boardMembers = []) {
   if (type === "coach") {
     return coaches.map((coach) => ({
       id: coach.id,
-      name: getPersonDisplayName(coach),
+      displayName: resolvePersonDisplayName(coach),
       email: coach.email || "",
       label: getCoachOptionLabel(coach),
+      roleLabel: coach?.roleLabels?.join(", ") || coach?.primaryRoleLabel || coach?.role_de || coach?.role || coach?.role_en || "Trainer",
+      teamLabels: coach?.teamNames?.length ? coach.teamNames : [coach?.teams?.name_de || coach?.primaryTeamName || "Ohne Mannschaft"],
+      imageUrl: coach?.imageUrl || coach?.image_url || coach?.photo_url || "",
+      isActive: coach?.isActive ?? coach?.is_active ?? true,
+      targetType: "coach",
     }));
   }
 
   if (type === "board") {
     return boardMembers.map((member) => ({
       id: member.id,
-      name: getPersonDisplayName(member),
+      displayName: resolvePersonDisplayName(member),
       email: member.email || "",
       label: getBoardOptionLabel(member),
+      roleLabel: member?.role_de || "Vorstand",
+      teamLabels: [member?.department_name || member?.department || "Vorstand"],
+      imageUrl: member?.image_url || member?.photo_url || "",
+      isActive: member?.is_active ?? true,
+      targetType: "board",
     }));
   }
 

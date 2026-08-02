@@ -1,74 +1,26 @@
-import { FormSection } from "@/components/admin/forms";
-import EntityBadge from "@/components/admin/ui/EntityBadge";
-import SettingsSelectionList from "./SettingsSelectionList";
+import {
+  AdminListChevron,
+  AdminListHeader,
+  AdminListMobileCard,
+  AdminListRow,
+  AdminModuleCards,
+  AdminModuleEmptyState,
+  AdminModuleList,
+  AdminStatusChip,
+} from "@/components/admin/design-system";
 
-export default function MembershipRequestList({
-  membershipRequests,
-  selectedMembershipRequestId,
-  onSelectRequest,
-  formatRequestDate,
-  getMembershipRequestTypeLabel,
-  getMembershipStatusLabel,
-  getMembershipForwardTypeLabel,
-}) {
-  return (
-    <FormSection
-      eyebrow="Mitgliedsanfragen"
-      title="Eingegangene Anfragen"
-      description="Neueste Anfragen werden zuerst angezeigt. Wähle eine Anfrage, um Status und interne Angaben zu prüfen oder zu aktualisieren."
-    >
-      <SettingsSelectionList
-        items={membershipRequests}
-        emptyText="Noch keine Mitgliedsanfragen eingegangen."
-        renderItem={(item) => {
-          const active = selectedMembershipRequestId === item.id;
-          const fullName =
-            `${item.first_name || ""} ${item.last_name || ""}`.trim();
+const template = "minmax(0,1.4fr) minmax(0,1fr) minmax(0,.8fr) minmax(0,.8fr) 2rem";
+const columns = ["Antragsteller", "Mannschaft / Jahrgang", "Eingang", "Status", ""].map((label) => ({ key: label || "overview", label }));
+const fullName = (item) => `${item.first_name || ""} ${item.last_name || ""}`.trim() || "Anfrage";
+const statusVariant = (status) => status === "done" ? "success" : status === "in_progress" ? "warning" : "danger";
 
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onSelectRequest(item)}
-              className={`w-full rounded-2xl border p-4 text-left transition ${active ? "border-red-500/70 bg-red-600/10" : "border-white/10 bg-black/20 hover:border-red-500/40"}`}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <EntityBadge variant="blue">
-                  {getMembershipRequestTypeLabel(item.request_type)}
-                </EntityBadge>
-                <EntityBadge
-                  variant={
-                    item.status === "done"
-                      ? "success"
-                      : item.status === "in_progress"
-                        ? "warning"
-                        : "red"
-                  }
-                >
-                  {getMembershipStatusLabel(item.status)}
-                </EntityBadge>
-                {item.forwarded_at && (
-                  <EntityBadge variant="success">Weitergeleitet</EntityBadge>
-                )}
-              </div>
-              <p className="mt-3 text-lg font-black">{fullName || "Anfrage"}</p>
-              <div className="mt-2 space-y-1 text-sm text-white/60">
-                <p>Jahrgang: {item.year_group || "-"}</p>
-                <p>Mannschaft: {item.teams?.name_de || "-"}</p>
-                <p>Telefon: {item.phone || "-"}</p>
-                <p>E-Mail: {item.email || "-"}</p>
-                <p>Eingang: {formatRequestDate(item.created_at)}</p>
-                {item.forwarded_at && (
-                  <p>
-                    Weitergeleitet an {item.forwarded_to_name || "-"} (
-                    {getMembershipForwardTypeLabel(item.forwarded_to_type)})
-                  </p>
-                )}
-              </div>
-            </button>
-          );
-        }}
-      />
-    </FormSection>
-  );
+function Status({ item, getMembershipStatusLabel }) {
+  return <div className="min-w-0 space-y-1"><AdminStatusChip compact variant={statusVariant(item.status)}>{getMembershipStatusLabel(item.status)}</AdminStatusChip>{item.forwarded_at ? <p className="text-[0.7rem] font-bold uppercase tracking-[0.1em] text-emerald-300">Weitergeleitet</p> : null}</div>;
+}
+
+export default function MembershipRequestList({ membershipRequests, selectedMembershipRequestId, onSelectRequest, formatRequestDate, getMembershipStatusLabel, compact = false }) {
+  if (!membershipRequests.length) return <AdminModuleEmptyState title="Keine Mitgliedsanfragen" description="Es liegen derzeit keine Mitgliedsanfragen vor." />;
+  const cards = <AdminModuleCards className={compact ? "" : "xl:hidden"}>{membershipRequests.map((item) => <AdminListMobileCard key={item.id} onClick={() => onSelectRequest(item)} label={`Anfrage von ${fullName(item)} öffnen`} className={selectedMembershipRequestId === item.id ? "border-red-500/55 border-l-4 bg-red-600/[0.07]" : ""}><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="break-words text-base font-black text-white">{fullName(item)}</p><p className="mt-1 text-sm text-white/55">{formatRequestDate(item.created_at)}</p></div><AdminListChevron label="Übersicht" /></div><div className="mt-3"><Status item={item} getMembershipStatusLabel={getMembershipStatusLabel} /></div><p className="mt-3 break-words text-sm text-white/60">{item.teams?.name_de || "Keine Mannschaft"}{item.year_group ? ` · ${item.year_group}` : ""}</p></AdminListMobileCard>)}</AdminModuleCards>;
+  if (compact) return cards;
+  return <AdminModuleList mobile={cards} desktopClassName="hidden overflow-hidden xl:block"><AdminListHeader columns={columns} template={template} />{membershipRequests.map((item) => <AdminListRow key={item.id} onClick={() => onSelectRequest(item)} label={`Anfrage von ${fullName(item)} öffnen`} template={template} className={selectedMembershipRequestId === item.id ? "border-l-2 border-red-500 bg-red-600/[0.07]" : ""}><span className="min-w-0 break-words font-black text-white">{fullName(item)}</span><span className="min-w-0 break-words text-white/65">{item.teams?.name_de || "–"}{item.year_group ? ` · ${item.year_group}` : ""}</span><span className="text-white/60">{formatRequestDate(item.created_at)}</span><Status item={item} getMembershipStatusLabel={getMembershipStatusLabel} /><AdminListChevron label="Übersicht" /></AdminListRow>)}</AdminModuleList>;
 }

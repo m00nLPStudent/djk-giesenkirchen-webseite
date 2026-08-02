@@ -28,6 +28,7 @@ export async function loadAdminNavigationFromAuthContext(authContext, currentPat
   return resolveAdminNavigation({
     sections: ADMIN_NAVIGATION_SECTIONS,
     permissionKeys: permissionKeys(authContext),
+    roleKeys: roleKeys(authContext),
     scopeContext: scopeResult.context,
     currentPath,
     featureFlags,

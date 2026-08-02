@@ -195,6 +195,10 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "prefix",
     priority: 300,
   }),
+  buildRule("/admin/membership-requests", "dashboard.view", {
+    matchType: "prefix",
+    priority: 310,
+  }),
   buildRule("/admin/department", "settings.view", {
     matchType: "prefix",
     priority: 300,
@@ -339,6 +343,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin/users": "users.view",
   "/admin/roles": "roles.view",
   "/admin/permissions": "permissions.view",
+  "/admin/membership-requests": "dashboard.view",
   "/admin/settings": "settings.view",
 };
 
@@ -348,6 +353,7 @@ export const ADMIN_DASHBOARD_ACTION_PERMISSION_MAP = {
   "/admin/users": "users.view",
   "/admin/roles": "roles.view",
   "/admin/permissions": "permissions.view",
+  "/admin/membership-requests": "dashboard.view",
   "/admin/teams/new": "teams.create",
   "/admin/settings": "settings.view",
   "/admin/club-history": "club_history.view",

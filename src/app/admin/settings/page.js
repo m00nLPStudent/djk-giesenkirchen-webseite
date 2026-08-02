@@ -1,8 +1,6 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { AdminSettingsEditor } from "@/components/admin/settings";
-import { createCoachReadDto } from "@/components/admin/persons/coachReadDto";
-import { getCoachSeasonalReadModelsMap } from "@/components/admin/persons/coachSeasonalReadModelRepository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
 
@@ -19,15 +17,7 @@ export default async function AdminSettingsPage() {
 
   const db = permissionResult.supabaseServer;
 
-  const [
-    settingsResult,
-    contactsResult,
-    pagesResult,
-    recipientsResult,
-    requestsResult,
-    coachesResult,
-    boardMembersResult,
-  ] = await Promise.all([
+  const [settingsResult, contactsResult, pagesResult] = await Promise.all([
     db.from("club_settings").select("*").maybeSingle(),
     db
       .from("club_contacts")
@@ -39,35 +29,12 @@ export default async function AdminSettingsPage() {
       .select("*")
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: true }),
-    db
-      .from("membership_request_recipients")
-      .select("*")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: true }),
-    db
-      .from("membership_requests")
-      .select("*, teams(name_de)")
-      .order("created_at", { ascending: false }),
-    db
-      .from("coaches")
-      .select("id, first_name, last_name, name, email, role, role_de, role_en")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: true }),
-    db
-      .from("board_members")
-      .select("id, first_name, last_name, email, role_de")
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: true }),
   ]);
 
   const errors = [
     { scope: "club_settings", error: settingsResult?.error },
     { scope: "club_contacts", error: contactsResult?.error },
     { scope: "pages", error: pagesResult?.error },
-    { scope: "membership_request_recipients", error: recipientsResult?.error },
-    { scope: "membership_requests", error: requestsResult?.error },
-    { scope: "coaches", error: coachesResult?.error },
-    { scope: "board_members", error: boardMembersResult?.error },
   ].filter((entry) => Boolean(entry.error));
 
   if (errors.length > 0) {
@@ -95,15 +62,6 @@ export default async function AdminSettingsPage() {
     );
   }
 
-  const coachRows = coachesResult?.data || [];
-  const coachReadModels = await getCoachSeasonalReadModelsMap(
-    db,
-    coachRows.map((coach) => coach.id).filter(Boolean),
-  );
-  const initialCoaches = coachRows.map((coach) =>
-    createCoachReadDto(coach, coachReadModels.get(coach.id) || {}),
-  );
-
   return (
     <AdminLayout
       title="Einstellungen"
@@ -121,10 +79,6 @@ export default async function AdminSettingsPage() {
         initialClubSettings={settingsResult?.data || null}
         initialClubContacts={contactsResult?.data || []}
         initialPages={pagesResult?.data || []}
-        initialMembershipRecipients={recipientsResult?.data || []}
-        initialMembershipRequests={requestsResult?.data || []}
-        initialCoaches={initialCoaches}
-        initialBoardMembers={boardMembersResult?.data || []}
       />
       </AdminModulePage>
     </AdminLayout>

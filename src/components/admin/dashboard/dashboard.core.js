@@ -32,16 +32,11 @@ export function resolveDashboardIntro({ permissionKeys = [], scopeContext = {}, 
 }
 
 export function canViewMembershipRequestsOnDashboard({ permissionKeys = [], roleKeys = [], scopeContext = {} } = {}) {
-  const permissions = new Set(permissionKeys);
-  const roles = new Set(roleKeys);
-  const isSuperadmin = scopeContext.isGlobal || roles.has("superadmin");
-  const isEligibleBoard = roles.has("vorstand") && permissions.has("membership_requests.view");
-  const hasYouthResponsibility = scopeContext.canAccessYouthAll || roles.has("jugendleiter") || roles.has("jugendkoordinator");
-  return Boolean(isSuperadmin || isEligibleBoard || hasYouthResponsibility);
+  return canAccessMembershipRequests({ permissionKeys, roleKeys, scopeContext });
 }
 
-export function canOpenMembershipRequestTarget({ permissionKeys = [], scopeContext = {} } = {}) {
-  return Boolean(scopeContext.isGlobal || new Set(permissionKeys).has("settings.view"));
+export function canOpenMembershipRequestTarget({ permissionKeys = [], roleKeys = [], scopeContext = {} } = {}) {
+  return canAccessMembershipRequests({ permissionKeys, roleKeys, scopeContext });
 }
 
 export async function loadMembershipRequestCountForDashboard({ allowed, loadCount }) {
@@ -65,7 +60,7 @@ export function buildDashboardNotices({ contributionSummary, membershipOpenCount
   const notices = [];
   if (contributionSummary?.overdueCount > 0) notices.push({ key: "contributions-overdue", tone: "danger", count: contributionSummary.overdueCount, text: "überfällige Beitragsfälle", href: "/admin/contributions" });
   if (contributionSummary?.openCount > 0) notices.push({ key: "contributions-open", tone: "warning", count: contributionSummary.openCount, text: "offene Beitragsfälle", href: "/admin/contributions" });
-  if (membershipOpenCount > 0) notices.push({ key: "membership-open", tone: "info", count: membershipOpenCount, text: "offene Mitgliedsanfragen", href: membershipTargetAvailable ? "/admin/settings" : null });
+  if (membershipOpenCount > 0) notices.push({ key: "membership-open", tone: "info", count: membershipOpenCount, text: "offene Mitgliedsanfragen", href: membershipTargetAvailable ? "/admin/membership-requests" : null });
   return notices;
 }
 
@@ -93,3 +88,4 @@ export function createDashboardDto(input = {}) {
   };
   return JSON.parse(JSON.stringify(dto));
 }
+import { canAccessMembershipRequests } from "../../../lib/admin-auth/membershipAccess.js";

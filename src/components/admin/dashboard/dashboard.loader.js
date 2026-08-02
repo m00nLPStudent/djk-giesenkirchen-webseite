@@ -58,7 +58,7 @@ export const loadDashboard = cache(async () => {
   const permissions = permissionKeys(auth);
   const roles = roleKeys(auth);
   const scopeResult = await loadAdminProfileScopeContext({ adminProfileId: auth.profile?.id, userId: auth.userId, roleKeys: roles, permissionKeys: permissions, supabase: auth.supabaseServer });
-  const navigation = resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys: permissions, scopeContext: scopeResult.context, currentPath: "/admin" });
+  const navigation = resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys: permissions, roleKeys: roles, scopeContext: scopeResult.context, currentPath: "/admin" });
   const accessContext = { roleKeys: roles, scopeContext: scopeResult.context };
   const plan = createDashboardQueryPlan(permissions, accessContext);
   const now = new Date();
@@ -73,7 +73,7 @@ export const loadDashboard = cache(async () => {
   const notices = buildDashboardNotices({
     contributionSummary,
     membershipOpenCount,
-    membershipTargetAvailable: canOpenMembershipRequestTarget({ permissionKeys: permissions, scopeContext: scopeResult.context }),
+    membershipTargetAvailable: canOpenMembershipRequestTarget({ permissionKeys: permissions, roleKeys: roles, scopeContext: scopeResult.context }),
   });
   const quickLinks = buildDashboardQuickLinks(navigation);
   const recentItems = buildRecentItems({ news: recentNews, events: upcomingEvents });

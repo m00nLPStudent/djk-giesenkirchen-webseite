@@ -1,7 +1,6 @@
 export const SETTINGS_TABS = [
   { id: "club", label: "Vereinsdaten" },
   { id: "contacts", label: "Allgemeine Kontakte" },
-  { id: "membership", label: "Mitglied werden" },
   { id: "pages", label: "Seiten" },
 ];
 

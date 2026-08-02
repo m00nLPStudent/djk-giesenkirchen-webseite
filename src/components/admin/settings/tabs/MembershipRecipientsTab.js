@@ -16,7 +16,7 @@ export default function MembershipRecipientsTab({
   getMembershipRequestTypeLabel,
 }) {
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_1.35fr]">
+    <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,35fr)_minmax(0,65fr)]">
       <MembershipRecipientList
         membershipRecipients={membershipRecipients}
         selectedMembershipRecipientId={selectedMembershipRecipientId}

@@ -21,7 +21,7 @@ export default function MembershipRequestsTab({
   getMembershipForwardTypeLabel,
 }) {
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_1.35fr]">
+    <div className={`grid min-w-0 gap-6 ${selectedMembershipRequest ? "xl:grid-cols-[minmax(0,35fr)_minmax(0,65fr)]" : "grid-cols-1"}`}>
       <MembershipRequestList
         membershipRequests={membershipRequests}
         selectedMembershipRequestId={selectedMembershipRequestId}
@@ -30,9 +30,10 @@ export default function MembershipRequestsTab({
         getMembershipRequestTypeLabel={getMembershipRequestTypeLabel}
         getMembershipStatusLabel={getMembershipStatusLabel}
         getMembershipForwardTypeLabel={getMembershipForwardTypeLabel}
+        compact={Boolean(selectedMembershipRequest)}
       />
 
-      <MembershipRequestDetails
+      {selectedMembershipRequest ? <MembershipRequestDetails
         selectedMembershipRequest={selectedMembershipRequest}
         membershipRequestForm={membershipRequestForm}
         membershipRequestLoading={membershipRequestLoading}
@@ -45,7 +46,7 @@ export default function MembershipRequestsTab({
         onMarkDone={onMarkMembershipRequestDone}
         formatRequestDate={formatRequestDate}
         getMembershipForwardTypeLabel={getMembershipForwardTypeLabel}
-      />
+      /> : null}
     </div>
   );
 }

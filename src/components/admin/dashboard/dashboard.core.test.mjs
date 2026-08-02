@@ -66,8 +66,8 @@ test("membership query and target link are decided independently before loading"
   const youthPlan = createDashboardQueryPlan([], { roleKeys: ["jugendleiter"], scopeContext: { canAccessYouthAll: true } });
   assert.equal(cashierPlan.membershipRequests, false);
   assert.equal(youthPlan.membershipRequests, true);
-  assert.equal(canOpenMembershipRequestTarget({ permissionKeys: [], scopeContext: { canAccessYouthAll: true } }), false);
-  assert.equal(canOpenMembershipRequestTarget({ permissionKeys: ["settings.view"] }), true);
+  assert.equal(canOpenMembershipRequestTarget({ permissionKeys: [], scopeContext: { canAccessYouthAll: true } }), true);
+  assert.equal(canOpenMembershipRequestTarget({ roleKeys: ["superadmin"] }), true);
 });
 
 test("membership query gate never calls the loader for an unauthorized context", async () => {
@@ -83,6 +83,7 @@ test("membership notice contains only aggregate count and an optional safe targe
   assert.ok(!buildDashboardNotices({ membershipOpenCount: 0 }).some((item) => item.key === "membership-open"));
   const withoutTarget = buildDashboardNotices({ membershipOpenCount: 4 }).find((item) => item.key === "membership-open");
   assert.deepEqual(withoutTarget, { key: "membership-open", tone: "info", count: 4, text: "offene Mitgliedsanfragen", href: null });
+  assert.equal(buildDashboardNotices({ membershipOpenCount: 1, membershipTargetAvailable: true })[0].href, "/admin/membership-requests");
   const serialized = JSON.stringify(withoutTarget);
   for (const sensitive of ["id", "first_name", "last_name", "notes", "email"]) assert.ok(!serialized.includes(sensitive));
 });

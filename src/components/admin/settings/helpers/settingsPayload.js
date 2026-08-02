@@ -15,7 +15,7 @@ export function createMembershipForwardPayload(form = {}, selectedTarget) {
   return {
     forwarded_to_type: form.forwarded_to_type,
     forwarded_to_id: selectedTarget.id,
-    forwarded_to_name: selectedTarget.name,
+      forwarded_to_name: selectedTarget.displayName || selectedTarget.name,
     forwarded_to_email: selectedTarget.email,
     forwarded_note: form.forwarded_note,
   };

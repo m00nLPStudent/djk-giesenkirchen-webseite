@@ -15,14 +15,20 @@ export function AdminListHeader({ columns, template, className = "" }) {
   return <div style={{ gridTemplateColumns: template }} className={`grid gap-4 border-b border-white/10 px-5 py-3 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/45 ${className}`}>{columns.map((column) => <span key={column.key || column.label} className={column.className}>{column.label}</span>)}</div>;
 }
 
-export function AdminListRow({ href, label, template, children, className = "" }) {
-  const classes = `grid items-center gap-4 border-t border-white/10 px-5 py-3 text-sm ${href ? `transition hover:bg-white/[0.05] ${adminUi.focusRing} focus-visible:outline-offset-[-2px]` : ""} ${className}`;
-  return href ? <Link href={href} aria-label={label} style={{ gridTemplateColumns: template }} className={classes}>{children}</Link> : <div style={{ gridTemplateColumns: template }} className={classes}>{children}</div>;
+export function AdminListRow({ href, onClick, label, template, children, className = "" }) {
+  const interactive = href || onClick;
+  const classes = `grid w-full items-center gap-4 border-t border-white/10 px-5 py-3 text-left text-sm ${interactive ? `transition hover:bg-white/[0.05] ${adminUi.focusRing} focus-visible:outline-offset-[-2px]` : ""} ${className}`;
+  if (href) return <Link href={href} aria-label={label} style={{ gridTemplateColumns: template }} className={classes}>{children}</Link>;
+  if (onClick) return <button type="button" onClick={onClick} aria-label={label} style={{ gridTemplateColumns: template }} className={classes}>{children}</button>;
+  return <div style={{ gridTemplateColumns: template }} className={classes}>{children}</div>;
 }
 
-export function AdminListMobileCard({ href, label, children, className = "" }) {
-  const classes = `block ${adminUi.mobileCard} ${href ? `transition hover:border-red-500/40 hover:bg-white/[0.06] ${adminUi.focusRing}` : ""} ${className}`;
-  return href ? <Link href={href} aria-label={label} className={classes}>{children}</Link> : <div className={classes}>{children}</div>;
+export function AdminListMobileCard({ href, onClick, label, children, className = "" }) {
+  const interactive = href || onClick;
+  const classes = `block w-full text-left ${adminUi.mobileCard} ${interactive ? `transition hover:border-red-500/40 hover:bg-white/[0.06] ${adminUi.focusRing}` : ""} ${className}`;
+  if (href) return <Link href={href} aria-label={label} className={classes}>{children}</Link>;
+  if (onClick) return <button type="button" onClick={onClick} aria-label={label} className={classes}>{children}</button>;
+  return <div className={classes}>{children}</div>;
 }
 
 export function AdminListChevron({ label }) {

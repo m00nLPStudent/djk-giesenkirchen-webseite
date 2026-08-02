@@ -1,5 +1,6 @@
 import { createCoachRoleSummary } from "./coachRoleSummary.mjs";
 import { resolveCoachImageUrl } from "../../../lib/people/imageUrl.js";
+import { resolvePersonDisplayName } from "../../../lib/people/displayName.js";
 
 function normalizeText(value) {
   if (typeof value !== "string") return null;
@@ -97,9 +98,8 @@ function compareAssignments(a, b) {
 }
 
 export function getCoachDisplayName(coach = {}) {
-  return normalizeText(`${coach.first_name || ""} ${coach.last_name || ""}`) ||
-    normalizeCoachNameFallback(coach.name) ||
-    "Name nicht hinterlegt";
+  const displayName = resolvePersonDisplayName(coach, null);
+  return normalizeCoachNameFallback(displayName) || "Name nicht hinterlegt";
 }
 
 export function getCoachImageUrl(coach = {}, fallbackImage = null) {
