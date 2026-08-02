@@ -107,7 +107,7 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+    <form id="board-member-editor" onSubmit={handleSubmit} className="space-y-6">
       <FormSection eyebrow="Vorstand" title="Personendaten">
         <FormGrid>
           <InputField
