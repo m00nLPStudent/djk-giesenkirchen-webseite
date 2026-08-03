@@ -1,4 +1,5 @@
-import { FormSection, TextareaField } from "@/components/admin/forms";
+import { FormSection } from "@/components/admin/forms";
+import AdminRichTextEditor from "@/components/admin/richtext/AdminRichTextEditor";
 import NewsAuthorPanel from "../components/NewsAuthorPanel";
 import NewsMetaPanel from "../components/NewsMetaPanel";
 
@@ -27,11 +28,14 @@ export default function NewsContentTab({
         description="Der vollständige Text für die spätere Detailseite."
       >
         <div>
-          <TextareaField
+          <AdminRichTextEditor
+            id="news-content-de"
+            name="content_de"
             label="Inhalt Deutsch"
-            rows={14}
             value={form.content_de}
-            onChange={(event) => updateField("content_de", event.target.value)}
+            onChange={(value) => updateField("content_de", value)}
+            minHeight={360}
+            helpText="Formatierter Hauptinhalt der öffentlichen News-Detailseite."
           />
         </div>
       </FormSection>

@@ -1,0 +1,9 @@
+module,route_or_component,field,previous_editor,new_editor,html_compatible,payload_unchanged,sanitizer,responsive,test_status,status,notes
+News,NewsContentTab,content_de,Textarea,AdminRichTextEditor,yes,yes,RichTextContent,yes,covered,DONE,Deutscher Hauptinhalt
+Vereinsgeschichte,ClubHistoryEditorForm,content_de,TipTap,AdminRichTextEditor,yes,yes,RichTextContent,yes,covered,DONE,Hauptinhalt
+CMS-Seiten,PageForm,content_de,TipTap,AdminRichTextEditor,yes,yes,RichTextContent,yes,covered,DONE,EN-Daten bleiben verborgen und erhalten
+Mannschaften,TeamDescriptionTab,description_de|description_en,Textarea,Textarea,not_applicable,yes,escaped text,yes,inventory,NOT_APPLICABLE,Vorhandene Kurzbeschreibung ist kein HTML-Feld
+Sponsoren,AdminSponsorForm,description_de|description_en,Textarea,Textarea,not_applicable,yes,escaped text,yes,inventory,NOT_APPLICABLE,Öffentliche Karte rendert einfachen Text
+Termine,EventBasicTab,description_de,Textarea,Textarea,not_applicable,yes,escaped text,yes,inventory,NOT_APPLICABLE,Vorhandene Terminbeschreibung ist kein Rich Text
+Spieler,PlayerDescriptionFields,description_de|description_en,Textarea,Textarea,not_applicable,yes,escaped text,yes,inventory,NOT_APPLICABLE,Personenbeschreibung bleibt einfacher Text
+Downloads,future,description,none,none,not_applicable,not_applicable,not_applicable,not_applicable,not_applicable,DEFERRED,Keine Download-Fachlogik in B15.17

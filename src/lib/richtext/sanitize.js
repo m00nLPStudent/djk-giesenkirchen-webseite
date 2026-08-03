@@ -1,6 +1,8 @@
 const ALLOWED_TAGS = new Set([
   "h2",
   "h3",
+  "h1",
+  "h4",
   "p",
   "strong",
   "em",
@@ -11,6 +13,17 @@ const ALLOWED_TAGS = new Set([
   "a",
   "span",
   "br",
+  "s",
+  "blockquote",
+  "table",
+  "thead",
+  "tbody",
+  "tfoot",
+  "tr",
+  "th",
+  "td",
+  "hr",
+  "img",
 ]);
 
 const ALLOWED_LINK_PROTOCOLS = ["http:", "https:", "mailto:"];
@@ -102,16 +115,38 @@ function extractStyle(attributes) {
   return styleMatch[1] || styleMatch[2] || styleMatch[3] || null;
 }
 
+function extractAttribute(attributes, name) {
+  if (!attributes) return null;
+  const match = attributes.match(new RegExp(`${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'\u0060=<>]+))`, "i"));
+  return match ? match[1] || match[2] || match[3] || null : null;
+}
+
+function normalizeImageSource(value) {
+  if (!value) return null;
+  try {
+    const parsed = new URL(value, "https://example.com");
+    return ["http:", "https:"].includes(parsed.protocol) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeColor(value) {
+  const candidate = String(value || "").trim();
+  return /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\))$/i.test(candidate) ? candidate : null;
+}
+
 function normalizeSpanStyle(rawStyle) {
   if (typeof rawStyle !== "string") return null;
 
-  const fontSizeMatch = rawStyle.match(/font-size\s*:\s*([^;]+)/i);
-  if (!fontSizeMatch) return null;
-
-  const value = String(fontSizeMatch[1] || "")
-    .trim()
-    .toLowerCase();
-  return ALLOWED_FONT_SIZES.has(value) ? value : null;
+  const declarations = [];
+  const fontSize = rawStyle.match(/font-size\s*:\s*([^;]+)/i)?.[1]?.trim().toLowerCase();
+  const color = normalizeColor(rawStyle.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i)?.[1]);
+  const background = normalizeColor(rawStyle.match(/background-color\s*:\s*([^;]+)/i)?.[1]);
+  if (ALLOWED_FONT_SIZES.has(fontSize)) declarations.push(`font-size: ${fontSize}`);
+  if (color) declarations.push(`color: ${color}`);
+  if (background) declarations.push(`background-color: ${background}`);
+  return declarations.join("; ") || null;
 }
 
 export function sanitizeRichTextHtml(input) {
@@ -152,6 +187,20 @@ export function sanitizeRichTextHtml(input) {
       continue;
     }
 
+    if (tagName === "hr") {
+      result += "<hr>";
+      continue;
+    }
+
+    if (tagName === "img") {
+      const src = normalizeImageSource(extractAttribute(rawAttributes, "src"));
+      if (!src) continue;
+      const alt = extractAttribute(rawAttributes, "alt") || "";
+      const title = extractAttribute(rawAttributes, "title");
+      result += `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}"${title ? ` title="${escapeAttribute(title)}"` : ""}>`;
+      continue;
+    }
+
     if (tagName === "a") {
       const href = normalizeHref(extractHref(rawAttributes));
 
@@ -164,13 +213,22 @@ export function sanitizeRichTextHtml(input) {
     }
 
     if (tagName === "span") {
-      const fontSize = normalizeSpanStyle(extractStyle(rawAttributes));
+      const safeStyle = normalizeSpanStyle(extractStyle(rawAttributes));
 
-      if (fontSize) {
-        result += `<span style="font-size: ${escapeAttribute(fontSize)}">`;
+      if (safeStyle) {
+        result += `<span style="${escapeAttribute(safeStyle)}">`;
       } else {
         result += "<span>";
       }
+      continue;
+    }
+
+    if (tagName === "td" || tagName === "th") {
+      const colspan = extractAttribute(rawAttributes, "colspan");
+      const rowspan = extractAttribute(rawAttributes, "rowspan");
+      const safeColspan = /^\d{1,2}$/.test(colspan || "") ? ` colspan="${colspan}"` : "";
+      const safeRowspan = /^\d{1,2}$/.test(rowspan || "") ? ` rowspan="${rowspan}"` : "";
+      result += `<${tagName}${safeColspan}${safeRowspan}>`;
       continue;
     }
 

@@ -4,6 +4,7 @@ import { formatFileSize } from "@/lib/files";
 import { formatGermanDate } from "@/lib/dates";
 import { getNewsCategoryDisplay } from "@/components/admin/news/helpers/newsCategories.core";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
+import RichTextContent from "@/components/website/content/RichTextContent";
 
 export default async function NewsDetailPage({ params }) {
   const { slug } = await params;
@@ -58,9 +59,7 @@ export default async function NewsDetailPage({ params }) {
             <span>{formatGermanDate(article.published_at)}</span>
           </div>
 
-          <div className="mt-12 text-lg leading-9 text-white/80">
-            {article.content_de}
-          </div>
+          <RichTextContent content={article.content_de} className="mt-12 text-lg leading-9 text-white/80" />
 
           {documents.length > 0 && (
             <div className="mt-10">
