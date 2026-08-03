@@ -11,6 +11,9 @@ import { saveTeamWithSeason } from "@/components/admin/teams/services/teams.serv
 import { archiveTeam } from "@/components/admin/archiving/archive.service";
 import { revalidatePath } from "next/cache";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
+import { loadTeamRosterNotificationSnapshot } from "@/components/admin/notifications/teamRosterNotification.repository";
+import { logNotificationFailure, notifyTeamArchived, notifyTeamRosterChange } from "@/components/admin/notifications/teamAssignmentNotifications.service";
+import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 
 function buildError(message) {
   return { error: { message } };
@@ -46,6 +49,7 @@ async function loadAuthorizedTeamMutationContext(requiredPermission) {
     ok: true,
     supabaseServer: permissionResult.supabaseServer,
     scopeContext,
+    userId: permissionResult.userId,
   };
 }
 
@@ -78,12 +82,27 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
     }
   }
 
+  const previousRoster = teamId && teamPayload?.season_id
+    ? await loadTeamRosterNotificationSnapshot(supabaseServer, teamId, teamPayload.season_id)
+    : { data: null, error: null };
+
   const result = await saveTeamWithSeason(teamPayload || {}, teamId, {
     client: supabaseServer,
   });
 
   if (result?.error) {
     return buildError(result.error.message || "Fehler beim Speichern.");
+  }
+
+  if (previousRoster.error) {
+    logNotificationFailure("load-team-roster-before-save", previousRoster.error);
+  } else if (result.teamId && result.teamSeasonId) {
+    const nextRoster = await loadTeamRosterNotificationSnapshot(supabaseServer, result.teamId, teamPayload.season_id);
+    if (nextRoster.error) logNotificationFailure("load-team-roster-postcheck", nextRoster.error);
+    else {
+      const notificationResult = await notifyTeamRosterChange({ previous: previousRoster.data, next: nextRoster.data, actorUserId: authContext.userId });
+      logNotificationFailure("save-team-roster", notificationResult.error);
+    }
   }
 
   return { error: null };
@@ -107,9 +126,18 @@ export async function removeTeamWithScopeAction(teamId) {
     return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
   }
 
+  const season = await loadCurrentSeasonResolution(supabaseServer);
+  const rosterSnapshot = season.activeSeasonId
+    ? await loadTeamRosterNotificationSnapshot(supabaseServer, teamId, season.activeSeasonId)
+    : { data: null, error: null };
   const result = await archiveTeam(supabaseServer, teamId);
 
   if (result?.ok) {
+    if (rosterSnapshot.error) logNotificationFailure("load-team-roster-before-archive", rosterSnapshot.error);
+    else if (rosterSnapshot.data) {
+      const notificationResult = await notifyTeamArchived({ snapshot: rosterSnapshot.data, actorUserId: authContext.userId });
+      logNotificationFailure("archive-team-roster", notificationResult.error);
+    }
     revalidatePath("/admin");
     revalidatePath("/admin/teams");
     revalidatePath(`/admin/teams/${teamId}`);

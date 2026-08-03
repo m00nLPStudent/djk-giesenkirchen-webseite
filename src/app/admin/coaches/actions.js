@@ -10,6 +10,8 @@ import {
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
 import { saveCoach } from "@/components/admin/coaches/services/coachWrite.service";
+import { loadCoachCurrentSeasonAssignmentRows } from "@/components/admin/coaches/services/coachWrite.repository";
+import { logNotificationFailure, notifyCoachAssignmentChange } from "@/components/admin/notifications/teamAssignmentNotifications.service";
 import {
   loadScopedCoachTeamSeasonOptions,
   resolveCoachTeamSeasonTargets,
@@ -142,14 +144,21 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
       );
     }
 
-    const { error } = await saveCoach(coachPayload || {}, coachId, {
+    const saveResult = await saveCoach(coachPayload || {}, coachId, {
       client: supabaseServer,
       teamSeasonOptions: targetResolution.teamSeasonOptions,
     });
 
-    if (error) {
-      return buildError(error.message || "Fehler beim Speichern.");
+    if (saveResult.error) {
+      return buildError(saveResult.error.message || "Fehler beim Speichern.");
     }
+
+    const notificationResult = await notifyCoachAssignmentChange({
+      coach: saveResult.data,
+      change: saveResult.assignmentChange,
+      actorUserId: permissionResult.userId,
+    });
+    logNotificationFailure("save-coach", notificationResult.error);
 
     revalidatePath("/admin/coaches");
     revalidatePublicCoachPages();
@@ -188,9 +197,19 @@ export async function removeCoachWithScopeAction(coachId) {
     return buildError("Du darfst dieses Trainerprofil nicht loeschen.");
   }
 
+  const assignmentSnapshot = await loadCoachCurrentSeasonAssignmentRows(supabaseServer, coachId);
+  const optionSnapshot = await loadScopedCoachTeamSeasonOptions(scopeContext, supabaseServer);
+  const optionById = new Map((optionSnapshot.teamOptions || []).map((item) => [item.teamSeasonId, item]));
+  const previousAssignments = (assignmentSnapshot.data || []).filter((item) => item.isActive !== false).map((item) => ({ ...item, ...(optionById.get(item.teamSeasonId) || {}) }));
   const result = await archiveCoach(supabaseServer, coachId);
 
   if (result.ok) {
+    const notificationResult = await notifyCoachAssignmentChange({
+      coach,
+      change: { previousAssignments, nextAssignments: [], insertedIds: [], updatedIds: [], reactivatedIds: [], deactivatedIds: previousAssignments.map((item) => item.coachTeamSeasonId) },
+      actorUserId: permissionResult.userId,
+    });
+    logNotificationFailure("archive-coach", notificationResult.error);
     revalidatePath("/admin");
     revalidatePath("/admin/coaches");
     revalidatePath(`/admin/coaches/edit/${coachId}`);

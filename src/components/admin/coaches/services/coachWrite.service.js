@@ -24,7 +24,6 @@ import {
 function resolveClient(client = null) {
   return client || supabase;
 }
-
 function createServiceError(message, code = "COACH_SAVE_FAILED") {
   return { message, code };
 }
@@ -37,7 +36,6 @@ function combineServiceErrors(primaryError, secondaryError) {
     primaryError.code,
   );
 }
-
 async function restoreCoachMaster(db, coachId, previousCoach) {
   const restorePayload = buildCoachMasterRollbackPayload(previousCoach, {
     placeholderImage: COACH_PLACEHOLDER_IMAGE,
@@ -45,7 +43,6 @@ async function restoreCoachMaster(db, coachId, previousCoach) {
 
   return await updateCoachMaster(db, coachId, restorePayload);
 }
-
 async function applyAssignmentRollbackPlan(db, rollbackPlan = []) {
   let rollbackError = null;
 
@@ -204,7 +201,8 @@ export async function saveCoach(
     );
 
     if (!createAssignmentsResult.error) {
-      return coachResult;
+      return { ...coachResult, assignmentChange: { previousAssignments: [], nextAssignments: normalizedAssignments,
+        insertedIds: createAssignmentsResult.insertedAssignmentIds, updatedIds: [], reactivatedIds: [], deactivatedIds: [] } };
     }
 
     const rollbackError = await deleteCoachMaster(db, coachResult.data.id);
@@ -272,7 +270,12 @@ export async function saveCoach(
   );
 
   if (!editAssignmentsResult.error) {
-    return masterResult;
+    const previousAssignments = existingAssignmentsResult.data.map(
+      (assignment) => ({ ...assignment, ...(optionById.get(assignment.teamSeasonId) || {}) }),
+    );
+    return { ...masterResult, assignmentChange: { previousAssignments, nextAssignments: normalizedAssignments,
+      insertedIds: editAssignmentsResult.insertedIds, updatedIds: editAssignmentsResult.updatedIds,
+      reactivatedIds: editAssignmentsResult.reactivatedIds, deactivatedIds: editAssignmentsResult.deactivatedIds } };
   }
 
   const assignmentRollbackError = await rollbackEditAssignments(

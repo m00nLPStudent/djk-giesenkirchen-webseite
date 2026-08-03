@@ -128,6 +128,8 @@ export function normalizeCoachAssignments(
         teamSeasonId: assignment?.team_season_id || null,
         teamId: option?.teamId || null,
         teamNameDe: option?.teamNameDe || null,
+        seasonId: option?.seasonId || null,
+        seasonName: option?.seasonName || null,
         roleDe,
         roleEn: normalizeRoleEn(roleDe, assignment?.role_en),
         isActive: assignment?.is_active ?? true,

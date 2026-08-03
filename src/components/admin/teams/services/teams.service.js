@@ -245,5 +245,5 @@ export async function saveTeamWithSeason(
     if (coachResult.error) return coachResult;
   }
 
-  return teamResult;
+  return { ...teamResult, teamId, teamSeasonId: savedTeamSeason?.id || null };
 }

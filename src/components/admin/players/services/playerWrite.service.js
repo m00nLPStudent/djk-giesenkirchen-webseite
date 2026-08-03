@@ -206,7 +206,8 @@ export async function savePlayer(
     );
 
     if (!assignmentResult.error) {
-      return playerResult;
+      return { ...playerResult, assignmentChange: { operation: PLAYER_ASSIGNMENT_OPERATIONS.CREATE,
+        previousAssignment: null, targetAssignment: targetTeamSeasonOption, assignmentId: assignmentResult.data?.id || null } };
     }
 
     const rollbackError = await deletePlayerMaster(db, playerResult.data.id);
@@ -263,7 +264,12 @@ export async function savePlayer(
   );
 
   if (!editAssignmentResult.error) {
-    return masterResult;
+    const previousAssignment = existingAssignmentsResult.data.find(
+      (assignment) => assignment.isActive !== false,
+    ) || null;
+    const assignmentId = editAssignmentResult.insertedIds[0] || editAssignmentResult.reactivatedIds[0] || editAssignmentResult.updatedIds[0] || assignmentDecision.currentAssignmentId || null;
+    return { ...masterResult, assignmentChange: { operation: assignmentDecision.operation,
+      previousAssignment, targetAssignment: targetTeamSeasonOption, assignmentId } };
   }
 
   const assignmentRollbackError = await applyAssignmentRollbackPlan(

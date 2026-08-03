@@ -14,6 +14,8 @@ import {
   resolvePlayerTeamSeasonTarget,
 } from "@/components/admin/players/services/playerTeamSeasonOptions.repository";
 import { savePlayer } from "@/components/admin/players/services/playerWrite.service";
+import { loadPlayerCurrentSeasonAssignmentRows } from "@/components/admin/players/services/playerWrite.repository";
+import { notifyPlayerAssignmentChange, logNotificationFailure } from "@/components/admin/notifications/teamAssignmentNotifications.service";
 import {
   archivePlayer,
   loadPlayerArchivePreview,
@@ -28,7 +30,7 @@ function buildError(message) {
 async function loadPlayerById(client, playerId) {
   const { data } = await client
     .from("players")
-    .select("id")
+    .select("id, first_name, last_name")
     .eq("id", playerId)
     .maybeSingle();
 
@@ -140,14 +142,28 @@ export async function savePlayerWithScopeAction(
       );
     }
 
-    const { error } = await savePlayer(playerPayload || {}, playerId, {
+    const saveResult = await savePlayer(playerPayload || {}, playerId, {
       client: supabaseServer,
       targetTeamSeasonOption: targetResolution.teamSeasonOption,
     });
 
-    if (error) {
-      return buildError(error.message || "Fehler beim Speichern.");
+    if (saveResult.error) {
+      return buildError(saveResult.error.message || "Fehler beim Speichern.");
     }
+
+    if (saveResult.assignmentChange?.previousAssignment) {
+      saveResult.assignmentChange.previousAssignment = {
+        ...saveResult.assignmentChange.previousAssignment,
+        seasonId: targetResolution.teamSeasonOption.seasonId,
+        seasonName: targetResolution.teamSeasonOption.seasonName,
+      };
+    }
+    const notificationResult = await notifyPlayerAssignmentChange({
+      player: saveResult.data,
+      change: saveResult.assignmentChange,
+      actorUserId: permissionResult.userId,
+    });
+    logNotificationFailure("save-player", notificationResult.error);
 
     revalidatePath("/admin/players");
 
@@ -186,9 +202,22 @@ export async function removePlayerWithScopeAction(playerId) {
     return buildError("Du darfst diesen Spieler nicht archivieren.");
   }
 
+  const seasonResolution = await import("@/components/admin/persons/currentSeasonRepository").then(({ loadCurrentSeasonResolution }) => loadCurrentSeasonResolution(supabaseServer));
+  const assignmentSnapshot = seasonResolution.activeSeasonId
+    ? await loadPlayerCurrentSeasonAssignmentRows(supabaseServer, playerId, seasonResolution.activeSeasonId)
+    : { data: [] };
   const result = await archivePlayer(supabaseServer, playerId);
 
   if (result.ok) {
+    const previousAssignment = (assignmentSnapshot.data || []).find((item) => item.isActive !== false) || null;
+    if (previousAssignment) {
+      const notificationResult = await notifyPlayerAssignmentChange({
+        player: existingPlayer,
+        change: { operation: "DEACTIVATE_ASSIGNMENT", previousAssignment: { ...previousAssignment, seasonId: seasonResolution.activeSeasonId, seasonName: seasonResolution.activeSeasonName }, targetAssignment: null },
+        actorUserId: permissionResult.userId,
+      });
+      logNotificationFailure("archive-player", notificationResult.error);
+    }
     revalidatePath("/admin/players");
     revalidatePath(`/admin/players/${playerId}`);
     revalidatePath("/admin/teams");
