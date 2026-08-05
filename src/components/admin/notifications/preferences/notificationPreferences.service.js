@@ -1,6 +1,6 @@
 import "server-only";
 import * as repository from "./notificationPreferences.repository";
-import { getOptionalNotificationTypes, isNotificationEnabled, isNotificationTypeConfigurable, isNotificationTypeMandatory, notificationPreferenceDefinitions } from "./notificationPreferencePolicy.mjs";
+import { filterInputsWithPreferenceMap, getOptionalNotificationTypes, isNotificationEnabled, isNotificationTypeConfigurable, isNotificationTypeMandatory, notificationPreferenceDefinitions } from "./notificationPreferencePolicy.mjs";
 
 export async function loadOwnNotificationPreferences(db, userId) {
   const result = await repository.loadNotificationPreferences(db, userId);
@@ -24,7 +24,6 @@ export async function filterRecipientsByNotificationPreferences(db, inputs = [])
   if (types.every(isNotificationTypeMandatory)) return { allowed: inputs, skipped: [], mandatoryType: true, lookupError: null, inputCount: inputs.length, outputCount: inputs.length };
   const lookup = await repository.loadNotificationPreferenceMap(db, inputs.map((item) => item.recipientUserId), types);
   if (lookup.error) return { allowed: inputs, skipped: [], mandatoryType: types.every(isNotificationTypeMandatory), lookupError: lookup.error, inputCount: inputs.length, outputCount: inputs.length };
-  const allowed = [], skipped = [];
-  for (const input of inputs) (isNotificationEnabled(input.type, lookup.data.get(`${input.recipientUserId}:${input.type}`)) ? allowed : skipped).push(input);
+  const { allowed, skipped } = filterInputsWithPreferenceMap(inputs, lookup.data);
   return { allowed, skipped, mandatoryType: types.every(isNotificationTypeMandatory), lookupError: null, inputCount: inputs.length, outputCount: allowed.length };
 }

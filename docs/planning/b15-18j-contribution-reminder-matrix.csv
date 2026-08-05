@@ -1,0 +1,8 @@
+stage,type,calendar_rule,status,recipient,privacy,idempotency
+due_soon_14,membership_payment_due_soon,14 days before due_date,READY,finance|team,role_based,type+contribution+recipient+stage+business_date+year
+due_soon_7,membership_payment_due_soon,7 days before due_date,READY,finance|team,role_based,type+contribution+recipient+stage+business_date+year
+due_today,membership_payment_due_today,on due_date,READY,finance|team,role_based,type+contribution+recipient+stage+business_date+year
+overdue_7,membership_payment_overdue|membership_payment_partial_open,7 days after due_date,READY,finance|team,role_based,type+contribution+recipient+stage+business_date+year
+overdue_recurring,membership_payment_overdue|membership_payment_partial_open,"21 days after due_date, then every 14 days",READY,finance|team,role_based,type+contribution+recipient+stage+business_date+year
+deferral_end,membership_payment_deferral_ending,on deferred_until,PARTIAL,finance|team,role_based,type+contribution+recipient+stage+business_date+year
+excluded,none,"paid, exempt, canceled, invalid due date, nonpositive remainder",READY,none,none,none

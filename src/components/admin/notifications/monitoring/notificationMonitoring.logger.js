@@ -43,6 +43,7 @@ function createAuditPayload(event = {}) {
         outputCount: count(preferences.outputCount),
         mandatoryType: preferences.mandatoryType === true,
       },
+      ...(event.dispatcherAnalysis ? { dispatcherAnalysis: event.dispatcherAnalysis } : {}),
     },
   };
 }

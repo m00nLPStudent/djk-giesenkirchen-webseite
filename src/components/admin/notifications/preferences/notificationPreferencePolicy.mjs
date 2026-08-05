@@ -20,6 +20,10 @@ const definitions = [
   ["membership_payment_confirmed","contributions","Zahlung bestätigt","Eine Zahlung wurde bestätigt.",false],
   ["membership_payment_overdue","contributions","Zahlung überfällig","Eine Beitragszahlung ist überfällig.",false],
   ["membership_payment_deleted","contributions","Zahlung storniert","Eine Zahlung wurde storniert.",false],
+  ["membership_payment_due_soon","contributions","Fälligkeit steht bevor","Ein offener Vereinsbeitrag wird in Kürze fällig.",false],
+  ["membership_payment_due_today","contributions","Beitrag heute fällig","Ein offener Vereinsbeitrag ist heute fällig.",false],
+  ["membership_payment_partial_open","contributions","Offene Restzahlung","Ein teilweise bezahlter Beitrag ist weiterhin offen.",false],
+  ["membership_payment_deferral_ending","contributions","Stundung endet","Eine bestehende Stundung erreicht ihr Enddatum.",false],
   ["member_activated","contributions","Mitglied aktiviert","Ein Mitglied wurde aktiviert.",false],
   ["member_deactivated","contributions","Mitglied deaktiviert","Ein Mitglied wurde deaktiviert.",false],
   ["member_archived","contributions","Mitglied archiviert","Ein Mitglied wurde archiviert.",false],
@@ -42,3 +46,8 @@ export const isNotificationTypeMandatory = (type) => getNotificationPreferenceDe
 export const isNotificationTypeConfigurable = (type) => getNotificationPreferenceDefinition(type)?.configurable === true;
 export const getOptionalNotificationTypes = () => definitions.filter((item) => item.configurable).map((item) => item.type);
 export const isNotificationEnabled = (type, storedValue) => !getNotificationPreferenceDefinition(type) || isNotificationTypeMandatory(type) || storedValue !== false;
+export function filterInputsWithPreferenceMap(inputs = [], preferenceMap = new Map()) {
+  const allowed = [], skipped = [];
+  for (const input of inputs) (isNotificationEnabled(input.type, preferenceMap.get(`${input.recipientUserId}:${input.type}`)) ? allowed : skipped).push(input);
+  return { allowed, skipped };
+}

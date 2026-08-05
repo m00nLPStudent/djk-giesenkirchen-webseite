@@ -1,0 +1,20 @@
+test_id,area,scenario,actor_role,recipient_roles,notification_type,preferences,expected_recipients,expected_skips,expected_audit_status,expected_route,parallelism,test_method,test_status,status,notes
+I-01,multi_account,four team recipients,Vorstand,Trainer|Co-Trainer|Betreuer,player_assigned,enabled,4,0,success,player_or_team,1,core,PASSED,PASSED,synthetic UUID fixtures
+I-02,preferences,mixed opt-outs,Vorstand,Trainer|Co-Trainer|Betreuer,player_assigned,mixed,2,2,warning,authorized,1,core,PASSED,PASSED,
+I-03,mandatory,all optional disabled,Vorstand,Trainer,trainer_removed,disabled,4,0,success,notification_detail,1,core,PASSED,PASSED,
+I-04,multi_role,same auth user in multiple roles,Superadmin,Superadmin|Trainer,player_assigned,enabled,1,0,success,authorized,1,core,PASSED,PASSED,
+I-05,idempotency,parallel identical requests,Vorstand,Trainer,player_assigned,enabled,1,1,duplicate,authorized,2,architecture,PARTIAL,PARTIAL,read-before-write race proven; SQL proposal prepared
+I-06,parallel,different entity keys,Vorstand,Trainer,player_assigned,enabled,all,0,success,authorized,20,static,PASSED,PASSED,keys contain entity or assignment identity
+I-07,preferences,parallel bulk actions,Trainer,Trainer,event_updated,mixed,last-write,0,success,settings,2,architecture,PARTIAL,PARTIAL,unique constraint and last-write-wins
+I-08,audit,consistency equations,Superadmin,none,event_updated,mixed,2,2,warning,monitoring,1,core,PASSED,PASSED,
+I-09,monitoring,100 rows,Superadmin,none,mixed,mixed,n/a,n/a,mixed,monitoring,1,local_benchmark,PASSED,PASSED,JS mapping only
+I-10,monitoring,1000 rows,Superadmin,none,mixed,mixed,n/a,n/a,mixed,monitoring,1,local_benchmark,PASSED,PASSED,JS mapping only
+I-11,monitoring,10000 rows,Superadmin,none,mixed,mixed,n/a,n/a,mixed,monitoring,1,local_benchmark,PASSED,PASSED,JS mapping only
+I-12,rls,notification own row,Trainer,Trainer,any,any,own,foreign blocked,n/a,center,1,static,PASSED,PASSED,live session deferred
+I-13,rls,preference own row,Trainer,Trainer,any,any,own,foreign blocked,n/a,settings,1,static,PASSED,PASSED,live session deferred
+I-14,rls,audit superadmin read,Trainer|Vorstand,Superadmin,any,any,superadmin,others blocked,n/a,monitoring,1,static,PASSED,PASSED,live session deferred
+I-15,security,direct audit insert,Trainer,none,any,any,n/a,n/a,n/a,none,1,architecture,FAILED,FAILED,hardening RPC proposal required
+I-16,tabs,focus refresh,Trainer,Trainer,any,any,n/a,n/a,n/a,center,2,browser,BLOCKED,BLOCKED,no browser accounts supplied
+I-17,persistence,server restart,Trainer,Trainer,event_updated,disabled,0,1,skipped,center,1,browser,BLOCKED,BLOCKED,requires staging database
+I-18,routing,removed resource,Vorstand,Trainer,trainer_removed,mandatory,1,0,success,notification_detail,1,core,PASSED,PASSED,
+I-19,retry,retry stays disabled,Superadmin,none,any,any,0,0,n/a,monitoring,1,static,PASSED,PASSED,

@@ -18,6 +18,22 @@ export function insertNotificationsInRepository(db, payloads) {
   return db.from("notifications").insert(payloads).select(SELECT_FIELDS);
 }
 
+export function isNotificationUniqueViolation(error) {
+  return error?.code === "23505" && String(error?.message || "").includes("notifications_recipient_type_idempotency_unique");
+}
+
+export async function insertNotificationsIdempotentlyInRepository(db, payloads) {
+  const settled = await Promise.all(payloads.map((payload) => insertNotificationInRepository(db, payload)));
+  const data = [], errors = [];
+  let duplicateCount = 0;
+  for (const result of settled) {
+    if (!result.error && result.data) data.push(result.data);
+    else if (isNotificationUniqueViolation(result.error)) duplicateCount += 1;
+    else if (result.error) errors.push(result.error);
+  }
+  return { data, duplicateCount, error: errors[0] || null, failedCount: errors.length };
+}
+
 export function markNotificationReadInRepository(db, recipientUserId, id, nowIso) {
   return db.from("notifications").update({ is_read: true, read_at: nowIso }).eq("id", id).eq("recipient_user_id", recipientUserId).select(SELECT_FIELDS).maybeSingle();
 }

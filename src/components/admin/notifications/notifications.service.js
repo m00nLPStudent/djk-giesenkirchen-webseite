@@ -25,7 +25,7 @@ export async function createNotification(input, { db }) {
   const started = Date.now();
   const preferences = await filterRecipientsByNotificationPreferences(db, [input]);
   const result = preferences.allowed.length ? await repository.insertNotificationInRepository(db, createPayload(input)) : { data: null, error: null };
-  await recordNotificationMonitoringEvent({ type: input.type, status: result.error ? "failed" : preferences.skipped.length ? "skipped" : "success", actorId: input.actorUserId, recipientId: input.recipientUserId, recipientCount: 1, afterDedupeCount: 1, successCount: result.error ? 0 : result.data ? 1 : 0, failedCount: result.error ? 1 : 0, skippedCount: preferences.skipped.length, durationMs: Date.now() - started, route: input.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : null, idempotencyKey: input.metadata?.idempotencyKey, recipientAnalysis: input.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) });
+  await recordNotificationMonitoringEvent({ type: input.type, status: result.error ? "failed" : preferences.skipped.length ? "skipped" : "success", actorId: input.actorUserId, recipientId: input.recipientUserId, recipientCount: 1, afterDedupeCount: 1, successCount: result.error ? 0 : result.data ? 1 : 0, failedCount: result.error ? 1 : 0, skippedCount: preferences.skipped.length, durationMs: Date.now() - started, route: input.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : null, idempotencyKey: input.metadata?.idempotencyKey, recipientAnalysis: input.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) }, { db });
   return { ...result, data: result.data ? createNotificationDto(result.data) : null };
 }
 
@@ -33,7 +33,7 @@ export async function createNotifications(inputs, { db }) {
   const started = Date.now();
   const preferences = await filterRecipientsByNotificationPreferences(db, inputs);
   const result = preferences.allowed.length ? await repository.insertNotificationsInRepository(db, preferences.allowed.map(createPayload)) : { data: [], error: null };
-  await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: result.error ? "failed" : preferences.skipped.length ? "warning" : "success", actorId: inputs[0]?.actorUserId, recipientId: inputs.length === 1 ? inputs[0]?.recipientUserId : null, recipientCount: inputs.length, afterDedupeCount: inputs.length, successCount: result.error ? 0 : result.data?.length || 0, failedCount: result.error ? preferences.allowed.length : 0, skippedCount: preferences.skipped.length, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : null, idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) });
+  await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: result.error ? "failed" : preferences.skipped.length ? "warning" : "success", actorId: inputs[0]?.actorUserId, recipientId: inputs.length === 1 ? inputs[0]?.recipientUserId : null, recipientCount: inputs.length, afterDedupeCount: inputs.length, successCount: result.error ? 0 : result.data?.length || 0, failedCount: result.error ? preferences.allowed.length : 0, skippedCount: preferences.skipped.length, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : null, idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) }, { db });
   return { ...result, data: createNotificationDtos(result.data || []) };
 }
 
@@ -48,7 +48,7 @@ export async function createNotificationsOnce(inputs, { db }) {
     new Date(Date.now() - 5 * 60 * 1000).toISOString(),
   );
   if (existing.error) {
-    await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: "failed", actorId: inputs[0]?.actorUserId, recipientCount: inputs.length, failedCount: inputs.length, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: "idempotency_lookup_failed", idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis });
+    await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: "failed", actorId: inputs[0]?.actorUserId, recipientCount: inputs.length, failedCount: inputs.length, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: "idempotency_lookup_failed", idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis }, { db });
     return { data: [], error: existing.error };
   }
   const existingKeys = new Set((existing.data || []).map((row) => `${row.recipient_user_id}:${row.type}:${row.metadata?.idempotencyKey || ""}`));
@@ -56,17 +56,19 @@ export async function createNotificationsOnce(inputs, { db }) {
     .filter((item) => !existingKeys.has(`${item.recipient_user_id}:${item.type}:${item.metadata?.idempotencyKey || ""}`));
   const duplicateCount = payloads.length - unique.length;
   if (!unique.length) {
-    await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: "duplicate", actorId: inputs[0]?.actorUserId, recipientCount: inputs.length, afterDedupeCount: 0, duplicateCount, skippedCount: duplicateCount, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: "idempotency_duplicate", idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis });
+    await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: "duplicate", actorId: inputs[0]?.actorUserId, recipientCount: inputs.length, afterDedupeCount: 0, duplicateCount, skippedCount: duplicateCount, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: "idempotency_duplicate", idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis }, { db });
     return { data: [], error: null };
   }
   const uniqueInputs = unique.map((payload) => inputs.find((input) => input.recipientUserId === payload.recipient_user_id && input.type === payload.type && (input.metadata?.idempotencyKey || "") === (payload.metadata?.idempotencyKey || "")));
   const preferences = await filterRecipientsByNotificationPreferences(db, uniqueInputs);
   const allowedKeys = new Set(preferences.allowed.map((item) => `${item.recipientUserId}:${item.type}:${item.metadata?.idempotencyKey || ""}`));
   const allowedPayloads = unique.filter((item) => allowedKeys.has(`${item.recipient_user_id}:${item.type}:${item.metadata?.idempotencyKey || ""}`));
-  const result = allowedPayloads.length ? await repository.insertNotificationsInRepository(db, allowedPayloads) : { data: [], error: null };
+  const result = allowedPayloads.length ? await repository.insertNotificationsIdempotentlyInRepository(db, allowedPayloads) : { data: [], duplicateCount: 0, failedCount: 0, error: null };
+  const atomicDuplicateCount = result.duplicateCount || 0;
   const preferenceSkipped = preferences.skipped.length;
-  await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: result.error ? "failed" : duplicateCount || preferenceSkipped ? "warning" : "success", actorId: inputs[0]?.actorUserId, recipientId: allowedPayloads.length === 1 ? allowedPayloads[0].recipient_user_id : null, recipientCount: inputs.length, afterDedupeCount: unique.length, successCount: result.error ? 0 : result.data?.length || 0, failedCount: result.error ? allowedPayloads.length : 0, duplicateCount, skippedCount: duplicateCount + preferenceSkipped, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : duplicateCount ? "idempotency_duplicate" : null, idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) });
-  return { ...result, data: createNotificationDtos(result.data || []) };
+  const allDuplicates = duplicateCount + atomicDuplicateCount;
+  await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: result.error ? "failed" : allDuplicates || preferenceSkipped ? "warning" : "success", actorId: inputs[0]?.actorUserId, recipientId: allowedPayloads.length === 1 ? allowedPayloads[0].recipient_user_id : null, recipientCount: inputs.length, afterDedupeCount: unique.length, successCount: result.data?.length || 0, failedCount: result.failedCount || 0, duplicateCount: allDuplicates, skippedCount: allDuplicates + preferenceSkipped, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : allDuplicates ? "idempotency_duplicate" : null, idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) }, { db });
+  return { ...result, duplicateCount: allDuplicates, preferenceSkippedCount: preferenceSkipped, data: createNotificationDtos(result.data || []) };
 }
 
 export async function loadNotifications({ db, userId, limit = 100 }) {
