@@ -16,6 +16,7 @@ import {
 import { savePlayer } from "@/components/admin/players/services/playerWrite.service";
 import { loadPlayerCurrentSeasonAssignmentRows } from "@/components/admin/players/services/playerWrite.repository";
 import { notifyPlayerAssignmentChange, logNotificationFailure } from "@/components/admin/notifications/teamAssignmentNotifications.service";
+import { notifyMemberStatusWorkflow, logWorkflowNotificationFailure } from "@/components/admin/notifications/workflowNotifications.service";
 import {
   archivePlayer,
   loadPlayerArchivePreview,
@@ -30,7 +31,7 @@ function buildError(message) {
 async function loadPlayerById(client, playerId) {
   const { data } = await client
     .from("players")
-    .select("id, first_name, last_name")
+    .select("id, first_name, last_name, is_active")
     .eq("id", playerId)
     .maybeSingle();
 
@@ -110,8 +111,9 @@ export async function savePlayerWithScopeAction(
       ],
     ]);
 
+    let existingPlayer = null;
     if (playerId) {
-      const existingPlayer = await loadPlayerById(supabaseServer, playerId);
+      existingPlayer = await loadPlayerById(supabaseServer, playerId);
       if (!existingPlayer) {
         return buildError("Spieler nicht gefunden.");
       }
@@ -164,6 +166,15 @@ export async function savePlayerWithScopeAction(
       actorUserId: permissionResult.userId,
     });
     logNotificationFailure("save-player", notificationResult.error);
+    if (existingPlayer && typeof playerPayload?.is_active === "boolean" && existingPlayer.is_active !== playerPayload.is_active) {
+      const memberNotification = await notifyMemberStatusWorkflow({
+        type: playerPayload.is_active ? "member_activated" : "member_deactivated",
+        player: saveResult.data || existingPlayer,
+        teamSeasonId: targetResolution.teamSeasonOption.teamSeasonId || playerPayload?.team_season_id,
+        actorUserId: permissionResult.profile?.id || permissionResult.userId,
+      });
+      logWorkflowNotificationFailure("player-status", memberNotification.error);
+    }
 
     revalidatePath("/admin/players");
 
@@ -211,12 +222,8 @@ export async function removePlayerWithScopeAction(playerId) {
   if (result.ok) {
     const previousAssignment = (assignmentSnapshot.data || []).find((item) => item.isActive !== false) || null;
     if (previousAssignment) {
-      const notificationResult = await notifyPlayerAssignmentChange({
-        player: existingPlayer,
-        change: { operation: "DEACTIVATE_ASSIGNMENT", previousAssignment: { ...previousAssignment, seasonId: seasonResolution.activeSeasonId, seasonName: seasonResolution.activeSeasonName }, targetAssignment: null },
-        actorUserId: permissionResult.userId,
-      });
-      logNotificationFailure("archive-player", notificationResult.error);
+      const notificationResult = await notifyMemberStatusWorkflow({ type: "member_archived", player: existingPlayer, teamSeasonId: previousAssignment.teamSeasonId, actorUserId: permissionResult.profile?.id || permissionResult.userId, detailOnly: true });
+      logWorkflowNotificationFailure("archive-player", notificationResult.error);
     }
     revalidatePath("/admin/players");
     revalidatePath(`/admin/players/${playerId}`);

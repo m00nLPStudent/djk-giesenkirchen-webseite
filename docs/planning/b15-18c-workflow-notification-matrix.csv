@@ -1,0 +1,18 @@
+Bereich;Fachereignis;Notificationtyp;Empfänger;Route;Status
+Mitgliedschaft;Neue Anfrage;membership_created;Bestehender Mitgliedschafts-Zugriff;/admin/membership-requests;angebunden
+Mitgliedschaft;Erste Zuweisung;membership_assigned;Zielperson;Fachroute oder Notification Detail;angebunden
+Mitgliedschaft;Weiterleitung;membership_forwarded;Neue Zielperson;Fachroute oder Notification Detail;angebunden
+Mitgliedschaft;In Bearbeitung;membership_processing;Zugewiesene Zielperson;Fachroute oder Notification Detail;angebunden
+Mitgliedschaft;Erledigt;membership_completed;Zugewiesene Zielperson;Fachroute oder Notification Detail;angebunden
+Mitgliedschaft;Angenommen;membership_accepted;Zuständiger Bearbeiter;Notification Detail;nicht vorhandener Fachworkflow
+Mitgliedschaft;Abgelehnt;membership_rejected;Zuständiger Bearbeiter;Notification Detail;nicht vorhandener Fachworkflow
+Mitgliedschaft;Archiviert;membership_archived;keine zusätzliche Notification;Notification Detail;nicht vorhandener Fachworkflow
+Beiträge;Beitrag angelegt;membership_payment_created;Finanzberechtigte;/admin/contributions/[id];angebunden
+Beiträge;Beitrag geändert;membership_payment_updated;Finanzberechtigte;/admin/contributions/[id];angebunden
+Zahlungen;Zahlung erfasst;membership_payment_received;Finanzberechtigte;/admin/contributions/[id];angebunden
+Zahlungen;Zahlung storniert;membership_payment_deleted;Finanzberechtigte;/admin/contributions/[id];angebunden
+Zahlungen;Zahlung bestätigt;membership_payment_confirmed;Finanzberechtigte;/admin/contributions/[id];nicht vorhandener Fachworkflow
+Zahlungen;Überfällig;membership_payment_overdue;Finanzberechtigte;/admin/contributions/[id];nicht vorhandener Fachworkflow
+Mitglieder;Aktiviert;member_activated;Mannschaftstrainer;Fachroute oder Notification Detail;angebunden
+Mitglieder;Deaktiviert;member_deactivated;Mannschaftstrainer;Fachroute oder Notification Detail;angebunden
+Mitglieder;Archiviert;member_archived;Mannschaftstrainer;Notification Detail;angebunden

@@ -11,7 +11,7 @@ const notificationService = await readFile(new URL("./notifications.service.js",
 
 test("player notifications run only after successful save and archive postcheck", () => {
   assert.ok(playerAction.indexOf("if (saveResult.error)") < playerAction.indexOf("const notificationResult = await notifyPlayerAssignmentChange"));
-  assert.ok(playerAction.indexOf("const result = await archivePlayer") < playerAction.lastIndexOf("notifyPlayerAssignmentChange"));
+  assert.ok(playerAction.indexOf("const result = await archivePlayer") < playerAction.lastIndexOf("notifyMemberStatusWorkflow"));
 });
 
 test("coach notifications run only after successful save and archive postcheck", () => {

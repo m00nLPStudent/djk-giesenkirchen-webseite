@@ -3,12 +3,15 @@ import { normalizeNotificationTarget, normalizeNotificationType } from "./notifi
 export function createNotificationDto(row = {}) {
   const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata : {};
   const detailOnly = metadata.notificationDetailOnly || metadata.accessLost || ["trainer_removed", "player_removed"].includes(row.type);
+  const assignedMembershipTarget = (metadata.membershipRecordTarget || metadata.assignedMembershipRequest) && row.entity_id && row.id
+    ? `/admin/membership-requests/${encodeURIComponent(row.entity_id)}?notification=${encodeURIComponent(row.id)}`
+    : null;
   return {
     id: row.id || null,
     title: row.title || "Benachrichtigung",
     message: row.message || "",
     type: normalizeNotificationType(row.type),
-    targetUrl: detailOnly && row.id ? `/admin/notifications?notification=${encodeURIComponent(row.id)}` : normalizeNotificationTarget(row.target_url),
+    targetUrl: detailOnly && row.id ? `/admin/notifications?notification=${encodeURIComponent(row.id)}` : assignedMembershipTarget || normalizeNotificationTarget(row.target_url),
     entityType: row.entity_type || null,
     entityId: row.entity_id || null,
     createdAt: row.created_at || null,

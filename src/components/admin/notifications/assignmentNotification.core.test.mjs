@@ -64,3 +64,8 @@ test("notification DTO repairs legacy removal targets and safely encodes the own
   assert.equal(legacy.targetUrl, "/admin/notifications?notification=notice%2F1");
   assert.equal(ordinary.targetUrl, "/admin/teams/team-1");
 });
+
+test("assigned membership DTO adds the own notification id for safe revocation fallback", () => {
+  const dto = createNotificationDto({ id: "notice/1", type: "membership_assigned", entity_type: "membership_request", entity_id: "request/1", metadata: { assignedMembershipRequest: true }, target_url: "/admin/membership-requests/request-1" });
+  assert.equal(dto.targetUrl, "/admin/membership-requests/request%2F1?notification=notice%2F1");
+});

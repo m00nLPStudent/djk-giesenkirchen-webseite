@@ -1,7 +1,4 @@
-import {
-  forwardMembershipRequest,
-  saveMembershipRequestStatus,
-} from "@/lib/membership/membership.service";
+import { forwardMembershipRequestAction, saveMembershipRequestStatusAction } from "@/app/admin/membership-requests/actions";
 import { createInitialMembershipRequestForm } from "./settingsInitialState";
 import { createMembershipForwardPayload } from "./settingsPayload";
 
@@ -39,7 +36,7 @@ export function createMembershipRequestHandlers({
     if (!selectedMembershipRequest) return;
 
     setMembershipRequestLoading(true);
-    const result = await saveMembershipRequestStatus(
+    const result = await saveMembershipRequestStatusAction(
       selectedMembershipRequest,
       membershipRequestForm,
     );
@@ -71,7 +68,7 @@ export function createMembershipRequestHandlers({
     if (!selectedMembershipRequest) return;
 
     setMembershipRequestLoading(true);
-    const result = await saveMembershipRequestStatus(
+    const result = await saveMembershipRequestStatusAction(
       selectedMembershipRequest,
       {
         ...membershipRequestForm,
@@ -126,7 +123,7 @@ export function createMembershipRequestHandlers({
     }
 
     setMembershipRequestLoading(true);
-    const result = await forwardMembershipRequest(
+    const result = await forwardMembershipRequestAction(
       selectedMembershipRequest,
       createMembershipForwardPayload(membershipRequestForm, selectedTarget),
     );

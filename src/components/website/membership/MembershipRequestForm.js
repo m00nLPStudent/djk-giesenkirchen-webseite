@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { submitMembershipRequest } from "@/lib/membership/membership.service";
+import { submitMembershipRequestAction } from "@/app/membership/actions";
 import MembershipFootballData from "./components/MembershipFootballData";
 import MembershipPersonalData from "./components/MembershipPersonalData";
 import MembershipPrivacySection from "./components/MembershipPrivacySection";
@@ -111,7 +111,7 @@ export default function MembershipRequestForm({ teams = [] }) {
       message: form.message.trim() || null,
     };
 
-    const { error } = await submitMembershipRequest(payload);
+    const { error } = await submitMembershipRequestAction(payload);
 
     setLoading(false);
 

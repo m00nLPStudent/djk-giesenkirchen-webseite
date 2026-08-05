@@ -4,8 +4,8 @@ import {
 } from "./membership.repository";
 import { sendMembershipRequestNotifications } from "./membership.mail";
 
-export async function submitMembershipRequest(payload) {
-  const result = await insertMembershipRequest(payload);
+export async function submitMembershipRequest(payload, { client } = {}) {
+  const result = await insertMembershipRequest(payload, client);
 
   if (result.error) {
     return result;
@@ -16,7 +16,7 @@ export async function submitMembershipRequest(payload) {
   return result;
 }
 
-export async function saveMembershipRequestStatus(request, payload) {
+export async function saveMembershipRequestStatus(request, payload, { client } = {}) {
   const nextPayload = {
     status: payload.status,
   };
@@ -32,10 +32,10 @@ export async function saveMembershipRequestStatus(request, payload) {
     nextPayload.processed_at = new Date().toISOString();
   }
 
-  return await updateMembershipRequest(request.id, nextPayload);
+  return await updateMembershipRequest(request.id, nextPayload, client);
 }
 
-export async function forwardMembershipRequest(request, payload) {
+export async function forwardMembershipRequest(request, payload, { client } = {}) {
   const nextPayload = {
     forwarded_to_type: payload.forwarded_to_type,
     forwarded_to_id: payload.forwarded_to_id,
@@ -52,5 +52,5 @@ export async function forwardMembershipRequest(request, payload) {
     nextPayload.status = "in_progress";
   }
 
-  return await updateMembershipRequest(request.id, nextPayload);
+  return await updateMembershipRequest(request.id, nextPayload, client);
 }
