@@ -20,13 +20,12 @@ import EventMediaTab from "./tabs/EventMediaTab";
 import EventSettingsTab from "./tabs/EventSettingsTab";
 import EventTimeTab from "./tabs/EventTimeTab";
 import {
-  createEvent,
   deleteEventDocument,
   getEventDocuments,
-  updateEvent,
   uploadEventDocument,
   uploadEventImage,
 } from "../services/events.service";
+import { saveEventWithNotificationAction } from "@/app/admin/events/actions";
 
 export default function EventEditorForm({ event = null, teams = [], eventTypes = [] }) {
   const router = useRouter();
@@ -129,9 +128,10 @@ export default function EventEditorForm({ event = null, teams = [], eventTypes =
     setLoading(true);
     const payload = buildEventPayload({ form, publicSlug, hasRecurrence });
 
-    const { error } = isEdit
-      ? await updateEvent(event.id, payload)
-      : await createEvent(payload);
+    const { error } = await saveEventWithNotificationAction(
+      payload,
+      isEdit ? event.id : null,
+    );
 
     setLoading(false);
 

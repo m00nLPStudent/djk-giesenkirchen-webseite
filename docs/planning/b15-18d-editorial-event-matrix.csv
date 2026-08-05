@@ -1,0 +1,19 @@
+module,event_type,source_action,workflow_exists,stable_recipient_relation,condition,recipient_rule,actor_excluded,target_route,detail_fallback,metadata,idempotency,status,test_status,notes
+News,news_created,saveNewsWithAuthorAction,yes,no,draft created,none,yes,notification detail,yes,none,n/a,BLOCKED,DONE,author is display text only and no separate review workflow
+News,news_published,saveNewsWithAuthorAction,partial,no,publish flag changes,none,yes,notification detail,yes,none,n/a,BLOCKED,DONE,no stable creator profile
+News,news_revision_requested,none,no,no,n/a,none,yes,notification detail,yes,none,n/a,DEFERRED,DONE,no revision workflow
+News,news_rejected,none,no,no,n/a,none,yes,notification detail,yes,none,n/a,DEFERRED,DONE,no rejection workflow
+News,news_updated,saveNewsWithAuthorAction,yes,no,relevant update,none,yes,notification detail,yes,none,n/a,BLOCKED,DONE,no stable responsible recipient
+News,news_deleted,removeNewsRecord,yes,no,successful delete,none,yes,notification detail,yes,none,n/a,BLOCKED,DONE,no stable creator profile
+Events,event_created,saveEventWithNotificationAction,yes,yes,persisted event with team,active coaches of current team season,yes,admin edit or public route,yes,event id slug team season time type status,central key,DONE,DONE,general club events have no stable recipient
+Events,event_updated,saveEventWithNotificationAction,yes,yes,relevant fields changed on team event,active coaches of old and new current team season,yes,admin edit or public route,yes,event id slug team season time type status changes,central key,DONE,DONE,unchanged save is suppressed
+Events,event_cancelled,none,no,yes,n/a,none,yes,notification detail,yes,none,n/a,DEFERRED,DONE,no cancel status or action for persisted events
+Events,event_deleted,none,no,yes,n/a,none,yes,notification detail,yes,none,n/a,DEFERRED,DONE,no event record delete action
+Training,event_updated,training.service client mutations,yes,yes,training time changed or removed,active coaches of team season,yes,team or notification detail,yes,none,n/a,DEFERRED,DONE,requires authorized server mutation hook
+Training,event_cancelled,training exception client mutations,yes,yes,cancelled exception saved,active coaches of team season,yes,team or notification detail,yes,none,n/a,DEFERRED,DONE,requires authorized server mutation hook
+Training,event_cancelled,club closure data,no,no,closure changed,none,yes,notification detail,yes,none,n/a,DEFERRED,DONE,no admin write action found
+CMS,content_updated,savePage,yes,no,page saved,none,yes,notification detail,yes,none,n/a,BLOCKED,DONE,no stable creator profile
+CMS,content_published,savePage,partial,no,publish flag changes,none,yes,notification detail,yes,none,n/a,BLOCKED,DONE,no stable creator profile
+CMS,content_review_required,none,no,no,n/a,none,yes,notification detail,yes,none,n/a,DEFERRED,DONE,no review workflow
+CMS,content_revision_requested,none,no,no,n/a,none,yes,notification detail,yes,none,n/a,DEFERRED,DONE,no revision workflow
+CMS,content_deleted,deletePage,yes,no,successful delete,none,yes,notification detail,yes,none,n/a,BLOCKED,DONE,no stable creator profile
