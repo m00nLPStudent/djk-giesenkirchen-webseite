@@ -1,0 +1,10 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+const read=(path)=>readFile(new URL(path,import.meta.url),"utf8");
+const [repository,service,central,actions,page,ui,rls,postcheck]=await Promise.all([read("./notificationPreferences.repository.js"),read("./notificationPreferences.service.js"),read("../notifications.service.js"),read("../../../../app/admin/notifications/settings/actions.js"),read("../../../../app/admin/notifications/settings/page.js"),read("./NotificationPreferencesModule.js"),read("../../../../../docs/sql/b15-18h-notification-preferences-rls.sql"),read("../../../../../docs/sql/b15-18h-notification-preferences-postcheck-readonly.sql")]);
+test("repository batches users and types without per-recipient queries",()=>{ assert.match(repository,/\.in\("user_id", users\)\.in\("notification_type", notificationTypes\)/); assert.match(repository,/onConflict: "user_id,notification_type"/); });
+test("central service filters before all notification inserts and fails open",()=>{ assert.equal((central.match(/filterRecipientsByNotificationPreferences/g)||[]).length>=4,true); assert.match(service,/if \(lookup\.error\) return \{ allowed: inputs/); assert.match(central,/notification_preference_lookup_failed/); });
+test("actions derive own user id and mandatory types are server protected",()=>{ assert.match(actions,/auth\.userId/); assert.doesNotMatch(actions,/function .*\(userId/); assert.match(service,/!isNotificationTypeConfigurable/); });
+test("authenticated route renders grouped accessible self service and setup state",()=>{ assert.match(page,/assertAdminActionPermission/); assert.match(ui,/role="switch"/); assert.match(ui,/aria-checked/); assert.match(ui,/Erforderlich/); assert.match(ui,/Technische Vorbereitung erforderlich/); assert.match(ui,/Alle optionalen deaktivieren/); });
+test("RLS is own-row only and postcheck is read-only",()=>{ assert.equal((rls.match(/user_id = auth\.uid\(\)/g)||[]).length,5); assert.doesNotMatch(rls,/app_metadata|service_role|USING \(true\)/); assert.doesNotMatch(postcheck,/\b(INSERT|UPDATE|DELETE|ALTER|DROP|CREATE)\b/i); });

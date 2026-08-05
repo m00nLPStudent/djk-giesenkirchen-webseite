@@ -51,7 +51,10 @@ WITH scoped AS (
     coalesce(sum((metadata #>> '{recipientAnalysis,validAuthUsers}')::integer),0) valid_auth_users,
     coalesce(sum((metadata #>> '{recipientAnalysis,afterActorFilter}')::integer),0) after_actor_filter,
     coalesce(sum((metadata #>> '{recipientAnalysis,afterDedupe}')::integer),0) after_dedupe,
-    coalesce(sum((metadata #>> '{recipientAnalysis,storedNotifications}')::integer),0) stored_notifications FROM scoped
+    coalesce(sum((metadata #>> '{recipientAnalysis,storedNotifications}')::integer),0) stored_notifications,
+    coalesce(sum((metadata #>> '{preferenceAnalysis,inputCount}')::integer),0) preference_input,
+    coalesce(sum((metadata #>> '{preferenceAnalysis,skippedCount}')::integer),0) preference_skipped,
+    coalesce(sum((metadata #>> '{preferenceAnalysis,outputCount}')::integer),0) preference_output FROM scoped
 ), top_errors AS (
   SELECT coalesce(jsonb_agg(jsonb_build_object('errorClass', error_class, 'count', amount) ORDER BY amount DESC), '[]'::jsonb) value FROM (SELECT error_class, sum(GREATEST(failed_count, duplicate_count, 1)) amount FROM scoped WHERE error_class IS NOT NULL GROUP BY error_class ORDER BY amount DESC LIMIT 7) x
 ), active_types AS (
@@ -60,7 +63,7 @@ WITH scoped AS (
 SELECT jsonb_build_object(
   'entries', coalesce((SELECT jsonb_agg(jsonb_build_object('id',id,'timestamp',created_at,'source','audit','type',notification_type,'status',status,'actorId',actor_user_id,'recipientId',recipient_user_id,'recipientCount',recipient_count,'afterDedupeCount',coalesce((metadata #>> '{recipientAnalysis,afterDedupe}')::integer,0),'actorRemovedCount',coalesce((metadata #>> '{recipientAnalysis,actorRemoved}')::integer,0),'successCount',successful_count,'failedCount',failed_count,'duplicateCount',duplicate_count,'skippedCount',skipped_count,'durationMs',duration_ms,'route',target_url,'errorClass',error_class,'resolver',resolver_source) ORDER BY created_at DESC) FROM filtered), '[]'::jsonb),
   'health', (SELECT jsonb_build_object('successful',successful,'failures',failures,'duplicates',duplicates,'skipped',skipped,'actorRemoved',actor_removed,'lastSuccess',last_success,'lastFailure',last_failure,'status',CASE WHEN failures > 0 THEN 'warning' ELSE 'success' END) FROM health),
-  'recipientAnalysis', (SELECT jsonb_build_object('resolverInput',resolver_input,'foundTrainers',found_trainers,'activeTrainers',active_trainers,'adminProfiles',admin_profiles,'validAuthUsers',valid_auth_users,'afterActorFilter',after_actor_filter,'afterDedupe',after_dedupe,'storedNotifications',stored_notifications) FROM analysis),
+  'recipientAnalysis', (SELECT jsonb_build_object('resolverInput',resolver_input,'foundTrainers',found_trainers,'activeTrainers',active_trainers,'adminProfiles',admin_profiles,'validAuthUsers',valid_auth_users,'afterActorFilter',after_actor_filter,'afterDedupe',after_dedupe,'storedNotifications',stored_notifications,'preferenceInput',preference_input,'preferenceSkipped',preference_skipped,'preferenceOutput',preference_output) FROM analysis),
   'topErrors', (SELECT value FROM top_errors), 'activeTypes', (SELECT value FROM active_types)
 );
 $$;

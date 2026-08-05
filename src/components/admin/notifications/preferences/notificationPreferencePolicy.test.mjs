@@ -1,0 +1,8 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { getNotificationPreferenceDefinition, getNotificationPreferenceGroup, getOptionalNotificationTypes, isNotificationEnabled, isNotificationTypeMandatory, notificationPreferenceDefinitions } from "./notificationPreferencePolicy.mjs";
+test("definitions are unique and expose German labels", () => { assert.equal(new Set(notificationPreferenceDefinitions.map((item)=>item.type)).size, notificationPreferenceDefinitions.length); assert.ok(notificationPreferenceDefinitions.every((item)=>item.label && item.description)); });
+test("groups resolve centrally", () => { assert.equal(getNotificationPreferenceGroup("player_assigned"),"team"); assert.equal(getNotificationPreferenceGroup("membership_created"),"membership"); assert.equal(getNotificationPreferenceGroup("event_updated"),"events"); });
+test("personally relevant assignment types are mandatory", () => { for (const type of ["trainer_assigned","trainer_removed","trainer_changed","membership_assigned","membership_forwarded","membership_completed","system_information"]) assert.equal(isNotificationTypeMandatory(type),true); });
+test("optional types can be disabled while missing and unknown values stay enabled", () => { assert.ok(getOptionalNotificationTypes().includes("player_assigned")); assert.equal(isNotificationEnabled("player_assigned",false),false); assert.equal(isNotificationEnabled("player_assigned",undefined),true); assert.equal(isNotificationEnabled("future_dynamic_type",false),true); assert.equal(getNotificationPreferenceDefinition("future_dynamic_type"),null); });
+test("mandatory type ignores a stored false value", () => assert.equal(isNotificationEnabled("trainer_removed",false),true));

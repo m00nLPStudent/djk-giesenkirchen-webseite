@@ -6,6 +6,7 @@ const count = (value) => Math.max(0, Number(value || 0));
 
 function createAuditPayload(event = {}) {
   const analysis = event.recipientAnalysis || {};
+  const preferences = event.preferenceAnalysis || {};
   return {
     notification_type: event.type || "unknown",
     status: event.status || "warning",
@@ -35,6 +36,12 @@ function createAuditPayload(event = {}) {
         afterDedupe: count(analysis.afterDedupe ?? event.afterDedupeCount),
         storedNotifications: count(event.successCount),
         actorRemoved: count(analysis.actorRemoved ?? event.actorRemovedCount),
+      },
+      preferenceAnalysis: {
+        inputCount: count(preferences.inputCount),
+        skippedCount: count(preferences.skippedCount),
+        outputCount: count(preferences.outputCount),
+        mandatoryType: preferences.mandatoryType === true,
       },
     },
   };

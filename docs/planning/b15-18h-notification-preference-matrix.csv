@@ -1,0 +1,29 @@
+notification_type,group,label_de,description_de,currently_produced,mandatory,configurable,default_enabled,recipient_context,audit_support,test_status,status,notes
+player_assigned,team,Spieler hinzugefügt,Kaderzugang,true,false,true,true,Trainer,true,DONE,DONE,
+player_removed,team,Spieler entfernt,Kaderabgang,true,false,true,true,Trainer,true,DONE,DONE,
+player_updated,team,Spielerzuordnung geändert,Saisonzuordnung,true,false,true,true,Trainer,true,DONE,DONE,
+trainer_assigned,team,Mannschaftszuordnung erhalten,Persönliche Zuordnung,true,true,false,true,Trainer,true,DONE,DONE,Erforderlich
+trainer_removed,team,Mannschaftszuordnung beendet,Zugriffsverlust,true,true,false,true,Trainer,true,DONE,DONE,Erforderlich
+trainer_changed,team,Trainerfunktion geändert,Persönliche Funktion,true,true,false,true,Trainer,true,DONE,DONE,Erforderlich
+team_changed,team,Mannschaft geändert,Relevante Mannschaft,true,false,true,true,Trainer,true,DONE,DONE,
+membership_created,membership,Neue Mitgliedsanfrage,Neue Anfrage,true,false,true,true,Zuständige,true,DONE,DONE,
+membership_assigned,membership,Mitgliedsanfrage zugewiesen,Persönliche Aufgabe,true,true,false,true,Bearbeiter,true,DONE,DONE,Erforderlich
+membership_forwarded,membership,Mitgliedsanfrage weitergeleitet,Persönliche Aufgabe,true,true,false,true,Bearbeiter,true,DONE,DONE,Erforderlich
+membership_processing,membership,Anfrage in Bearbeitung,Statusänderung,true,false,true,true,Zuständige,true,DONE,DONE,
+membership_completed,membership,Persönliche Rückmeldung,Erledigte Anfrage,true,true,false,true,Bearbeiter,true,DONE,DONE,Erforderlich
+membership_accepted,membership,Mitgliedsanfrage angenommen,Statusänderung,true,false,true,true,Zuständige,true,DONE,DONE,
+membership_rejected,membership,Mitgliedsanfrage abgelehnt,Statusänderung,true,false,true,true,Zuständige,true,DONE,DONE,
+membership_archived,membership,Mitgliedsanfrage archiviert,Statusänderung,true,false,true,true,Zuständige,true,DONE,DONE,
+membership_payment_created,contributions,Vereinsbeitrag angelegt,Beitragsänderung,true,false,true,true,Finanzrollen,true,DONE,DONE,
+membership_payment_updated,contributions,Vereinsbeitrag geändert,Beitragsänderung,true,false,true,true,Finanzrollen,true,DONE,DONE,
+membership_payment_received,contributions,Zahlung erfasst,Zahlungsänderung,true,false,true,true,Finanzrollen,true,DONE,DONE,
+membership_payment_confirmed,contributions,Zahlung bestätigt,Zahlungsänderung,true,false,true,true,Finanzrollen,true,DONE,DONE,
+membership_payment_overdue,contributions,Zahlung überfällig,Zahlungsstatus,true,false,true,true,Finanzrollen,true,DONE,DONE,
+membership_payment_deleted,contributions,Zahlung storniert,Zahlungsänderung,true,false,true,true,Finanzrollen,true,DONE,DONE,
+member_activated,contributions,Mitglied aktiviert,Mitgliederstatus,true,false,true,true,Zuständige,true,DONE,DONE,
+member_deactivated,contributions,Mitglied deaktiviert,Mitgliederstatus,true,false,true,true,Zuständige,true,DONE,DONE,
+member_archived,contributions,Mitglied archiviert,Mitgliederstatus,true,false,true,true,Zuständige,true,DONE,DONE,
+event_created,events,Termin oder Trainingszeit erstellt,Terminänderung,true,false,true,true,Teamempfänger,true,DONE,DONE,Gemeinsamer vorhandener Typ
+event_updated,events,Termin oder Training geändert,Terminänderung,true,false,true,true,Teamempfänger,true,DONE,DONE,Gemeinsamer vorhandener Typ
+event_cancelled,events,Termin oder Training abgesagt,Terminänderung,true,false,true,true,Teamempfänger,true,DONE,DONE,Gemeinsamer vorhandener Typ
+system_information,system,Wichtige Systeminformation,Systemhinweis,false,true,false,true,Betroffene,true,DONE,DONE,Vorbereitet aber aktuell nicht produziert
