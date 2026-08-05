@@ -2,11 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  createTrainingTime,
-  deleteTrainingTime,
   getTrainingTimes,
-  updateTrainingTime,
 } from "../services/training.service";
+import { createTrainingTimeAction, deleteTrainingTimeAction, updateTrainingTimeAction } from "@/app/admin/teams/training/actions";
 import TrainingTimeCard from "../training/TrainingTimeCard";
 import TrainingTimesCreatePanel from "../training/TrainingTimesCreatePanel";
 import { createNewTrainingTime } from "../training/trainingDefaults";
@@ -117,7 +115,7 @@ export default function TrainingTimesManager({ teamSeasonId }) {
       effective_until: toDateValue(nextItem.effective_until),
     };
 
-    const { data, error } = await updateTrainingTime(nextItem.id, payload);
+    const { data, error } = await updateTrainingTimeAction(nextItem.id, payload);
 
     if (error) {
       alert(error.message);
@@ -152,7 +150,7 @@ export default function TrainingTimesManager({ teamSeasonId }) {
       team_season_id: teamSeasonId,
       weekday,
     }));
-    const { data, error } = await createTrainingTime(payload);
+    const { data, error } = await createTrainingTimeAction(payload);
     setCreating(false);
 
     if (error) {
@@ -186,7 +184,7 @@ export default function TrainingTimesManager({ teamSeasonId }) {
     );
     if (!shouldDelete) return;
 
-    const { error } = await deleteTrainingTime(item.id);
+    const { error } = await deleteTrainingTimeAction(item.id);
     if (error) {
       alert(error.message);
       return;

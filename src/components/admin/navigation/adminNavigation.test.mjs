@@ -12,8 +12,8 @@ const allPermissions = [...new Set(activeItems.flatMap((item) => [
 ]).filter(Boolean))];
 const globalScope = { isGlobal: true, roleScopeTypes: ["global"], assignedTeamIds: [] };
 
-function dto(permissionKeys, scopeContext = globalScope, currentPath = "/admin") {
-  return resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys, scopeContext, currentPath });
+function dto(permissionKeys, scopeContext = globalScope, currentPath = "/admin", roleKeys = []) {
+  return resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys, roleKeys, scopeContext, currentPath });
 }
 
 function itemKeys(result) {
@@ -34,7 +34,7 @@ test("configuration keys, hrefs and ordering are stable and unique", () => {
 test("active items are valid admin routes with permission metadata", () => {
   for (const item of activeItems) {
     assert.match(item.href, /^\/admin(?:\/|$)/);
-    assert.ok(item.permissionKey || item.permissionKeys?.length);
+    assert.ok(item.permissionKey || item.permissionKeys?.length || item.accessPolicy === "superadmin_only");
   }
 });
 
@@ -46,7 +46,12 @@ test("planned items are never clickable", () => {
 });
 
 test("all active permitted modules resolve for a global context", () => {
-  assert.deepEqual(itemKeys(dto(allPermissions)).sort(), activeItems.map((item) => item.key).sort());
+  assert.deepEqual(itemKeys(dto(allPermissions)).sort(), activeItems.filter((item) => item.accessPolicy !== "superadmin_only").map((item) => item.key).sort());
+});
+
+test("notification monitoring navigation is visible only to superadmin", () => {
+  assert.ok(!itemKeys(dto(allPermissions)).includes("notification-monitoring"));
+  assert.ok(itemKeys(dto(allPermissions, globalScope, "/admin/system/notifications", ["superadmin"])).includes("notification-monitoring"));
 });
 
 test("cashier permissions expose contributions but no team or player links", () => {

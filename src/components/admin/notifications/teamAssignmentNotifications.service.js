@@ -21,11 +21,23 @@ export async function resolveTeamNotificationRecipients(db, teamSeasonIds, actor
   const activeProfileIds = new Set(source.profiles.map((row) => row.id));
   const coachById = new Map(source.coaches.filter((row) => row.admin_profile_id && activeProfileIds.has(row.admin_profile_id)).map((row) => [row.id, row]));
   const permissions = permissionMap(source);
-  return {
-    recipients: deduplicateRecipients(source.assignments.flatMap((assignment) => {
+  const candidates = source.assignments.flatMap((assignment) => {
       const coach = coachById.get(assignment.coach_id);
       return coach ? [{ userId: coach.admin_profile_id, teamSeasonId: assignment.team_season_id, permissionKeys: permissions.get(coach.admin_profile_id) || [] }] : [];
-    }), actorUserId),
+    });
+  const recipients = deduplicateRecipients(candidates, actorUserId);
+  return {
+    recipients,
+    analysis: {
+      resolverInput: source.assignments.length,
+      foundTrainers: source.coaches.length,
+      activeTrainers: coachById.size,
+      adminProfiles: activeProfileIds.size,
+      validAuthUsers: new Set(candidates.map((item) => item.userId)).size,
+      afterActorFilter: candidates.filter((item) => item.userId !== actorUserId).length,
+      afterDedupe: recipients.length,
+      actorRemoved: candidates.filter((item) => item.userId === actorUserId).length,
+    },
     error: null,
   };
 }

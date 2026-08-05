@@ -2,12 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  createTrainingException,
-  deleteTrainingException,
   getTrainingExceptions,
   getTrainingTimes,
-  updateTrainingException,
 } from "../services/training.service";
+import { createTrainingExceptionAction, deleteTrainingExceptionAction, updateTrainingExceptionAction } from "@/app/admin/teams/training/actions";
 import { createNewException } from "../training/trainingDefaults";
 import {
   toDateValue,
@@ -75,7 +73,7 @@ export default function TrainingExceptionsManager({ teamSeasonId }) {
       override_end_time: toTimeValue(nextItem.override_end_time),
     };
 
-    const { data, error } = await updateTrainingException(nextItem.id, payload);
+    const { data, error } = await updateTrainingExceptionAction(nextItem.id, payload);
 
     if (error) {
       alert(error.message);
@@ -96,7 +94,7 @@ export default function TrainingExceptionsManager({ teamSeasonId }) {
     }
 
     setCreating(true);
-    const { data, error } = await createTrainingException(
+    const { data, error } = await createTrainingExceptionAction(
       createNewException(trainingTimes[0].id),
     );
     setCreating(false);
@@ -113,7 +111,7 @@ export default function TrainingExceptionsManager({ teamSeasonId }) {
     const shouldDelete = window.confirm("Diese Ausnahme wirklich löschen?");
     if (!shouldDelete) return;
 
-    const { error } = await deleteTrainingException(item.id);
+    const { error } = await deleteTrainingExceptionAction(item.id);
     if (error) {
       alert(error.message);
       return;

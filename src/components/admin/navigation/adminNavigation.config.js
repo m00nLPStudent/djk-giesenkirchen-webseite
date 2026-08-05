@@ -62,6 +62,12 @@ export const ADMIN_NAVIGATION_SECTIONS = [
     ],
   },
   {
+    key: "system", label: "System", iconKey: "activity", href: null,
+    description: "Technische Überwachung des CMS.", order: 35,
+    visibility: { strategy: "visible_items" }, implementationStatus: "active",
+    items: [{ ...active("notification-monitoring", "Notification Monitoring", "/admin/system/notifications", "activity", null, "permission_only", 10, "Zustellungen und Fehler der Notification-Infrastruktur überwachen."), accessPolicy: "superadmin_only" }],
+  },
+  {
     key: "table_tennis", label: "Tischtennis", iconKey: "circle-dot", href: null,
     description: "Geplanter Verwaltungsbereich für Tischtennis.", order: 40,
     visibility: { strategy: "visible_items" }, implementationStatus: "planned",

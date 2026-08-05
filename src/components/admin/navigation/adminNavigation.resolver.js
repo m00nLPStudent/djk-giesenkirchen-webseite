@@ -55,8 +55,9 @@ export function resolveAdminNavigation({
     items: [...(section.items || [])]
       .sort((a, b) => a.order - b.order)
       .filter((item) => isRuntimeCandidate(item, includePlanned))
-      .filter((item) => item.implementationStatus !== "active" || item.accessPolicy === "membership_requests" || hasPermission(item, permissionSet))
+      .filter((item) => item.implementationStatus !== "active" || ["membership_requests", "superadmin_only"].includes(item.accessPolicy) || hasPermission(item, permissionSet))
       .filter((item) => item.accessPolicy !== "membership_requests" || canAccessMembershipRequests({ roleKeys, permissionKeys, scopeContext }))
+      .filter((item) => item.accessPolicy !== "superadmin_only" || unique(roleKeys).has("superadmin"))
       .filter((item) => item.implementationStatus !== "active" || hasScope(item.scopeType, scopeContext)),
   })).filter((section) => section.items.length > 0);
   const active = findActiveNavigationEntry(allowed, currentPath);
