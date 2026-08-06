@@ -19,10 +19,12 @@ import {
 import { revalidatePath } from "next/cache";
 import { archiveCoach } from "@/components/admin/archiving/archive.service";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
+import { canManageMedia, loadMediaLibrary, resolvePublicCoachMedia, syncCoachMediaUsage, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 
 function buildError(message) {
   return { error: { message } };
 }
+const SAFE_MEDIA_ERRORS = new Set(["Keine Datei ausgewählt.", "Nur JPEG-, PNG-, WebP-Bilder und PDF-Dokumente sind erlaubt.", "Dateiinhalt und MIME-Typ stimmen nicht überein.", "Ungültige WebP-Datei.", "Die Datei ist leer oder größer als 10 MB."]);
 
 function revalidatePublicCoachPages() {
   revalidatePath("/fussball/abteilung/trainer");
@@ -117,9 +119,15 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
       }
     }
 
+    const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
+    const mediaResult = await resolvePublicCoachMedia(coachPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingCoach?.image_media_asset_id && existingCoach.image_media_asset_id === coachPayload?.image_media_asset_id), allowedVisibilities });
+    if (mediaResult.error) return buildError(mediaResult.error.message);
+    const safeCoachPayload = { ...coachPayload, image_media_asset_id: mediaResult.data?.id || null,
+      image_url: mediaResult.data?.previewUrl || coachPayload?.image_url || null };
+
     const targetResolution = await resolveCoachTeamSeasonTargets(
       supabaseServer,
-      coachPayload?.assignments || [],
+      safeCoachPayload.assignments || [],
     );
 
     if (!targetResolution.ok) {
@@ -144,7 +152,7 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
       );
     }
 
-    const saveResult = await saveCoach(coachPayload || {}, coachId, {
+    const saveResult = await saveCoach(safeCoachPayload, coachId, {
       client: supabaseServer,
       teamSeasonOptions: targetResolution.teamSeasonOptions,
     });
@@ -152,6 +160,9 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
     if (saveResult.error) {
       return buildError(saveResult.error.message || "Fehler beim Speichern.");
     }
+
+    const usageResult = await syncCoachMediaUsage(saveResult.data.id, safeCoachPayload.image_media_asset_id);
+    if (usageResult.error) return buildError("Die Trainerbild-Verwendung konnte nicht gespeichert werden.");
 
     const notificationResult = await notifyCoachAssignmentChange({
       coach: saveResult.data,
@@ -168,6 +179,47 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
       error?.message || "Das Trainerprofil konnte nicht gespeichert werden.",
     );
   }
+}
+
+async function authorizeCoachMedia(coachId = null) {
+  const requiredPermission = coachId ? "coaches.edit" : "coaches.create";
+  const permissionResult = await assertAdminActionPermission({ requiredPermission });
+  if (!permissionResult.ok) return { ok: false, message: permissionResult.message || "Berechtigung fehlt." };
+  const scopeContext = await loadServerPersonScopeContext(permissionResult);
+  if (!coachId && !canCreateCoachOnServer(scopeContext)) return { ok: false, message: "Du darfst keine Trainerprofile erstellen." };
+  if (coachId) {
+    const coach = await loadCoachById(permissionResult.supabaseServer, coachId);
+    if (!coach) return { ok: false, message: "Trainer nicht gefunden." };
+    const { teamIdsByCoachId, teamById } = await getCoachTeamIdsMap(permissionResult.supabaseServer, [coachId]);
+    if (!canEditCoachOnServer(scopeContext, coach, teamIdsByCoachId.get(coachId) || [], teamById)) return { ok: false, message: "Du darfst dieses Trainerprofil nicht bearbeiten." };
+  }
+  return { ok: true, permissionResult };
+}
+
+export async function loadCoachMediaPickerAction(filters = {}, coachId = null) {
+  try {
+    const auth = await authorizeCoachMedia(coachId);
+    if (!auth.ok) return { ok: false, error: auth.message, items: [], total: 0 };
+    const allowedVisibilities = canManageMedia(auth.permissionResult.roles) ? ["public", "admin"] : ["public"];
+    const requestedVisibility = allowedVisibilities.includes(filters.visibility) ? filters.visibility : allowedVisibilities;
+    const result = await loadMediaLibrary({ ...filters, kind: "image", visibility: requestedVisibility, purpose: "coach", archived: "active" });
+    if (result.error) return { ok: false, error: "Medien konnten nicht geladen werden.", items: [], total: 0 };
+    return { ok: true, items: result.data, total: result.count || 0 };
+  } catch { return { ok: false, error: "Medien konnten nicht geladen werden.", items: [], total: 0 }; }
+}
+
+export async function uploadCoachMediaAction(formData, coachId = null) {
+  try {
+    const auth = await authorizeCoachMedia(coachId);
+    if (!auth.ok) return { ok: false, error: auth.message };
+    const file = formData.get("file");
+    if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) return { ok: false, error: "Für Trainerbilder sind nur JPEG, PNG und WebP erlaubt." };
+    const result = await uploadMediaAsset(file, { displayName: formData.get("displayName"), altText: formData.get("altText"), visibility: "public", purpose: "coach" }, auth.permissionResult.profile.id);
+    if (result.error) return { ok: false, error: SAFE_MEDIA_ERRORS.has(result.error.message) ? result.error.message : "Das Trainerbild konnte nicht hochgeladen werden." };
+    const resolved = await resolvePublicCoachMedia(result.data.id);
+    if (resolved.error) return { ok: false, error: "Das hochgeladene Bild konnte nicht geladen werden." };
+    return { ok: true, item: resolved.data };
+  } catch { return { ok: false, error: "Das Trainerbild konnte nicht hochgeladen werden." }; }
 }
 
 export async function removeCoachWithScopeAction(coachId) {

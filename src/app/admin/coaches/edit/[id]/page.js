@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/persons/serverPersonScope";
 import { getCoachSeasonalReadModel } from "@/components/admin/persons/coachSeasonalReadModelRepository";
 import { loadScopedCoachTeamSeasonOptions } from "@/components/admin/coaches/services/coachTeamSeasonOptions.repository";
+import { loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +64,7 @@ export default async function EditCoachPage({ params }) {
     teamById,
   );
   const coachDetail = createCoachReadDto(coach, coachSeasonalReadModel);
+  const mediaResult = await loadMediaAssetForPicker(coach.image_media_asset_id);
 
   return (
     <AdminLayout title="Trainer bearbeiten" subtitle="Trainer" showHeader={false}>
@@ -75,6 +77,7 @@ export default async function EditCoachPage({ params }) {
         coach={coach}
         teamOptionsResult={teamOptionsResult}
         coachSeasonalReadModel={coachSeasonalReadModel}
+        initialMediaAsset={mediaResult.data || null}
       />
     </AdminLayout>
   );

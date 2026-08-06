@@ -3,17 +3,15 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
-import { saveCoachWithScopeAction } from "@/app/admin/coaches/actions";
+import { loadCoachMediaPickerAction, saveCoachWithScopeAction, uploadCoachMediaAction } from "@/app/admin/coaches/actions";
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { FormAlert, FormSection } from "@/components/admin/forms";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import useEntityForm from "@/components/admin/hooks/useEntityForm";
-import useImageUpload from "@/components/admin/hooks/useImageUpload";
+import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
-import CoachImageUpload from "../components/CoachImageUpload";
-import { deleteCoachImage, uploadCoachImage } from "../services/coaches.service";
 import {
   createCoachPayload,
   createInitialCoachForm,
@@ -40,9 +38,11 @@ export default function AdminCoachesForm({
   coach,
   teamOptionsResult,
   coachSeasonalReadModel,
+  initialMediaAsset = null,
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
+  const [selectedMedia, setSelectedMedia] = useState(initialMediaAsset);
   const teamOptions = useMemo(
     () => teamOptionsResult?.teamOptions || [],
     [teamOptionsResult?.teamOptions],
@@ -77,18 +77,10 @@ export default function AdminCoachesForm({
     teamOptions,
   );
 
-  const { uploadImage, removeImage } = useImageUpload({
-    currentUrl: form.image_url,
-    placeholderUrl: COACH_PLACEHOLDER_IMAGE,
-    uploadAction: uploadCoachImage,
-    deleteAction: deleteCoachImage,
-    onChange: (url) => updateField("image_url", url),
-    getUploadContext: () => ({
-      id: coach?.id,
-      name: `${form.first_name} ${form.last_name}`.trim(),
-      image_url: form.image_url,
-    }),
-  });
+  function handleMediaChange(media) {
+    setSelectedMedia(media);
+    setForm((current) => ({ ...current, image_media_asset_id: media?.id || null, image_url: media?.previewUrl || COACH_PLACEHOLDER_IMAGE }));
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -237,12 +229,7 @@ export default function AdminCoachesForm({
           title="Trainerbild"
           description="Das Bild wird im Adminbereich und auf der oeffentlichen Trainerprofilseite verwendet."
         >
-          <CoachImageUpload
-            imageUrl={form.image_url || COACH_PLACEHOLDER_IMAGE}
-            placeholderUrl={COACH_PLACEHOLDER_IMAGE}
-            onUpload={uploadImage}
-            onRemove={removeImage}
-          />
+          <AdminMediaPicker value={selectedMedia} legacyUrl={selectedMedia ? null : form.image_url} placeholderUrl={COACH_PLACEHOLDER_IMAGE} onChange={handleMediaChange} loadAction={(filters) => loadCoachMediaPickerAction(filters, coach?.id || null)} uploadAction={(data) => uploadCoachMediaAction(data, coach?.id || null)} />
         </FormSection>
       )}
 

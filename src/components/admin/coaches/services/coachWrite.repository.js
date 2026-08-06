@@ -32,7 +32,7 @@ function mapCoachAssignmentWriteError(error, fallbackMessage, fallbackCode) {
 export async function loadCoachMasterRecord(db, coachId) {
   const { data, error } = await db
     .from("coaches")
-    .select("id, first_name, last_name, name, slug, role, role_de, role_en, email, phone, whatsapp, license, team_id, team_name, image_url, photo_url, nationality, sort_order, is_active")
+    .select("id, first_name, last_name, name, slug, role, role_de, role_en, email, phone, whatsapp, license, team_id, team_name, image_url, photo_url, image_media_asset_id, nationality, sort_order, is_active")
     .eq("id", coachId)
     .maybeSingle();
 
