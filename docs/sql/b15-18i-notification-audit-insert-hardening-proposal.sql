@@ -1,4 +1,5 @@
--- Proposal only. Requires coordinated logger deployment. Do not execute automatically.
+-- SUPERSEDED by b15-18k-notification-audit-append-hardening.sql.
+-- Kept as the B15.18I design record; do not execute this older proposal.
 BEGIN;
 DROP POLICY IF EXISTS notification_audit_insert_active_admin ON public.notification_audit;
 REVOKE INSERT ON public.notification_audit FROM authenticated;

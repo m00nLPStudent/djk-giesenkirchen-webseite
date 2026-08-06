@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createServerActionSupabaseClient } from "@/lib/supabase.server";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 
 const count = (value) => Math.max(0, Number(value || 0));
 
@@ -8,24 +8,21 @@ function createAuditPayload(event = {}) {
   const analysis = event.recipientAnalysis || {};
   const preferences = event.preferenceAnalysis || {};
   return {
-    notification_type: event.type || "unknown",
-    status: event.status || "warning",
-    actor_user_id: event.actorId || null,
-    recipient_user_id: event.recipientId || null,
-    recipient_count: count(event.recipientCount),
-    successful_count: count(event.successCount),
-    failed_count: count(event.failedCount),
-    duplicate_count: count(event.duplicateCount),
-    skipped_count: count(event.skippedCount),
-    duration_ms: count(event.durationMs),
-    target_url: event.route || null,
-    resolver_source: event.resolver || "central-notification-service",
-    error_class: event.errorClass || null,
-    idempotency_key: event.idempotencyKey || null,
-    retry_count: 0,
-    last_retry_at: null,
-    retry_allowed: false,
-    metadata: {
+    p_notification_type: event.type || "unknown",
+    p_status: event.status || "warning",
+    p_actor_user_id: event.actorId || null,
+    p_recipient_user_id: event.recipientId || null,
+    p_recipient_count: count(event.recipientCount),
+    p_successful_count: count(event.successCount),
+    p_failed_count: count(event.failedCount),
+    p_duplicate_count: count(event.duplicateCount),
+    p_skipped_count: count(event.skippedCount),
+    p_duration_ms: count(event.durationMs),
+    p_target_url: event.route || null,
+    p_resolver_source: event.resolver || "central-notification-service",
+    p_error_class: event.errorClass || null,
+    p_idempotency_key: event.idempotencyKey || null,
+    p_metadata: {
       recipientAnalysis: {
         resolverInput: count(analysis.resolverInput ?? event.recipientCount),
         foundTrainers: count(analysis.foundTrainers),
@@ -50,9 +47,10 @@ function createAuditPayload(event = {}) {
 
 export async function recordNotificationMonitoringEvent(event = {}, { db } = {}) {
   try {
-    const auditDb = db || await createServerActionSupabaseClient();
-    const result = await auditDb.from("notification_audit").insert(createAuditPayload(event)).select("id, created_at").single();
-    return { data: result.data || null, error: result.error || null };
+    const auditDb = db || createSupabaseAdminClient();
+    if (!auditDb) return { data: null, error: new Error("Notification-Audit-Service-Client ist nicht konfiguriert.") };
+    const result = await auditDb.rpc("append_notification_audit", createAuditPayload(event));
+    return { data: result.data ? { id: result.data } : null, error: result.error || null };
   } catch (error) {
     return { data: null, error };
   }
