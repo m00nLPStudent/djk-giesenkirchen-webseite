@@ -6,6 +6,8 @@ function normalizeText(value) {
 
 function resolveImageUrl(entity = {}, fallbackImage = null) {
   return (
+    normalizeText(entity.mediaAsset?.previewUrl) ||
+    normalizeText(entity.media_asset?.previewUrl) ||
     normalizeText(entity.imageUrl) ||
     normalizeText(entity.image_url) ||
     normalizeText(entity.photo_url) ||

@@ -19,7 +19,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { archiveCoach } from "@/components/admin/archiving/archive.service";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
-import { canManageMedia, loadMediaLibrary, resolvePublicCoachMedia, syncCoachMediaUsage, uploadMediaAsset } from "@/components/admin/media-library/media.service";
+import { canManageMedia, loadMediaLibrary, resolvePublicCoachMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 
 function buildError(message) {
   return { error: { message } };
@@ -161,7 +161,7 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
       return buildError(saveResult.error.message || "Fehler beim Speichern.");
     }
 
-    const usageResult = await syncCoachMediaUsage(saveResult.data.id, safeCoachPayload.image_media_asset_id);
+    const usageResult = await synchronizeMediaAssignment("coach", saveResult.data.id, safeCoachPayload.image_media_asset_id);
     if (usageResult.error) return buildError("Die Trainerbild-Verwendung konnte nicht gespeichert werden.");
 
     const notificationResult = await notifyCoachAssignmentChange({

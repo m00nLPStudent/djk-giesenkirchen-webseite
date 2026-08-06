@@ -10,6 +10,7 @@ import {
 } from "@/components/admin/persons/serverPersonScope";
 import { getPlayerSeasonalReadModel } from "@/components/admin/persons/playerSeasonalReadModelRepository";
 import { loadScopedPlayerTeamSeasonOptions } from "@/components/admin/players/services/playerTeamSeasonOptions.repository";
+import { loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function EditPlayerPage({ params }) {
 
   const { data: player } = await supabaseServer
     .from("players")
-    .select("id, first_name, last_name, image_url, photo_url, is_active, description_de, description_en, birthdate, joined_at, year_group, strong_foot, nationality, gender")
+    .select("id, first_name, last_name, image_url, photo_url, image_media_asset_id, is_active, description_de, description_en, birthdate, joined_at, year_group, strong_foot, nationality, gender")
     .eq("id", id)
     .maybeSingle();
 
@@ -54,6 +55,7 @@ export default async function EditPlayerPage({ params }) {
     scopeContext,
     supabaseServer,
   );
+  const mediaResult = await loadMediaAssetForPicker(player.image_media_asset_id);
 
   return (
     <AdminLayout title="Spieler bearbeiten" subtitle="Spieler" showHeader={false}>
@@ -61,7 +63,7 @@ export default async function EditPlayerPage({ params }) {
         <AdminBackLink href={`/admin/players/${id}`}>Zurück zu Spielerdetails</AdminBackLink>
         <AdminModuleHeader eyebrow="Spieler" title="Spieler bearbeiten" description="Spielerprofil und Mannschaftszuordnung bearbeiten." />
         <AdminPlayersForm
-          player={player}
+          player={{ ...player, mediaAsset: mediaResult.data || null }}
           teamOptionsResult={teamOptionsResult}
           playerSeasonalReadModel={playerSeasonalReadModel}
         />

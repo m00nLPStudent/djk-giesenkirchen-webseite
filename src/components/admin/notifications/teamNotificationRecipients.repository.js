@@ -1,16 +1,27 @@
 import "server-only";
 
+function emptyTeamRecipientSource() {
+  return {
+    assignments: [],
+    coaches: [],
+    profiles: [],
+    roleLinks: [],
+    rolePermissions: [],
+    permissions: [],
+  };
+}
+
 export async function loadTeamRecipientSource(db, teamSeasonIds = []) {
   const ids = [...new Set(teamSeasonIds.filter(Boolean))];
-  if (!ids.length) return { data: [], error: null };
+  if (!ids.length) return { data: emptyTeamRecipientSource(), error: null };
   const assignments = await db.from("coach_team_seasons").select("id, coach_id, team_season_id, role_de, is_active").in("team_season_id", ids).eq("is_active", true);
   if (assignments.error) return { data: [], error: assignments.error };
   const coachIds = [...new Set((assignments.data || []).map((row) => row.coach_id).filter(Boolean))];
-  if (!coachIds.length) return { data: [], error: null };
+  if (!coachIds.length) return { data: emptyTeamRecipientSource(), error: null };
   const coaches = await db.from("coaches").select("id, admin_profile_id, is_active").in("id", coachIds).eq("is_active", true);
   if (coaches.error) return { data: [], error: coaches.error };
   const profileIds = [...new Set((coaches.data || []).map((row) => row.admin_profile_id).filter(Boolean))];
-  if (!profileIds.length) return { data: [], error: null };
+  if (!profileIds.length) return { data: emptyTeamRecipientSource(), error: null };
   const [profiles, roleLinks] = await Promise.all([
     db.from("admin_profiles").select("id, is_active").in("id", profileIds).eq("is_active", true),
     db.from("admin_user_roles").select("user_id, role_id").in("user_id", profileIds),

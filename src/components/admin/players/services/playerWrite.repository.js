@@ -12,7 +12,7 @@ function createServiceError(message, code) {
 export async function loadPlayerMasterRecord(db, playerId) {
   const { data, error } = await db
     .from("players")
-    .select("id, first_name, last_name, image_url, photo_url, is_active, description_de, description_en, birthdate, joined_at, year_group, strong_foot, nationality, gender")
+    .select("id, first_name, last_name, image_url, photo_url, image_media_asset_id, is_active, description_de, description_en, birthdate, joined_at, year_group, strong_foot, nationality, gender")
     .eq("id", playerId)
     .maybeSingle();
 

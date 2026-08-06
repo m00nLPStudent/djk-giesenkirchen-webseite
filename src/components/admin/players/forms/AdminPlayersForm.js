@@ -2,20 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { savePlayerWithScopeAction } from "@/app/admin/players/actions";
+import { loadPlayerMediaPickerAction, savePlayerWithScopeAction, uploadPlayerMediaAction } from "@/app/admin/players/actions";
 import { FormAlert, FormSection } from "@/components/admin/forms";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import useEntityForm from "@/components/admin/hooks/useEntityForm";
-import useImageUpload from "@/components/admin/hooks/useImageUpload";
+import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker";
 import TabNavigation from "@/components/admin/ui/TabNavigation";
 import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
-import PlayerImageUpload from "../components/PlayerImageUpload";
-import {
-  deletePlayerImage,
-  PLAYER_PLACEHOLDER_IMAGE,
-  uploadPlayerImage,
-} from "../services/players.service";
+import { PLAYER_PLACEHOLDER_IMAGE } from "../services/players.service";
 import { getPositionOptions, POSITION_EN } from "./playerForm.config";
 import {
   createInitialPlayerForm,
@@ -47,6 +42,7 @@ export default function AdminPlayersForm({
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
+  const [selectedMedia, setSelectedMedia] = useState(player?.mediaAsset || null);
   const teamOptions = useMemo(
     () => teamOptionsResult?.teamOptions || [],
     [teamOptionsResult?.teamOptions],
@@ -99,19 +95,10 @@ export default function AdminPlayersForm({
     }
   }
 
-  const { uploadImage, removeImage } = useImageUpload({
-    currentUrl: form.image_url,
-    placeholderUrl: PLAYER_PLACEHOLDER_IMAGE,
-    uploadAction: uploadPlayerImage,
-    deleteAction: deletePlayerImage,
-    onChange: (url) => updateField("image_url", url),
-    getUploadContext: () => ({
-      id: player?.id,
-      first_name: form.first_name,
-      last_name: form.last_name,
-      image_url: form.image_url,
-    }),
-  });
+  function handleMediaChange(media) {
+    setSelectedMedia(media);
+    setForm((current) => ({ ...current, image_media_asset_id: media?.id || null, image_url: media?.previewUrl || (media ? current.image_url : null) }));
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -247,12 +234,7 @@ export default function AdminPlayersForm({
           title="Spielerbild"
           description="Das Bild wird in der Verwaltung, Mannschaftsübersicht und Spielerprofilseite verwendet."
         >
-          <PlayerImageUpload
-            imageUrl={form.image_url || PLAYER_PLACEHOLDER_IMAGE}
-            placeholderUrl={PLAYER_PLACEHOLDER_IMAGE}
-            onUpload={uploadImage}
-            onRemove={removeImage}
-          />
+          <AdminMediaPicker value={selectedMedia} legacyUrl={selectedMedia ? null : form.image_url} placeholderUrl={PLAYER_PLACEHOLDER_IMAGE} onChange={handleMediaChange} loadAction={(filters) => loadPlayerMediaPickerAction(filters, player?.id || null)} uploadAction={(data) => uploadPlayerMediaAction(data, player?.id || null)} usageContext="player" entityLabel="Spielerbild" />
         </FormSection>
       )}
 

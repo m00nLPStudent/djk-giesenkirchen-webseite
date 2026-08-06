@@ -21,6 +21,7 @@ export function createInitialPlayerFormData(
     position_de: primaryAssignment?.positionDe || "",
     position_en: primaryAssignment?.positionEn || "",
     image_url: player?.image_url || player?.photo_url || placeholderImage,
+    image_media_asset_id: player?.image_media_asset_id || null,
     description_de: player?.description_de || "",
     description_en: player?.description_en || "",
     birthdate: player?.birthdate || "",
@@ -43,6 +44,7 @@ export function createPlayerPayloadData(form, yearGroup, placeholderImage) {
   return {
     ...form,
     image_url: form.image_url || placeholderImage,
+    image_media_asset_id: form.image_media_asset_id || null,
     year_group: yearGroup,
   };
 }

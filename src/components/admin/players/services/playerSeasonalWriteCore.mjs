@@ -64,7 +64,6 @@ export function buildPlayerMasterPayload(
     first_name: toNullableString(player?.first_name),
     last_name: toNullableString(player?.last_name),
     image_url: imageUrl,
-    photo_url: imageUrl,
     is_active: player?.is_active ?? true,
     description_de: toNullableString(player?.description_de),
     description_en: toNullableString(player?.description_en),

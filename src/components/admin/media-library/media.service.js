@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { createMediaStoragePath, MEDIA_BUCKETS, normalizeMediaMetadata, validateMediaDescriptor } from "./mediaValidation.core.mjs";
 import * as repository from "./media.repository";
+import { buildMediaAssignmentPayload } from "./mediaAssignment.core.mjs";
 
 export const canManageMedia = (roles = []) => roles.some((role) => ["superadmin", "webmaster"].includes(role?.key));
 const withPickerFields = (asset) => ({ ...asset, displayName: asset.display_name, storageBucket: asset.storage_bucket, storagePath: asset.storage_path, mediaKind: asset.media_kind, visibility: asset.visibility });
@@ -35,19 +36,23 @@ export async function loadMediaAssetForPicker(id) {
   return { data: withPickerFields({ ...asset, previewUrl }), error: null };
 }
 
-export async function resolvePublicCoachMedia(id, { allowArchived = false, allowedVisibilities = ["public"] } = {}) {
+export async function resolveEntityImageMedia(id, { allowArchived = false, allowedVisibilities = ["public"], purpose } = {}) {
   if (!id) return { data: null, error: null };
   const result = await loadMediaAssetForPicker(id);
   if (result.error || !result.data) return { data: null, error: result.error || new Error("Das ausgewählte Medium wurde nicht gefunden.") };
-  if ((!allowArchived && result.data.is_archived) || result.data.media_kind !== "image" || !allowedVisibilities.includes(result.data.visibility)) return { data: null, error: new Error("Dieses Trainerbild ist für den aktuellen Zugriff nicht auswählbar.") };
+  if ((!allowArchived && result.data.is_archived) || result.data.media_kind !== "image" || result.data.purpose !== purpose || !allowedVisibilities.includes(result.data.visibility)) return { data: null, error: new Error("Dieses Bild ist für den aktuellen Zugriff nicht auswählbar.") };
   return { data: result.data, error: null };
 }
 
-export async function syncCoachMediaUsage(coachId, mediaAssetId) {
+export function resolvePublicCoachMedia(id, options = {}) { return resolveEntityImageMedia(id, { ...options, purpose: "coach" }); }
+
+export async function synchronizeMediaAssignment(entityType, entityId, mediaAssetId) {
+  const assignment = buildMediaAssignmentPayload(entityType, entityId, mediaAssetId);
+  if (!assignment.ok) return { error: assignment.error };
   const db = createSupabaseAdminClient();
   if (!db) return { error: new Error("Media-Service-Client ist nicht konfiguriert.") };
-  if (!mediaAssetId) return repository.removeMediaUsage(db, "coach", coachId, "image");
-  return repository.upsertMediaUsage(db, { media_asset_id: mediaAssetId, entity_type: "coach", entity_id: coachId, field_name: "image" });
+  const result = await repository.synchronizeMediaAssignment(db, assignment.payload);
+  return { data: result.data || null, error: result.error || null };
 }
 
 export async function uploadMediaAsset(file, input, actorUserId) {

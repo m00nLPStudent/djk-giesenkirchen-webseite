@@ -30,6 +30,10 @@ test("resolvePlayerImageUrl keeps legacy photo_url temporarily for bestandsdaten
   assert.equal(resolvePlayerImageUrl({}, "fallback.png"), "fallback.png");
 });
 
+test("resolvePlayerImageUrl prefers a resolved media asset over legacy URLs", () => {
+  assert.equal(resolvePlayerImageUrl({ mediaAsset: { previewUrl: "media.png" }, image_url: "legacy.png" }), "media.png");
+});
+
 test("resolveCoachImageUrl prefers canonical image fields", () => {
   assert.equal(
     resolveCoachImageUrl(

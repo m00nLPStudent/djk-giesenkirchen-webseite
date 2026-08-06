@@ -25,3 +25,4 @@ export function archiveMediaAsset(db, id) { return db.from("media_assets").updat
 export function loadMediaAsset(db, id) { return db.from("media_assets").select(SELECT).eq("id", id).maybeSingle(); }
 export function removeMediaUsage(db, entityType, entityId, fieldName) { return db.from("media_asset_usages").delete().eq("entity_type", entityType).eq("entity_id", entityId).eq("field_name", fieldName); }
 export function upsertMediaUsage(db, payload) { return db.from("media_asset_usages").upsert(payload, { onConflict: "entity_type,entity_id,field_name" }); }
+export function synchronizeMediaAssignment(db, payload) { return db.rpc("synchronize_media_assignment", payload); }

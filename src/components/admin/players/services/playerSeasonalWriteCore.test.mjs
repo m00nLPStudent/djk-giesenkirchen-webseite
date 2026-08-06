@@ -29,7 +29,7 @@ test("buildPlayerMasterPayload keeps seasonal assignment snapshots out of the ma
   );
 
   assert.equal(payload.image_url, "https://example.test/max.png");
-  assert.equal(payload.photo_url, "https://example.test/max.png");
+  assert.equal(Object.hasOwn(payload, "photo_url"), false);
   assert.equal("team_id" in payload, false);
   assert.equal("shirt_number" in payload, false);
   assert.equal("position_de" in payload, false);
@@ -54,9 +54,9 @@ test("buildPlayerMasterPayload falls back to legacy photo_url and placeholder im
   );
 
   assert.equal(legacyPayload.image_url, "https://example.test/legacy.png");
-  assert.equal(legacyPayload.photo_url, "https://example.test/legacy.png");
+  assert.equal(Object.hasOwn(legacyPayload, "photo_url"), false);
   assert.equal(placeholderPayload.image_url, placeholderImage);
-  assert.equal(placeholderPayload.photo_url, placeholderImage);
+  assert.equal(Object.hasOwn(placeholderPayload, "photo_url"), false);
 });
 
 test("buildPlayerMasterRollbackPayload restores the previous master snapshot without team synthesis", () => {
@@ -70,7 +70,7 @@ test("buildPlayerMasterRollbackPayload restores the previous master snapshot wit
   );
 
   assert.equal(payload.image_url, "https://example.test/legacy.png");
-  assert.equal(payload.photo_url, "https://example.test/legacy.png");
+  assert.equal(Object.hasOwn(payload, "photo_url"), false);
   assert.equal("team_id" in payload, false);
   assert.equal("shirt_number" in payload, false);
   assert.equal("position_de" in payload, false);
