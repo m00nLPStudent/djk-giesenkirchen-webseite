@@ -34,7 +34,7 @@ test("configuration keys, hrefs and ordering are stable and unique", () => {
 test("active items are valid admin routes with permission metadata", () => {
   for (const item of activeItems) {
     assert.match(item.href, /^\/admin(?:\/|$)/);
-    assert.ok(item.permissionKey || item.permissionKeys?.length || item.accessPolicy === "superadmin_only");
+    assert.ok(item.permissionKey || item.permissionKeys?.length || ["superadmin_only", "media_roles"].includes(item.accessPolicy));
   }
 });
 
@@ -46,7 +46,13 @@ test("planned items are never clickable", () => {
 });
 
 test("all active permitted modules resolve for a global context", () => {
-  assert.deepEqual(itemKeys(dto(allPermissions)).sort(), activeItems.filter((item) => item.accessPolicy !== "superadmin_only").map((item) => item.key).sort());
+  assert.deepEqual(itemKeys(dto(allPermissions)).sort(), activeItems.filter((item) => !["superadmin_only", "media_roles"].includes(item.accessPolicy)).map((item) => item.key).sort());
+});
+
+test("media library navigation is visible only to superadmin and webmaster", () => {
+  assert.ok(itemKeys(dto(allPermissions, globalScope, "/admin/media", ["superadmin"])).includes("media"));
+  assert.ok(itemKeys(dto(allPermissions, globalScope, "/admin/media", ["webmaster"])).includes("media"));
+  assert.ok(!itemKeys(dto(allPermissions, globalScope, "/admin/media", ["kassierer"])).includes("media"));
 });
 
 test("notification monitoring navigation is visible only to superadmin", () => {
