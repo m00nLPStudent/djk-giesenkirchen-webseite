@@ -9,7 +9,7 @@ test("buildMediaAssignmentPayload supports the shared coach and player image pat
 
 test("buildMediaAssignmentPayload supports events and rejects unrelated modules and fields", () => {
   assert.equal(buildMediaAssignmentPayload("event", "event-1", "asset-1").ok, true);
-  assert.equal(buildMediaAssignmentPayload("sponsor", "sponsor-1", "asset-1").ok, false);
+  assert.equal(buildMediaAssignmentPayload("download", "download-1", "asset-1").ok, false);
   assert.equal(buildMediaAssignmentPayload("player", "player-1", "asset-1", "document").ok, false);
 });
 
@@ -35,4 +35,10 @@ test("news and event documents share the central file assignment contract", () =
   assert.equal(buildMediaAssignmentPayload("news_document", "news-doc-1", "asset-1", "file").ok, true);
   assert.equal(buildMediaAssignmentPayload("event_document", "event-doc-1", "asset-1", "file").ok, true);
   assert.equal(buildMediaAssignmentPayload("event_document", "event-doc-1", "asset-1", "image").ok, false);
+});
+
+test("sponsor logos use the shared image assignment contract", () => {
+  const result = buildMediaAssignmentPayload("sponsor", "sponsor-1", "asset-1", "image");
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.payload, { p_entity_type: "sponsor", p_entity_id: "sponsor-1", p_media_asset_id: "asset-1", p_field_name: "image" });
 });

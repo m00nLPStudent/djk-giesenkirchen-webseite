@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path) => fs.readFileSync(new URL(path, import.meta.url), "utf8");
 const button = read("../delete/AdminRemoveButton.js");
 const newsButton = read("../ui/DeleteNewsButton.js");
-const actions = read("../delete/removeActions.js");
+const actions = read("../../../app/admin/news/actions.js");
 
 test("news delete targets the canonical overview after success", () => {
   assert.match(newsButton, /successHref="\/admin\/news"/);
@@ -14,10 +14,12 @@ test("news delete targets the canonical overview after success", () => {
   assert.doesNotMatch(redirectBranch, /router\.refresh/);
 });
 
-test("news delete awaits existing public revalidation before returning", () => {
-  const newsAction = actions.slice(actions.indexOf("export async function removeNewsRecord"), actions.indexOf("export async function removeBoardMemberRecord"));
-  assert.match(newsAction, /const result = await removeEntity\("news", news\?\.id\)/);
-  assert.match(newsAction, /if \(!result\?\.error\)/);
+test("news delete uses the permission-checked server action and revalidates before returning", () => {
+  const newsAction = actions.slice(actions.indexOf("export async function deleteNewsAction"), actions.indexOf("export async function saveNewsWithAuthorAction"));
+  assert.match(newsAction, /requiredPermission: "news\.delete"/);
+  assert.match(newsAction, /createSupabaseAdminClient\(\)/);
+  assert.match(newsAction, /from\("news"\)\.delete\(\)/);
+  assert.match(newsAction, /if \(!result\.error\)/);
   assert.match(newsAction, /await revalidatePublicContentAction\("news"\)/);
   assert.ok(newsAction.indexOf("await revalidatePublicContentAction") < newsAction.indexOf("return result"));
 });

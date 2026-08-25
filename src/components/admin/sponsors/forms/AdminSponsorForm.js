@@ -15,17 +15,20 @@ import {
   TextareaField,
 } from "@/components/admin/forms";
 import SponsorImageUpload from "../components/SponsorImageUpload";
-import { saveSponsor, uploadSponsorImage } from "../services/sponsors.service";
+import { loadSponsorMediaPickerAction, saveSponsorAction, uploadSponsorMediaAction } from "@/app/admin/sponsors/actions";
 
-export default function AdminSponsorForm({ sponsor, categories = [] }) {
+export default function AdminSponsorForm({ sponsor, categories = [], initialMedia = null }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(initialMedia);
   const [form, setForm] = useState({
     category_id: sponsor?.category_id || "",
     name: sponsor?.name || "",
     description_de: sponsor?.description_de || "",
     description_en: sponsor?.description_en || "",
     image_url: sponsor?.image_url || "",
+    image_media_asset_id: sponsor?.image_media_asset_id || null,
+    remove_legacy_logo: false,
     website_url: sponsor?.website_url || "",
     facebook_url: sponsor?.facebook_url || "",
     instagram_url: sponsor?.instagram_url || "",
@@ -38,16 +41,13 @@ export default function AdminSponsorForm({ sponsor, categories = [] }) {
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  async function uploadImage(file) {
-    const { data, error } = await uploadSponsorImage(file, {
-      ...form,
-      id: sponsor?.id,
-    });
-    if (error) {
-      alert(error.message);
-      return;
-    }
-    updateField("image_url", data);
+  function handleMediaChange(media) {
+    setSelectedMedia(media);
+    setForm((current) => ({
+      ...current,
+      image_media_asset_id: media?.id || null,
+      remove_legacy_logo: media ? false : Boolean(current.image_url),
+    }));
   }
 
   async function handleSubmit(event) {
@@ -59,7 +59,7 @@ export default function AdminSponsorForm({ sponsor, categories = [] }) {
       success: true,
     });
     setLoading(true);
-    const { error } = await saveSponsor(form, sponsor?.id || null);
+    const { error } = await saveSponsorAction(form, sponsor?.id || null);
     setLoading(false);
 
     if (error) {
@@ -138,9 +138,11 @@ export default function AdminSponsorForm({ sponsor, categories = [] }) {
 
       <FormSection eyebrow="Banner" title="Bild / Banner">
         <SponsorImageUpload
-          imageUrl={form.image_url}
-          onUpload={uploadImage}
-          onRemove={() => updateField("image_url", "")}
+          selectedMedia={selectedMedia}
+          legacyUrl={form.remove_legacy_logo ? null : form.image_url}
+          onChange={handleMediaChange}
+          loadAction={(filters) => loadSponsorMediaPickerAction(filters, sponsor?.id || null)}
+          uploadAction={(data) => uploadSponsorMediaAction(data, sponsor?.id || null)}
         />
       </FormSection>
 

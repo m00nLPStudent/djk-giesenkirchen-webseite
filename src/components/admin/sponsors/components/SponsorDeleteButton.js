@@ -1,8 +1,8 @@
 "use client";
 
 import AdminRemoveButton from "@/components/admin/delete/AdminRemoveButton";
-import { removeSponsorRecord } from "@/components/admin/delete/removeActions";
+import { deleteSponsorAction } from "@/app/admin/sponsors/actions";
 
 export default function SponsorDeleteButton({ sponsor }) {
-  return <AdminRemoveButton label="Sponsor" name={sponsor.name} action={() => removeSponsorRecord(sponsor)} affected={["Sponsor"]} preserved={["News", "Mannschaften", "Trainer"]} successHref="/admin/sponsors" />;
+  return <AdminRemoveButton label="Sponsor" name={sponsor.name} action={() => deleteSponsorAction(sponsor.id)} affected={["Sponsor"]} preserved={["News", "Mannschaften", "Trainer", "zentrale Medien"]} successHref="/admin/sponsors" />;
 }

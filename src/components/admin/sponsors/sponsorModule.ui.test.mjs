@@ -10,7 +10,7 @@ const detail = read("../../../app/admin/sponsors/edit/[id]/page.js");
 const overviewPage = read("../../../app/admin/sponsors/page.js");
 const form = read("./forms/AdminSponsorForm.js");
 const upload = read("./components/SponsorImageUpload.js");
-const service = read("./services/sponsors.service.js");
+const actions = read("../../../app/admin/sponsors/actions.js");
 const publicBanner = read("../../website/sponsors/SponsorBanner.js");
 
 test("overview uses shared header, search, primary action and compact summary", () => {
@@ -58,12 +58,12 @@ test("hard delete appears only in the lower danger zone and keeps the existing r
 });
 
 test("create, edit, upload, links, status and sorting write paths stay intact", () => {
-  for (const value of ["saveSponsor(form", "uploadSponsorImage", "description_en", "website_url", "is_active", "sort_order", "revalidatePublicContentAction"]) assert.ok(form.includes(value));
-  assert.match(upload, /AdminImageUpload/);
+  for (const value of ["saveSponsorAction(form", "uploadSponsorMediaAction", "description_en", "website_url", "is_active", "sort_order", "revalidatePublicContentAction"]) assert.ok(form.includes(value));
+  assert.match(upload, /AdminMediaPicker/);
   assert.match(upload, /object-contain/);
-  assert.match(service, /uploadMediaFile/);
-  assert.match(service, /sort_order: Number\(sponsor\.sort_order \|\| 0\)/);
-  assert.doesNotMatch(service, /drag/i);
+  assert.match(actions, /uploadMediaAsset/);
+  assert.match(actions, /sort_order: Number\(sponsor\?\.sort_order \|\| 0\)/);
+  assert.doesNotMatch(actions, /uploadMediaFile|uploadStorageFile/);
 });
 
 test("queries, permissions, navigation and public sponsor rendering remain anchored", () => {
@@ -71,5 +71,5 @@ test("queries, permissions, navigation and public sponsor rendering remain ancho
   assert.match(list, /sponsors\.create/);
   assert.match(list, /sponsors\.edit/);
   assert.match(detail, /sponsors\.delete/);
-  assert.match(publicBanner, /sponsor\.image_url/);
+  assert.match(publicBanner, /sponsor\.resolved_image_url \|\| sponsor\.image_url/);
 });

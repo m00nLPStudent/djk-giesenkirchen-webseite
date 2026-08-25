@@ -1,5 +1,6 @@
 import { SponsorSection, SponsorTabs } from "@/components/website/sponsors";
 import { supabase } from "@/lib/supabase";
+import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
 
 export default async function FootballSponsorsPage() {
   const { data: categories } = await supabase
@@ -14,14 +15,20 @@ export default async function FootballSponsorsPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
+  const media = await loadPublicMediaUrlMap((sponsors || []).map((sponsor) => sponsor.image_media_asset_id));
+  const resolvedSponsors = (sponsors || []).map((sponsor) => ({
+    ...sponsor,
+    resolved_image_url: media.data.get(sponsor.image_media_asset_id) || sponsor.image_url || null,
+  }));
+
   const activeCategoryIds = new Set((categories || []).map((item) => item.id));
 
-  const sponsorsByCategory = (sponsors || []).reduce((groups, sponsor) => {
+  const sponsorsByCategory = resolvedSponsors.reduce((groups, sponsor) => {
     const key = sponsor.category_id || "none";
     return { ...groups, [key]: [...(groups[key] || []), sponsor] };
   }, {});
 
-  const uncategorizedSponsors = (sponsors || []).filter(
+  const uncategorizedSponsors = resolvedSponsors.filter(
     (sponsor) =>
       !sponsor.category_id || !activeCategoryIds.has(sponsor.category_id),
   );

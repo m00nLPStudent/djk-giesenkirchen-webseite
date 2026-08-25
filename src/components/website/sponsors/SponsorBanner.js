@@ -1,5 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
+
 export default function SponsorBanner({ sponsor }) {
-  const image = sponsor.image_url;
+  const image = sponsor.resolved_image_url || sponsor.image_url;
   const hasWebsite = Boolean(sponsor.website_url);
   const className =
     "flex min-w-0 h-32 items-center justify-center overflow-hidden bg-white p-4 sm:h-40 sm:p-5 md:h-44 md:p-6";

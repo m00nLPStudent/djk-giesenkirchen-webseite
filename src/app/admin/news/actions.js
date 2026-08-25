@@ -5,6 +5,8 @@ import { resolveNewsAuthorName, sanitizeNewsWritePayload } from "@/components/ad
 import { canManageMedia, loadMediaLibrary, loadMediaUrlMap, loadPublicMediaUrlMap, resolveEntityDocumentMedia, resolveEntityImageMedia, synchronizeMediaAssignment, synchronizeNewsContentMediaUsages, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
 import { extractNewsInlineMediaAssetIds, hasInvalidNewsInlineMediaAssetIds, hasNewTransientImageSources, rewriteCentralMediaImageSources } from "@/components/admin/news/helpers/newsInlineMedia.core.mjs";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 
 async function prepareNewsInlineContent(content, previousContent = "") {
   if (hasNewTransientImageSources(content, previousContent)) return { error: "Eingefügte Bilder müssen zuerst über die Medienbibliothek hochgeladen werden." };
@@ -18,6 +20,18 @@ async function prepareNewsInlineContent(content, previousContent = "") {
 async function resolveAuthorName(db, profile) {
   const { data } = await db.from("admin_profiles").select("full_name, email").eq("id", profile.id).maybeSingle();
   return resolveNewsAuthorName(data || profile);
+}
+
+export async function deleteNewsAction(newsId) {
+  const permission = await assertAdminActionPermission({ requiredPermission: "news.delete" });
+  if (!permission.ok) return { data: null, error: { message: permission.message || "Berechtigung fehlt." } };
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: null, error: { message: "News-Service ist nicht konfiguriert." } };
+  const existing = await db.from("news").select("id").eq("id", newsId).maybeSingle();
+  if (existing.error || !existing.data) return { data: null, error: { message: "News nicht gefunden." } };
+  const result = await db.from("news").delete().eq("id", newsId);
+  if (!result.error) await revalidatePublicContentAction("news");
+  return result;
 }
 
 export async function saveNewsWithAuthorAction(payload, newsId = null) {

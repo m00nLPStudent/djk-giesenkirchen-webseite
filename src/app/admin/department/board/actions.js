@@ -11,6 +11,7 @@ import { saveBoardMember } from "@/components/admin/board/services/board.service
 import { revalidatePath } from "next/cache";
 import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 
 const SAFE_MEDIA_ERRORS = new Set(["Keine Datei ausgewÃ¤hlt.", "Dateityp ist nicht erlaubt.", "Datei ist zu groÃŸ.", "Dateiinhalt passt nicht zum Dateityp."]);
 
@@ -131,10 +132,9 @@ export async function removeBoardMemberWithScopeAction(boardMemberId) {
     return buildError("Vorstandsmitglied nicht gefunden.");
   }
 
-  const result = await supabaseServer.rpc("remove_entity", {
-    entity_type: "board_member",
-    entity_uuid: boardMemberId,
-  });
+  const db = createSupabaseAdminClient();
+  if (!db) return buildError("Vorstands-Service ist nicht konfiguriert.");
+  const result = await db.from("board_members").delete().eq("id", boardMemberId);
 
   if (!result.error) {
     revalidatePath("/admin/department");

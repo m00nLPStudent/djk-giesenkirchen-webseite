@@ -3,13 +3,13 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
-const [actions, editor, tab, panel, handlers, legacyService, initial, payload, edit, publicService, home, landing, overview, detail, proposal, postcheck, rollback, remove] = await Promise.all([
+const [actions, editor, tab, panel, handlers, legacyService, initial, payload, edit, publicService, home, landing, overview, detail, proposal, postcheck, rollback] = await Promise.all([
   read("../../../app/admin/news/actions.js"), read("../news/forms/NewsEditorForm.js"), read("../news/tabs/NewsImagesTab.js"), read("../news/components/NewsMediaPanel.js"),
   read("../news/helpers/newsHandlers.js"), read("../news/services/news.service.js"), read("../news/helpers/newsInitialState.js"), read("../news/helpers/newsPayload.js"),
   read("../../../app/admin/news/edit/[id]/page.js"), read("../news/services/newsMedia.service.js"), read("../../../app/(website)/page.js"),
   read("../../../app/(website)/news/page.js"), read("../../../app/(website)/news/uebersicht/page.js"), read("../../../app/(website)/news/[slug]/page.js"),
   read("../../../../docs/sql/b15-19f1-news-image-media-reference-proposal.sql"), read("../../../../docs/sql/b15-19f1-news-image-media-reference-postcheck-readonly.sql"),
-  read("../../../../docs/sql/b15-19f1-news-image-media-reference-rollback.sql"), read("../delete/removeActions.js"),
+  read("../../../../docs/sql/b15-19f1-news-image-media-reference-rollback.sql"),
 ]);
 
 test("create and edit use only the central news picker and upload path", () => {
@@ -50,5 +50,6 @@ test("SQL adds only F1 state, hardens grants and cleans news usage on delete", (
   assert.match(postcheck, /anon_must_be_false[\s\S]*authenticated_must_be_false[\s\S]*service_role_must_be_true/);
   assert.match(rollback, /Restores the exact B15\.19E3 assignment scope/);
   assert.doesNotMatch(rollback, /DROP TABLE|DELETE FROM public\.media_assets|storage\./);
-  assert.match(remove, /removeEntity\("news"/);
+  assert.match(actions, /deleteNewsAction[\s\S]*from\("news"\)\.delete\(\)/);
+  assert.doesNotMatch(actions, /remove_entity/);
 });

@@ -1,16 +1,7 @@
-import { AdminImageUpload } from "@/components/admin/media";
+import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker";
 
-export default function SponsorImageUpload(props) {
-  return (
-    <div className="[&_img]:object-contain">
-    <AdminImageUpload
-      {...props}
-      placeholderUrl=""
-      alt="Sponsor-Banner"
-      description="Sponsor-Banner oder Logo hochladen. Die Anzeige wird auf der Website automatisch einheitlich skaliert."
-      uploadLabel="Banner auswählen"
-      removeLabel="Banner entfernen"
-    />
-    </div>
-  );
+export default function SponsorImageUpload({ selectedMedia, legacyUrl, onChange, loadAction, uploadAction }) {
+  return <div className="[&_img]:object-contain">
+    <AdminMediaPicker value={selectedMedia} legacyUrl={legacyUrl || ""} placeholderUrl="" onChange={onChange} loadAction={loadAction} uploadAction={uploadAction} usageContext="sponsor" entityLabel="Sponsorlogo" />
+  </div>;
 }
