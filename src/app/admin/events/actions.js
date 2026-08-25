@@ -2,8 +2,9 @@
 
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { logEditorialNotificationFailure, notifyEventWorkflow } from "@/components/admin/notifications/editorialNotifications.service";
-import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
+import { canManageMedia, loadMediaLibrary, loadMediaUrlMap, resolveEntityDocumentMedia, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 
 async function buildUniqueSlug(db, slug, ignoreId = null) {
   if (!slug) return null;
@@ -101,4 +102,96 @@ export async function uploadEventMediaAction(formData, eventId = null) {
   } catch {
     return { ok: false, error: "Das Terminbild konnte nicht hochgeladen werden." };
   }
+}
+
+const eventDocumentError = (message) => ({ data: null, error: { message } });
+const getEventDocumentAdminClient = () => createSupabaseAdminClient();
+
+export async function loadEventDocumentsAction(eventId) {
+  const authorization = await authorizeEventMedia(eventId);
+  if (!authorization.ok) return eventDocumentError(authorization.message);
+  const db = getEventDocumentAdminClient();
+  if (!db) return eventDocumentError("Event-Dokument-Service ist nicht konfiguriert.");
+  const result = await db.from("event_documents").select("*").eq("event_id", eventId).order("sort_order").order("created_at");
+  if (result.error) return result;
+  const allowed = canManageMedia(authorization.auth.roles) ? ["public", "admin"] : ["public"];
+  const media = await loadMediaUrlMap((result.data || []).map((item) => item.media_asset_id), allowed, "document");
+  if (media.error) return eventDocumentError("Dokumente konnten nicht aufgelöst werden.");
+  return { data: (result.data || []).map((item) => ({ ...item, resolved_file_url: media.data.get(item.media_asset_id) || item.file_url || null })), error: null };
+}
+
+export async function loadEventDocumentPickerAction(filters = {}, eventId) {
+  const authorization = await authorizeEventMedia(eventId);
+  if (!authorization.ok) return { ok: false, error: authorization.message, items: [], total: 0 };
+  const allowed = canManageMedia(authorization.auth.roles) ? ["public", "admin"] : ["public"];
+  const visibility = allowed.includes(filters.visibility) ? filters.visibility : allowed;
+  const purpose = normalizePickerPurpose(filters.purpose, "event", "document");
+  const result = await loadMediaLibrary({ ...filters, kind: "document", visibility, purpose, archived: "active" });
+  return result.error ? { ok: false, error: "Dokumente konnten nicht geladen werden.", items: [], total: 0 } : { ok: true, items: result.data, total: result.count || 0 };
+}
+
+export async function uploadEventDocumentMediaAction(formData, eventId) {
+  const authorization = await authorizeEventMedia(eventId);
+  if (!authorization.ok) return { ok: false, error: authorization.message };
+  const file = formData.get("file");
+  if (!file || file.type !== "application/pdf") return { ok: false, error: "Für Event-Dokumente sind zentral ausschließlich PDF-Dateien erlaubt." };
+  const result = await uploadMediaAsset(file, { displayName: formData.get("displayName"), visibility: "public", purpose: "event" }, authorization.auth.profile.id);
+  if (result.error) return { ok: false, error: result.stage === "validation" ? result.error.message : "Das Event-Dokument konnte nicht hochgeladen werden." };
+  const resolved = await resolveEntityDocumentMedia(result.data.id, { allowedVisibilities: ["public"] });
+  return resolved.error ? { ok: false, error: resolved.error.message } : { ok: true, item: resolved.data };
+}
+
+export async function createEventDocumentAction(eventId, mediaAssetId) {
+  const authorization = await authorizeEventMedia(eventId);
+  if (!authorization.ok) return eventDocumentError(authorization.message);
+  const allowed = canManageMedia(authorization.auth.roles) ? ["public", "admin"] : ["public"];
+  const media = await resolveEntityDocumentMedia(mediaAssetId, { allowedVisibilities: allowed });
+  if (media.error) return eventDocumentError(media.error.message);
+  const db = getEventDocumentAdminClient();
+  if (!db) return eventDocumentError("Event-Dokument-Service ist nicht konfiguriert.");
+  const asset = media.data;
+  const saved = await db.from("event_documents").insert({
+    event_id: eventId,
+    media_asset_id: asset.id,
+    display_name_de: asset.display_name || asset.original_filename,
+    file_name: asset.original_filename,
+    mime_type: asset.mime_type,
+    file_size: asset.file_size_bytes,
+    is_public: asset.visibility === "public",
+    sort_order: 0,
+  }).select("*").single();
+  if (saved.error) return eventDocumentError("Das Event-Dokument konnte nicht hinzugefügt werden.");
+  const usage = await synchronizeMediaAssignment("event_document", saved.data.id, asset.id, "file");
+  if (usage.error) {
+    await db.from("event_documents").delete().eq("id", saved.data.id);
+    return eventDocumentError("Die Dokumentverwendung konnte nicht gespeichert werden.");
+  }
+  return { data: { ...saved.data, resolved_file_url: asset.previewUrl }, error: null };
+}
+
+export async function updateEventDocumentAction(documentId, updates = {}) {
+  const permission = await assertAdminActionPermission({ requiredPermission: "events.edit" });
+  if (!permission.ok) return eventDocumentError(permission.message || "Berechtigung fehlt.");
+  const db = getEventDocumentAdminClient();
+  if (!db) return eventDocumentError("Event-Dokument-Service ist nicht konfiguriert.");
+  const current = await db.from("event_documents").select("id,event_id").eq("id", documentId).maybeSingle();
+  if (current.error || !current.data) return eventDocumentError("Dokument nicht gefunden.");
+  const allowed = ["display_name_de", "description_de", "sort_order", "is_public"];
+  const safe = Object.fromEntries(Object.entries(updates).filter(([key]) => allowed.includes(key)));
+  if ("sort_order" in safe) safe.sort_order = Math.max(0, Math.trunc(Number(safe.sort_order) || 0));
+  return db.from("event_documents").update(safe).eq("id", documentId).select("*").maybeSingle();
+}
+
+export async function deleteEventDocumentAction(documentId) {
+  const permission = await assertAdminActionPermission({ requiredPermission: "events.edit" });
+  if (!permission.ok) return eventDocumentError(permission.message || "Berechtigung fehlt.");
+  const db = getEventDocumentAdminClient();
+  if (!db) return eventDocumentError("Event-Dokument-Service ist nicht konfiguriert.");
+  const current = await db.from("event_documents").select("id,media_asset_id,file_path").eq("id", documentId).maybeSingle();
+  if (current.error || !current.data) return eventDocumentError("Dokument nicht gefunden.");
+  if (!current.data.media_asset_id && current.data.file_path) {
+    const removed = await db.storage.from("events-documents").remove([decodeURIComponent(current.data.file_path)]);
+    if (removed.error) return eventDocumentError(removed.error.message);
+  }
+  return db.from("event_documents").delete().eq("id", documentId);
 }

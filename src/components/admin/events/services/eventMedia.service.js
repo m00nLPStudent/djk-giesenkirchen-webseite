@@ -13,3 +13,12 @@ export async function resolvePublicEventImages(items = []) {
     ),
   }));
 }
+
+export async function resolvePublicEventDocuments(items = []) {
+  const rows = items.filter((item) => item?.is_public);
+  const media = await loadPublicMediaUrlMap(rows.map((item) => item.media_asset_id), "document");
+  return rows.map((item) => ({
+    ...item,
+    resolved_file_url: media.data.get(item.media_asset_id) || item.file_url || null,
+  })).filter((item) => item.resolved_file_url);
+}

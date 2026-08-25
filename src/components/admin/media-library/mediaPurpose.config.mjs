@@ -7,7 +7,7 @@ export const MEDIA_PURPOSE_OPTIONS = Object.freeze([
   { key: "cms", label: "CMS / Vereinskontakt", mediaKind: "image", pickerFilterable: true },
   { key: "club_history", label: "Vereinsgeschichte", mediaKind: "image", pickerFilterable: true },
   { key: "sponsor", label: "Sponsor", mediaKind: "image", pickerFilterable: true },
-  { key: "event", label: "Event / Termin", mediaKind: "image", pickerFilterable: true },
+  { key: "event", label: "Event / Termin", mediaKind: "all", pickerFilterable: true },
   { key: "document", label: "Dokument", mediaKind: "document", pickerFilterable: true },
   { key: "download", label: "Download", mediaKind: "document", pickerFilterable: true },
   { key: "system", label: "System", mediaKind: "image", pickerFilterable: true },

@@ -19,7 +19,7 @@ import {
   diagnoseEventLookupBySlug,
   getPublishedEventBySlug,
 } from "@/components/admin/events/services/events.service";
-import { resolvePublicEventImages } from "@/components/admin/events/services/eventMedia.service";
+import { resolvePublicEventDocuments, resolvePublicEventImages } from "@/components/admin/events/services/eventMedia.service";
 
 export default async function EventDetailPage({ params }) {
   const resolvedParams = await Promise.resolve(params);
@@ -60,8 +60,7 @@ export default async function EventDetailPage({ params }) {
   const outlookCalendarUrl = buildOutlookCalendarUrl(event);
   const icsUrl = event.slug ? `/termine/${event.slug}/ics` : null;
   const recurrenceText = formatRecurrenceText(event);
-  const documents = (event.event_documents || [])
-    .filter((document) => document.is_public)
+  const documents = (await resolvePublicEventDocuments(event.event_documents || []))
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
   return (
@@ -218,7 +217,7 @@ export default async function EventDetailPage({ params }) {
                   return (
                     <li key={document.id}>
                       <Link
-                        href={document.file_url}
+                        href={document.resolved_file_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-between gap-3 py-1 text-sm text-white/80 transition hover:text-red-400"

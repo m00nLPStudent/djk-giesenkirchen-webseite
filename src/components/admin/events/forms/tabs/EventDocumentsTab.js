@@ -3,11 +3,15 @@ import EventDocumentsManager from "../../components/EventDocumentsManager";
 
 export default function EventDocumentsTab({
   isEdit,
+  eventId,
   documents,
   setDocuments,
-  onUploadDocument,
+  onSelectDocument,
   onDeleteDocument,
   documentsLoading,
+  loadMediaAction,
+  uploadMediaAction,
+  updateDocumentAction,
 }) {
   return (
     <FormSection
@@ -22,11 +26,15 @@ export default function EventDocumentsTab({
         </div>
       ) : (
         <EventDocumentsManager
+          eventId={eventId}
           documents={documents}
           setDocuments={setDocuments}
-          onUploadDocument={onUploadDocument}
+          onSelectDocument={onSelectDocument}
           onDeleteDocument={onDeleteDocument}
           loading={documentsLoading}
+          loadMediaAction={loadMediaAction}
+          uploadMediaAction={uploadMediaAction}
+          updateDocumentAction={updateDocumentAction}
         />
       )}
     </FormSection>

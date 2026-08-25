@@ -19,12 +19,7 @@ import EventLocationTab from "./tabs/EventLocationTab";
 import EventMediaTab from "./tabs/EventMediaTab";
 import EventSettingsTab from "./tabs/EventSettingsTab";
 import EventTimeTab from "./tabs/EventTimeTab";
-import {
-  deleteEventDocument,
-  getEventDocuments,
-  uploadEventDocument,
-} from "../services/events.service";
-import { loadEventMediaPickerAction, saveEventWithNotificationAction, uploadEventMediaAction } from "@/app/admin/events/actions";
+import { createEventDocumentAction, deleteEventDocumentAction, loadEventDocumentPickerAction, loadEventDocumentsAction, loadEventMediaPickerAction, saveEventWithNotificationAction, updateEventDocumentAction, uploadEventDocumentMediaAction, uploadEventMediaAction } from "@/app/admin/events/actions";
 
 export default function EventEditorForm({ event = null, initialMedia = null, teams = [], eventTypes = [] }) {
   const router = useRouter();
@@ -46,7 +41,7 @@ export default function EventEditorForm({ event = null, initialMedia = null, tea
       if (!isEdit || !event?.id) return;
 
       setDocumentsLoading(true);
-      const { data, error } = await getEventDocuments(event.id);
+      const { data, error } = await loadEventDocumentsAction(event.id);
       setDocumentsLoading(false);
 
       if (error) {
@@ -73,10 +68,9 @@ export default function EventEditorForm({ event = null, initialMedia = null, tea
     }));
   }
 
-  async function handleDocumentUpload(file) {
+  async function handleDocumentSelect(media) {
     if (!event?.id) return;
-
-    const { data, error } = await uploadEventDocument(file, event.id);
+    const { data, error } = await createEventDocumentAction(event.id, media.id);
     if (error) {
       alert(error.message);
       return;
@@ -88,7 +82,7 @@ export default function EventEditorForm({ event = null, initialMedia = null, tea
   }
 
   async function handleDocumentDelete(documentItem) {
-    const { error } = await deleteEventDocument(documentItem);
+    const { error } = await deleteEventDocumentAction(documentItem.id);
     if (error) {
       alert(error.message);
       return;
@@ -169,6 +163,7 @@ export default function EventEditorForm({ event = null, initialMedia = null, tea
         <EventBasicTab
           form={form}
           isEdit={isEdit}
+          eventId={event?.id || null}
           event={event}
           updateField={updateField}
         />
@@ -201,11 +196,15 @@ export default function EventEditorForm({ event = null, initialMedia = null, tea
       {activeTab === "documents" && (
         <EventDocumentsTab
           isEdit={isEdit}
+          eventId={event?.id || null}
           documents={documents}
           setDocuments={setDocuments}
-          onUploadDocument={handleDocumentUpload}
+          onSelectDocument={handleDocumentSelect}
           onDeleteDocument={handleDocumentDelete}
           documentsLoading={documentsLoading}
+          loadMediaAction={(filters) => loadEventDocumentPickerAction(filters, event?.id)}
+          uploadMediaAction={(data) => uploadEventDocumentMediaAction(data, event?.id)}
+          updateDocumentAction={updateEventDocumentAction}
         />
       )}
 

@@ -30,3 +30,9 @@ test("news title images use the shared image assignment field", () => {
   assert.equal(buildMediaAssignmentPayload("news", "news-1", "asset-1").ok, true);
   assert.equal(buildMediaAssignmentPayload("news", "news-1", "asset-1", "contact_image").ok, false);
 });
+
+test("news and event documents share the central file assignment contract", () => {
+  assert.equal(buildMediaAssignmentPayload("news_document", "news-doc-1", "asset-1", "file").ok, true);
+  assert.equal(buildMediaAssignmentPayload("event_document", "event-doc-1", "asset-1", "file").ok, true);
+  assert.equal(buildMediaAssignmentPayload("event_document", "event-doc-1", "asset-1", "image").ok, false);
+});
