@@ -1,0 +1,10 @@
+-- B15.19F3 read-only postcheck and approximate HTML inventory.
+SELECT pg_get_functiondef('public.synchronize_news_content_media_usages(uuid,uuid[])'::regprocedure);
+SELECT has_function_privilege('anon','public.synchronize_news_content_media_usages(uuid,uuid[])','EXECUTE') anon_must_be_false,has_function_privilege('authenticated','public.synchronize_news_content_media_usages(uuid,uuid[])','EXECUTE') authenticated_must_be_false,has_function_privilege('service_role','public.synchronize_news_content_media_usages(uuid,uuid[])','EXECUTE') service_role_must_be_true;
+SELECT pg_get_functiondef('public.cleanup_news_media_usage()'::regprocedure);
+SELECT tgname,pg_get_triggerdef(oid) FROM pg_trigger WHERE tgrelid='public.news'::regclass AND tgname='news_cleanup_media_usage';
+SELECT count(*) total_news,count(*) FILTER(WHERE NULLIF(btrim(content_de),'') IS NOT NULL) with_content,count(*) FILTER(WHERE content_de~*'<img\b') with_images,count(*) FILTER(WHERE content_de~*'data:image') with_data_images,count(*) FILTER(WHERE content_de~*'blob:') with_blob_images,count(*) FILTER(WHERE content_de~*'https?://') with_http_urls FROM public.news;
+SELECT id,slug,(SELECT count(*) FROM regexp_matches(content_de,'<img\b','gi')) image_count FROM public.news WHERE content_de~*'<img\b' ORDER BY image_count DESC,id;
+SELECT entity_id AS news_id,count(*) usage_count FROM public.media_asset_usages WHERE entity_type='news' AND field_name='content' GROUP BY entity_id ORDER BY usage_count DESC;
+SELECT usage.* FROM public.media_asset_usages usage LEFT JOIN public.news news ON news.id=usage.entity_id LEFT JOIN public.media_assets asset ON asset.id=usage.media_asset_id WHERE usage.entity_type='news' AND usage.field_name='content' AND (news.id IS NULL OR asset.id IS NULL OR asset.is_archived OR asset.media_kind<>'image' OR asset.visibility<>'public');
+SELECT asset.id,asset.display_name,count(usage.id) usage_count FROM public.media_assets asset JOIN public.media_asset_usages usage ON usage.media_asset_id=asset.id WHERE usage.entity_type='news' AND usage.field_name='content' GROUP BY asset.id,asset.display_name ORDER BY usage_count DESC;

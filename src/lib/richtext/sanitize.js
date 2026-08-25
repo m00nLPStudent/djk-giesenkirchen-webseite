@@ -15,6 +15,7 @@ const ALLOWED_TAGS = new Set([
   "br",
   "s",
   "blockquote",
+  "pre",
   "table",
   "thead",
   "tbody",
@@ -35,6 +36,14 @@ const ALLOWED_FONT_SIZES = new Set([
   "24px",
   "28px",
   "32px",
+]);
+const ALLOWED_NEWS_IMAGE_CLASSES = new Set([
+  "news-inline-image--standard",
+  "news-inline-image--left",
+  "news-inline-image--center",
+  "news-inline-image--right",
+  "news-inline-image--flow-left",
+  "news-inline-image--flow-right",
 ]);
 
 function escapeText(value) {
@@ -131,6 +140,20 @@ function normalizeImageSource(value) {
   }
 }
 
+function normalizeImageClass(value) {
+  const classes = String(value || "").trim().split(/\s+/);
+  return classes.find((candidate) => ALLOWED_NEWS_IMAGE_CLASSES.has(candidate)) || null;
+}
+
+function normalizeImageWidth(attributes) {
+  const widthAttribute = extractAttribute(attributes, "width");
+  const styleWidth = extractStyle(attributes)?.match(/(?:^|;)\s*width\s*:\s*(\d{1,4})(?:px)?\s*(?:;|$)/i)?.[1];
+  const candidate = widthAttribute || styleWidth;
+  if (!/^\d{1,4}$/.test(candidate || "")) return null;
+  const width = Number(candidate);
+  return width >= 40 && width <= 2400 ? String(width) : null;
+}
+
 function normalizeColor(value) {
   const candidate = String(value || "").trim();
   return /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\))$/i.test(candidate) ? candidate : null;
@@ -197,7 +220,11 @@ export function sanitizeRichTextHtml(input) {
       if (!src) continue;
       const alt = extractAttribute(rawAttributes, "alt") || "";
       const title = extractAttribute(rawAttributes, "title");
-      result += `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}"${title ? ` title="${escapeAttribute(title)}"` : ""}>`;
+      const mediaAssetId = extractAttribute(rawAttributes, "data-media-asset-id");
+      const safeMediaAssetId = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(mediaAssetId || "") ? ` data-media-asset-id="${mediaAssetId}"` : "";
+      const imageClass = normalizeImageClass(extractAttribute(rawAttributes, "class"));
+      const width = normalizeImageWidth(rawAttributes);
+      result += `<img src="${escapeAttribute(src)}" alt="${escapeAttribute(alt)}"${title ? ` title="${escapeAttribute(title)}"` : ""}${imageClass ? ` class="${imageClass}"` : ""}${width ? ` width="${width}"` : ""}${safeMediaAssetId}>`;
       continue;
     }
 

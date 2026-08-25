@@ -2,8 +2,18 @@
 
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { resolveNewsAuthorName, sanitizeNewsWritePayload } from "@/components/admin/news/helpers/newsAuthor.core.mjs";
-import { canManageMedia, loadMediaLibrary, loadMediaUrlMap, resolveEntityDocumentMedia, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
+import { canManageMedia, loadMediaLibrary, loadMediaUrlMap, loadPublicMediaUrlMap, resolveEntityDocumentMedia, resolveEntityImageMedia, synchronizeMediaAssignment, synchronizeNewsContentMediaUsages, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
+import { extractNewsInlineMediaAssetIds, hasInvalidNewsInlineMediaAssetIds, hasNewTransientImageSources, rewriteCentralMediaImageSources } from "@/components/admin/news/helpers/newsInlineMedia.core.mjs";
+
+async function prepareNewsInlineContent(content, previousContent = "") {
+  if (hasNewTransientImageSources(content, previousContent)) return { error: "Eingefügte Bilder müssen zuerst über die Medienbibliothek hochgeladen werden." };
+  if (hasInvalidNewsInlineMediaAssetIds(content)) return { error: "Der News-Inhalt enthält eine ungültige Medienreferenz." };
+  const ids = extractNewsInlineMediaAssetIds(content);
+  const media = await loadPublicMediaUrlMap(ids, "image");
+  if (media.error || media.data.size !== ids.length) return { error: "Mindestens ein Inline-Bild ist nicht öffentlich verfügbar oder nicht mehr auswählbar." };
+  return { content: rewriteCentralMediaImageSources(content, media.data), ids };
+}
 
 async function resolveAuthorName(db, profile) {
   const { data } = await db.from("admin_profiles").select("full_name, email").eq("id", profile.id).maybeSingle();
@@ -18,26 +28,42 @@ export async function saveNewsWithAuthorAction(payload, newsId = null) {
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
   let existing = null;
   if (newsId) {
-    const existingResult = await db.from("news").select("id, author, image_url, image_media_asset_id").eq("id", newsId).maybeSingle();
+    const existingResult = await db.from("news").select("id, author, image_url, image_media_asset_id, content_de").eq("id", newsId).maybeSingle();
     if (existingResult.error || !existingResult.data) return { data: null, error: existingResult.error || { message: "News nicht gefunden." } };
     existing = existingResult.data;
   }
   const media = await resolveEntityImageMedia(payload?.image_media_asset_id || null, { allowArchived: Boolean(existing?.image_media_asset_id === payload?.image_media_asset_id), allowedVisibilities });
   if (media.error) return { data: null, error: { message: media.error.message } };
-  const safePayload = sanitizeNewsWritePayload({ ...payload, image_url: payload?.remove_legacy_image === true ? null : payload?.image_url || null });
+  const inline = await prepareNewsInlineContent(payload?.content_de || "", existing?.content_de || "");
+  if (inline.error) return { data: null, error: { message: inline.error } };
+  const safePayload = sanitizeNewsWritePayload({ ...payload, content_de: inline.content, image_url: payload?.remove_legacy_image === true ? null : payload?.image_url || null });
 
   if (newsId) {
     const saved = await db.from("news").update({ ...safePayload, author: existing.author }).eq("id", newsId).select("*").single();
     if (saved.error) return saved;
     const usage = await synchronizeMediaAssignment("news", saved.data.id, media.data?.id || null);
-    return usage.error ? { data: null, error: { message: "Die News-Titelbild-Verwendung konnte nicht gespeichert werden." } } : { ...saved, data: { ...saved.data, image_media_asset_id: media.data?.id || null } };
+    if (usage.error) return { data: null, error: { message: "Die News-Titelbild-Verwendung konnte nicht gespeichert werden." } };
+    const inlineUsage = await synchronizeNewsContentMediaUsages(saved.data.id, inline.ids);
+    if (inlineUsage.error) {
+      console.error("[news-inline-media]", { stage: "update_usage", code: inlineUsage.error.code || "INLINE_USAGE_SYNC_FAILED" });
+      await db.from("news").update({ content_de: existing.content_de }).eq("id", saved.data.id);
+      return { data: null, error: { message: "Die Inline-Bildverwendungen konnten nicht gespeichert werden." } };
+    }
+    return { ...saved, data: { ...saved.data, image_media_asset_id: media.data?.id || null } };
   }
 
   const author = await resolveAuthorName(db, permissionResult.profile);
   const saved = await db.from("news").insert({ ...safePayload, author }).select("*").single();
   if (saved.error) return saved;
   const usage = await synchronizeMediaAssignment("news", saved.data.id, media.data?.id || null);
-  return usage.error ? { data: null, error: { message: "Die News-Titelbild-Verwendung konnte nicht gespeichert werden." } } : { ...saved, data: { ...saved.data, image_media_asset_id: media.data?.id || null } };
+  if (usage.error) return { data: null, error: { message: "Die News-Titelbild-Verwendung konnte nicht gespeichert werden." } };
+  const inlineUsage = await synchronizeNewsContentMediaUsages(saved.data.id, inline.ids);
+  if (inlineUsage.error) {
+    console.error("[news-inline-media]", { stage: "create_usage", code: inlineUsage.error.code || "INLINE_USAGE_SYNC_FAILED" });
+    await db.from("news").delete().eq("id", saved.data.id);
+    return { data: null, error: { message: "Die Inline-Bildverwendungen konnten nicht gespeichert werden." } };
+  }
+  return { ...saved, data: { ...saved.data, image_media_asset_id: media.data?.id || null } };
 }
 
 async function authorizeNewsMedia(newsId = null) {
@@ -73,6 +99,18 @@ export async function uploadNewsMediaAction(formData, newsId = null) {
   } catch {
     return { ok: false, error: "Das News-Titelbild konnte nicht hochgeladen werden." };
   }
+}
+
+export async function loadNewsInlineMediaPickerAction(filters = {}, newsId = null) {
+  const auth = await authorizeNewsMedia(newsId);
+  if (!auth.ok) return { ok: false, error: auth.message, items: [], total: 0 };
+  const purpose = normalizePickerPurpose(filters.purpose, "news");
+  const result = await loadMediaLibrary({ ...filters, kind: "image", visibility: "public", purpose, archived: "active" });
+  return result.error ? { ok: false, error: "Inline-Bilder konnten nicht geladen werden.", items: [], total: 0 } : { ok: true, items: result.data, total: result.count || 0 };
+}
+
+export async function uploadNewsInlineMediaAction(formData, newsId = null) {
+  return uploadNewsMediaAction(formData, newsId);
 }
 
 const documentError = (message) => ({ data: null, error: { message } });

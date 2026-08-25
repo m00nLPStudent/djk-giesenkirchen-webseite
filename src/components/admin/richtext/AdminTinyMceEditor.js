@@ -36,6 +36,8 @@ export default function AdminTinyMceEditor({
   placeholder = "",
   minHeight = 260,
   toolbarMode = "full",
+  onEditorReady,
+  onOpenMediaPicker,
   "aria-describedby": ariaDescribedBy,
 }) {
   const [loadError, setLoadError] = useState(false);
@@ -60,6 +62,7 @@ export default function AdminTinyMceEditor({
       rollback={false}
       onScriptsLoadError={() => setLoadError(true)}
       onEditorChange={(html) => onChange?.(html)}
+      onInit={(_event, instance) => onEditorReady?.(instance)}
       init={createTinyMceInit({
         id,
         minHeight,
@@ -67,6 +70,7 @@ export default function AdminTinyMceEditor({
         toolbarMode,
         required,
         ariaDescribedBy,
+        onOpenMediaPicker,
       })}
     />
   );

@@ -111,6 +111,13 @@ export async function synchronizeMediaAssignment(entityType, entityId, mediaAsse
   return { data: result.data || null, error: result.error || null };
 }
 
+export async function synchronizeNewsContentMediaUsages(newsId, mediaAssetIds = []) {
+  const db = createSupabaseAdminClient();
+  if (!db) return { error: new Error("Media-Service-Client ist nicht konfiguriert.") };
+  const result = await db.rpc("synchronize_news_content_media_usages", { p_news_id: newsId, p_media_asset_ids: [...new Set(mediaAssetIds)] });
+  return { data: result.data || null, error: result.error || null };
+}
+
 export async function uploadMediaAsset(file, input, actorUserId) {
   try {
     if (!(file instanceof File)) return { data: null, error: new Error("Keine Datei ausgewählt."), stage: "validation" };
