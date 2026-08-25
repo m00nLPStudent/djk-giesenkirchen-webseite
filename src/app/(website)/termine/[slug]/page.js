@@ -19,6 +19,7 @@ import {
   diagnoseEventLookupBySlug,
   getPublishedEventBySlug,
 } from "@/components/admin/events/services/events.service";
+import { resolvePublicEventImages } from "@/components/admin/events/services/eventMedia.service";
 
 export default async function EventDetailPage({ params }) {
   const resolvedParams = await Promise.resolve(params);
@@ -40,7 +41,8 @@ export default async function EventDetailPage({ params }) {
     });
     notFound();
   }
-  const event = createEventDto(storedEvent, eventTypes || []);
+  const [resolvedEvent] = await resolvePublicEventImages([storedEvent]);
+  const event = createEventDto(resolvedEvent, eventTypes || []);
 
   const location = [
     event.location_name,
@@ -66,9 +68,9 @@ export default async function EventDetailPage({ params }) {
     <main className="min-h-screen bg-[#101014] text-white">
       <section className="px-6 pt-32 pb-20">
         <div className="mx-auto max-w-5xl">
-          {event.image_url && (
+          {(event.resolved_image_url || event.image_url) && (
             <img
-              src={event.image_url}
+              src={event.resolved_image_url || event.image_url}
               alt={event.title_de}
               className="mb-10 max-h-[460px] w-full rounded-3xl bg-white/5 object-contain p-8"
             />

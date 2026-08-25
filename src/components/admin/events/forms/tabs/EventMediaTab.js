@@ -1,25 +1,18 @@
 import { FormSection } from "@/components/admin/forms";
-import AdminImageUpload from "@/components/admin/media/AdminImageUpload";
+import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker";
 
-export default function EventMediaTab({
-  form,
-  handleImageUpload,
-  updateField,
-}) {
+export default function EventMediaTab({ form, selectedMedia, onMediaChange, loadMediaAction, uploadMediaAction }) {
   return (
-    <FormSection
-      eyebrow="Medien"
-      title="Event-Bild"
-      description="Optionales Bild für Kartenansicht und spätere öffentliche Darstellung."
-    >
-      <AdminImageUpload
-        imageUrl={form.image_url}
-        onUpload={handleImageUpload}
-        onRemove={() => updateField("image_url", "")}
-        description="Lade ein Bild für den Termin hoch."
-        uploadLabel="Bild hochladen"
-        removeLabel="Bild entfernen"
-        alt={form.title_de || "Event-Bild"}
+    <FormSection eyebrow="Medien" title="Terminbild" description="Optionales Bild für Kartenansicht und öffentliche Detailansicht.">
+      <AdminMediaPicker
+        value={selectedMedia}
+        legacyUrl={selectedMedia || form.remove_legacy_image ? null : form.image_url}
+        placeholderUrl=""
+        onChange={onMediaChange}
+        loadAction={loadMediaAction}
+        uploadAction={uploadMediaAction}
+        usageContext="event"
+        entityLabel="Terminbild"
       />
     </FormSection>
   );

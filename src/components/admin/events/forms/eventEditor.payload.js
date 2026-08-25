@@ -20,6 +20,8 @@ export function buildEventPayload({ form, publicSlug, hasRecurrence }) {
     team_id: form.team_id || null,
     external_url: form.external_url.trim() || null,
     image_url: form.image_url || null,
+    image_media_asset_id: form.image_media_asset_id || null,
+    remove_legacy_image: form.remove_legacy_image === true,
     slug: publicSlug || null,
     recurrence_type: hasRecurrence ? form.recurrence_type : "none",
     recurrence_interval: hasRecurrence

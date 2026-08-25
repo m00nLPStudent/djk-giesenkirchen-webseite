@@ -11,6 +11,7 @@ import {
   getVirtualTrainingEvents,
   mergeEventsWithVirtualTrainings,
 } from "@/lib/events";
+import { resolvePublicEventImages } from "@/components/admin/events/services/eventMedia.service";
 
 export default async function Home() {
   const [{ data: categories }, { data: eventTypes }] = await Promise.all([
@@ -39,7 +40,8 @@ export default async function Home() {
   const now = new Date();
   const from = now;
   const to = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
-  const expandedEvents = expandRecurringEvents(publishedEvents || [], {
+  const resolvedEvents = await resolvePublicEventImages(publishedEvents || []);
+  const expandedEvents = expandRecurringEvents(resolvedEvents, {
     from,
     to,
     maxOccurrencesPerEvent: 180,

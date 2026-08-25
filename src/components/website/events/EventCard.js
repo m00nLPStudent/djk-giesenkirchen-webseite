@@ -23,10 +23,10 @@ export default function EventCard({ event }) {
       href={href}
       className="block overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 transition hover:border-red-500/40 hover:bg-white/10"
     >
-      {event.image_url && (
+      {(event.resolved_image_url || event.image_url) && (
         <div className="flex h-40 items-center justify-center bg-white/5 p-4 sm:h-48 md:h-56 md:p-6">
           <img
-            src={event.image_url}
+            src={event.resolved_image_url || event.image_url}
             alt={event.title_de}
             className="h-full w-full rounded-[1.25rem] object-cover"
           />

@@ -4,6 +4,7 @@ import { expandRecurringEvents, splitEventsByTimeline } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
 import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
+import { resolvePublicEventImages } from "@/components/admin/events/services/eventMedia.service";
 
 function filterRealEvents(events = []) {
   return events.filter((event) => !event?.is_virtual);
@@ -15,7 +16,8 @@ export default async function GeneralEventsPage() {
     loadEventTypes(supabase, { activeOnly: false }),
   ]);
   const now = new Date();
-  const expandedEvents = expandRecurringEvents(events || [], {
+  const resolvedEvents = await resolvePublicEventImages(events || []);
+  const expandedEvents = expandRecurringEvents(resolvedEvents, {
     from: new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000),
     to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
     maxOccurrencesPerEvent: 180,

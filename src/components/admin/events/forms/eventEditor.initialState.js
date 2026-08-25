@@ -18,6 +18,8 @@ export function createInitialEventForm(event, eventTypes = []) {
     team_id: event?.team_id || "",
     external_url: event?.external_url || "",
     image_url: event?.image_url || "",
+    image_media_asset_id: event?.image_media_asset_id || null,
+    remove_legacy_image: false,
     slug: initialSlug,
     recurrence_type: event?.recurrence_type || "none",
     recurrence_interval: event?.recurrence_interval ?? 1,

@@ -7,8 +7,9 @@ test("buildMediaAssignmentPayload supports the shared coach and player image pat
   assert.equal(buildMediaAssignmentPayload("coach", "coach-1", null).payload.p_media_asset_id, null);
 });
 
-test("buildMediaAssignmentPayload rejects unrelated modules and fields", () => {
-  assert.equal(buildMediaAssignmentPayload("event", "event-1", "asset-1").ok, false);
+test("buildMediaAssignmentPayload supports events and rejects unrelated modules and fields", () => {
+  assert.equal(buildMediaAssignmentPayload("event", "event-1", "asset-1").ok, true);
+  assert.equal(buildMediaAssignmentPayload("sponsor", "sponsor-1", "asset-1").ok, false);
   assert.equal(buildMediaAssignmentPayload("player", "player-1", "asset-1", "document").ok, false);
 });
 

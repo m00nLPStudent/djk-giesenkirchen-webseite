@@ -23,15 +23,15 @@ import {
   deleteEventDocument,
   getEventDocuments,
   uploadEventDocument,
-  uploadEventImage,
 } from "../services/events.service";
-import { saveEventWithNotificationAction } from "@/app/admin/events/actions";
+import { loadEventMediaPickerAction, saveEventWithNotificationAction, uploadEventMediaAction } from "@/app/admin/events/actions";
 
-export default function EventEditorForm({ event = null, teams = [], eventTypes = [] }) {
+export default function EventEditorForm({ event = null, initialMedia = null, teams = [], eventTypes = [] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
   const [form, setForm] = useState(() => createInitialEventForm(event, eventTypes));
   const [loading, setLoading] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(initialMedia);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documents, setDocuments] = useState(() =>
     sortDocuments(event?.event_documents || []),
@@ -64,18 +64,13 @@ export default function EventEditorForm({ event = null, teams = [], eventTypes =
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  async function handleImageUpload(file) {
-    const { data, error } = await uploadEventImage(file, {
-      ...form,
-      id: event?.id,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("image_url", data);
+  function handleMediaChange(media) {
+    setSelectedMedia(media || null);
+    setForm((current) => ({
+      ...current,
+      image_media_asset_id: media?.id || null,
+      remove_legacy_image: !media,
+    }));
   }
 
   async function handleDocumentUpload(file) {
@@ -196,8 +191,10 @@ export default function EventEditorForm({ event = null, teams = [], eventTypes =
       {activeTab === "media" && (
         <EventMediaTab
           form={form}
-          handleImageUpload={handleImageUpload}
-          updateField={updateField}
+          selectedMedia={selectedMedia}
+          onMediaChange={handleMediaChange}
+          loadMediaAction={(filters) => loadEventMediaPickerAction(filters, event?.id || null)}
+          uploadMediaAction={(data) => uploadEventMediaAction(data, event?.id || null)}
         />
       )}
 

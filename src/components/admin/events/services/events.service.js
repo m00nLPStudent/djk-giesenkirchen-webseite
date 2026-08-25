@@ -4,7 +4,6 @@ import {
   getStoragePublicUrl,
   removeStorageFiles,
   uploadStorageFile,
-  uploadMediaFile,
 } from "@/lib/storage";
 import {
   ALLOWED_DOCUMENT_TYPES,
@@ -154,14 +153,6 @@ export async function getUpcomingPublishedEvents(limit = 5) {
     .gte("starts_at", new Date().toISOString())
     .order("starts_at", { ascending: true })
     .limit(limit);
-}
-
-export async function uploadEventImage(file, event = {}) {
-  return await uploadMediaFile(file, {
-    folder: "events",
-    name: `${event.title_de || "event"}-${event.id || Date.now()}`,
-    previousUrl: event.image_url,
-  });
 }
 
 export async function getEventDocuments(eventId) {

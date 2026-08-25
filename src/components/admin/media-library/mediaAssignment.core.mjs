@@ -1,4 +1,4 @@
-const TARGETS = new Set(["coach", "player", "board_member", "club_contact", "team", "team_season", "news", "news_document"]);
+const TARGETS = new Set(["coach", "player", "board_member", "club_contact", "team", "team_season", "news", "news_document", "event"]);
 const CONTACT_IMAGE_TARGETS = new Set(["team", "team_season"]);
 
 export function buildMediaAssignmentPayload(entityType, entityId, mediaAssetId, fieldName = "image") {
