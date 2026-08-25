@@ -26,7 +26,7 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { redirect } from "next/navigation";
 import { canManageMedia, loadMediaUrlMap } from "@/components/admin/media-library/media.service";
-import { resolveLoadedMediaImage } from "@/lib/people/publicMediaImage.mjs";
+import { resolveTeamImage } from "@/lib/football/publicTeamImage.core.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +63,8 @@ function mergeTeamSeason(team, teamSeason, season) {
     id: team.id,
     is_active: team.is_active,
     team_season_is_active: teamSeason.is_active,
+    team_image_media_asset_id: team.team_image_media_asset_id || null,
+    season_team_image_media_asset_id: teamSeason.team_image_media_asset_id || null,
     base_slug: team.slug,
     season: seasonName,
     public_season_name: seasonName,
@@ -135,7 +137,6 @@ export default async function AdminTeamsPage({ searchParams }) {
   const scopedTeams = filterScopedTeamsOnServer(scopeContext, teams || []);
   const teamIds = scopedTeams.map((team) => team.id);
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
-  const teamMediaUrls = await loadMediaUrlMap(scopedTeams.map((team) => team.team_image_media_asset_id), allowedVisibilities);
 
   const { data: teamSeasons } = teamIds.length
     ? await supabaseServer
@@ -146,6 +147,10 @@ export default async function AdminTeamsPage({ searchParams }) {
     : { data: [] };
 
   const teamSeasonIds = (teamSeasons || []).map((teamSeason) => teamSeason.id);
+  const teamMediaUrls = await loadMediaUrlMap([
+    ...scopedTeams.map((team) => team.team_image_media_asset_id),
+    ...(teamSeasons || []).map((teamSeason) => teamSeason.team_image_media_asset_id),
+  ], allowedVisibilities);
 
   const { data: playerAssignments } = teamSeasonIds.length
     ? await supabaseServer
@@ -172,7 +177,12 @@ export default async function AdminTeamsPage({ searchParams }) {
 
     return {
       ...displayTeam,
-      resolved_team_image_url: resolveLoadedMediaImage({ image_media_asset_id: team.team_image_media_asset_id, image_url: displayTeam.team_image_url }, teamMediaUrls.data),
+      resolved_team_image_url: resolveTeamImage({
+        seasonMediaAssetId: teamSeason?.team_image_media_asset_id,
+        seasonLegacyUrl: teamSeason?.team_image_url,
+        teamMediaAssetId: team.team_image_media_asset_id,
+        teamLegacyUrl: team.team_image_url,
+      }, teamMediaUrls.data),
       players_count: playerList.filter(
         (player) =>
           player.team_season_id === teamSeason?.id && player.is_active,

@@ -1,16 +1,16 @@
 import { resolveSeasonDisplayName } from "@/lib/football/seasonDisplay";
+import TeamImagePlaceholder from "./TeamImagePlaceholder";
 
 export default function TeamHero({ team }) {
-  if (!team?.team_image_url) return null;
   const seasonName = resolveSeasonDisplayName(team, "Keine Saison ausgewählt");
 
   return (
     <section className="relative min-w-0 overflow-hidden rounded-[2rem] border border-white/10">
-      <img
+      {team?.team_image_url ? <img
         src={team.team_image_url}
         alt={team.name_de}
         className="h-52 w-full object-cover sm:h-72 md:h-[500px]"
-      />
+      /> : <TeamImagePlaceholder className="h-52 w-full sm:h-72 md:h-[500px]" sizes="(max-width: 1280px) 100vw, 1280px" />}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 

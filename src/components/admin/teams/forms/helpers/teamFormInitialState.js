@@ -53,9 +53,12 @@ export function createInitialTeamForm({
       source.training_times_de || team?.training_times_de || "",
     training_times_en:
       source.training_times_en || team?.training_times_en || "",
-    team_image_url: source.team_image_url || team?.team_image_url || "",
+    team_image_url: team?.team_image_url || "",
     team_image_media_asset_id: team?.team_image_media_asset_id || null,
     remove_legacy_team_image: false,
+    season_team_image_url: selectedTeamSeason?.team_image_url || "",
+    season_team_image_media_asset_id: selectedTeamSeason?.team_image_media_asset_id || null,
+    remove_legacy_season_team_image: false,
     sort_order: source.sort_order ?? team?.sort_order ?? 0,
     is_active: team?.is_active ?? true,
     contact_name: source.contact_name || team?.contact_name || "",

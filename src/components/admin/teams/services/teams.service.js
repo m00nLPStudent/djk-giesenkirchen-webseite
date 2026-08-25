@@ -3,8 +3,9 @@ import { supabase } from "@/lib/supabase";
 import { createEntityRepository } from "@/components/admin/services/entity.repository";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { syncTeamCoachAssignments } from "./teamCoachAssignments.service";
+import { TEAM_PLACEHOLDER_IMAGE } from "@/lib/football/publicTeamImage.core.mjs";
 
-export const TEAM_PLACEHOLDER_IMAGE = "";
+export { TEAM_PLACEHOLDER_IMAGE };
 export const TEAM_CONTACT_PLACEHOLDER_IMAGE = "";
 
 const teamRepository = createEntityRepository({
@@ -82,7 +83,7 @@ function createTeamSeasonPayload(team, teamId, seasonId) {
     description_en: team.description_en || null,
     training_times_de: team.training_times_de || null,
     training_times_en: team.training_times_en || null,
-    team_image_url: team.team_image_url || null,
+    team_image_url: team.remove_legacy_season_team_image ? null : team.season_team_image_url || null,
     contact_name: team.contact_name || null,
     contact_email: team.contact_email || null,
     contact_phone: team.contact_phone || null,

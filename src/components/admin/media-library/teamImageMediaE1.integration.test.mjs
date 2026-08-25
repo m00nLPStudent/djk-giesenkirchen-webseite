@@ -58,12 +58,12 @@ test("team picker is server-authorized, cross-purpose and upload remains team-pu
 });
 
 test("admin overview and detail resolve central media server-side without N plus one", () => {
-  assert.match(adminListPage, /loadMediaUrlMap\(scopedTeams\.map\(\(team\) => team\.team_image_media_asset_id\)/);
-  assert.match(adminListPage, /resolved_team_image_url: resolveLoadedMediaImage/);
+  assert.match(adminListPage, /loadMediaUrlMap\(\[[\s\S]*team\.team_image_media_asset_id/);
+  assert.match(adminListPage, /resolved_team_image_url: resolveTeamImage/);
   assert.match(adminList, /TeamImage team=\{team\}/);
   assert.equal((adminList.match(/<TeamImage team=\{team\}/g) || []).length, 2);
   assert.doesNotMatch(adminList, /supabase|loadMediaUrlMap/);
-  assert.match(adminDetail, /loadMediaUrlMap\(\[team\.team_image_media_asset_id\]/);
+  assert.match(adminDetail, /loadMediaUrlMap\(\[[\s\S]*team\.team_image_media_asset_id/);
   assert.match(adminDetail, /team_image_url: resolvedTeamImageUrl/);
   assert.match(editPage, /loadMediaAssetForPicker\(team\.team_image_media_asset_id\)/);
   assert.match(editPage, /initialTeamMedia=\{teamMedia\.data \|\| null\}/);
@@ -79,9 +79,10 @@ test("public list and detail use only public media and preserve season merge bef
   assert.doesNotMatch(publicRepository + publicDetail, /loadMediaUrlMap/);
 });
 
-test("E1 does not introduce seasonal or contact media ids", () => {
+test("team media keeps contact media legacy and uses only the planned seasonal media id", () => {
   const all = actions + form + hook + tab + initial + service;
-  assert.doesNotMatch(all, /team_season_image_media_asset_id|contact_image_media_asset_id/);
+  assert.doesNotMatch(all, /contact_image_media_asset_id/);
+  assert.match(all, /season_team_image_media_asset_id/);
   assert.match(service, /contact_image_url/);
   assert.match(service, /createTeamSeasonPayload/);
 });

@@ -53,6 +53,8 @@ function mergeTeamSeason(team, teamSeason, season) {
     ...teamSeason,
     id: team.id,
     team_season_id: teamSeason.id,
+    team_image_media_asset_id: team.team_image_media_asset_id || null,
+    season_team_image_media_asset_id: teamSeason.team_image_media_asset_id || null,
     base_slug: team.slug,
     season: seasonName,
     public_season_name: seasonName,
@@ -172,11 +174,12 @@ export default async function TeamPage({ params }) {
       : { data: null };
 
   const displayTeam = mergeTeamSeason(team, teamSeason, selectedSeason);
-  const teamMediaUrls = await loadPublicMediaUrlMap([team?.team_image_media_asset_id]);
+  const teamMediaUrls = await loadPublicMediaUrlMap([teamSeason?.team_image_media_asset_id, team?.team_image_media_asset_id]);
   displayTeam.team_image_url = resolvePublicTeamImage({
-    mediaAssetId: team?.team_image_media_asset_id,
-    teamLegacyUrl: team?.team_image_url,
+    seasonMediaAssetId: teamSeason?.team_image_media_asset_id,
     seasonLegacyUrl: teamSeason?.team_image_url,
+    teamMediaAssetId: team?.team_image_media_asset_id,
+    teamLegacyUrl: team?.team_image_url,
   }, teamMediaUrls.data);
 
   let coaches = [];

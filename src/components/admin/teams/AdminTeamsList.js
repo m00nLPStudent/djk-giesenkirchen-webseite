@@ -4,11 +4,12 @@ import { AdminListChevron, AdminListHeader, AdminListMobileCard, AdminListRow, A
 import { formatContributionAmount } from "@/components/admin/contributions/helpers/contributionFormatters";
 import TeamEmptyState from "./components/TeamEmptyState";
 import useTeamScope from "./useTeamScope";
+import TeamImagePlaceholder from "@/components/website/team/TeamImagePlaceholder";
 
 const TEMPLATE = "3rem minmax(13rem,1.35fr) minmax(8rem,0.75fr) minmax(7rem,0.65fr) 6rem 6rem minmax(12rem,1fr) 3rem";
 
 function TeamImage({ team }) {
-  if (!team.resolved_team_image_url) return <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-xs text-white/35">–</span>;
+  if (!team.resolved_team_image_url) return <TeamImagePlaceholder className="h-10 w-10 rounded-xl" sizes="40px" />;
   // Signed admin URLs are rendered directly and expire after a short period.
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={team.resolved_team_image_url} alt={team.name_de} className="h-10 w-10 rounded-xl object-cover" />;

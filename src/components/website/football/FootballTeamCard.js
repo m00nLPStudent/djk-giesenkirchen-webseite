@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TeamImagePlaceholder from "@/components/website/team/TeamImagePlaceholder";
 
 export default function FootballTeamCard({ team }) {
   return (
@@ -14,7 +15,7 @@ export default function FootballTeamCard({ team }) {
             className="h-full w-full object-contain"
           />
         ) : (
-          <span className="text-sm text-white/40">Kein Bild</span>
+          <TeamImagePlaceholder className="h-full w-full rounded-xl" sizes="(max-width: 768px) calc(100vw - 5rem), 24rem" />
         )}
       </div>
 

@@ -11,3 +11,10 @@ test("buildMediaAssignmentPayload rejects unrelated modules and fields", () => {
   assert.equal(buildMediaAssignmentPayload("news", "news-1", "asset-1").ok, false);
   assert.equal(buildMediaAssignmentPayload("player", "player-1", "asset-1", "document").ok, false);
 });
+
+test("buildMediaAssignmentPayload supports an independent team season image usage", () => {
+  assert.deepEqual(buildMediaAssignmentPayload("team_season", "season-1", "asset-1"), {
+    ok: true,
+    payload: { p_entity_type: "team_season", p_entity_id: "season-1", p_media_asset_id: "asset-1", p_field_name: "image" },
+  });
+});

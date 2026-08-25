@@ -6,6 +6,7 @@ import ContributionStatusBadge from "@/components/admin/contributions/components
 import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminDetailLayout, AdminInformationRow, AdminInformationSection, AdminListChevron, AdminListHeader, AdminListMobileCard, AdminListRow, AdminMetric, AdminModuleCards, AdminModuleEmptyState, AdminModuleList, AdminModuleSummary, AdminStatusChip } from "@/components/admin/design-system";
 import PlayerAvatar from "@/components/admin/players/components/PlayerAvatar";
 import CoachAvatar from "@/components/admin/coaches/components/CoachAvatar";
+import TeamImagePlaceholder from "@/components/website/team/TeamImagePlaceholder";
 
 const PLAYER_TEMPLATE = "3.5rem minmax(12rem,1.4fr) minmax(8rem,0.8fr) 7rem minmax(10rem,1fr) 7rem 3rem";
 const COACH_TEMPLATE = "3.5rem minmax(12rem,1.4fr) minmax(9rem,1fr) minmax(8rem,0.8fr) 7rem 3rem";
@@ -17,7 +18,8 @@ export default function TeamContributionDetailView({ team, canEdit = false, canA
   const playerColumns = [{ key: "avatar", label: "Profil" }, { key: "name", label: "Spieler" }, { key: "position", label: "Position" }, { key: "status", label: "Status" }, { key: "contribution", label: "Beitrag" }, { key: "open", label: "Offen" }, { key: "details", label: "" }];
   const coachColumns = [{ key: "avatar", label: "Profil" }, { key: "name", label: "Name" }, { key: "role", label: "Funktion" }, { key: "license", label: "Lizenz" }, { key: "status", label: "Status" }, { key: "details", label: "Übersicht" }];
 
-  return <AdminDetailLayout header={<AdminDetailHeader backHref="/admin/teams" backLabel="Zurück zu Mannschaften" backVariant="pill" title={team.name_de} status={<AdminStatusChip variant={team.is_active === false ? "warning" : "success"}>{team.is_active === false ? "Inaktiv" : "Aktiv"}</AdminStatusChip>} meta={`${team.age_group || "Mannschaft"} · ${team.seasonName || "Keine Saison"}`} actions={headerActions} backgroundImageUrl={team.team_image_url} backgroundPosition="center 38%" />} dangerZone={dangerZone}>
+  const placeholder = !team.team_image_url ? <TeamImagePlaceholder className="h-16 w-16 shrink-0 rounded-2xl" sizes="64px" /> : null;
+  return <AdminDetailLayout header={<AdminDetailHeader backHref="/admin/teams" backLabel="Zurück zu Mannschaften" backVariant="pill" title={team.name_de} status={<AdminStatusChip variant={team.is_active === false ? "warning" : "success"}>{team.is_active === false ? "Inaktiv" : "Aktiv"}</AdminStatusChip>} meta={`${team.age_group || "Mannschaft"} · ${team.seasonName || "Keine Saison"}`} leading={placeholder} actions={headerActions} backgroundImageUrl={team.team_image_url} backgroundPosition="center 38%" />} dangerZone={dangerZone}>
     {contributionVisibility === "none" ? <FormAlert className="border-white/10 bg-white/[0.04] text-white/75" tone="warning">Für deine Rolle werden keine Beitragsdaten angezeigt.</FormAlert> : null}
     {contributionSeasonWarning ? <FormAlert className="border-amber-400/30 bg-amber-500/10 text-amber-50" tone="warning">{contributionSeasonWarning}</FormAlert> : null}
     <AdminInformationSection title="Mannschaftsinformationen"><AdminInformationRow label="Bereich">{team.age_group || "–"}</AdminInformationRow><AdminInformationRow label="Saison">{team.seasonName || "–"}</AdminInformationRow><AdminInformationRow label="Spieler">{team.playerCount}</AdminInformationRow><AdminInformationRow label="Trainer">{activeCoachAssignments}</AdminInformationRow><AdminInformationRow label="Beschreibung">{team.description_de || "–"}</AdminInformationRow></AdminInformationSection>

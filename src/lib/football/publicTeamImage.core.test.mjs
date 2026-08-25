@@ -6,20 +6,24 @@ const mediaUrls = new Map([["public-b", "/media/b.jpg"], ["public-a", "/media/a.
 
 test("public central team media wins over empty seasonal and team legacy values", () => {
   for (const seasonLegacyUrl of [undefined, null, "", "   "]) {
-    assert.equal(resolvePublicTeamImage({ mediaAssetId: "public-b", teamLegacyUrl: "/legacy/a.jpg", seasonLegacyUrl }, mediaUrls), "/media/b.jpg");
+    assert.equal(resolvePublicTeamImage({ teamMediaAssetId: "public-b", teamLegacyUrl: "/legacy/a.jpg", seasonLegacyUrl }, mediaUrls), "/media/b.jpg");
   }
 });
 
 test("a real seasonal legacy image keeps its existing public priority", () => {
-  assert.equal(resolvePublicTeamImage({ mediaAssetId: "public-b", teamLegacyUrl: "/legacy/team.jpg", seasonLegacyUrl: " /legacy/season.jpg " }, mediaUrls), "/legacy/season.jpg");
+  assert.equal(resolvePublicTeamImage({ teamMediaAssetId: "public-b", teamLegacyUrl: "/legacy/team.jpg", seasonLegacyUrl: " /legacy/season.jpg " }, mediaUrls), "/legacy/season.jpg");
 });
 
 test("missing or rejected public media falls back safely", () => {
-  assert.equal(resolvePublicTeamImage({ mediaAssetId: "admin-private", teamLegacyUrl: "/legacy/team.jpg" }, mediaUrls), "/legacy/team.jpg");
-  assert.equal(resolvePublicTeamImage({ mediaAssetId: "admin-private" }, mediaUrls), "");
+  assert.equal(resolvePublicTeamImage({ teamMediaAssetId: "admin-private", teamLegacyUrl: "/legacy/team.jpg" }, mediaUrls), "/legacy/team.jpg");
+  assert.equal(resolvePublicTeamImage({ teamMediaAssetId: "admin-private" }, mediaUrls), "");
 });
 
 test("replacement selects only the currently mapped public asset", () => {
-  assert.equal(resolvePublicTeamImage({ mediaAssetId: "public-a" }, mediaUrls), "/media/a.jpg");
-  assert.equal(resolvePublicTeamImage({ mediaAssetId: "public-b" }, mediaUrls), "/media/b.jpg");
+  assert.equal(resolvePublicTeamImage({ teamMediaAssetId: "public-a" }, mediaUrls), "/media/a.jpg");
+  assert.equal(resolvePublicTeamImage({ teamMediaAssetId: "public-b" }, mediaUrls), "/media/b.jpg");
+});
+
+test("season media has priority over every legacy and general source", () => {
+  assert.equal(resolvePublicTeamImage({ seasonMediaAssetId: "public-b", seasonLegacyUrl: "/legacy/season.jpg", teamMediaAssetId: "public-a", teamLegacyUrl: "/legacy/team.jpg" }, mediaUrls), "/media/b.jpg");
 });

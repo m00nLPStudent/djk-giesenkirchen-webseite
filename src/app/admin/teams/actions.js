@@ -89,6 +89,11 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   const allowedVisibilities = canManageMedia(authContext.roles) ? ["public", "admin"] : ["public"];
   const mediaResult = await resolveEntityImageMedia(teamPayload?.team_image_media_asset_id || null, { allowArchived: Boolean(existingTeam?.team_image_media_asset_id === teamPayload?.team_image_media_asset_id), allowedVisibilities });
   if (mediaResult.error) return buildError(mediaResult.error.message);
+  const existingTeamSeason = teamPayload?.season_id && existingTeam?.id
+    ? (await supabaseServer.from("team_seasons").select("id, team_image_media_asset_id").eq("team_id", existingTeam.id).eq("season_id", teamPayload.season_id).maybeSingle()).data
+    : null;
+  const seasonMediaResult = await resolveEntityImageMedia(teamPayload?.season_team_image_media_asset_id || null, { allowArchived: Boolean(existingTeamSeason?.team_image_media_asset_id === teamPayload?.season_team_image_media_asset_id), allowedVisibilities });
+  if (seasonMediaResult.error) return buildError(seasonMediaResult.error.message);
 
   const previousRoster = teamId && teamPayload?.season_id
     ? await loadTeamRosterNotificationSnapshot(supabaseServer, teamId, teamPayload.season_id)
@@ -106,6 +111,13 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   if (usageResult.error) {
     console.error("[team-media-sync]", { code: usageResult.error.code || "TEAM_MEDIA_SYNC_FAILED", message: usageResult.error.message || "Unbekannter Fehler" });
     return buildError("Die Mannschaftsbild-Verwendung konnte nicht gespeichert werden.");
+  }
+  if (result.teamSeasonId) {
+    const seasonUsageResult = await synchronizeMediaAssignment("team_season", result.teamSeasonId, seasonMediaResult.data?.id || null);
+    if (seasonUsageResult.error) {
+      console.error("[team-season-media-sync]", { code: seasonUsageResult.error.code || "TEAM_SEASON_MEDIA_SYNC_FAILED", message: seasonUsageResult.error.message || "Unbekannter Fehler" });
+      return buildError("Die saisonale Mannschaftsbild-Verwendung konnte nicht gespeichert werden.");
+    }
   }
 
   if (previousRoster.error) {

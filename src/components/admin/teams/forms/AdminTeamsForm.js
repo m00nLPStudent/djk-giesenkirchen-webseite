@@ -64,6 +64,7 @@ export default function AdminTeamsForm({
   currentSeasonResolution = null,
   currentTeamSeasons = [],
   initialTeamMedia = null,
+  initialSeasonMediaByTeamSeasonId = {},
 }) {
   const router = useRouter();
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
@@ -81,7 +82,8 @@ export default function AdminTeamsForm({
     }),
   );
   const [loading, setLoading] = useState(false);
-  const teamMedia = useTeamMedia({ teamId: team?.id, initialMedia: initialTeamMedia, setForm });
+  const initialTeamSeasonId = form.team_season_id;
+  const teamMedia = useTeamMedia({ teamId: team?.id, initialMedia: initialTeamMedia, initialSeasonMedia: initialSeasonMediaByTeamSeasonId[initialTeamSeasonId] || null, setForm });
   const isEditMode = Boolean(team?.id);
   const { scopeContext, canAccessTeamInScope, canCreateTeamInScope } =
     useTeamScope();
@@ -105,6 +107,7 @@ export default function AdminTeamsForm({
         isAssignedToCurrentTeam: selectedIds.has(coachItem.coach_id),
       })),
     }));
+    teamMedia.resetSeasonMedia(initialSeasonMediaByTeamSeasonId[nextForm.team_season_id] || null);
   }
 
   function updateSeason(seasonId) {
@@ -298,7 +301,9 @@ export default function AdminTeamsForm({
         <TeamMediaTab
           form={form}
           selectedMedia={teamMedia.selectedMedia}
+          selectedSeasonMedia={teamMedia.selectedSeasonMedia}
           onMediaChange={teamMedia.handleMediaChange}
+          onSeasonMediaChange={teamMedia.handleSeasonMediaChange}
           loadMediaAction={teamMedia.loadMediaAction}
           uploadMediaAction={teamMedia.uploadMediaAction}
         />

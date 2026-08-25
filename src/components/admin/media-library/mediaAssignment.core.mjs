@@ -1,4 +1,4 @@
-const TARGETS = new Set(["coach", "player", "board_member", "club_contact", "team"]);
+const TARGETS = new Set(["coach", "player", "board_member", "club_contact", "team", "team_season"]);
 
 export function buildMediaAssignmentPayload(entityType, entityId, mediaAssetId, fieldName = "image") {
   if (!TARGETS.has(entityType) || !entityId || fieldName !== "image") {

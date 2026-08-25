@@ -36,6 +36,21 @@ export async function loadMediaAssetForPicker(id) {
   return { data: withPickerFields({ ...asset, previewUrl }), error: null };
 }
 
+export async function loadMediaAssetsForPicker(ids = []) {
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (!uniqueIds.length) return { data: new Map(), error: null };
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: new Map(), error: new Error("Media-Service-Client ist nicht konfiguriert.") };
+  const result = await repository.loadMediaAssets(db, uniqueIds);
+  if (result.error) return { data: new Map(), error: result.error };
+  const assets = result.data || [];
+  const privateAssets = assets.filter((asset) => asset.visibility !== "public");
+  const signed = privateAssets.length ? await db.storage.from("media-library-private").createSignedUrls(privateAssets.map((asset) => asset.storage_path), 300) : { data: [], error: null };
+  if (signed.error) return { data: new Map(), error: signed.error };
+  const signedByPath = new Map((signed.data || []).map((item) => [item.path, item.signedUrl]));
+  return { data: new Map(assets.map((asset) => [asset.id, withPickerFields({ ...asset, previewUrl: asset.visibility === "public" ? db.storage.from(asset.storage_bucket).getPublicUrl(asset.storage_path).data.publicUrl : signedByPath.get(asset.storage_path) || null })])), error: null };
+}
+
 export async function loadPublicMediaUrlMap(ids = []) {
   const uniqueIds = [...new Set(ids.filter(Boolean))];
   if (!uniqueIds.length) return { data: new Map(), error: null };

@@ -26,7 +26,7 @@ import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentS
 import { loadActiveTeamSeasonCoaches } from "@/components/admin/teams/teamCoachList.repository";
 import { canEditCoachOnServer, getCoachTeamIdsMap, loadServerPersonScopeContext } from "@/components/admin/persons/serverPersonScope";
 import { canManageMedia, loadMediaUrlMap } from "@/components/admin/media-library/media.service";
-import { resolveLoadedMediaImage } from "@/lib/people/publicMediaImage.mjs";
+import { resolveTeamImage } from "@/lib/football/publicTeamImage.core.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -61,8 +61,7 @@ export default async function AdminTeamDetailPage({ params }) {
     redirect("/admin/unauthorized?reason=missing-team-scope");
   }
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
-  const teamMediaUrls = await loadMediaUrlMap([team.team_image_media_asset_id], allowedVisibilities);
-  const resolvedTeamImageUrl = resolveLoadedMediaImage({ image_media_asset_id: team.team_image_media_asset_id, image_url: team.team_image_url }, teamMediaUrls.data);
+  const teamSeasonResolution = await loadCurrentSeasonResolution(supabaseServer);
 
   const contributionVisibility = getContributionStatusVisibility(scopeContext);
   const contributionAdminClient =
@@ -150,15 +149,22 @@ export default async function AdminTeamDetailPage({ params }) {
     permissionResult.permissions.includes("teams.delete") &&
     canAccessTeamOnServer(scopeContext, team);
   let currentTeamSeason = null;
-  if (contributionSeasonResolution?.activeSeasonId) {
+  if (teamSeasonResolution?.activeSeasonId) {
     const { data } = await supabaseServer
       .from("team_seasons")
-      .select("id")
+      .select("id, team_image_url, team_image_media_asset_id")
       .eq("team_id", id)
-      .eq("season_id", contributionSeasonResolution.activeSeasonId)
+      .eq("season_id", teamSeasonResolution.activeSeasonId)
       .maybeSingle();
     currentTeamSeason = data || null;
   }
+  const teamMediaUrls = await loadMediaUrlMap([currentTeamSeason?.team_image_media_asset_id, team.team_image_media_asset_id], allowedVisibilities);
+  const resolvedTeamImageUrl = resolveTeamImage({
+    seasonMediaAssetId: currentTeamSeason?.team_image_media_asset_id,
+    seasonLegacyUrl: currentTeamSeason?.team_image_url,
+    teamMediaAssetId: team.team_image_media_asset_id,
+    teamLegacyUrl: team.team_image_url,
+  }, teamMediaUrls.data);
   const coachResults = await loadActiveTeamSeasonCoaches(supabaseServer, currentTeamSeason?.id);
   const coachIds = coachResults.map(({ coach }) => coach.id);
   const mayOpenCoachDetails = permissionResult.permissions.includes("coaches.edit");
@@ -179,7 +185,7 @@ export default async function AdminTeamDetailPage({ params }) {
           team={{
             ...team,
             team_image_url: resolvedTeamImageUrl,
-            seasonName: contributionSeasonResolution?.activeSeasonName || null,
+            seasonName: teamSeasonResolution?.activeSeasonName || null,
             playerCount: playerIds.length,
           }}
           canEdit={canEdit}
