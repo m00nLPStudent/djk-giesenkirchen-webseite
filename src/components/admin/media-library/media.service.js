@@ -89,8 +89,8 @@ export async function resolveEntityImageMedia(id, { allowArchived = false, allow
 
 export function resolvePublicCoachMedia(id, options = {}) { return resolveEntityImageMedia(id, { ...options, purpose: "coach" }); }
 
-export async function synchronizeMediaAssignment(entityType, entityId, mediaAssetId) {
-  const assignment = buildMediaAssignmentPayload(entityType, entityId, mediaAssetId);
+export async function synchronizeMediaAssignment(entityType, entityId, mediaAssetId, fieldName = "image") {
+  const assignment = buildMediaAssignmentPayload(entityType, entityId, mediaAssetId, fieldName);
   if (!assignment.ok) return { error: assignment.error };
   const db = createSupabaseAdminClient();
   if (!db) return { error: new Error("Media-Service-Client ist nicht konfiguriert.") };

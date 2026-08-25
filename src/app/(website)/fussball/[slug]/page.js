@@ -12,6 +12,7 @@ import { mapTeamRosterPlayers } from "@/components/website/team/teamRoster.core.
 import { supabase } from "@/lib/supabase";
 import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
 import { resolvePublicTeamImage } from "@/lib/football/publicTeamImage.core.mjs";
+import { resolveTeamContactImage } from "@/lib/football/publicTeamContactImage.core.mjs";
 
 const tournamentItems = [
   "Spielpläne",
@@ -55,6 +56,8 @@ function mergeTeamSeason(team, teamSeason, season) {
     team_season_id: teamSeason.id,
     team_image_media_asset_id: team.team_image_media_asset_id || null,
     season_team_image_media_asset_id: teamSeason.team_image_media_asset_id || null,
+    contact_image_media_asset_id: team.contact_image_media_asset_id || null,
+    season_contact_image_media_asset_id: teamSeason.contact_image_media_asset_id || null,
     base_slug: team.slug,
     season: seasonName,
     public_season_name: seasonName,
@@ -174,12 +177,18 @@ export default async function TeamPage({ params }) {
       : { data: null };
 
   const displayTeam = mergeTeamSeason(team, teamSeason, selectedSeason);
-  const teamMediaUrls = await loadPublicMediaUrlMap([teamSeason?.team_image_media_asset_id, team?.team_image_media_asset_id]);
+  const teamMediaUrls = await loadPublicMediaUrlMap([teamSeason?.team_image_media_asset_id, team?.team_image_media_asset_id, teamSeason?.contact_image_media_asset_id, team?.contact_image_media_asset_id]);
   displayTeam.team_image_url = resolvePublicTeamImage({
     seasonMediaAssetId: teamSeason?.team_image_media_asset_id,
     seasonLegacyUrl: teamSeason?.team_image_url,
     teamMediaAssetId: team?.team_image_media_asset_id,
     teamLegacyUrl: team?.team_image_url,
+  }, teamMediaUrls.data);
+  displayTeam.contact_image_url = resolveTeamContactImage({
+    seasonMediaAssetId: teamSeason?.contact_image_media_asset_id,
+    seasonLegacyUrl: teamSeason?.contact_image_url,
+    teamMediaAssetId: team?.contact_image_media_asset_id,
+    teamLegacyUrl: team?.contact_image_url,
   }, teamMediaUrls.data);
 
   let coaches = [];

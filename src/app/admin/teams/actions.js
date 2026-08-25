@@ -89,11 +89,15 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   const allowedVisibilities = canManageMedia(authContext.roles) ? ["public", "admin"] : ["public"];
   const mediaResult = await resolveEntityImageMedia(teamPayload?.team_image_media_asset_id || null, { allowArchived: Boolean(existingTeam?.team_image_media_asset_id === teamPayload?.team_image_media_asset_id), allowedVisibilities });
   if (mediaResult.error) return buildError(mediaResult.error.message);
+  const contactMediaResult = await resolveEntityImageMedia(teamPayload?.contact_image_media_asset_id || null, { allowArchived: Boolean(existingTeam?.contact_image_media_asset_id === teamPayload?.contact_image_media_asset_id), allowedVisibilities });
+  if (contactMediaResult.error) return buildError(contactMediaResult.error.message);
   const existingTeamSeason = teamPayload?.season_id && existingTeam?.id
-    ? (await supabaseServer.from("team_seasons").select("id, team_image_media_asset_id").eq("team_id", existingTeam.id).eq("season_id", teamPayload.season_id).maybeSingle()).data
+    ? (await supabaseServer.from("team_seasons").select("id, team_image_media_asset_id, contact_image_media_asset_id").eq("team_id", existingTeam.id).eq("season_id", teamPayload.season_id).maybeSingle()).data
     : null;
   const seasonMediaResult = await resolveEntityImageMedia(teamPayload?.season_team_image_media_asset_id || null, { allowArchived: Boolean(existingTeamSeason?.team_image_media_asset_id === teamPayload?.season_team_image_media_asset_id), allowedVisibilities });
   if (seasonMediaResult.error) return buildError(seasonMediaResult.error.message);
+  const seasonContactMediaResult = await resolveEntityImageMedia(teamPayload?.season_contact_image_media_asset_id || null, { allowArchived: Boolean(existingTeamSeason?.contact_image_media_asset_id === teamPayload?.season_contact_image_media_asset_id), allowedVisibilities });
+  if (seasonContactMediaResult.error) return buildError(seasonContactMediaResult.error.message);
 
   const previousRoster = teamId && teamPayload?.season_id
     ? await loadTeamRosterNotificationSnapshot(supabaseServer, teamId, teamPayload.season_id)
@@ -112,11 +116,21 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
     console.error("[team-media-sync]", { code: usageResult.error.code || "TEAM_MEDIA_SYNC_FAILED", message: usageResult.error.message || "Unbekannter Fehler" });
     return buildError("Die Mannschaftsbild-Verwendung konnte nicht gespeichert werden.");
   }
+  const contactUsageResult = await synchronizeMediaAssignment("team", result.teamId, contactMediaResult.data?.id || null, "contact_image");
+  if (contactUsageResult.error) {
+    console.error("[team-contact-media-sync]", { code: contactUsageResult.error.code || "TEAM_CONTACT_MEDIA_SYNC_FAILED", message: contactUsageResult.error.message || "Unbekannter Fehler" });
+    return buildError("Die Kontaktbild-Verwendung konnte nicht gespeichert werden.");
+  }
   if (result.teamSeasonId) {
     const seasonUsageResult = await synchronizeMediaAssignment("team_season", result.teamSeasonId, seasonMediaResult.data?.id || null);
     if (seasonUsageResult.error) {
       console.error("[team-season-media-sync]", { code: seasonUsageResult.error.code || "TEAM_SEASON_MEDIA_SYNC_FAILED", message: seasonUsageResult.error.message || "Unbekannter Fehler" });
       return buildError("Die saisonale Mannschaftsbild-Verwendung konnte nicht gespeichert werden.");
+    }
+    const seasonContactUsageResult = await synchronizeMediaAssignment("team_season", result.teamSeasonId, seasonContactMediaResult.data?.id || null, "contact_image");
+    if (seasonContactUsageResult.error) {
+      console.error("[team-season-contact-media-sync]", { code: seasonContactUsageResult.error.code || "TEAM_SEASON_CONTACT_MEDIA_SYNC_FAILED", message: seasonContactUsageResult.error.message || "Unbekannter Fehler" });
+      return buildError("Die saisonale Kontaktbild-Verwendung konnte nicht gespeichert werden.");
     }
   }
 

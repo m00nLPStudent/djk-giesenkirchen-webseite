@@ -64,8 +64,13 @@ export function createInitialTeamForm({
     contact_name: source.contact_name || team?.contact_name || "",
     contact_email: source.contact_email || team?.contact_email || "",
     contact_phone: source.contact_phone || team?.contact_phone || "",
-    contact_image_url:
-      source.contact_image_url || team?.contact_image_url || "",
+    contact_image_url: team?.contact_image_url || "",
+    contact_image_media_asset_id: team?.contact_image_media_asset_id || null,
+    remove_legacy_contact_image: false,
+    season_contact_image_url: selectedTeamSeason?.contact_image_url || "",
+    season_contact_image_media_asset_id:
+      selectedTeamSeason?.contact_image_media_asset_id || null,
+    remove_legacy_season_contact_image: false,
     fussball_de_matches_widget_code: "",
     fussball_de_table_widget_code: "",
     fussball_de_matches_widget_id:

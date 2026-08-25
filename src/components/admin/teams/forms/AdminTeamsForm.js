@@ -6,7 +6,6 @@ import { saveTeamWithScopeAction } from "@/app/admin/teams/actions";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import { FormAlert } from "@/components/admin/forms";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
-import { uploadTeamImage } from "../services/teams.service";
 import TeamFormTabs from "./components/TeamFormTabs";
 import TeamSubmitBar from "./components/TeamSubmitBar";
 import { createInitialTeamForm } from "./helpers/teamFormInitialState";
@@ -65,6 +64,8 @@ export default function AdminTeamsForm({
   currentTeamSeasons = [],
   initialTeamMedia = null,
   initialSeasonMediaByTeamSeasonId = {},
+  initialTeamContactMedia = null,
+  initialSeasonContactMediaByTeamSeasonId = {},
 }) {
   const router = useRouter();
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
@@ -83,7 +84,7 @@ export default function AdminTeamsForm({
   );
   const [loading, setLoading] = useState(false);
   const initialTeamSeasonId = form.team_season_id;
-  const teamMedia = useTeamMedia({ teamId: team?.id, initialMedia: initialTeamMedia, initialSeasonMedia: initialSeasonMediaByTeamSeasonId[initialTeamSeasonId] || null, setForm });
+  const teamMedia = useTeamMedia({ teamId: team?.id, initialMedia: initialTeamMedia, initialSeasonMedia: initialSeasonMediaByTeamSeasonId[initialTeamSeasonId] || null, initialContactMedia: initialTeamContactMedia, initialSeasonContactMedia: initialSeasonContactMediaByTeamSeasonId[initialTeamSeasonId] || null, setForm });
   const isEditMode = Boolean(team?.id);
   const { scopeContext, canAccessTeamInScope, canCreateTeamInScope } =
     useTeamScope();
@@ -107,7 +108,6 @@ export default function AdminTeamsForm({
         isAssignedToCurrentTeam: selectedIds.has(coachItem.coach_id),
       })),
     }));
-    teamMedia.resetSeasonMedia(initialSeasonMediaByTeamSeasonId[nextForm.team_season_id] || null);
   }
 
   function updateSeason(seasonId) {
@@ -123,12 +123,16 @@ export default function AdminTeamsForm({
       seasonId: season?.id,
     });
 
+    teamMedia.resetSeasonMedia(initialSeasonMediaByTeamSeasonId[nextForm.team_season_id] || null, initialSeasonContactMediaByTeamSeasonId[nextForm.team_season_id] || null);
+
     setForm((current) => ({
       ...nextForm,
       public_season_id: current.public_season_id,
       team_template_id: current.team_template_id,
       team_image_media_asset_id: current.team_image_media_asset_id,
       remove_legacy_team_image: current.remove_legacy_team_image,
+      contact_image_media_asset_id: current.contact_image_media_asset_id,
+      remove_legacy_contact_image: current.remove_legacy_contact_image,
     }));
   }
 
@@ -149,21 +153,6 @@ export default function AdminTeamsForm({
         isAssignedToCurrentTeam: false,
       })),
     }));
-  }
-
-  async function uploadContactImage(file) {
-    const { data, error } = await uploadTeamImage(file, {
-      id: team?.id,
-      name_de: form.contact_name || form.name_de,
-      team_image_url: form.contact_image_url,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("contact_image_url", data);
   }
 
   async function handleSubmit(event) {
@@ -294,7 +283,6 @@ export default function AdminTeamsForm({
         <TeamContactTab
           form={form}
           onFieldChange={updateField}
-          onUploadContactImage={uploadContactImage}
         />
       )}
       {activeTab === "media" && (
@@ -302,8 +290,12 @@ export default function AdminTeamsForm({
           form={form}
           selectedMedia={teamMedia.selectedMedia}
           selectedSeasonMedia={teamMedia.selectedSeasonMedia}
+          selectedContactMedia={teamMedia.selectedContactMedia}
+          selectedSeasonContactMedia={teamMedia.selectedSeasonContactMedia}
           onMediaChange={teamMedia.handleMediaChange}
           onSeasonMediaChange={teamMedia.handleSeasonMediaChange}
+          onContactMediaChange={teamMedia.handleContactMediaChange}
+          onSeasonContactMediaChange={teamMedia.handleSeasonContactMediaChange}
           loadMediaAction={teamMedia.loadMediaAction}
           uploadMediaAction={teamMedia.uploadMediaAction}
         />

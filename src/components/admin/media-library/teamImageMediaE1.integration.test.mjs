@@ -13,14 +13,12 @@ const [actions, form, hook, tab, initial, service, assignment, adminListPage, ad
   read("../../../app/(website)/fussball/[slug]/page.js"), read("./media.service.js"),
 ]);
 
-test("team form uses the central picker and keeps contact media on the legacy path", () => {
+test("team form keeps the central E1 picker after contact media integration", () => {
   assert.match(tab, /AdminMediaPicker/);
   assert.match(tab, /usageContext="team"/);
   assert.match(tab, /resolveLoadedMediaImage/);
   assert.match(form, /useTeamMedia/);
   assert.doesNotMatch(form, /async function uploadImage/);
-  assert.match(form, /uploadTeamImage[\s\S]*async function uploadContactImage/);
-  assert.match(form, /uploadContactImage/);
   assert.match(form, /TeamContactTab/);
 });
 
@@ -79,9 +77,9 @@ test("public list and detail use only public media and preserve season merge bef
   assert.doesNotMatch(publicRepository + publicDetail, /loadMediaUrlMap/);
 });
 
-test("team media keeps contact media legacy and uses only the planned seasonal media id", () => {
+test("team image media remains distinct from contact and seasonal media", () => {
   const all = actions + form + hook + tab + initial + service;
-  assert.doesNotMatch(all, /contact_image_media_asset_id/);
+  assert.match(all, /contact_image_media_asset_id/);
   assert.match(all, /season_team_image_media_asset_id/);
   assert.match(service, /contact_image_url/);
   assert.match(service, /createTeamSeasonPayload/);

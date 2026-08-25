@@ -18,3 +18,9 @@ test("buildMediaAssignmentPayload supports an independent team season image usag
     payload: { p_entity_type: "team_season", p_entity_id: "season-1", p_media_asset_id: "asset-1", p_field_name: "image" },
   });
 });
+
+test("contact image is restricted to team and team season targets", () => {
+  assert.equal(buildMediaAssignmentPayload("team", "team-1", "asset-1", "contact_image").ok, true);
+  assert.equal(buildMediaAssignmentPayload("team_season", "season-1", null, "contact_image").ok, true);
+  assert.equal(buildMediaAssignmentPayload("coach", "coach-1", "asset-1", "contact_image").ok, false);
+});

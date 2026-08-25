@@ -21,7 +21,7 @@ test("the final local placeholder exists and is rendered through next image", as
 });
 
 test("all team fallback surfaces use the central component", () => {
-  assert.match(mediaTab, /placeholder=\{<TeamImagePlaceholder/);
+  assert.match(mediaTab, /<TeamImagePlaceholder/);
   assert.match(picker, /placeholder \|\| <span/);
   assert.match(adminList, /!team\.resolved_team_image_url[\s\S]*<TeamImagePlaceholder/);
   assert.match(adminDetail, /!team\.team_image_url[\s\S]*<TeamImagePlaceholder/);

@@ -1,5 +1,6 @@
-import { Phone, User } from "lucide-react";
+import { Phone } from "lucide-react";
 import { FaEnvelope, FaWhatsapp } from "react-icons/fa";
+import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 
 function formatPhone(phone = "") {
   if (!phone) return "";
@@ -47,17 +48,11 @@ export default function TeamContact({ team, className = "" }) {
       <div className="mt-8 min-w-0 rounded-3xl border border-white/10 bg-black/20 p-4 sm:p-5">
         <div className="flex items-center gap-4">
           <div className="h-16 w-16 shrink-0 overflow-hidden rounded-3xl border border-white/10 bg-white/5 sm:h-20 sm:w-20">
-            {team.contact_image_url ? (
-              <img
-                src={team.contact_image_url}
+            <img
+                src={team.contact_image_url || COACH_PLACEHOLDER_IMAGE}
                 alt={team.contact_name || "Ansprechpartner"}
                 className="h-full w-full object-cover"
               />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-white/50">
-                <User size={30} />
-              </div>
-            )}
           </div>
 
           <div className="min-w-0">

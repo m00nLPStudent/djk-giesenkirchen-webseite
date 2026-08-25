@@ -4,13 +4,8 @@ import {
   InputField,
   PhoneField,
 } from "@/components/admin/forms";
-import TeamLogoUpload from "../../components/TeamLogoUpload";
 
-export default function TeamContactTab({
-  form,
-  onFieldChange,
-  onUploadContactImage,
-}) {
+export default function TeamContactTab({ form, onFieldChange }) {
   return (
     <FormSection eyebrow="Kontakt" title="Ansprechpartner">
       <div className="space-y-4">
@@ -28,11 +23,6 @@ export default function TeamContactTab({
         <PhoneField
           value={form.contact_phone}
           onChange={(value) => onFieldChange("contact_phone", value)}
-        />
-        <TeamLogoUpload
-          imageUrl={form.contact_image_url}
-          onUpload={onUploadContactImage}
-          onRemove={() => onFieldChange("contact_image_url", "")}
         />
       </div>
     </FormSection>
