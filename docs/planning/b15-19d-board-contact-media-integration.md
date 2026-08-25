@@ -49,3 +49,23 @@ Der zentrale Picker bezieht seine Filter aus `mediaPurpose.config.mjs`. Board st
 Die administrative Vorstandsübersicht selektiert `image_media_asset_id` und löst alle IDs gemeinsam auf. Der Batchresolver lädt nur aktive Bilder in erlaubten Sichtbarkeiten, signiert private Adminbilder gesammelt und fällt auf `image_url` sowie den vorhandenen Platzhalter zurück. Desktop und Mobile verwenden denselben Avatar.
 
 Risiko: Fachübergreifende Wiederverwendung funktioniert erst nach manueller Ausführung des D2-SQL-Proposals. `restricted` bleibt ausgeschlossen. Bestehende Purpose-Werte und Usages werden nicht umgeschrieben.
+
+## B15.19D3 – Contact-Synchronisation und Entfernen
+
+Das Setzen und Ersetzen eines Kontaktbilds erreichte die zentrale RPC korrekt mit `entity_type = club_contact`, `field_name = image`, Contact-ID und Media-ID. Die RPC aktualisierte damit zunächst `club_contacts.image_media_asset_id`; der anschließende Usage-Insert scheiterte jedoch am ursprünglichen B15.19A-Check-Constraint, dessen Entity-Allowlist `club_contact` nicht enthielt. Board war nicht betroffen, weil `board_member` bereits seit B15.19A erlaubt war. Das D3-Proposal ergänzt ausschließlich diesen fehlenden Entity-Typ; D2-Cross-Purpose, Bild-/Archivprüfung und RPC-Grants bleiben unverändert.
+
+Der Contact-Save-Pfad speichert zuerst den existierenden oder neuen Kontakt und synchronisiert danach Referenz und Usage. Setzen erzeugt die Contact-Usage, Ersetzen entfernt nur die bisherige Contact-/Image-Usage und legt die neue an. Andere Usages und beide Assets bleiben bestehen. Wiederholtes Speichern bleibt durch den eindeutigen Entity-/Feld-Index und den atomaren RPC-Wechsel sicher.
+
+Beim Entfernen wurde die Media-ID bereits als `null` übergeben. Danach erschien aber `club_contacts.image_url` erneut als Legacy-Fallback. Der Contact-Editor kennzeichnet deshalb jetzt ausschließlich einen expliziten Klick auf „Bild entfernen“ mit `remove_legacy_image`. Nur in diesem Fall schreibt die Contact-Action das eigene Legacyfeld auf `null`; keine Datei und kein Asset werden gelöscht. Ein normaler Kontakt ohne zentrale Zuordnung behält seinen Legacy-Fallback unverändert. Die Action gibt den gespeicherten Media- und Legacyzustand zurück, aus dem der Editor seinen Formularzustand neu aufbaut.
+
+Bei Sync-Fehlern wird nur Fehlercode und -meldung strukturiert serverseitig protokolliert. Der Client erhält weiterhin eine verständliche Meldung und keinen Erfolg. Da Stammdaten vor dem RPC gespeichert werden, können sie bei einem Sync-Fehler bereits geändert sein; erneutes Speichern ist sicher. Eine gemeinsame Gesamttransaktion wäre eine größere Architekturänderung.
+
+## B15.19D4 – Einheitliche Contact-Bildauflösung im Adminbereich
+
+Der Detailkopf verwendete unmittelbar `form.image_url`, während die darunterliegende Vorschau bereits `selectedMedia.previewUrl` vor dem Legacyfeld bevorzugte. Die Kontaktübersicht selektierte durch `select(*)` zwar `image_media_asset_id`, reichte die Datensätze aber ohne Media-Auflösung an den gemeinsamen Desktop-/Mobile-Avatar weiter; auch dieser las direkt `image_url`. Das war kein Cacheproblem.
+
+Detailkopf und Bildvorschau verwenden nun denselben zentralen geladenen Resolver mit der Reihenfolge Media-URL, Legacy-`image_url`, Platzhalter. Der Edit-Loader erzeugt zulässige Public- beziehungsweise kurzlebige Admin-Signed-URLs weiterhin serverseitig und gibt sie als Picker-Medium weiter. Nach Auswahl oder Entfernung aktualisiert derselbe Clientzustand beide Darstellungen sofort.
+
+Die Admin-Übersicht sammelt alle `image_media_asset_id` und ruft den vorhandenen `loadMediaUrlMap` genau einmal auf. Berechtigte Superadmins/Webmaster erhalten `public` und `admin`, andere Settings-Leser nur `public`; `restricted`, archivierte Datensätze und Nicht-Bilder bleiben ausgeschlossen. Der angereicherte DTO-Wert wird vom gemeinsamen Avatar in Desktopliste und Mobile Cards verwendet. Es gibt keine N+1-Abfrage und keine persistierte Signed URL.
+
+Die öffentliche Kontaktseite bleibt beim separaten `loadPublicMediaUrlMap` und kann deshalb keine Admin-Medien ausgeben. Die bestehende Revalidation von `/admin/settings` und `/kontakt` ist ausreichend; Editrouten sind dynamisch und der Editor aktualisiert seinen lokalen Mediazustand. Tests decken Resolverreihenfolge, Detailkopf, beide Listenvarianten, Batchauflösung, rollenabhängige Sichtbarkeit, Public-Abgrenzung, Wechsel und Entfernung ab. Offenes Betriebsrisiko bleibt nur das reguläre Ablaufen einer bereits gerenderten Admin-Signed-URL nach fünf Minuten; eine erneute Servernavigation erzeugt eine neue URL.

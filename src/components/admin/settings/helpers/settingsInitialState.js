@@ -62,6 +62,7 @@ export function createInitialContactForm(contact = null) {
     phone: contact?.phone || "",
     image_url: contact?.image_url || "",
     image_media_asset_id: contact?.image_media_asset_id || null,
+    remove_legacy_image: false,
     is_public: contact?.is_public ?? true,
     is_active: contact?.is_active ?? true,
     sort_order: contact?.sort_order ?? 0,

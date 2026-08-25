@@ -12,6 +12,8 @@ export function resolvePublicMediaImage(record = {}, getPublicUrl, placeholder =
   return record.image_url || placeholder;
 }
 
-export function resolveLoadedPublicMediaImage(record = {}, mediaUrls = new Map(), placeholder = "") {
+export function resolveLoadedMediaImage(record = {}, mediaUrls = new Map(), placeholder = "") {
   return mediaUrls.get(record.image_media_asset_id) || record.image_url || placeholder;
 }
+
+export const resolveLoadedPublicMediaImage = resolveLoadedMediaImage;

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { resolveLoadedPublicMediaImage, resolvePublicMediaImage } from "./publicMediaImage.mjs";
+import { resolveLoadedMediaImage, resolveLoadedPublicMediaImage, resolvePublicMediaImage } from "./publicMediaImage.mjs";
 
 const publicAsset = { media_kind: "image", visibility: "public", storage_bucket: "media-library-public", storage_path: "board_member/a.webp", is_archived: false };
 const url = (bucket, path) => `https://storage.test/${bucket}/${path}`;
@@ -20,4 +20,11 @@ test("batch-loaded public resolver keeps media, legacy, placeholder order", () =
   assert.equal(resolveLoadedPublicMediaImage({ image_media_asset_id: "1", image_url: "legacy" }, media, "placeholder"), "public-url");
   assert.equal(resolveLoadedPublicMediaImage({ image_url: "legacy" }, media, "placeholder"), "legacy");
   assert.equal(resolveLoadedPublicMediaImage({}, media, "placeholder"), "placeholder");
+});
+
+test("shared loaded resolver gives admin and public callers the same fallback order", () => {
+  const media = new Map([["1", "signed-or-public-url"]]);
+  assert.equal(resolveLoadedMediaImage({ image_media_asset_id: "1", image_url: "legacy" }, media, "placeholder"), "signed-or-public-url");
+  assert.equal(resolveLoadedMediaImage({ image_url: "legacy" }, media, "placeholder"), "legacy");
+  assert.equal(resolveLoadedMediaImage({}, media, "placeholder"), "placeholder");
 });

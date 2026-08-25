@@ -2,6 +2,9 @@ import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { AdminSettingsEditor } from "@/components/admin/settings";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { canManageMedia, loadMediaUrlMap } from "@/components/admin/media-library/media.service";
+import { resolveLoadedMediaImage } from "@/lib/people/publicMediaImage.mjs";
+import { CLUB_CONTACT_PLACEHOLDER_IMAGE } from "@/components/admin/settings/settings.service";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -63,6 +66,14 @@ export default async function AdminSettingsPage({ searchParams }) {
     );
   }
 
+  const contacts = contactsResult?.data || [];
+  const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
+  const contactMediaUrls = await loadMediaUrlMap(contacts.map((contact) => contact.image_media_asset_id), allowedVisibilities);
+  const contactsForUi = contacts.map((contact) => ({
+    ...contact,
+    resolved_image_url: resolveLoadedMediaImage(contact, contactMediaUrls.data, CLUB_CONTACT_PLACEHOLDER_IMAGE),
+  }));
+
   return (
     <AdminLayout
       title="Einstellungen"
@@ -78,7 +89,7 @@ export default async function AdminSettingsPage({ searchParams }) {
 
       <AdminSettingsEditor
         initialClubSettings={settingsResult?.data || null}
-        initialClubContacts={contactsResult?.data || []}
+        initialClubContacts={contactsForUi}
         initialPages={pagesResult?.data || []}
         initialTab={params?.tab}
       />

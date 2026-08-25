@@ -21,6 +21,7 @@ export async function saveClubContactAction(form, contactId = null) {
   const access = await authorize(contactId);
   if (!access.ok) return { data: null, error: { message: access.message } };
   const payload = normalizeClubContactPayload(form);
+  if (form?.remove_legacy_image === true) payload.image_url = null;
   if (!payload.role_de || !payload.contact_name) return { data: null, error: { message: "Rolle und Name sind erforderlich." } };
   const allowedVisibilities = canManageMedia(access.auth.roles) ? ["public", "admin"] : ["public"];
   const media = await resolveEntityImageMedia(form?.image_media_asset_id || null, { allowArchived: Boolean(access.contact?.image_media_asset_id === form?.image_media_asset_id), allowedVisibilities });
@@ -31,10 +32,13 @@ export async function saveClubContactAction(form, contactId = null) {
   const saved = await query.select("*").maybeSingle();
   if (saved.error || !saved.data) return saved;
   const usage = await synchronizeMediaAssignment("club_contact", saved.data.id, media.data?.id || null);
-  if (usage.error) return { data: null, error: { message: "Die Kontaktbild-Verwendung konnte nicht gespeichert werden." } };
+  if (usage.error) {
+    console.error("[club-contact-media-sync]", { code: usage.error.code || "CONTACT_MEDIA_SYNC_FAILED", message: usage.error.message || "Unbekannter Fehler" });
+    return { data: null, error: { message: "Die Kontaktbild-Verwendung konnte nicht gespeichert werden." } };
+  }
   revalidatePath("/admin/settings");
   revalidatePath("/kontakt");
-  return { data: { ...saved.data, image_media_asset_id: media.data?.id || null }, error: null };
+  return { data: { ...saved.data, image_media_asset_id: media.data?.id || null, image_url: form?.remove_legacy_image === true ? null : saved.data.image_url }, error: null };
 }
 
 export async function deleteClubContactAction(contactId) {

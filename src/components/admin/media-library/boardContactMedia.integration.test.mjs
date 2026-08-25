@@ -43,5 +43,6 @@ test("legacy image URLs are read by forms but not written by the new saves", () 
   assert.match(boardForm, /legacyUrl=/);
   assert.match(contactForm, /legacyUrl=/);
   assert.doesNotMatch(boardActions, /image_url:/);
-  assert.doesNotMatch(contactActions, /image_url:/);
+  assert.match(contactActions, /remove_legacy_image === true/);
+  assert.doesNotMatch(contactActions, /image_url:\s*media/);
 });

@@ -1,7 +1,7 @@
 import { AdminListChevron, AdminListHeader, AdminListMobileCard, AdminListRow, AdminModuleCards, AdminModuleEmptyState, AdminModuleList, AdminStatusChip } from "@/components/admin/design-system";
 import CoachAvatar from "@/components/admin/coaches/components/CoachAvatar";
 
-const avatar = (contact) => <CoachAvatar coach={{ displayName: contact.contact_name || contact.role_de || "Kontakt", imageUrl: contact.image_url }} sizeClassName="h-10 w-10" />;
+const avatar = (contact) => <CoachAvatar coach={{ displayName: contact.contact_name || contact.role_de || "Kontakt", imageUrl: contact.resolved_image_url }} sizeClassName="h-10 w-10" />;
 
 export default function ContactList({ contacts, getCategoryLabel }) {
   if (!contacts.length) return <AdminModuleEmptyState title="Keine Kontakte" description="Es wurden noch keine allgemeinen Kontakte angelegt." />;
