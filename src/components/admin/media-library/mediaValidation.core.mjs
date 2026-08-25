@@ -11,8 +11,21 @@ const TYPES = Object.freeze({
   "application/pdf": { extension: "pdf", kind: "document", max: 20 * 1024 * 1024, signatures: [[0x25, 0x50, 0x44, 0x46, 0x2d]] },
 });
 
+export const MEDIA_FILE_LIMITS = Object.freeze({
+  image: TYPES["image/jpeg"].max,
+  document: TYPES["application/pdf"].max,
+});
+
 const cleanText = (value, max) => String(value || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, max) || null;
 const startsWith = (bytes, signature) => signature.every((value, index) => bytes[index] === value);
+const formatMegabytes = (bytes) => bytes / 1024 / 1024;
+
+export function getMediaFileSizeError(file = {}) {
+  const definition = TYPES[String(file.type || "").toLowerCase()];
+  if (!definition || !Number.isFinite(file.size) || file.size <= definition.max) return null;
+  const label = definition.kind === "image" ? "Bilddatei" : "PDF-Datei";
+  return `Die ausgewählte ${label} ist zu groß. Erlaubt sind maximal ${formatMegabytes(definition.max)} MB.`;
+}
 
 export function normalizeMediaMetadata(input = {}) {
   const visibility = MEDIA_VISIBILITIES.includes(input.visibility) ? input.visibility : "admin";
@@ -27,7 +40,9 @@ export function normalizeMediaMetadata(input = {}) {
 export function validateMediaDescriptor({ name = "", type = "", size = 0, bytes = [] } = {}) {
   const definition = TYPES[String(type).toLowerCase()];
   if (!definition) return { ok: false, error: "Nur JPEG-, PNG-, WebP-Bilder und PDF-Dokumente sind erlaubt." };
-  if (!Number.isSafeInteger(size) || size <= 0 || size > definition.max) return { ok: false, error: `Die Datei ist leer oder größer als ${definition.max / 1024 / 1024} MB.` };
+  if (!Number.isSafeInteger(size) || size <= 0) return { ok: false, error: "Die ausgewählte Datei ist leer." };
+  const sizeError = getMediaFileSizeError({ type, size });
+  if (sizeError) return { ok: false, error: sizeError };
   if (!definition.signatures.some((signature) => startsWith(bytes, signature))) return { ok: false, error: "Dateiinhalt und MIME-Typ stimmen nicht überein." };
   if (definition.extension === "webp" && String.fromCharCode(...bytes.slice(8, 12)) !== "WEBP") return { ok: false, error: "Ungültige WebP-Datei." };
   return { ok: true, extension: definition.extension, mediaKind: definition.kind, originalFilename: cleanText(name, 255) || `datei.${definition.extension}`, maxBytes: definition.max };

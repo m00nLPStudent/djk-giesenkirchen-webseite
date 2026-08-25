@@ -5,6 +5,7 @@ import { useState } from "react";
 import AdminMediaPickerDialog from "./AdminMediaPickerDialog";
 import AdminMediaPickerTrigger from "./AdminMediaPickerTrigger";
 import { getDefaultPurposeForUsageContext } from "./mediaPurpose.config.mjs";
+import { getMediaFileSizeError } from "./mediaValidation.core.mjs";
 
 export default function AdminMediaPicker({ value, legacyUrl, placeholderUrl, onChange, loadAction, uploadAction, usageContext = "coach", defaultPurpose = getDefaultPurposeForUsageContext(usageContext), entityLabel = "Trainerbild" }) {
   const [open, setOpen] = useState(false);
@@ -14,6 +15,8 @@ export default function AdminMediaPicker({ value, legacyUrl, placeholderUrl, onC
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
+    const sizeError = getMediaFileSizeError(file);
+    if (sizeError) { alert(sizeError); return; }
     const data = new FormData();
     data.set("file", file);
     data.set("displayName", file.name);

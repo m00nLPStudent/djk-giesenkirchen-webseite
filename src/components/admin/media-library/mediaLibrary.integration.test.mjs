@@ -7,9 +7,12 @@ const [service, actions, schema, rls, rollback] = await Promise.all([read("./med
 test("central upload is server-only, content validated and database failure cleans storage", () => {
   assert.match(service, /import "server-only"/);
   assert.match(service, /validateMediaDescriptor/);
-  assert.match(service, /if \(saved\.error\) await db\.storage\.from\(bucket\)\.remove/);
+  assert.match(service, /stage: "media_assets_insert"/);
+  assert.match(service, /rollbackAttempted: true/);
   assert.match(actions, /assertAdminActionPermission/);
   assert.match(actions, /canManageMedia/);
+  assert.match(actions, /try[\s\S]*catch/);
+  assert.match(actions, /\[media-upload\]/);
 });
 
 test("schema separates public and private storage and keeps usages referential", () => {

@@ -58,7 +58,7 @@ function createTeamPayload(team) {
     description_en: team.description_en || null,
     training_times_de: team.training_times_de || null,
     training_times_en: team.training_times_en || null,
-    team_image_url: team.team_image_url || null,
+    team_image_url: team.remove_legacy_team_image ? null : team.team_image_url || null,
     contact_name: team.contact_name || null,
     contact_email: team.contact_email || null,
     contact_phone: team.contact_phone || null,

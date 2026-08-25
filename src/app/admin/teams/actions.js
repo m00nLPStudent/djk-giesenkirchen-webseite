@@ -14,6 +14,8 @@ import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalid
 import { loadTeamRosterNotificationSnapshot } from "@/components/admin/notifications/teamRosterNotification.repository";
 import { logNotificationFailure, notifyTeamArchived, notifyTeamRosterChange } from "@/components/admin/notifications/teamAssignmentNotifications.service";
 import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
+import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
+import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
 
 function buildError(message) {
   return { error: { message } };
@@ -50,6 +52,7 @@ async function loadAuthorizedTeamMutationContext(requiredPermission) {
     supabaseServer: permissionResult.supabaseServer,
     scopeContext,
     userId: permissionResult.userId,
+    roles: permissionResult.roles || [],
   };
 }
 
@@ -64,8 +67,9 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
 
   const { supabaseServer, scopeContext } = authContext;
 
+  let existingTeam = null;
   if (teamId) {
-    const existingTeam = await loadTeamById(supabaseServer, teamId);
+    existingTeam = await loadTeamById(supabaseServer, teamId);
 
     if (!existingTeam || !canAccessTeamOnServer(scopeContext, existingTeam)) {
       return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
@@ -82,6 +86,10 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
     }
   }
 
+  const allowedVisibilities = canManageMedia(authContext.roles) ? ["public", "admin"] : ["public"];
+  const mediaResult = await resolveEntityImageMedia(teamPayload?.team_image_media_asset_id || null, { allowArchived: Boolean(existingTeam?.team_image_media_asset_id === teamPayload?.team_image_media_asset_id), allowedVisibilities });
+  if (mediaResult.error) return buildError(mediaResult.error.message);
+
   const previousRoster = teamId && teamPayload?.season_id
     ? await loadTeamRosterNotificationSnapshot(supabaseServer, teamId, teamPayload.season_id)
     : { data: null, error: null };
@@ -92,6 +100,12 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
 
   if (result?.error) {
     return buildError(result.error.message || "Fehler beim Speichern.");
+  }
+
+  const usageResult = await synchronizeMediaAssignment("team", result.teamId, mediaResult.data?.id || null);
+  if (usageResult.error) {
+    console.error("[team-media-sync]", { code: usageResult.error.code || "TEAM_MEDIA_SYNC_FAILED", message: usageResult.error.message || "Unbekannter Fehler" });
+    return buildError("Die Mannschaftsbild-Verwendung konnte nicht gespeichert werden.");
   }
 
   if (previousRoster.error) {
@@ -105,7 +119,50 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
     }
   }
 
+  revalidatePath("/admin/teams");
+  revalidatePath(`/admin/teams/${result.teamId}`);
+  revalidatePublicContent("teams");
   return { error: null };
+}
+
+async function authorizeTeamMedia(teamId = null) {
+  const permissionResult = await assertAdminActionPermission({ requiredPermission: teamId ? "teams.edit" : "teams.create" });
+  if (!permissionResult.ok) return { ok: false, message: permissionResult.message || "Berechtigung fehlt." };
+  const scopeContext = await loadServerTeamScopeContext(permissionResult);
+  if (teamId) {
+    const team = await loadTeamById(permissionResult.supabaseServer, teamId);
+    if (!team || !canAccessTeamOnServer(scopeContext, team)) return { ok: false, message: "Du hast keinen Zugriff auf diese Mannschaft." };
+  } else if (!canReachTeamCreateOnServer(scopeContext)) return { ok: false, message: "Du darfst keine Mannschaft erstellen." };
+  return { ok: true, permissionResult };
+}
+
+export async function loadTeamMediaPickerAction(filters = {}, teamId = null) {
+  const auth = await authorizeTeamMedia(teamId);
+  if (!auth.ok) return { ok: false, error: auth.message, items: [], total: 0 };
+  const allowed = canManageMedia(auth.permissionResult.roles) ? ["public", "admin"] : ["public"];
+  const visibility = allowed.includes(filters.visibility) ? filters.visibility : allowed;
+  const purpose = normalizePickerPurpose(filters.purpose, "team");
+  const result = await loadMediaLibrary({ ...filters, kind: "image", visibility, purpose, archived: "active" });
+  return result.error ? { ok: false, error: "Medien konnten nicht geladen werden.", items: [], total: 0 } : { ok: true, items: result.data, total: result.count || 0 };
+}
+
+export async function uploadTeamMediaAction(formData, teamId = null) {
+  try {
+    const auth = await authorizeTeamMedia(teamId);
+    if (!auth.ok) return { ok: false, error: auth.message };
+    const file = formData.get("file");
+    if (!file || !["image/jpeg", "image/png", "image/webp"].includes(file.type)) return { ok: false, error: "Für Mannschaftsbilder sind nur JPEG, PNG und WebP erlaubt." };
+    const result = await uploadMediaAsset(file, { displayName: formData.get("displayName"), altText: formData.get("altText"), visibility: "public", purpose: "team" }, auth.permissionResult.profile.id);
+    if (result.error) {
+      console.error("[team-media-upload]", { stage: result.stage, code: result.error.code || "TEAM_MEDIA_UPLOAD_FAILED", message: result.error.message, rollbackAttempted: Boolean(result.rollbackAttempted), rollbackErrorCode: result.rollbackError?.code || null });
+      return { ok: false, error: result.stage === "validation" ? result.error.message : "Das Mannschaftsbild konnte nicht hochgeladen werden." };
+    }
+    const resolved = await resolveEntityImageMedia(result.data.id, { purpose: "team" });
+    return resolved.error ? { ok: false, error: "Das hochgeladene Mannschaftsbild konnte nicht geladen werden." } : { ok: true, item: resolved.data };
+  } catch (error) {
+    console.error("[team-media-upload]", { stage: "server_action", code: error?.code || "UNEXPECTED_TEAM_MEDIA_ACTION_ERROR", message: error?.message || "Unbekannter Fehler" });
+    return { ok: false, error: "Das Mannschaftsbild konnte nicht hochgeladen werden." };
+  }
 }
 
 export async function removeTeamWithScopeAction(teamId) {

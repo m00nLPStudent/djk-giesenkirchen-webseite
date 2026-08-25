@@ -10,6 +10,8 @@ import {
 } from "@/components/website/team";
 import { mapTeamRosterPlayers } from "@/components/website/team/teamRoster.core.mjs";
 import { supabase } from "@/lib/supabase";
+import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
+import { resolvePublicTeamImage } from "@/lib/football/publicTeamImage.core.mjs";
 
 const tournamentItems = [
   "Spielpläne",
@@ -170,6 +172,12 @@ export default async function TeamPage({ params }) {
       : { data: null };
 
   const displayTeam = mergeTeamSeason(team, teamSeason, selectedSeason);
+  const teamMediaUrls = await loadPublicMediaUrlMap([team?.team_image_media_asset_id]);
+  displayTeam.team_image_url = resolvePublicTeamImage({
+    mediaAssetId: team?.team_image_media_asset_id,
+    teamLegacyUrl: team?.team_image_url,
+    seasonLegacyUrl: teamSeason?.team_image_url,
+  }, teamMediaUrls.data);
 
   let coaches = [];
   let players = [];

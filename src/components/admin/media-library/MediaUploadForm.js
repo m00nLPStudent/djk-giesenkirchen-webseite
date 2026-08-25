@@ -3,11 +3,16 @@
 import { useActionState } from "react";
 import { uploadMediaAction } from "@/app/admin/media/actions";
 import { MEDIA_PURPOSE_OPTIONS } from "./mediaPurpose.config.mjs";
+import { getMediaFileSizeError } from "./mediaValidation.core.mjs";
 
 const initialState = { ok: false, error: null };
 
 export default function MediaUploadForm() {
-  const [state, action, pending] = useActionState(async (_state, formData) => uploadMediaAction(formData), initialState);
+  const [state, action, pending] = useActionState(async (_state, formData) => {
+    const sizeError = getMediaFileSizeError(formData.get("file"));
+    if (sizeError) return { ok: false, error: sizeError };
+    return uploadMediaAction(formData);
+  }, initialState);
   return <form action={action} className="grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-5 md:grid-cols-2">
     <label className="space-y-2 text-sm font-bold text-white">Datei<input required name="file" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" className="block w-full rounded-2xl border border-white/10 bg-black/20 p-3 text-white/70" /></label>
     <label className="space-y-2 text-sm font-bold text-white">Anzeigename<input name="displayName" maxLength={200} className="block w-full rounded-2xl border border-white/10 bg-black/20 p-3" /></label>

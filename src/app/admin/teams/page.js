@@ -25,6 +25,8 @@ import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentS
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { redirect } from "next/navigation";
+import { canManageMedia, loadMediaUrlMap } from "@/components/admin/media-library/media.service";
+import { resolveLoadedMediaImage } from "@/lib/people/publicMediaImage.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -132,6 +134,8 @@ export default async function AdminTeamsPage({ searchParams }) {
 
   const scopedTeams = filterScopedTeamsOnServer(scopeContext, teams || []);
   const teamIds = scopedTeams.map((team) => team.id);
+  const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
+  const teamMediaUrls = await loadMediaUrlMap(scopedTeams.map((team) => team.team_image_media_asset_id), allowedVisibilities);
 
   const { data: teamSeasons } = teamIds.length
     ? await supabaseServer
@@ -168,6 +172,7 @@ export default async function AdminTeamsPage({ searchParams }) {
 
     return {
       ...displayTeam,
+      resolved_team_image_url: resolveLoadedMediaImage({ image_media_asset_id: team.team_image_media_asset_id, image_url: displayTeam.team_image_url }, teamMediaUrls.data),
       players_count: playerList.filter(
         (player) =>
           player.team_season_id === teamSeason?.id && player.is_active,

@@ -84,21 +84,26 @@ export async function synchronizeMediaAssignment(entityType, entityId, mediaAsse
 }
 
 export async function uploadMediaAsset(file, input, actorUserId) {
-  if (!(file instanceof File)) return { data: null, error: new Error("Keine Datei ausgewählt.") };
-  const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
-  const validation = validateMediaDescriptor({ name: file.name, type: file.type, size: file.size, bytes: header });
-  if (!validation.ok) return { data: null, error: new Error(validation.error) };
-  const metadata = normalizeMediaMetadata(input);
-  const id = randomUUID();
-  const bucket = MEDIA_BUCKETS[metadata.visibility];
-  const path = createMediaStoragePath({ purpose: metadata.purpose, id, extension: validation.extension, mediaKind: validation.mediaKind });
-  const db = createSupabaseAdminClient();
-  if (!db) return { data: null, error: new Error("Media-Service-Client ist nicht konfiguriert.") };
-  const upload = await db.storage.from(bucket).upload(path, file, { cacheControl: "3600", contentType: file.type, upsert: false });
-  if (upload.error) return { data: null, error: upload.error };
-  const saved = await repository.insertMediaAsset(db, { id, storage_bucket: bucket, storage_path: path, original_filename: validation.originalFilename, display_name: metadata.displayName || validation.originalFilename, media_kind: validation.mediaKind, mime_type: file.type, file_extension: validation.extension, file_size_bytes: file.size, alt_text: metadata.altText, description: metadata.description, copyright_notice: metadata.copyrightNotice, source_label: metadata.sourceLabel, visibility: metadata.visibility, purpose: metadata.purpose, uploaded_by_user_id: actorUserId });
-  if (saved.error) await db.storage.from(bucket).remove([path]);
-  return saved;
+  try {
+    if (!(file instanceof File)) return { data: null, error: new Error("Keine Datei ausgewählt."), stage: "validation" };
+    const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+    const validation = validateMediaDescriptor({ name: file.name, type: file.type, size: file.size, bytes: header });
+    if (!validation.ok) return { data: null, error: new Error(validation.error), stage: "validation" };
+    const metadata = normalizeMediaMetadata(input);
+    const id = randomUUID();
+    const bucket = MEDIA_BUCKETS[metadata.visibility];
+    const path = createMediaStoragePath({ purpose: metadata.purpose, id, extension: validation.extension, mediaKind: validation.mediaKind });
+    const db = createSupabaseAdminClient();
+    if (!db) return { data: null, error: new Error("Media-Service-Client ist nicht konfiguriert."), stage: "configuration" };
+    const upload = await db.storage.from(bucket).upload(path, file, { cacheControl: "3600", contentType: file.type, upsert: false });
+    if (upload.error) return { data: null, error: upload.error, stage: "storage_upload" };
+    const saved = await repository.insertMediaAsset(db, { id, storage_bucket: bucket, storage_path: path, original_filename: validation.originalFilename, display_name: metadata.displayName || validation.originalFilename, media_kind: validation.mediaKind, mime_type: file.type, file_extension: validation.extension, file_size_bytes: file.size, alt_text: metadata.altText, description: metadata.description, copyright_notice: metadata.copyrightNotice, source_label: metadata.sourceLabel, visibility: metadata.visibility, purpose: metadata.purpose, uploaded_by_user_id: actorUserId });
+    if (!saved.error) return { ...saved, stage: "complete" };
+    const rollback = await db.storage.from(bucket).remove([path]);
+    return { ...saved, stage: "media_assets_insert", rollbackAttempted: true, rollbackError: rollback.error || null };
+  } catch (error) {
+    return { data: null, error, stage: "unexpected" };
+  }
 }
 
 export async function archiveMediaAsset(id) {

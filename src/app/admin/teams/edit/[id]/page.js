@@ -10,6 +10,7 @@ import { loadTeamEditPlayerOptions } from "@/components/admin/teams/teamEditPlay
 import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
+import { loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 
 export default async function EditTeamPage({ params }) {
   const { id } = await params;
@@ -54,6 +55,7 @@ export default async function EditTeamPage({ params }) {
     : { data: [] };
 
   const players = await loadTeamEditPlayerOptions(supabaseServer, id);
+  const teamMedia = await loadMediaAssetForPicker(team.team_image_media_asset_id);
 
   return (
     <AdminLayout title="Mannschaft bearbeiten" subtitle="Mannschaften" showHeader={false}>
@@ -74,6 +76,7 @@ export default async function EditTeamPage({ params }) {
           }
           currentSeasonResolution={coachEditData.currentSeasonResolution}
           currentTeamSeasons={coachEditData.currentTeamSeasons || []}
+          initialTeamMedia={teamMedia.data || null}
         />
       </TeamScopeGate>
       </AdminModulePage>

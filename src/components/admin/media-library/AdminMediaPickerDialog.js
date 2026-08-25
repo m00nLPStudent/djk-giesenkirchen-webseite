@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { FileText } from "lucide-react";
 import { formatFileSize } from "@/lib/files";
 import { getPickerPurposeOptions } from "./mediaPurpose.config.mjs";
+import { getMediaFileSizeError } from "./mediaValidation.core.mjs";
 
 const PAGE_SIZE = 12;
 const initialFilters = (purpose) => ({ search: "", visibility: "all", purpose, page: 1, pageSize: PAGE_SIZE });
@@ -45,6 +46,8 @@ export default function AdminMediaPickerDialog({ open, onClose, onSelect, loadAc
   async function go(page) { const next = { ...filters, page }; setFilters(next); await load(next); }
   async function upload(event) {
     const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
+    const sizeError = getMediaFileSizeError(file);
+    if (sizeError) { setResult((current) => ({ ...current, error: sizeError })); return; }
     setUploading(true);
     const data = new FormData(); data.set("file", file); data.set("displayName", file.name); data.set("altText", "");
     const response = await uploadAction(data); setUploading(false);

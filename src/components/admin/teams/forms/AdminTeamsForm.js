@@ -24,6 +24,7 @@ import TeamStaffTab from "./tabs/TeamStaffTab";
 import TeamTrainingTab from "./tabs/TeamTrainingTab";
 import useTeamScope from "../useTeamScope";
 import { isYouthTeam } from "../teamScope";
+import useTeamMedia from "./useTeamMedia";
 
 function getCoachStatusMessage(currentSeasonResolution, currentTeamSeasons = []) {
   if (!currentSeasonResolution?.activeSeasonStatus) return null;
@@ -62,6 +63,7 @@ export default function AdminTeamsForm({
   currentSeasonCoachAssignments = [],
   currentSeasonResolution = null,
   currentTeamSeasons = [],
+  initialTeamMedia = null,
 }) {
   const router = useRouter();
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
@@ -79,6 +81,7 @@ export default function AdminTeamsForm({
     }),
   );
   const [loading, setLoading] = useState(false);
+  const teamMedia = useTeamMedia({ teamId: team?.id, initialMedia: initialTeamMedia, setForm });
   const isEditMode = Boolean(team?.id);
   const { scopeContext, canAccessTeamInScope, canCreateTeamInScope } =
     useTeamScope();
@@ -121,6 +124,8 @@ export default function AdminTeamsForm({
       ...nextForm,
       public_season_id: current.public_season_id,
       team_template_id: current.team_template_id,
+      team_image_media_asset_id: current.team_image_media_asset_id,
+      remove_legacy_team_image: current.remove_legacy_team_image,
     }));
   }
 
@@ -141,21 +146,6 @@ export default function AdminTeamsForm({
         isAssignedToCurrentTeam: false,
       })),
     }));
-  }
-
-  async function uploadImage(file) {
-    const { data, error } = await uploadTeamImage(file, {
-      id: team?.id,
-      name_de: form.name_de,
-      team_image_url: form.team_image_url,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("team_image_url", data);
   }
 
   async function uploadContactImage(file) {
@@ -307,8 +297,10 @@ export default function AdminTeamsForm({
       {activeTab === "media" && (
         <TeamMediaTab
           form={form}
-          onFieldChange={updateField}
-          onUploadImage={uploadImage}
+          selectedMedia={teamMedia.selectedMedia}
+          onMediaChange={teamMedia.handleMediaChange}
+          loadMediaAction={teamMedia.loadMediaAction}
+          uploadMediaAction={teamMedia.uploadMediaAction}
         />
       )}
       {activeTab === "settings" && (

@@ -25,6 +25,8 @@ import {
 import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 import { loadActiveTeamSeasonCoaches } from "@/components/admin/teams/teamCoachList.repository";
 import { canEditCoachOnServer, getCoachTeamIdsMap, loadServerPersonScopeContext } from "@/components/admin/persons/serverPersonScope";
+import { canManageMedia, loadMediaUrlMap } from "@/components/admin/media-library/media.service";
+import { resolveLoadedMediaImage } from "@/lib/people/publicMediaImage.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +60,9 @@ export default async function AdminTeamDetailPage({ params }) {
   if (!team || !canAccessTeamOnServer(scopeContext, team)) {
     redirect("/admin/unauthorized?reason=missing-team-scope");
   }
+  const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
+  const teamMediaUrls = await loadMediaUrlMap([team.team_image_media_asset_id], allowedVisibilities);
+  const resolvedTeamImageUrl = resolveLoadedMediaImage({ image_media_asset_id: team.team_image_media_asset_id, image_url: team.team_image_url }, teamMediaUrls.data);
 
   const contributionVisibility = getContributionStatusVisibility(scopeContext);
   const contributionAdminClient =
@@ -173,6 +178,7 @@ export default async function AdminTeamDetailPage({ params }) {
         <TeamContributionDetailView
           team={{
             ...team,
+            team_image_url: resolvedTeamImageUrl,
             seasonName: contributionSeasonResolution?.activeSeasonName || null,
             playerCount: playerIds.length,
           }}
