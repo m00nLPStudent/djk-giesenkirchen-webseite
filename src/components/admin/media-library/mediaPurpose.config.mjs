@@ -3,7 +3,7 @@ export const MEDIA_PURPOSE_OPTIONS = Object.freeze([
   { key: "coach", label: "Trainer", mediaKind: "image", pickerFilterable: true },
   { key: "board", label: "Vorstand", mediaKind: "image", pickerFilterable: true },
   { key: "team", label: "Mannschaft", mediaKind: "image", pickerFilterable: true },
-  { key: "news", label: "News", mediaKind: "image", pickerFilterable: true },
+  { key: "news", label: "News", mediaKind: "all", pickerFilterable: true },
   { key: "cms", label: "CMS / Vereinskontakt", mediaKind: "image", pickerFilterable: true },
   { key: "club_history", label: "Vereinsgeschichte", mediaKind: "image", pickerFilterable: true },
   { key: "sponsor", label: "Sponsor", mediaKind: "image", pickerFilterable: true },
@@ -14,6 +14,6 @@ export const MEDIA_PURPOSE_OPTIONS = Object.freeze([
 ]);
 
 export const MEDIA_PURPOSES = Object.freeze(MEDIA_PURPOSE_OPTIONS.map((option) => option.key));
-export function getPickerPurposeOptions(mediaKind = "image") { return MEDIA_PURPOSE_OPTIONS.filter((option) => option.pickerFilterable && option.mediaKind === mediaKind); }
-export function normalizePickerPurpose(value, fallback) { return value === "all" || getPickerPurposeOptions("image").some((option) => option.key === value) ? value : fallback; }
+export function getPickerPurposeOptions(mediaKind = "image") { return MEDIA_PURPOSE_OPTIONS.filter((option) => option.pickerFilterable && (option.mediaKind === mediaKind || option.mediaKind === "all")); }
+export function normalizePickerPurpose(value, fallback, mediaKind = "image") { return value === "all" || getPickerPurposeOptions(mediaKind).some((option) => option.key === value) ? value : fallback; }
 export function getDefaultPurposeForUsageContext(context) { return context === "board_member" ? "board" : context === "club_contact" ? "cms" : context; }

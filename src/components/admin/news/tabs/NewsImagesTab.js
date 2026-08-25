@@ -12,8 +12,12 @@ export default function NewsImagesTab({
   onMediaChange,
   loadMediaAction,
   uploadMediaAction,
-  handleDocumentUpload,
+  handleDocumentSelect,
   handleDocumentDelete,
+  loadDocumentMediaAction,
+  uploadDocumentMediaAction,
+  replaceDocumentFileAction,
+  updateDocumentAction,
 }) {
   if (activeTab === "media") {
     return (
@@ -33,8 +37,12 @@ export default function NewsImagesTab({
         newsId={news?.id}
         documents={documents}
         setDocuments={setDocuments}
-        onUploadDocument={handleDocumentUpload}
+        onSelectDocument={handleDocumentSelect}
         onDeleteDocument={handleDocumentDelete}
+        loadMediaAction={loadDocumentMediaAction}
+        uploadMediaAction={uploadDocumentMediaAction}
+        replaceFileAction={replaceDocumentFileAction}
+        updateDocumentAction={updateDocumentAction}
         loading={documentsLoading}
       />
     );

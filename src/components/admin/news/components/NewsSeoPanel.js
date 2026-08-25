@@ -5,8 +5,12 @@ export default function NewsSeoPanel({
   newsId,
   documents,
   setDocuments,
-  onUploadDocument,
+  onSelectDocument,
   onDeleteDocument,
+  loadMediaAction,
+  uploadMediaAction,
+  replaceFileAction,
+  updateDocumentAction,
   loading,
 }) {
   return (
@@ -19,8 +23,12 @@ export default function NewsSeoPanel({
         newsId={newsId}
         documents={documents}
         setDocuments={setDocuments}
-        onUploadDocument={onUploadDocument}
+        onSelectDocument={onSelectDocument}
         onDeleteDocument={onDeleteDocument}
+        loadMediaAction={loadMediaAction}
+        uploadMediaAction={uploadMediaAction}
+        replaceFileAction={replaceFileAction}
+        updateDocumentAction={updateDocumentAction}
         loading={loading}
       />
     </FormSection>

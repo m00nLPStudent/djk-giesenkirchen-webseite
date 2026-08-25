@@ -10,7 +10,7 @@ import { NEWS_FORM_TABS } from "../helpers/newsOptions";
 import NewsContentTab from "../tabs/NewsContentTab";
 import NewsImagesTab from "../tabs/NewsImagesTab";
 import NewsSettingsTab from "../tabs/NewsSettingsTab";
-import { loadNewsMediaPickerAction, uploadNewsMediaAction } from "@/app/admin/news/actions";
+import { loadNewsDocumentPickerAction, loadNewsMediaPickerAction, replaceNewsDocumentFileAction, updateNewsDocumentAction, uploadNewsDocumentMediaAction, uploadNewsMediaAction } from "@/app/admin/news/actions";
 
 export default function NewsEditorForm({ news = null, initialMedia = null, teams = [], categories = [] }) {
   const router = useRouter();
@@ -72,8 +72,12 @@ export default function NewsEditorForm({ news = null, initialMedia = null, teams
         onMediaChange={handleMediaChange}
         loadMediaAction={(filters) => loadNewsMediaPickerAction(filters, news?.id || null)}
         uploadMediaAction={(data) => uploadNewsMediaAction(data, news?.id || null)}
-        handleDocumentUpload={handlers.handleDocumentUpload}
+        handleDocumentSelect={handlers.handleDocumentSelect}
         handleDocumentDelete={handlers.handleDocumentDelete}
+        loadDocumentMediaAction={(filters) => loadNewsDocumentPickerAction(filters, news?.id)}
+        uploadDocumentMediaAction={(data) => uploadNewsDocumentMediaAction(data, news?.id)}
+        replaceDocumentFileAction={replaceNewsDocumentFileAction}
+        updateDocumentAction={updateNewsDocumentAction}
       />
 
       <NewsSettingsTab

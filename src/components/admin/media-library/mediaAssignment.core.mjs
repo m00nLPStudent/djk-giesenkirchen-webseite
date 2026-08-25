@@ -1,8 +1,10 @@
-const TARGETS = new Set(["coach", "player", "board_member", "club_contact", "team", "team_season", "news"]);
+const TARGETS = new Set(["coach", "player", "board_member", "club_contact", "team", "team_season", "news", "news_document"]);
 const CONTACT_IMAGE_TARGETS = new Set(["team", "team_season"]);
 
 export function buildMediaAssignmentPayload(entityType, entityId, mediaAssetId, fieldName = "image") {
-  const validField = fieldName === "image" || (fieldName === "contact_image" && CONTACT_IMAGE_TARGETS.has(entityType));
+  const validField = (fieldName === "image" && entityType !== "news_document") ||
+    (fieldName === "contact_image" && CONTACT_IMAGE_TARGETS.has(entityType)) ||
+    (fieldName === "file" && entityType === "news_document");
   if (!TARGETS.has(entityType) || !entityId || !validField) {
     return { ok: false, error: new Error("Ungültiges Medienziel.") };
   }

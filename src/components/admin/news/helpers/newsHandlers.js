@@ -1,8 +1,4 @@
-import {
-  deleteNewsDocument,
-  getNewsDocuments,
-  uploadNewsDocument,
-} from "../services/news.service";
+import { createNewsDocumentAction, deleteNewsDocumentAction, loadNewsDocumentsAction } from "@/app/admin/news/actions";
 import { createNewsPayload } from "./newsPayload";
 import { saveNewsWithAuthorAction } from "@/app/admin/news/actions";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
@@ -31,7 +27,7 @@ export function createNewsHandlers({
     }
 
     setDocumentsLoading(true);
-    const { data, error } = await getNewsDocuments(news.id);
+    const { data, error } = await loadNewsDocumentsAction(news.id);
     setDocumentsLoading(false);
 
     if (error) {
@@ -42,14 +38,14 @@ export function createNewsHandlers({
     setDocuments(data || []);
   }
 
-  async function handleDocumentUpload(file) {
+  async function handleDocumentSelect(media) {
     if (!news?.id) {
       alert("Bitte speichere die News erst, bevor du Dokumente hochlädst.");
       return;
     }
 
     setDocumentsLoading(true);
-    const { data, error } = await uploadNewsDocument(file, news.id);
+    const { data, error } = await createNewsDocumentAction(news.id, media?.id);
     setDocumentsLoading(false);
 
     if (error) {
@@ -66,7 +62,7 @@ export function createNewsHandlers({
   async function handleDocumentDelete(documentItem) {
     if (!documentItem?.id) return;
 
-    const { error } = await deleteNewsDocument(documentItem);
+    const { error } = await deleteNewsDocumentAction(documentItem.id);
 
     if (error) {
       alert(error.message);
@@ -138,7 +134,7 @@ export function createNewsHandlers({
   return {
     updateField,
     loadDocuments,
-    handleDocumentUpload,
+    handleDocumentSelect,
     handleDocumentDelete,
     handleSubmit,
   };

@@ -18,6 +18,7 @@ export default function AdminMediaPickerDialog({ open, onClose, onSelect, loadAc
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const purposeOptions = getPickerPurposeOptions(mediaKind);
+  const isDocument = mediaKind === "document";
 
   async function load(next) {
     setLoading(true);
@@ -63,7 +64,7 @@ export default function AdminMediaPickerDialog({ open, onClose, onSelect, loadAc
         <select value={filters.visibility} onChange={(event) => setFilters((current) => ({ ...current, visibility: event.target.value }))} className="rounded-2xl border border-white/10 bg-neutral-900 p-3"><option value="all">Alle Sichtbarkeiten</option><option value="public">Öffentlich</option><option value="admin">Admin</option></select>
         <select aria-label="Verwendung" value={filters.purpose} onChange={(event) => void changePurpose(event.target.value)} className="rounded-2xl border border-white/10 bg-neutral-900 p-3"><option value="all">Alle Verwendungen</option>{purposeOptions.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}</select>
         <button type="button" onClick={search} className="w-fit rounded-full border border-white/15 px-5 py-2 font-bold">Suchen</button>
-        {allowUpload ? <label className="w-fit cursor-pointer rounded-full bg-red-600 px-5 py-2 font-bold"><input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={uploading} onChange={upload}/>{uploading ? "Upload läuft …" : "Neues Bild hochladen"}</label> : null}
+        {allowUpload ? <label className="w-fit cursor-pointer rounded-full bg-red-600 px-5 py-2 font-bold"><input type="file" accept={isDocument ? "application/pdf" : "image/jpeg,image/png,image/webp"} className="sr-only" disabled={uploading} onChange={upload}/>{uploading ? "Upload läuft …" : `Neues ${isDocument ? "Dokument" : "Bild"} hochladen`}</label> : null}
       </div>
       {result.error ? <p role="alert" className="mt-4 rounded-2xl bg-red-500/10 p-4 text-red-200">{result.error}</p> : null}{loading ? <p className="mt-8 text-center text-white/50">Medien werden geladen …</p> : null}
       {!loading ? <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{result.items.map((item) => <button type="button" key={item.id} onClick={() => { onSelect(item); close(); }} className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 text-left hover:border-red-400/60">{item.media_kind === "image" && item.previewUrl ? <img src={item.previewUrl} alt={item.alt_text || ""} className="aspect-video w-full object-cover"/> : <span className="flex aspect-video items-center justify-center bg-black/20"><FileText aria-hidden="true"/></span>}<span className="block p-4"><strong className="block truncate">{item.display_name}</strong><span className="mt-1 block text-xs text-white/50">{formatFileSize(item.file_size_bytes) || "–"} · {item.visibility} · {item.purpose}</span></span></button>)}</div> : null}

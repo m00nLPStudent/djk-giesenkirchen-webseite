@@ -5,7 +5,7 @@ import { formatGermanDate } from "@/lib/dates";
 import { getNewsCategoryDisplay } from "@/components/admin/news/helpers/newsCategories.core";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import RichTextContent from "@/components/website/content/RichTextContent";
-import { resolvePublicNewsImages } from "@/components/admin/news/services/newsMedia.service";
+import { resolvePublicNewsDocuments, resolvePublicNewsImages } from "@/components/admin/news/services/newsMedia.service";
 
 export default async function NewsDetailPage({ params }) {
   const { slug } = await params;
@@ -33,8 +33,7 @@ export default async function NewsDetailPage({ params }) {
 
   const [resolvedArticle] = await resolvePublicNewsImages([article]);
 
-  const documents = (article.news_documents || [])
-    .filter((document) => document.is_public)
+  const documents = (await resolvePublicNewsDocuments(article.news_documents || []))
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
   return (
@@ -77,7 +76,7 @@ export default async function NewsDetailPage({ params }) {
                   return (
                     <li key={document.id}>
                       <Link
-                        href={document.file_url}
+                        href={document.resolved_file_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-between gap-3 py-1 text-sm text-white/80 transition hover:text-red-400"
