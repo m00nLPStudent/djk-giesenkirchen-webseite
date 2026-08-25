@@ -10,15 +10,22 @@ import { NEWS_FORM_TABS } from "../helpers/newsOptions";
 import NewsContentTab from "../tabs/NewsContentTab";
 import NewsImagesTab from "../tabs/NewsImagesTab";
 import NewsSettingsTab from "../tabs/NewsSettingsTab";
+import { loadNewsMediaPickerAction, uploadNewsMediaAction } from "@/app/admin/news/actions";
 
-export default function NewsEditorForm({ news = null, teams = [], categories = [] }) {
+export default function NewsEditorForm({ news = null, initialMedia = null, teams = [], categories = [] }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
   const [form, setForm] = useState(() => createInitialNewsForm(news));
   const [documents, setDocuments] = useState(news?.news_documents || []);
   const [documentsLoading, setDocumentsLoading] = useState(Boolean(news?.id));
   const [loading, setLoading] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(initialMedia);
   const isEdit = Boolean(news?.id);
+
+  function handleMediaChange(media) {
+    setSelectedMedia(media || null);
+    setForm((current) => ({ ...current, image_media_asset_id: media?.id || null, remove_legacy_image: !media }));
+  }
 
   const handlers = createNewsHandlers({
     news,
@@ -61,8 +68,10 @@ export default function NewsEditorForm({ news = null, teams = [], categories = [
         setDocuments={setDocuments}
         documents={documents}
         documentsLoading={documentsLoading}
-        updateField={handlers.updateField}
-        uploadImage={handlers.uploadImage}
+        selectedMedia={selectedMedia}
+        onMediaChange={handleMediaChange}
+        loadMediaAction={(filters) => loadNewsMediaPickerAction(filters, news?.id || null)}
+        uploadMediaAction={(data) => uploadNewsMediaAction(data, news?.id || null)}
         handleDocumentUpload={handlers.handleDocumentUpload}
         handleDocumentDelete={handlers.handleDocumentDelete}
       />

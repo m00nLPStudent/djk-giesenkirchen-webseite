@@ -29,7 +29,7 @@ test("recipients reuse current season and the existing batched team resolver", (
 });
 
 test("news and pages expose no stable creator reference and are not guessed from display names", () => {
-  assert.match(newsActions, /select\("id, author"\)/);
+  assert.match(newsActions, /select\("id, author,/);
   assert.doesNotMatch(newsActions, /created_by|author_profile_id|notifyEventWorkflow/);
   assert.doesNotMatch(pageService, /created_by|author_profile_id|createNotification/);
 });

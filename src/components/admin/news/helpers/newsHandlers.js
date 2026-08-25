@@ -2,7 +2,6 @@ import {
   deleteNewsDocument,
   getNewsDocuments,
   uploadNewsDocument,
-  uploadNewsImage,
 } from "../services/news.service";
 import { createNewsPayload } from "./newsPayload";
 import { saveNewsWithAuthorAction } from "@/app/admin/news/actions";
@@ -41,17 +40,6 @@ export function createNewsHandlers({
     }
 
     setDocuments(data || []);
-  }
-
-  async function uploadImage(file) {
-    const { data, error } = await uploadNewsImage(file);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    updateField("image_url", data);
   }
 
   async function handleDocumentUpload(file) {
@@ -150,7 +138,6 @@ export function createNewsHandlers({
   return {
     updateField,
     loadDocuments,
-    uploadImage,
     handleDocumentUpload,
     handleDocumentDelete,
     handleSubmit,

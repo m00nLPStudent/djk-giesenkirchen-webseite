@@ -11,25 +11,6 @@ import {
   getFileExtension,
 } from "@/lib/files";
 
-export async function uploadNewsImage(file) {
-  if (!file) return { data: null, error: null };
-
-  const fileName = `news/${Date.now()}-${file.name}`;
-
-  const { error } = await uploadStorageFile("media", fileName, file);
-
-  if (error) {
-    return { data: null, error };
-  }
-
-  const data = getStoragePublicUrl("media", fileName);
-
-  return {
-    data: data.publicUrl,
-    error: null,
-  };
-}
-
 export async function createNews(news) {
   const result = await supabase.from("news").insert(news).select("*").single();
 

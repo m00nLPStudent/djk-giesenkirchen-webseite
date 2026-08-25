@@ -8,8 +8,10 @@ export default function NewsImagesTab({
   setDocuments,
   documents,
   documentsLoading,
-  updateField,
-  uploadImage,
+  selectedMedia,
+  onMediaChange,
+  loadMediaAction,
+  uploadMediaAction,
   handleDocumentUpload,
   handleDocumentDelete,
 }) {
@@ -17,8 +19,10 @@ export default function NewsImagesTab({
     return (
       <NewsMediaPanel
         form={form}
-        onUpload={uploadImage}
-        onRemove={() => updateField("image_url", "")}
+        selectedMedia={selectedMedia}
+        onMediaChange={onMediaChange}
+        loadMediaAction={loadMediaAction}
+        uploadMediaAction={uploadMediaAction}
       />
     );
   }

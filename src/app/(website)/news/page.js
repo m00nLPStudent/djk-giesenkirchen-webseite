@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { createPublicNewsCardDto } from "@/components/admin/news/helpers/newsCategories.core";
+import { resolvePublicNewsImages } from "@/components/admin/news/services/newsMedia.service";
 
 export default async function NewsPage() {
   const { data: categories } = await loadNewsCategories(supabase, { activeOnly: false });
@@ -14,7 +15,7 @@ export default async function NewsPage() {
     .order("published_at", { ascending: false })
     .limit(6);
 
-  const newsCards = (latestNews || []).map((item) => createPublicNewsCardDto(item, categories || []));
+  const newsCards = (await resolvePublicNewsImages(latestNews || [])).map((item) => createPublicNewsCardDto(item, categories || []));
   const featuredNews = newsCards[0];
   const secondaryNews = newsCards.slice(1);
 

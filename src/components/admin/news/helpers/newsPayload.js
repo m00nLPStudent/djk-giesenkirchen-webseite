@@ -13,6 +13,8 @@ export function createNewsPayload(form, news) {
     content_de: form.content_de,
     category_key: form.category_key,
     image_url: form.image_url,
+    image_media_asset_id: form.image_media_asset_id || null,
+    remove_legacy_image: form.remove_legacy_image === true,
     slug: news?.slug || createSlug(form.title_de),
     football_team_id:
       form.category_key === "fussball" ? form.football_team_id || null : null,

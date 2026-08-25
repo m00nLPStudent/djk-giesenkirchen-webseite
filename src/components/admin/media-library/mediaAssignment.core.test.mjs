@@ -8,7 +8,7 @@ test("buildMediaAssignmentPayload supports the shared coach and player image pat
 });
 
 test("buildMediaAssignmentPayload rejects unrelated modules and fields", () => {
-  assert.equal(buildMediaAssignmentPayload("news", "news-1", "asset-1").ok, false);
+  assert.equal(buildMediaAssignmentPayload("event", "event-1", "asset-1").ok, false);
   assert.equal(buildMediaAssignmentPayload("player", "player-1", "asset-1", "document").ok, false);
 });
 
@@ -23,4 +23,9 @@ test("contact image is restricted to team and team season targets", () => {
   assert.equal(buildMediaAssignmentPayload("team", "team-1", "asset-1", "contact_image").ok, true);
   assert.equal(buildMediaAssignmentPayload("team_season", "season-1", null, "contact_image").ok, true);
   assert.equal(buildMediaAssignmentPayload("coach", "coach-1", "asset-1", "contact_image").ok, false);
+});
+
+test("news title images use the shared image assignment field", () => {
+  assert.equal(buildMediaAssignmentPayload("news", "news-1", "asset-1").ok, true);
+  assert.equal(buildMediaAssignmentPayload("news", "news-1", "asset-1", "contact_image").ok, false);
 });

@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { createPublicNewsCardDto } from "@/components/admin/news/helpers/newsCategories.core";
+import { resolvePublicNewsImages } from "@/components/admin/news/services/newsMedia.service";
 
 const PAGE_SIZE = 6;
 
@@ -45,7 +46,7 @@ export default async function NewsOverviewPage({ searchParams }) {
   }
 
   const { data: news, count } = await newsQuery;
-  const newsCards = (news || []).map((item) => createPublicNewsCardDto(item, categories || []));
+  const newsCards = (await resolvePublicNewsImages(news || [])).map((item) => createPublicNewsCardDto(item, categories || []));
   const totalPages = Math.max(1, Math.ceil((count || 0) / PAGE_SIZE));
 
   return (

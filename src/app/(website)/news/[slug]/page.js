@@ -5,6 +5,7 @@ import { formatGermanDate } from "@/lib/dates";
 import { getNewsCategoryDisplay } from "@/components/admin/news/helpers/newsCategories.core";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import RichTextContent from "@/components/website/content/RichTextContent";
+import { resolvePublicNewsImages } from "@/components/admin/news/services/newsMedia.service";
 
 export default async function NewsDetailPage({ params }) {
   const { slug } = await params;
@@ -30,6 +31,8 @@ export default async function NewsDetailPage({ params }) {
     );
   }
 
+  const [resolvedArticle] = await resolvePublicNewsImages([article]);
+
   const documents = (article.news_documents || [])
     .filter((document) => document.is_public)
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
@@ -38,9 +41,9 @@ export default async function NewsDetailPage({ params }) {
     <main className="min-h-screen bg-[#101014] text-white">
       <section className="px-4 pt-28 pb-16 sm:px-6 md:pt-32 md:pb-20">
         <div className="mx-auto max-w-5xl">
-          {article.image_url && (
+          {resolvedArticle.resolved_image_url && (
             <img
-              src={article.image_url}
+              src={resolvedArticle.resolved_image_url}
               alt={article.title_de}
               className="mb-8 max-h-[320px] w-full rounded-3xl bg-white/5 object-contain p-4 sm:max-h-[360px] md:mb-10 md:max-h-[420px] md:p-8"
             />

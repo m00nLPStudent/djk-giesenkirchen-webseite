@@ -48,5 +48,5 @@ test("edit page provides detail sections and danger action only at the bottom", 
 });
 
 test("upload publish and document handlers remain wired to the existing editor", () => {
-  for (const marker of ["uploadImage", "handleDocumentUpload", "handleDocumentDelete", "NewsSettingsTab"]) assert.ok(editor.includes(marker));
+  for (const marker of ["uploadNewsMediaAction", "handleDocumentUpload", "handleDocumentDelete", "NewsSettingsTab"]) assert.ok(editor.includes(marker));
 });

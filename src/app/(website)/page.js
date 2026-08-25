@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import NewsCard from "@/components/website/news/NewsCard";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { createPublicNewsCardDto } from "@/components/admin/news/helpers/newsCategories.core";
+import { resolvePublicNewsImages } from "@/components/admin/news/services/newsMedia.service";
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
 import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
 import { HomeEventsSection } from "@/components/website/events";
@@ -24,7 +25,7 @@ export default async function Home() {
     .order("published_at", { ascending: false })
     .limit(4);
 
-  const newsCards = (latestNews || []).map((item) => createPublicNewsCardDto(item, categories || []));
+  const newsCards = (await resolvePublicNewsImages(latestNews || [])).map((item) => createPublicNewsCardDto(item, categories || []));
   const featuredNews = newsCards[0];
   const secondaryNews = newsCards.slice(1, 4);
 

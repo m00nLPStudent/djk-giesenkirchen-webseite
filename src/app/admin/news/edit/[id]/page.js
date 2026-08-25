@@ -8,6 +8,7 @@ import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminD
 import { supabase } from "@/lib/supabase";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { canManageMedia, loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 
 export default async function EditNewsPage({ params }) {
   const { id } = await params;
@@ -25,12 +26,15 @@ export default async function EditNewsPage({ params }) {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
   const [{ data: categories }, { data: allCategories }] = auth.ok ? await Promise.all([loadNewsCategories(auth.supabaseServer), loadNewsCategories(auth.supabaseServer, { activeOnly: false })]) : [{ data: [] }, { data: [] }];
+  const media = await loadMediaAssetForPicker(news.image_media_asset_id);
+  const allowedVisibilities = canManageMedia(auth.roles) ? ["public", "admin"] : ["public"];
+  const initialMedia = allowedVisibilities.includes(media.data?.visibility) ? media.data : null;
 
   return (
     <AdminLayout title="News bearbeiten" subtitle="News" showHeader={false}>
       <AdminDetailLayout header={<AdminDetailHeader backHref="/admin/news" backLabel="Zurück zu News" backVariant="pill" eyebrow="News" title={news.title_de} status={<NewsStatusBadge isPublished={news.is_published} publishedAt={news.published_at} />} meta={`${news.author || "Autor nicht hinterlegt"} · ${news.published_at ? new Date(news.published_at).toLocaleString("de-DE") : "Kein Veröffentlichungsdatum"}`} actions={<AdminActionBar><AdminButton href="#news-editor-form" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />} dangerZone={<Can permission="news.delete" uiOnly><AdminDangerZone title="News löschen" description="Die News und ihre unmittelbar zugehörigen Inhalte werden dauerhaft entfernt. Mannschaften, Spieler und Trainer bleiben erhalten."><DeleteNewsButton id={news.id} title={news.title_de} /></AdminDangerZone></Can>}>
         <NewsDetailSummary news={news} categories={allCategories || []} />
-        <AdminNewsEditForm news={news} teams={teams || []} categories={categories || []} />
+        <AdminNewsEditForm news={news} initialMedia={initialMedia} teams={teams || []} categories={categories || []} />
       </AdminDetailLayout>
     </AdminLayout>
   );
