@@ -1,5 +1,4 @@
 "use server";
-
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
   canCreatePlayerOnServer,
@@ -24,7 +23,7 @@ import {
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 import { revalidatePath } from "next/cache";
 import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
-
+import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
 const SAFE_MEDIA_ERRORS = new Set(["Keine Datei ausgewählt.", "Nur JPEG-, PNG-, WebP-Bilder und PDF-Dokumente sind erlaubt.", "Dateiinhalt und MIME-Typ stimmen nicht überein.", "Ungültige WebP-Datei.", "Die Datei ist leer oder größer als 10 MB."]);
 
 function buildError(message) {
@@ -97,7 +96,7 @@ export async function savePlayerWithScopeAction(
     let existingPlayer = null;
     if (playerId) existingPlayer = await loadPlayerById(supabaseServer, playerId);
     const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
-    const mediaResult = await resolveEntityImageMedia(playerPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingPlayer?.image_media_asset_id && existingPlayer.image_media_asset_id === playerPayload?.image_media_asset_id), allowedVisibilities, purpose: "player" });
+    const mediaResult = await resolveEntityImageMedia(playerPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingPlayer?.image_media_asset_id && existingPlayer.image_media_asset_id === playerPayload?.image_media_asset_id), allowedVisibilities });
     if (mediaResult.error) return buildError(mediaResult.error.message);
     const safePlayerPayload = { ...playerPayload, image_media_asset_id: mediaResult.data?.id || null, image_url: mediaResult.data?.previewUrl || playerPayload?.image_url || null };
     const targetResolution = await resolvePlayerTeamSeasonTarget(
@@ -214,7 +213,8 @@ export async function loadPlayerMediaPickerAction(filters = {}, playerId = null)
     if (!auth.ok) return { ok: false, error: auth.message, items: [], total: 0 };
     const allowedVisibilities = canManageMedia(auth.permissionResult.roles) ? ["public", "admin"] : ["public"];
     const visibility = allowedVisibilities.includes(filters.visibility) ? filters.visibility : allowedVisibilities;
-    const result = await loadMediaLibrary({ ...filters, kind: "image", visibility, purpose: "player", archived: "active" });
+    const purpose = normalizePickerPurpose(filters.purpose, "player");
+    const result = await loadMediaLibrary({ ...filters, kind: "image", visibility, purpose, archived: "active" });
     return result.error ? { ok: false, error: "Medien konnten nicht geladen werden.", items: [], total: 0 } : { ok: true, items: result.data, total: result.count || 0 };
   } catch { return { ok: false, error: "Medien konnten nicht geladen werden.", items: [], total: 0 }; }
 }

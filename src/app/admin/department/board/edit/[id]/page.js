@@ -10,6 +10,7 @@ import { getBoardMemberName } from "@/components/admin/board/boardUi.helpers";
 import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminDetailLayout } from "@/components/admin/design-system";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canDeleteBoardMemberOnServer, canEditBoardMemberOnServer, loadServerPersonScopeContext } from "@/components/admin/persons/serverPersonScope";
+import { loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,8 @@ export default async function EditBoardMemberPage({ params }) {
   if (!member || !canEditBoardMemberOnServer(scopeContext, member)) redirect("/admin/unauthorized?reason=missing-board-scope");
   const { data: roles } = await permissionResult.supabaseServer.from("board_roles").select("*").eq("is_active", true).order("sort_order", { ascending: true });
   const canDelete = canDeleteBoardMemberOnServer(scopeContext);
+  const mediaResult = await loadMediaAssetForPicker(member.image_media_asset_id);
   const name = getBoardMemberName(member);
   const dangerZone = canDelete ? <Can permission="settings.edit" uiOnly><AdminDangerZone title="Vorstandsmitglied dauerhaft löschen" description="Das Vorstandsprofil wird mit der bestehenden Löschfunktion dauerhaft entfernt."><BoardMemberDeleteButton member={{ id: member.id, first_name: member.first_name, last_name: member.last_name }} /></AdminDangerZone></Can> : null;
-  return <AdminLayout title="Vorstandsmitglied bearbeiten" subtitle="Abteilung" showHeader={false}><AdminDetailLayout header={<AdminDetailHeader backHref="/admin/department" backLabel="Zurück zu Vorstand & Abteilungen" backVariant="pill" eyebrow="Fußballabteilung" title={name} leading={<BoardMemberAvatar member={member} sizeClassName="h-20 w-20" />} status={<BoardMemberStatus member={member} />} meta={`${member.role_de || "Keine Funktion"} · Fußballabteilung`} actions={<AdminActionBar><AdminButton href="#board-member-editor" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />} dangerZone={dangerZone}><BoardMemberDetailOverview member={member} /><AdminBoardMemberForm member={member} roles={roles || []} /></AdminDetailLayout></AdminLayout>;
+  return <AdminLayout title="Vorstandsmitglied bearbeiten" subtitle="Abteilung" showHeader={false}><AdminDetailLayout header={<AdminDetailHeader backHref="/admin/department" backLabel="Zurück zu Vorstand & Abteilungen" backVariant="pill" eyebrow="Fußballabteilung" title={name} leading={<BoardMemberAvatar member={{ ...member, image_url: mediaResult.data?.previewUrl || member.image_url }} sizeClassName="h-20 w-20" />} status={<BoardMemberStatus member={member} />} meta={`${member.role_de || "Keine Funktion"} · Fußballabteilung`} actions={<AdminActionBar><AdminButton href="#board-member-editor" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />} dangerZone={dangerZone}><BoardMemberDetailOverview member={member} /><AdminBoardMemberForm member={member} roles={roles || []} initialMedia={mediaResult.data || null} /></AdminDetailLayout></AdminLayout>;
 }

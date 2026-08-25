@@ -16,15 +16,14 @@ import {
 } from "@/components/admin/forms";
 import AdminSaveBar from "@/components/admin/common/AdminSaveBar";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
-import BoardMemberImageUpload from "../components/BoardMemberImageUpload";
-import {
-  BOARD_PLACEHOLDER_IMAGE,
-  uploadBoardImage,
-} from "../services/board.service";
+import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker";
+import { BOARD_PLACEHOLDER_IMAGE } from "../services/board.service";
+import { loadBoardMediaPickerAction, uploadBoardMediaAction } from "@/app/admin/department/board/actions";
 
-export default function AdminBoardMemberForm({ member, roles = [] }) {
+export default function AdminBoardMemberForm({ member, roles = [], initialMedia = null }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(initialMedia);
   const [form, setForm] = useState({
     role_id: member?.role_id || "",
     first_name: member?.first_name || "",
@@ -34,6 +33,7 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
     email: member?.email || "",
     phone: member?.phone || "",
     image_url: member?.image_url || BOARD_PLACEHOLDER_IMAGE,
+    image_media_asset_id: member?.image_media_asset_id || null,
     is_active: member?.is_active ?? true,
     sort_order: member?.sort_order ?? 0,
   });
@@ -52,16 +52,9 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
     }));
   }
 
-  async function uploadImage(file) {
-    const { data, error } = await uploadBoardImage(file, {
-      ...form,
-      id: member?.id,
-    });
-    if (error) {
-      alert(error.message);
-      return;
-    }
-    updateField("image_url", data);
+  function handleMediaChange(media) {
+    setSelectedMedia(media);
+    setForm((current) => ({ ...current, image_media_asset_id: media?.id || null }));
   }
 
   async function handleSubmit(event) {
@@ -155,11 +148,7 @@ export default function AdminBoardMemberForm({ member, roles = [] }) {
         </FormGrid>
       </FormSection>
       <FormSection eyebrow="Bild" title="Profilbild">
-        <BoardMemberImageUpload
-          imageUrl={form.image_url}
-          onUpload={uploadImage}
-          onRemove={() => updateField("image_url", BOARD_PLACEHOLDER_IMAGE)}
-        />
+        <AdminMediaPicker value={selectedMedia} legacyUrl={selectedMedia ? null : form.image_url} placeholderUrl={BOARD_PLACEHOLDER_IMAGE} onChange={handleMediaChange} loadAction={(filters) => loadBoardMediaPickerAction(filters, member?.id || null)} uploadAction={(data) => uploadBoardMediaAction(data, member?.id || null)} usageContext="board_member" entityLabel="Vorstandsbild" />
       </FormSection>
       <FormSection eyebrow="Einstellungen" title="Status und Sortierung">
         <FormGrid>

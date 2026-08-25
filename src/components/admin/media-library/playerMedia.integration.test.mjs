@@ -7,7 +7,8 @@ const [actions, form, core, service, repository, proposal] = await Promise.all([
 test("player picker is server-authorized and fixed to active player images", () => {
   assert.match(actions, /players\.edit|players\.create/);
   assert.match(actions, /canEditPlayerOnServer/);
-  assert.match(actions, /kind: "image"[\s\S]*purpose: "player"[\s\S]*archived: "active"/);
+  assert.match(actions, /normalizePickerPurpose\(filters\.purpose, "player"\)/);
+  assert.match(actions, /kind: "image"[\s\S]*purpose[\s\S]*archived: "active"/);
   assert.match(actions, /\["public", "admin"\] : \["public"\]/);
   assert.doesNotMatch(actions, /"restricted"/);
 });

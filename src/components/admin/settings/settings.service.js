@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import { deleteMediaFile, uploadMediaFile } from "@/lib/storage";
 import { createSlug } from "@/lib/slug";
 
 export const CLUB_CONTACT_PLACEHOLDER_IMAGE = "";
@@ -92,47 +91,10 @@ export function normalizeClubContactPayload(form = {}) {
     contact_name: String(form.contact_name || "").trim(),
     email: normalizeText(form.email),
     phone: normalizeText(form.phone),
-    image_url: normalizeText(form.image_url),
     is_public: Boolean(form.is_public),
     is_active: Boolean(form.is_active),
     sort_order: Number(form.sort_order || 0),
   };
-}
-
-export async function uploadClubContactImage(file, contact = {}) {
-  return await uploadMediaFile(file, {
-    folder: "club-contacts",
-    name: `${contact.role_de || contact.contact_name || "kontakt"}-${contact.id || Date.now()}`,
-    previousUrl: contact.image_url,
-    ignoredUrls: [CLUB_CONTACT_PLACEHOLDER_IMAGE],
-  });
-}
-
-export async function deleteClubContactImage(imageUrl) {
-  return await deleteMediaFile(imageUrl, {
-    ignoredUrls: [CLUB_CONTACT_PLACEHOLDER_IMAGE],
-  });
-}
-
-export async function createClubContact(form) {
-  return await supabase
-    .from("club_contacts")
-    .insert(normalizeClubContactPayload(form))
-    .select("*")
-    .maybeSingle();
-}
-
-export async function updateClubContact(id, form) {
-  return await supabase
-    .from("club_contacts")
-    .update(normalizeClubContactPayload(form))
-    .eq("id", id)
-    .select("*")
-    .maybeSingle();
-}
-
-export async function deleteClubContact(id) {
-  return await supabase.from("club_contacts").delete().eq("id", id);
 }
 
 export function normalizePagePayload(form = {}) {

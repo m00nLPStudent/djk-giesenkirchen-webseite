@@ -65,6 +65,6 @@ test("contact detail uses shared information image action and danger primitives"
   const source = read("./components/ContactForm.js");
   for (const component of ["AdminDetailLayout", "AdminDetailHeader", "AdminInformationSection", "AdminInformationRow", "AdminImagePreview", "AdminActionBar", "AdminButton", "AdminDangerZone", "AdminStatusChip"]) assert.match(source, new RegExp(component));
   assert.match(source, /xl:grid-cols-2/);
-  assert.match(source, /showPreview=\{false\}/);
+  assert.match(source, /AdminMediaPicker/);
   assert.doesNotMatch(source, /FormSection/);
 });

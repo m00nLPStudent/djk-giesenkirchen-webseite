@@ -1,8 +1,3 @@
-import {
-  createClubContact,
-  deleteClubContact,
-  updateClubContact,
-} from "../settings.service";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
   createInitialContactForm,
@@ -22,6 +17,8 @@ export function createContactHandlers({
   setContactLoading,
   onSaved,
   onDeleted,
+  saveAction,
+  deleteAction,
 }) {
   const updateContactField = createFieldUpdater(setContactForm);
 
@@ -61,9 +58,7 @@ export function createContactHandlers({
     }
 
     setContactLoading(true);
-    const result = selectedContactId
-      ? await updateClubContact(selectedContactId, contactForm)
-      : await createClubContact(contactForm);
+    const result = await saveAction(contactForm, selectedContactId);
     setContactLoading(false);
 
     if (result.error) {
@@ -103,7 +98,7 @@ export function createContactHandlers({
     );
     if (!confirmed) return;
 
-    const { error } = await deleteClubContact(selectedContact.id);
+    const { error } = await deleteAction(selectedContact.id);
     if (error) {
       alert(error.message || "Kontakt konnte nicht gelöscht werden.");
       return;

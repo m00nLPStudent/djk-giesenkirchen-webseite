@@ -36,11 +36,39 @@ export async function loadMediaAssetForPicker(id) {
   return { data: withPickerFields({ ...asset, previewUrl }), error: null };
 }
 
+export async function loadPublicMediaUrlMap(ids = []) {
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (!uniqueIds.length) return { data: new Map(), error: null };
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: new Map(), error: new Error("Media-Service-Client ist nicht konfiguriert.") };
+  const result = await db.from("media_assets")
+    .select("id, storage_bucket, storage_path, media_kind, visibility, is_archived")
+    .in("id", uniqueIds).eq("visibility", "public").eq("storage_bucket", "media-library-public")
+    .eq("media_kind", "image").eq("is_archived", false);
+  if (result.error) return { data: new Map(), error: result.error };
+  return { data: new Map((result.data || []).map((asset) => [asset.id, db.storage.from(asset.storage_bucket).getPublicUrl(asset.storage_path).data.publicUrl])), error: null };
+}
+
+export async function loadMediaUrlMap(ids = [], allowedVisibilities = ["public"]) {
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (!uniqueIds.length) return { data: new Map(), error: null };
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: new Map(), error: new Error("Media-Service-Client ist nicht konfiguriert.") };
+  const result = await db.from("media_assets").select("id, storage_bucket, storage_path, visibility").in("id", uniqueIds).in("visibility", allowedVisibilities).eq("media_kind", "image").eq("is_archived", false);
+  if (result.error) return { data: new Map(), error: result.error };
+  const assets = result.data || [];
+  const privateAssets = assets.filter((asset) => asset.visibility !== "public");
+  const signed = privateAssets.length ? await db.storage.from("media-library-private").createSignedUrls(privateAssets.map((asset) => asset.storage_path), 300) : { data: [], error: null };
+  if (signed.error) return { data: new Map(), error: signed.error };
+  const signedByPath = new Map((signed.data || []).map((item) => [item.path, item.signedUrl]));
+  return { data: new Map(assets.map((asset) => [asset.id, asset.visibility === "public" ? db.storage.from(asset.storage_bucket).getPublicUrl(asset.storage_path).data.publicUrl : signedByPath.get(asset.storage_path) || null])), error: null };
+}
+
 export async function resolveEntityImageMedia(id, { allowArchived = false, allowedVisibilities = ["public"], purpose } = {}) {
   if (!id) return { data: null, error: null };
   const result = await loadMediaAssetForPicker(id);
   if (result.error || !result.data) return { data: null, error: result.error || new Error("Das ausgewählte Medium wurde nicht gefunden.") };
-  if ((!allowArchived && result.data.is_archived) || result.data.media_kind !== "image" || result.data.purpose !== purpose || !allowedVisibilities.includes(result.data.visibility)) return { data: null, error: new Error("Dieses Bild ist für den aktuellen Zugriff nicht auswählbar.") };
+  if ((!allowArchived && result.data.is_archived) || result.data.media_kind !== "image" || (purpose && result.data.purpose !== purpose) || !allowedVisibilities.includes(result.data.visibility)) return { data: null, error: new Error("Dieses Bild ist für den aktuellen Zugriff nicht auswählbar.") };
   return { data: result.data, error: null };
 }
 

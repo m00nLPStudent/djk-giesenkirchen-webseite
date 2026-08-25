@@ -1,7 +1,8 @@
 export const MEDIA_BUCKETS = Object.freeze({ public: "media-library-public", admin: "media-library-private", restricted: "media-library-private" });
 export const MEDIA_VISIBILITIES = Object.freeze(["public", "admin", "restricted"]);
 export const MEDIA_KINDS = Object.freeze(["image", "document"]);
-export const MEDIA_PURPOSES = Object.freeze(["player", "coach", "board", "team", "news", "cms", "club_history", "sponsor", "event", "document", "download", "system"]);
+export { MEDIA_PURPOSES } from "./mediaPurpose.config.mjs";
+import { MEDIA_PURPOSES } from "./mediaPurpose.config.mjs";
 
 const TYPES = Object.freeze({
   "image/jpeg": { extension: "jpg", kind: "image", max: 10 * 1024 * 1024, signatures: [[0xff, 0xd8, 0xff]] },

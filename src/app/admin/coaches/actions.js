@@ -19,7 +19,8 @@ import {
 import { revalidatePath } from "next/cache";
 import { archiveCoach } from "@/components/admin/archiving/archive.service";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
-import { canManageMedia, loadMediaLibrary, resolvePublicCoachMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
+import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, resolvePublicCoachMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
+import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
 
 function buildError(message) {
   return { error: { message } };
@@ -120,7 +121,7 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
     }
 
     const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
-    const mediaResult = await resolvePublicCoachMedia(coachPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingCoach?.image_media_asset_id && existingCoach.image_media_asset_id === coachPayload?.image_media_asset_id), allowedVisibilities });
+    const mediaResult = await resolveEntityImageMedia(coachPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingCoach?.image_media_asset_id && existingCoach.image_media_asset_id === coachPayload?.image_media_asset_id), allowedVisibilities });
     if (mediaResult.error) return buildError(mediaResult.error.message);
     const safeCoachPayload = { ...coachPayload, image_media_asset_id: mediaResult.data?.id || null,
       image_url: mediaResult.data?.previewUrl || coachPayload?.image_url || null };
@@ -202,7 +203,8 @@ export async function loadCoachMediaPickerAction(filters = {}, coachId = null) {
     if (!auth.ok) return { ok: false, error: auth.message, items: [], total: 0 };
     const allowedVisibilities = canManageMedia(auth.permissionResult.roles) ? ["public", "admin"] : ["public"];
     const requestedVisibility = allowedVisibilities.includes(filters.visibility) ? filters.visibility : allowedVisibilities;
-    const result = await loadMediaLibrary({ ...filters, kind: "image", visibility: requestedVisibility, purpose: "coach", archived: "active" });
+    const purpose = normalizePickerPurpose(filters.purpose, "coach");
+    const result = await loadMediaLibrary({ ...filters, kind: "image", visibility: requestedVisibility, purpose, archived: "active" });
     if (result.error) return { ok: false, error: "Medien konnten nicht geladen werden.", items: [], total: 0 };
     return { ok: true, items: result.data, total: result.count || 0 };
   } catch { return { ok: false, error: "Medien konnten nicht geladen werden.", items: [], total: 0 }; }
