@@ -22,6 +22,8 @@ test("board and contact use only the central picker and media upload service", (
 
 test("both server paths recheck permission, visibility, purpose and active images", () => {
   assert.match(boardActions, /assertAdminActionPermission/);
+  assert.equal(boardActions.match(/requiredPermission: "settings\.edit"/g)?.length, 3);
+  assert.doesNotMatch(boardActions, /requiredPermission: boardMemberId \? "settings\.view" : "settings\.edit"/);
   assert.match(contactActions, /requiredPermission: "settings\.edit"/);
   for (const action of [boardActions, contactActions]) {
     assert.match(action, /canManageMedia/);

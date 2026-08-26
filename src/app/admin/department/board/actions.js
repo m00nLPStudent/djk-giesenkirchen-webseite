@@ -30,7 +30,7 @@ async function loadBoardMemberById(client, boardMemberId) {
 }
 
 async function authorizeBoardMedia(boardMemberId = null) {
-  const permissionResult = await assertAdminActionPermission({ requiredPermission: boardMemberId ? "settings.view" : "settings.edit" });
+  const permissionResult = await assertAdminActionPermission({ requiredPermission: "settings.edit" });
   if (!permissionResult.ok) return { ok: false, message: permissionResult.message || "Berechtigung fehlt." };
   const scopeContext = await loadServerPersonScopeContext(permissionResult);
   if (boardMemberId) {
@@ -45,7 +45,7 @@ export async function saveBoardMemberWithScopeAction(
   boardMemberId = null,
 ) {
   const permissionResult = await assertAdminActionPermission({
-    requiredPermission: boardMemberId ? "settings.view" : "settings.edit",
+    requiredPermission: "settings.edit",
   });
 
   if (!permissionResult.ok) {

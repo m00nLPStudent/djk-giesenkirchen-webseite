@@ -7,6 +7,7 @@ import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPu
 import { extractNewsInlineMediaAssetIds, hasInvalidNewsInlineMediaAssetIds, hasNewTransientImageSources, rewriteCentralMediaImageSources } from "@/components/admin/news/helpers/newsInlineMedia.core.mjs";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import { requiresPublishPermission } from "@/lib/admin-auth/publishPermission.core.mjs";
 
 async function prepareNewsInlineContent(content, previousContent = "") {
   if (hasNewTransientImageSources(content, previousContent)) return { error: "Eingefügte Bilder müssen zuerst über die Medienbibliothek hochgeladen werden." };
@@ -42,9 +43,13 @@ export async function saveNewsWithAuthorAction(payload, newsId = null) {
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
   let existing = null;
   if (newsId) {
-    const existingResult = await db.from("news").select("id, author, image_url, image_media_asset_id, content_de").eq("id", newsId).maybeSingle();
+    const existingResult = await db.from("news").select("id, author, image_url, image_media_asset_id, content_de, is_published, published_at").eq("id", newsId).maybeSingle();
     if (existingResult.error || !existingResult.data) return { data: null, error: existingResult.error || { message: "News nicht gefunden." } };
     existing = existingResult.data;
+  }
+  if (requiresPublishPermission(existing, payload, { tracksPublishedAt: true })) {
+    const publishPermission = await assertAdminActionPermission({ requiredPermission: "news.publish", supabaseServer: db });
+    if (!publishPermission.ok) return { data: null, error: { message: publishPermission.message || "Berechtigung zum Veröffentlichen fehlt." } };
   }
   const media = await resolveEntityImageMedia(payload?.image_media_asset_id || null, { allowArchived: Boolean(existing?.image_media_asset_id === payload?.image_media_asset_id), allowedVisibilities });
   if (media.error) return { data: null, error: { message: media.error.message } };

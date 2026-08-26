@@ -5,6 +5,7 @@ import { logEditorialNotificationFailure, notifyEventWorkflow } from "@/componen
 import { canManageMedia, loadMediaLibrary, loadMediaUrlMap, resolveEntityDocumentMedia, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { requiresPublishPermission } from "@/lib/admin-auth/publishPermission.core.mjs";
 
 async function buildUniqueSlug(db, slug, ignoreId = null) {
   if (!slug) return null;
@@ -23,12 +24,17 @@ async function buildUniqueSlug(db, slug, ignoreId = null) {
 export async function saveEventWithNotificationAction(payload, eventId = null) {
   const auth = await assertAdminActionPermission({ requiredPermission: eventId ? "events.edit" : "events.create" });
   if (!auth.ok) return { data: null, error: { message: auth.message || "Berechtigung fehlt." } };
-  const db = auth.supabaseServer;
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: null, error: { message: "Termin-Service ist nicht konfiguriert." } };
   let previous = null;
   if (eventId) {
     const snapshot = await db.from("events").select("*").eq("id", eventId).maybeSingle();
     if (snapshot.error || !snapshot.data) return { data: null, error: snapshot.error || { message: "Termin nicht gefunden." } };
     previous = snapshot.data;
+  }
+  if (requiresPublishPermission(previous, payload)) {
+    const publishPermission = await assertAdminActionPermission({ requiredPermission: "events.publish", supabaseServer: auth.supabaseServer });
+    if (!publishPermission.ok) return { data: null, error: { message: publishPermission.message || "Berechtigung zum Veröffentlichen fehlt." } };
   }
   const uniqueSlug = await buildUniqueSlug(db, payload?.slug, eventId);
   if (uniqueSlug.error) return { data: null, error: uniqueSlug.error };

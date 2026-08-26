@@ -19,6 +19,7 @@ import ClubHistoryImagesManager from "../components/ClubHistoryImagesManager";
 import ClubHistoryMilestonesManager from "../components/ClubHistoryMilestonesManager";
 import { CLUB_HISTORY_PAGE_KEY } from "../services/clubHistory.service";
 import { saveClubHistoryPageAction } from "@/app/admin/club-history/actions";
+import { formatDateTimeLocalInput } from "@/lib/dates";
 
 const TABS = [
   { id: "basic", label: "Grunddaten" },
@@ -26,13 +27,6 @@ const TABS = [
   { id: "milestones", label: "Meilensteine" },
   { id: "settings", label: "Einstellungen" },
 ];
-
-function toDateTimeLocal(value) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toISOString().slice(0, 16);
-}
 
 function toIsoDateTime(value) {
   if (!value) return null;
@@ -51,7 +45,7 @@ function createInitialForm(page) {
     content_en: page?.content_en || "",
     is_published: page?.is_published ?? false,
     is_active: page?.is_active ?? true,
-    published_at: toDateTimeLocal(page?.published_at),
+    published_at: formatDateTimeLocalInput(page?.published_at),
     sort_order: page?.sort_order ?? 0,
   };
 }

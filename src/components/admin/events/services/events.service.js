@@ -38,8 +38,8 @@ async function buildUniqueSlug(slug, ignoreId = null) {
   return candidate;
 }
 
-export async function getAdminEvents() {
-  return await supabase
+export async function getAdminEvents(client = supabase) {
+  return await client
     .from("events")
     .select("*")
     .order("starts_at", { ascending: true })

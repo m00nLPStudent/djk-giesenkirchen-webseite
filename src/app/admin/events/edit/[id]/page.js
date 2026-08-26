@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminEventsForm } from "@/components/admin/events";
 import EventDetailSummary from "@/components/admin/events/components/EventDetailSummary";
@@ -9,12 +9,16 @@ import { formatEventDate, formatEventTime, getEventStatusKey } from "@/lib/event
 import { supabase } from "@/lib/supabase";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canManageMedia, loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 
 export default async function EditEventPage({ params }) {
   const { id } = await params;
   const auth = await assertAdminActionPermission({ requiredPermission: "events.edit" });
+  if (!auth.ok) redirect("/admin/unauthorized?reason=missing-events-permission");
+  const adminClient = createSupabaseAdminClient();
+  if (!adminClient) throw new Error("Termin-Service ist nicht konfiguriert.");
   const [{ data: event }, { data: teams }, { data: eventTypes }] = await Promise.all([
-    supabase.from("events").select("*, event_documents(*)").eq("id", id).single(),
+    adminClient.from("events").select("*, event_documents(*)").eq("id", id).single(),
     supabase.from("teams").select("id, name_de, is_active, sort_order").eq("is_active", true).order("sort_order", { ascending: true }),
     loadEventTypes(supabase, { activeOnly: false }),
   ]);

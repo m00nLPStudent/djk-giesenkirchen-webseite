@@ -6,6 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
+import { requiresPublishPermission } from "@/lib/admin-auth/publishPermission.core.mjs";
 
 const fail = (error) => ({ ok: false, error });
 const allowedVisibilities = (auth) => canManageMedia(auth.roles) ? ["public", "admin"] : ["public"];
@@ -40,6 +41,16 @@ export async function saveClubHistoryPageAction(input, pageId = null) {
   if (!authorization.ok) return authorization;
   const db = authorization.db;
   const payload = pagePayload(input);
+  let previous = null;
+  if (pageId) {
+    const existing = await db.from("club_history_pages").select("id,is_published,published_at").eq("id", pageId).maybeSingle();
+    if (existing.error || !existing.data) return fail(existing.error?.message || "Vereinschronik nicht gefunden.");
+    previous = existing.data;
+  }
+  if (requiresPublishPermission(previous, payload, { tracksPublishedAt: true })) {
+    const publishPermission = await assertAdminActionPermission({ requiredPermission: "club_history.publish", supabaseServer: authorization.auth.supabaseServer });
+    if (!publishPermission.ok) return fail(publishPermission.message || "Berechtigung zum Veröffentlichen fehlt.");
+  }
   const saved = pageId
     ? await db.from("club_history_pages").update(payload).eq("id", pageId).select("*").single()
     : await db.from("club_history_pages").insert({ ...payload, page_key: "fussball-vereinsgeschichte" }).select("*").single();
