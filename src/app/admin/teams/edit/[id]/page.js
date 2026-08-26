@@ -11,6 +11,7 @@ import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
 import { canManageMedia, loadMediaAssetForPicker, loadMediaAssetsForPicker } from "@/components/admin/media-library/media.service";
+import { loadActiveTeamDepartments } from "@/components/admin/teams/services/teamDepartments.repository";
 
 export default async function EditTeamPage({ params }) {
   const { id } = await params;
@@ -41,6 +42,7 @@ export default async function EditTeamPage({ params }) {
     .select("*")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
+  const { data: departments } = await loadActiveTeamDepartments(supabaseServer);
 
   const coachEditData = await loadTeamEditCoachData(supabaseServer, id);
   const teamSeasons = coachEditData.teamSeasons;
@@ -75,6 +77,7 @@ export default async function EditTeamPage({ params }) {
         <AdminTeamsForm
           team={team}
           seasons={seasons || []}
+          departments={departments || []}
           teamSeasons={teamSeasons || []}
           players={players || []}
           coaches={coachEditData.coaches || []}

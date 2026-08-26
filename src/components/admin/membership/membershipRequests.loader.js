@@ -20,7 +20,7 @@ export async function loadMembershipRequestsPageData({ authenticate = assertAdmi
   const db = createSupabaseAdminClient();
   if (!db) return { ok: false, reason: "server-access-unavailable" };
   const [requestsResult, recipientsResult, coachesResult, boardMembersResult] = await Promise.all([
-    db.from("membership_requests").select("*, teams(name_de)").order("created_at", { ascending: false }),
+    db.from("membership_requests").select("*, teams(name_de), team_seasons(name_de, seasons(name))").order("created_at", { ascending: false }),
     db.from("membership_request_recipients").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
     db.from("coaches").select("id, first_name, last_name, name, email, role, role_de, role_en").order("sort_order", { ascending: true }).order("created_at", { ascending: true }),
     db.from("board_members").select("id, first_name, last_name, email, role_de").order("sort_order", { ascending: true }).order("created_at", { ascending: true }),

@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-> B15.21A und B15.21B0 sind produktiv ausgerollt und geprüft. B15.21B1 stellt die datengetriebene Jahrgangspflege im Dashboard bereit; die öffentliche Nutzung folgt separat in B15.21B2.
+> B15.21A bis B15.21B2 sind abgeschlossen. B15.21B3 integriert die dynamische Mannschaftsauswahl und serverseitige Saisonvalidierung in den Membership-Submit. B15.21B3.1 ergänzt die verpflichtende, serverseitig validierte Abteilungszuordnung in der Team-Pflege; vor Produktivnutzung ist die neue Request-Type-SQL-Familie manuell auszurollen und zu prüfen.
 
 Stand: 26. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 

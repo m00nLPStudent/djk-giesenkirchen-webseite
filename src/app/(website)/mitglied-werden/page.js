@@ -1,14 +1,6 @@
 import MembershipRequestForm from "@/components/website/membership/MembershipRequestForm";
-import { supabase } from "@/lib/supabase";
 
 export default async function MembershipPage() {
-  const { data: teams } = await supabase
-    .from("teams")
-    .select("id, name_de, sort_order")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true })
-    .order("name_de", { ascending: true });
-
   return (
     <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-52 md:pb-24">
       <section className="mx-auto max-w-5xl">
@@ -26,7 +18,7 @@ export default async function MembershipPage() {
         </div>
 
         <section className="mt-8 rounded-3xl border border-white/10 bg-black/20 p-6 md:p-10">
-          <MembershipRequestForm teams={teams || []} />
+          <MembershipRequestForm />
         </section>
       </section>
     </main>

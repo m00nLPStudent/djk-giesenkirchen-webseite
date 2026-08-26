@@ -15,9 +15,11 @@ export const MEMBERSHIP_SUBVIEWS = [
 export const MEMBERSHIP_REQUEST_TYPE_OPTIONS = [
   { value: "", label: "Alle Anfragearten" },
   { value: "aktives-mitglied-fussball", label: "Aktives Mitglied Fußball" },
+  { value: "aktives-mitglied-tischtennis", label: "Aktives Mitglied Tischtennis" },
+  { value: "aktives-mitglied-gymnastik-damen", label: "Aktives Mitglied Damen-Gymnastik" },
+  { value: "aktives-mitglied-behindertensport", label: "Aktives Mitglied Behindertensport" },
   { value: "trainer-werden", label: "Trainer werden" },
   { value: "passives-mitglied", label: "Passives Mitglied" },
-  { value: "sonstiges", label: "Sonstiges" },
 ];
 
 export const MEMBERSHIP_STATUS_OPTIONS = [

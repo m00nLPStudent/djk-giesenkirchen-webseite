@@ -25,6 +25,7 @@ Abgeschlossen, modularisiert und in Website sowie Admin integriert.
 ## Admin-Funktionen
 
 - Mannschaften pflegen
+- aktive Abteilung beim Erstellen und Bearbeiten verpflichtend zuordnen
 - Saisonzuordnung (`team_seasons`)
 - Spieler- und Trainerzuordnungen pro Saison
 - Trainingszeiten und Ausnahmen pflegen
@@ -45,3 +46,5 @@ Abgeschlossen, modularisiert und in Website sowie Admin integriert.
 ## Hinweis
 
 Legacy-Trainingsfelder bleiben aus Kompatibilitätsgründen vorhanden, die Laufzeitlogik nutzt strukturierte Trainingsdaten.
+
+Die Teamform lädt ausschließlich aktive Abteilungen. `department_id` wird vor jeder Team-Mutation serverseitig als UUID validiert und gegen eine vorhandene aktive Abteilung geprüft. Bestehende Teams ohne Zuordnung werden im Editor ausdrücklich gekennzeichnet und müssen vor dem nächsten Speichern zugeordnet werden. Eine datenbankseitige `NOT NULL`-Härtung bleibt wegen vorhandener Test-/Legacyzeilen einem separaten, live-geprüften Schritt vorbehalten.

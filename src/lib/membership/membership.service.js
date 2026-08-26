@@ -1,14 +1,14 @@
 import {
-  findMembershipTeamById,
   insertMembershipRequest,
   updateMembershipRequest,
 } from "./membership.repository";
 import { sendMembershipRequestNotifications } from "./membership.mail";
 import { prepareMembershipRequest } from "./membershipSubmit.core.mjs";
+import { resolveMembershipFootballTeamSelection } from "./membershipTeamResolver.service";
 
 export async function submitMembershipRequest(payload, { client } = {}) {
   const prepared = await prepareMembershipRequest(payload, {
-    findTeamById: (id) => findMembershipTeamById(id, client),
+    resolveTeamSeasonSelection: (birthdate, teamSeasonId) => resolveMembershipFootballTeamSelection(birthdate, teamSeasonId, { client }),
   });
   if (prepared.error) return prepared;
 

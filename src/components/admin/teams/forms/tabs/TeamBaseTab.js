@@ -10,7 +10,9 @@ export default function TeamBaseTab({
   isEditMode,
   form,
   teamTemplates = [],
+  departments = [],
   onTeamTemplateChange,
+  onDepartmentChange,
 }) {
   return (
     <FormSection
@@ -29,8 +31,29 @@ export default function TeamBaseTab({
             direkt geändert werden, damit Spieler-, Trainer- und
             Saisonzuordnungen stabil bleiben.
           </FormHintBox>
+          {!form.department_id ? (
+            <div className="mt-6">
+              <FormHintBox eyebrow="Abteilung fehlt">
+                Diese Mannschaft besitzt noch keine Abteilungszuordnung. Bitte
+                wähle vor dem Speichern eine aktive Abteilung aus.
+              </FormHintBox>
+            </div>
+          ) : null}
           <div className="mt-6">
             <FormGrid>
+              <SelectField
+                label="Abteilung"
+                required
+                value={form.department_id}
+                onChange={(event) => onDepartmentChange(event.target.value)}
+              >
+                <option value="">Abteilung auswählen</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name_de}
+                  </option>
+                ))}
+              </SelectField>
               <InputField
                 label="Mannschaft"
                 required
@@ -53,6 +76,19 @@ export default function TeamBaseTab({
         </>
       ) : (
         <FormGrid>
+          <SelectField
+            label="Abteilung"
+            required
+            value={form.department_id}
+            onChange={(event) => onDepartmentChange(event.target.value)}
+          >
+            <option value="">Abteilung auswählen</option>
+            {departments.map((department) => (
+              <option key={department.id} value={department.id}>
+                {department.name_de}
+              </option>
+            ))}
+          </SelectField>
           <SelectField
             label="Mannschaft auswählen"
             required

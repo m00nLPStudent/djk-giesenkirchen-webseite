@@ -11,6 +11,7 @@ import { isYouthTeam } from "@/components/admin/teams/teamScope";
 import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/admin/design-system";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { loadTeamTypes } from "@/components/admin/settings/team-types/teamTypes.repository";
+import { loadActiveTeamDepartments } from "@/components/admin/teams/services/teamDepartments.repository";
 import { redirect } from "next/navigation";
 
 export default async function NewTeamPage() {
@@ -44,6 +45,7 @@ export default async function NewTeamPage() {
     .order("sort_order", { ascending: true });
 
   const { data: teamTemplates } = await loadTeamTypes(supabaseServer, { activeOnly: true });
+  const { data: departments } = await loadActiveTeamDepartments(supabaseServer);
 
   const filteredTeamTemplates = canReachTeamCreateOnServer(scopeContext)
     ? (teamTemplates || []).filter((template) => {
@@ -80,6 +82,7 @@ export default async function NewTeamPage() {
       <TeamScopeGate requireCreateScope>
         <AdminTeamsForm
           seasons={seasons || []}
+          departments={departments || []}
           teamTemplates={filteredTeamTemplates}
           players={players || []}
           coaches={coaches || []}

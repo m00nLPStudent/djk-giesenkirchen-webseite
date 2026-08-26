@@ -43,6 +43,7 @@ export function createInitialTeamForm({
       .filter(Boolean),
     coach_team_state: coachTeamState,
     team_template_id: "",
+    department_id: team?.department_id || "",
     name_de: source.name_de || team?.name_de || "",
     name_en: source.name_en || team?.name_en || "",
     slug: source.slug || team?.slug || "",

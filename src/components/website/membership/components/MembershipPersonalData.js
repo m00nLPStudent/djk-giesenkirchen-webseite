@@ -4,6 +4,8 @@ export default function MembershipPersonalData({
   inputClassName,
   FormField,
   onUpdateField,
+  onBirthdateChange,
+  onRequestTypeChange,
 }) {
   return (
     <>
@@ -38,7 +40,7 @@ export default function MembershipPersonalData({
           type="date"
           className={inputClassName}
           value={form.birthdate}
-          onChange={(event) => onUpdateField("birthdate", event.target.value)}
+          onChange={(event) => onBirthdateChange(event.target.value)}
         />
       </FormField>
 
@@ -54,13 +56,14 @@ export default function MembershipPersonalData({
       <FormField label="Art der Anfrage" required>
         <select
           className={inputClassName}
+          style={{ colorScheme: "dark" }}
           value={form.request_type}
           onChange={(event) =>
-            onUpdateField("request_type", event.target.value)
+            onRequestTypeChange(event.target.value)
           }
         >
           {requestTypeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} value={option.value} className="bg-neutral-950 text-white">
               {option.label}
             </option>
           ))}

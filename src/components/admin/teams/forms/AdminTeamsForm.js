@@ -53,6 +53,7 @@ function getCoachStatusMessage(currentSeasonResolution, currentTeamSeasons = [])
 export default function AdminTeamsForm({
   team,
   seasons = [],
+  departments = [],
   teamTemplates = [],
   teamSeasons = [],
   players = [],
@@ -128,6 +129,7 @@ export default function AdminTeamsForm({
     setForm((current) => ({
       ...nextForm,
       public_season_id: current.public_season_id,
+      department_id: current.department_id,
       team_template_id: current.team_template_id,
       team_image_media_asset_id: current.team_image_media_asset_id,
       remove_legacy_team_image: current.remove_legacy_team_image,
@@ -198,6 +200,12 @@ export default function AdminTeamsForm({
       return;
     }
 
+    if (!form.department_id) {
+      alert("Bitte eine Abteilung auswählen.");
+      setActiveTab("base");
+      return;
+    }
+
     setLoading(true);
     const payload = createTeamFormPayload(form);
     const { error } = await saveTeamWithScopeAction(payload, team?.id ?? null);
@@ -250,6 +258,8 @@ export default function AdminTeamsForm({
           isEditMode={isEditMode}
           form={form}
           teamTemplates={teamTemplates}
+          departments={departments}
+          onDepartmentChange={(value) => updateField("department_id", value)}
           onTeamTemplateChange={updateTeamTemplate}
         />
       )}

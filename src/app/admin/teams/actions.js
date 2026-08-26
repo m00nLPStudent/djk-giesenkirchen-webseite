@@ -19,6 +19,8 @@ import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPu
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { normalizeBirthYears } from "@/components/admin/teams/services/teamSeasonYearGroups.core.mjs";
 import { replaceTeamSeasonYearGroups } from "@/components/admin/teams/services/teamSeasonYearGroups.repository";
+import { validateActiveTeamDepartment, validateTeamDepartmentId } from "@/components/admin/teams/services/teamDepartments.core.mjs";
+import { findTeamDepartmentById } from "@/components/admin/teams/services/teamDepartments.repository";
 
 function buildError(message) {
   return { error: { message } };
@@ -88,6 +90,14 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
       );
     }
   }
+
+  const normalizedDepartment = validateTeamDepartmentId(teamPayload?.department_id);
+  if (normalizedDepartment.error) return buildError(normalizedDepartment.error.message);
+  const departmentResult = await findTeamDepartmentById(supabaseServer, normalizedDepartment.data);
+  if (departmentResult.error) return buildError("Die Abteilung konnte nicht geprüft werden.");
+  const validatedDepartment = validateActiveTeamDepartment(normalizedDepartment.data, departmentResult.data);
+  if (validatedDepartment.error) return buildError(validatedDepartment.error.message);
+  teamPayload = { ...teamPayload, department_id: validatedDepartment.data };
 
   const allowedVisibilities = canManageMedia(authContext.roles) ? ["public", "admin"] : ["public"];
   const mediaResult = await resolveEntityImageMedia(teamPayload?.team_image_media_asset_id || null, { allowArchived: Boolean(existingTeam?.team_image_media_asset_id === teamPayload?.team_image_media_asset_id), allowedVisibilities });

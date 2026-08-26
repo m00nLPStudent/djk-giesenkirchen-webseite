@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { submitMembershipRequestAction } from "@/app/membership/actions";
 import MembershipFootballData from "./components/MembershipFootballData";
 import MembershipPersonalData from "./components/MembershipPersonalData";
@@ -9,9 +9,11 @@ import MembershipSuccessCard from "./components/MembershipSuccessCard";
 
 const REQUEST_TYPE_OPTIONS = [
   { value: "aktives-mitglied-fussball", label: "Aktives Mitglied Fußball" },
+  { value: "aktives-mitglied-tischtennis", label: "Aktives Mitglied Tischtennis" },
+  { value: "aktives-mitglied-gymnastik-damen", label: "Aktives Mitglied Damen-Gymnastik" },
+  { value: "aktives-mitglied-behindertensport", label: "Aktives Mitglied Behindertensport" },
   { value: "trainer-werden", label: "Trainer werden" },
   { value: "passives-mitglied", label: "Passives Mitglied" },
-  { value: "sonstiges", label: "Sonstiges" },
 ];
 
 function FormField({ label, required = false, children }) {
@@ -42,7 +44,7 @@ function createInitialForm() {
     birthdate: "",
     email: "",
     request_type: "aktives-mitglied-fussball",
-    desired_team_id: "",
+    desired_team_season_id: "",
     message: "",
     privacy_accepted: false,
     website: "",
@@ -50,16 +52,19 @@ function createInitialForm() {
 }
 
 function getYearGroupFromBirthdate(value = "") {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return String(date.getUTCFullYear());
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return "";
+  const [year, month, day] = match.slice(1).map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === day ? String(year) : "";
 }
 
-export default function MembershipRequestForm({ teams = [] }) {
+export default function MembershipRequestForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [form, setForm] = useState(createInitialForm());
+  const [teamResolution, setTeamResolution] = useState({ status: "idle", options: [] });
+  const requestSequence = useRef(0);
 
   const showFootballFields = useMemo(
     () => form.request_type === "aktives-mitglied-fussball",
@@ -71,11 +76,45 @@ export default function MembershipRequestForm({ teams = [] }) {
     [form.birthdate],
   );
 
+  useEffect(() => {
+    if (!showFootballFields || !derivedYearGroup) return undefined;
+    const controller = new AbortController();
+    const sequence = ++requestSequence.current;
+    const timer = setTimeout(async () => {
+      setTeamResolution({ status: "loading", options: [] });
+      try {
+        const response = await fetch("/api/membership/team-options", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ birthdate: form.birthdate }), signal: controller.signal });
+        const result = await response.json();
+        if (controller.signal.aborted || sequence !== requestSequence.current) return;
+        const options = Array.isArray(result?.options) ? result.options : [];
+        setTeamResolution({ status: result?.status || "unavailable", options });
+        if (result?.status === "single" && options[0]?.teamSeasonId) setForm((current) => ({ ...current, desired_team_season_id: options[0].teamSeasonId }));
+      } catch (error) {
+        if (error?.name !== "AbortError" && sequence === requestSequence.current) setTeamResolution({ status: "unavailable", options: [] });
+      }
+    }, 350);
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [derivedYearGroup, form.birthdate, showFootballFields]);
+
   function updateField(field, value) {
     setForm((current) => ({
       ...current,
       [field]: value,
     }));
+    setSuccess(false);
+  }
+
+  function updateBirthdate(value) {
+    requestSequence.current += 1;
+    setForm((current) => ({ ...current, birthdate: value, desired_team_season_id: "" }));
+    setTeamResolution({ status: "idle", options: [] });
+    setSuccess(false);
+  }
+
+  function updateRequestType(value) {
+    requestSequence.current += 1;
+    setForm((current) => ({ ...current, request_type: value, desired_team_season_id: "" }));
+    setTeamResolution({ status: "idle", options: [] });
     setSuccess(false);
   }
 
@@ -97,6 +136,10 @@ export default function MembershipRequestForm({ teams = [] }) {
       alert("Bitte der Datenschutzerklärung zustimmen.");
       return;
     }
+    if (showFootballFields && teamResolution.status === "multiple" && !form.desired_team_season_id) {
+      alert("Bitte eine passende Mannschaft auswählen.");
+      return;
+    }
 
     setLoading(true);
 
@@ -107,7 +150,7 @@ export default function MembershipRequestForm({ teams = [] }) {
       birthdate: form.birthdate || null,
       email: form.email.trim(),
       request_type: form.request_type,
-      desired_team_id: showFootballFields ? form.desired_team_id || null : null,
+      desired_team_season_id: showFootballFields ? form.desired_team_season_id || null : null,
       message: form.message.trim() || null,
       privacy_accepted: form.privacy_accepted,
       website: form.website,
@@ -151,13 +194,18 @@ export default function MembershipRequestForm({ teams = [] }) {
           inputClassName={inputClassName()}
           FormField={FormField}
           onUpdateField={updateField}
+          onBirthdateChange={updateBirthdate}
+          onRequestTypeChange={updateRequestType}
         />
+
+        <FormField label="Jahrgang">
+          <input className={inputClassName()} value={derivedYearGroup} readOnly aria-label="Jahrgang" />
+        </FormField>
 
         <MembershipFootballData
           showFootballFields={showFootballFields}
-          teams={teams}
           form={form}
-          derivedYearGroup={derivedYearGroup}
+          resolution={teamResolution}
           inputClassName={inputClassName()}
           FormField={FormField}
           onUpdateField={updateField}
@@ -165,6 +213,7 @@ export default function MembershipRequestForm({ teams = [] }) {
       </div>
 
       <FormField label="Nachricht">
+        {form.request_type === "trainer-werden" ? <p className="mb-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm leading-6 text-white/65">Bitte teile uns mit, für welchen Jahrgang beziehungsweise welche Mannschaft du dich interessierst und ob du bereits Trainerlizenzen oder andere Qualifikationen besitzt.</p> : null}
         <textarea
           rows={6}
           className={textareaClassName()}

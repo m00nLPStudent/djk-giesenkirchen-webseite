@@ -50,6 +50,7 @@ export async function deleteTeamContactImage(imageUrl) {
 
 function createTeamPayload(team) {
   return {
+    department_id: team.department_id || null,
     name_de: team.name_de || null,
     name_en: team.name_en || null,
     slug: team.slug || null,

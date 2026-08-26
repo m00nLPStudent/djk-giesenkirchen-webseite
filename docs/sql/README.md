@@ -30,7 +30,9 @@ Alle Proposal-/Postcheck-/Rollback-Familien von A bis I bleiben als nachvollzieh
 
 ## Noch offen oder manuell zu verifizieren
 
+- B15.21B3 Request-Type-Constraint: Preflight, Proposal und Postcheck manuell in dieser Reihenfolge ausführen; der Rollback bricht bei bereits gespeicherten neuen Typen ab.
 - Department-Zuordnungen erst nach manueller fachlicher Bestätigung; das B15.21B0-Template enthält bewusst keine geratenen Zuordnungen.
+- B15.21B3.1 inventarisiert aktive Teams ohne Abteilung read-only. Das separate D2-Proposal enthält ausschließlich die manuell bestätigten Testdaten-UUIDs und darf nur bewusst für diesen Browsertest ausgeführt werden.
 
 - B12-Dateien mit `noch-nicht-ausführen-` beziehungsweise `nach-Prüfung-ausführbar-`.
 - B13-Legacy-Removal und saisonale Cleanup-Dateien vor dem späteren Datenbank-/Saison-Cleanup.

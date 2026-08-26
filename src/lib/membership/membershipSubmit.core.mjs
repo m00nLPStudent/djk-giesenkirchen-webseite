@@ -1,8 +1,10 @@
 export const MEMBERSHIP_REQUEST_TYPES = Object.freeze([
   "aktives-mitglied-fussball",
+  "aktives-mitglied-tischtennis",
+  "aktives-mitglied-gymnastik-damen",
+  "aktives-mitglied-behindertensport",
   "trainer-werden",
   "passives-mitglied",
-  "sonstiges",
 ]);
 
 export const MEMBERSHIP_PRIVACY_POLICY_VERSION = "2026-08-26";
@@ -10,7 +12,6 @@ export const MEMBERSHIP_PRIVACY_POLICY_VERSION = "2026-08-26";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^[+0-9()/.\s-]+$/;
-const FOOTBALL_DEPARTMENT_SLUGS = new Set(["fussball", "fußball"]);
 
 function text(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -31,12 +32,7 @@ export function getMembershipYearGroup(birthdate) {
   return String(year);
 }
 
-function normalizeDepartment(team) {
-  const relation = team?.departments;
-  return Array.isArray(relation) ? relation[0] || null : relation || null;
-}
-
-export async function prepareMembershipRequest(payload, { findTeamById, now = new Date() } = {}) {
+export async function prepareMembershipRequest(payload, { resolveTeamSeasonSelection, now = new Date() } = {}) {
   const source = payload && typeof payload === "object" ? payload : {};
   if (text(source.website)) return fail("Die Anfrage konnte nicht gesendet werden.", "website");
 
@@ -68,16 +64,16 @@ export async function prepareMembershipRequest(payload, { findTeamById, now = ne
   if (message.length > 2000) return fail("Die Nachricht ist zu lang.", "message");
 
   let desiredTeamId = null;
-  if (requestType === "aktives-mitglied-fussball" && text(source.desired_team_id)) {
-    desiredTeamId = text(source.desired_team_id);
-    if (!UUID_PATTERN.test(desiredTeamId)) return fail("Die ausgewählte Mannschaft ist ungültig.", "desired_team_id");
-    if (typeof findTeamById !== "function") throw new Error("Teamvalidierung ist nicht konfiguriert.");
-    const teamResult = await findTeamById(desiredTeamId);
-    if (teamResult?.error) throw teamResult.error;
-    if (!teamResult?.data) return fail("Die ausgewählte Mannschaft wurde nicht gefunden.", "desired_team_id");
-    if (teamResult.data.is_active !== true) return fail("Die ausgewählte Mannschaft ist nicht aktiv.", "desired_team_id");
-    const department = normalizeDepartment(teamResult.data);
-    if (department && (department.is_active !== true || !FOOTBALL_DEPARTMENT_SLUGS.has(text(department.slug).toLowerCase()))) return fail("Die ausgewählte Mannschaft gehört nicht zur Fußballabteilung.", "desired_team_id");
+  let desiredTeamSeasonId = null;
+  if (requestType === "aktives-mitglied-fussball" && text(source.desired_team_season_id)) {
+    desiredTeamSeasonId = text(source.desired_team_season_id);
+    if (!UUID_PATTERN.test(desiredTeamSeasonId)) return fail("Die ausgewählte Mannschaft ist ungültig.", "desired_team_season_id");
+    if (typeof resolveTeamSeasonSelection !== "function") throw new Error("Mannschaftssaison-Validierung ist nicht konfiguriert.");
+    const selected = await resolveTeamSeasonSelection(birthdate, desiredTeamSeasonId);
+    if (selected?.error) throw selected.error;
+    if (!selected?.data) return fail("Die ausgewählte Mannschaft passt nicht zu Jahrgang und aktueller Saison.", "desired_team_season_id");
+    desiredTeamId = selected.data.teamId;
+    desiredTeamSeasonId = selected.data.teamSeasonId;
   }
 
   return {
@@ -90,6 +86,7 @@ export async function prepareMembershipRequest(payload, { findTeamById, now = ne
       request_type: requestType,
       year_group: yearGroup,
       desired_team_id: desiredTeamId,
+      desired_team_season_id: desiredTeamSeasonId,
       message: message || null,
       privacy_consent: true,
       privacy_consent_at: now.toISOString(),
