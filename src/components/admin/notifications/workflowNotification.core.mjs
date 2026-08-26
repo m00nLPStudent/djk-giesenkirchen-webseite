@@ -1,3 +1,5 @@
+import { resolveMembershipResponsibility } from "../../../lib/membership/membershipResponsibility.core.mjs";
+
 const CENTER = "/admin/notifications";
 
 const text = (value, fallback) => String(value || "").trim() || fallback;
@@ -12,9 +14,10 @@ export function getMembershipStatusNotificationPlan(previousStatus, nextStatus, 
 
 export function buildMembershipNotification(type, request = {}, context = {}) {
   const name = personName(request);
+  const requestLabel = resolveMembershipResponsibility(request.request_type)?.requestLabel || "Mitgliedsanfrage";
   const completedMessage = context.actorName ? `Die Mitgliedsanfrage von ${name} wurde von ${text(context.actorName, "Trainer")} als erledigt markiert.` : `Die Mitgliedsanfrage von ${name} wurde erledigt.`;
   const labels = {
-    membership_created: ["Neue Mitgliedsanfrage", `Eine neue Mitgliedsanfrage von ${name} ist eingegangen.`],
+    membership_created: ["Neue Mitgliedsanfrage", `${name} hat eine neue Anfrage gestellt: ${requestLabel}.`],
     membership_assigned: ["Mitgliedsanfrage zugewiesen", `Die Mitgliedsanfrage von ${name} wurde dir zugewiesen.`],
     membership_forwarded: ["Mitgliedsanfrage weitergeleitet", `Die Mitgliedsanfrage von ${name} wurde an dich weitergeleitet.`],
     membership_processing: ["Mitgliedsanfrage in Bearbeitung", `Die Mitgliedsanfrage von ${name} ist jetzt in Bearbeitung.`],
@@ -27,7 +30,7 @@ export function buildMembershipNotification(type, request = {}, context = {}) {
   return {
     type, title, message, entityType: "membership_request", entityId: request.id || null,
     targetUrl: context.detailOnly ? CENTER : request.id ? `/admin/membership-requests/${request.id}` : "/admin/membership-requests",
-    metadata: { requestId: request.id || null, requestType: request.request_type || null, assignedMembershipRequest: Boolean(context.assignedRecipient), membershipRecordTarget: Boolean(context.assignedRecipient || context.policyRecipient), status: request.status || null, completedByName: context.actorName || null, completedAt: request.processed_at || request.updated_at || null, teamName: request.teams?.name_de || null, yearGroup: request.year_group || null, idempotencyKey: `${type}:${request.id || request.notificationKey || "unknown"}:${context.changeKey || request.updated_at || request.created_at || "current"}`, ...(context.detailOnly ? { notificationDetailOnly: true } : {}) },
+    metadata: { requestId: request.id || null, requestType: request.request_type || null, assignedMembershipRequest: Boolean(context.assignedRecipient), membershipRecordTarget: Boolean(context.assignedRecipient || context.policyRecipient), ...(type === "membership_created" ? {} : { status: request.status || null, completedByName: context.actorName || null, completedAt: request.processed_at || request.updated_at || null, teamName: request.teams?.name_de || null, yearGroup: request.year_group || null }), idempotencyKey: `${type}:${request.id || "unknown"}:${context.changeKey || request.updated_at || request.created_at || "current"}`, ...(context.detailOnly ? { notificationDetailOnly: true } : {}) },
   };
 }
 

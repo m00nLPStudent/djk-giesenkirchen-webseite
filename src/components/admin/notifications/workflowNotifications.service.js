@@ -1,12 +1,12 @@
 import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
-import { canAccessMembershipRequests } from "@/lib/admin-auth/membershipAccess";
 import { createNotificationsOnce } from "./notifications.service";
 import { buildContributionNotification, buildMemberStatusNotification, buildMembershipNotification, resolveWorkflowTarget } from "./workflowNotification.core.mjs";
 import { createAdminNotificationRecipients, loadAdminNotificationRecipientSource } from "./workflowNotificationRecipients.repository";
 import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 import { loadPlayerCurrentSeasonAssignmentRows } from "@/components/admin/players/services/playerWrite.repository";
 import { resolveTeamNotificationRecipients } from "./teamAssignmentNotifications.service";
+import { resolveMembershipNotificationRecipients } from "@/lib/membership/membershipResponsibility.core.mjs";
 
 const uniqueWithoutActor = (items, actorUserId) => [...new Map(items.filter((item) => item.userId && item.userId !== actorUserId).map((item) => [item.userId, item])).values()];
 
@@ -38,11 +38,12 @@ export async function notifyMembershipWorkflow({ type, request, actorUserId = nu
     if (coach.error) return { delivered: 0, skipped: 0, error: coach.error };
     targetProfileId = coach.data?.admin_profile_id || null;
   }
-  const policyRecipients = loaded.recipients.filter((recipient) => canAccessMembershipRequests({ roleKeys: recipient.roleKeys, permissionKeys: recipient.permissionKeys })).map((recipient) => ({ ...recipient, canOpenMembershipRequest: true }));
+  const policyRecipients = resolveMembershipNotificationRecipients(loaded.recipients, request?.request_type, { actorUserId })
+    .map((recipient) => ({ ...recipient, canOpenMembershipRequest: true }));
   const recipients = type === "membership_created" || recipientMode === "membership_policy"
     ? policyRecipients
     : loaded.recipients.filter((recipient) => (targetProfileId && recipient.userId === targetProfileId) || (normalizedEmail && recipient.email.toLowerCase() === normalizedEmail));
-  return deliver(db, buildMembershipNotification(type, request, { detailOnly, actorName, policyRecipient: recipientMode === "membership_policy", assignedRecipient: type !== "membership_created" && recipientMode !== "membership_policy" }), recipients, actorUserId);
+  return deliver(db, buildMembershipNotification(type, request, { detailOnly, actorName, policyRecipient: type === "membership_created" || recipientMode === "membership_policy", assignedRecipient: type !== "membership_created" && recipientMode !== "membership_policy" }), recipients, actorUserId);
 }
 
 export async function notifyContributionWorkflow({ type, contribution, actorUserId }) {

@@ -21,5 +21,5 @@ export function createAdminNotificationRecipients(source = {}) {
   for (const row of source.rolePermissions || []) permissionsByRole.set(row.role_id, [...(permissionsByRole.get(row.role_id) || []), permissionById.get(row.permission_id)].filter(Boolean));
   const roleIdsByUser = new Map();
   for (const row of source.links || []) roleIdsByUser.set(row.user_id, [...(roleIdsByUser.get(row.user_id) || []), row.role_id]);
-  return (source.profiles || []).map((profile) => ({ userId: profile.id, email: profile.email || "", roleKeys: [...new Set(rolesByUser.get(profile.id) || [])], permissionKeys: [...new Set((roleIdsByUser.get(profile.id) || []).flatMap((id) => permissionsByRole.get(id) || []))] }));
+  return (source.profiles || []).map((profile) => ({ userId: profile.id, email: profile.email || "", isActive: profile.is_active !== false, roleKeys: [...new Set(rolesByUser.get(profile.id) || [])], permissionKeys: [...new Set((roleIdsByUser.get(profile.id) || []).flatMap((id) => permissionsByRole.get(id) || []))] }));
 }

@@ -54,8 +54,8 @@ test("membership dashboard policy allows only approved server contexts", () => {
   const withMembership = ["membership_requests.view", "settings.view"];
   assert.equal(canViewMembershipRequestsOnDashboard({ permissionKeys: withMembership, roleKeys: ["superadmin"], scopeContext: { isGlobal: true } }), true);
   assert.equal(canViewMembershipRequestsOnDashboard({ permissionKeys: withMembership, roleKeys: ["vorstand"] }), true);
-  assert.equal(canViewMembershipRequestsOnDashboard({ roleKeys: ["jugendleiter"], scopeContext: { canAccessYouthAll: true } }), true);
-  assert.equal(canViewMembershipRequestsOnDashboard({ roleKeys: ["jugendkoordinator"] }), true);
+  assert.equal(canViewMembershipRequestsOnDashboard({ permissionKeys: withMembership, roleKeys: ["jugendleiter"], scopeContext: { canAccessYouthAll: true } }), true);
+  assert.equal(canViewMembershipRequestsOnDashboard({ permissionKeys: withMembership, roleKeys: ["jugendkoordinator"] }), true);
   for (const role of ["kassierer", "trainer", "betreuer", "gast"]) {
     assert.equal(canViewMembershipRequestsOnDashboard({ permissionKeys: withMembership, roleKeys: [role] }), false);
   }
@@ -63,10 +63,10 @@ test("membership dashboard policy allows only approved server contexts", () => {
 
 test("membership query and target link are decided independently before loading", () => {
   const cashierPlan = createDashboardQueryPlan(["membership_requests.view", "settings.view"], { roleKeys: ["kassierer"], scopeContext: { roleScopeTypes: ["own_board_card"] } });
-  const youthPlan = createDashboardQueryPlan([], { roleKeys: ["jugendleiter"], scopeContext: { canAccessYouthAll: true } });
+  const youthPlan = createDashboardQueryPlan(["membership_requests.view"], { roleKeys: ["jugendleiter"], scopeContext: { canAccessYouthAll: true } });
   assert.equal(cashierPlan.membershipRequests, false);
   assert.equal(youthPlan.membershipRequests, true);
-  assert.equal(canOpenMembershipRequestTarget({ permissionKeys: [], scopeContext: { canAccessYouthAll: true } }), true);
+  assert.equal(canOpenMembershipRequestTarget({ permissionKeys: ["membership_requests.view"], roleKeys: ["jugendleiter"], scopeContext: { canAccessYouthAll: true } }), true);
   assert.equal(canOpenMembershipRequestTarget({ roleKeys: ["superadmin"] }), true);
 });
 

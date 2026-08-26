@@ -416,3 +416,8 @@ Rahmen bleibt unveraendert:
 - `AUTH_REQUIRED_FOR_ADMIN = true`
 - `AUTH_ENFORCEMENT_ENABLED = false`
 - Keine automatische SQL-Ausfuehrung in dieser Phase.
+# Membership-Zuständigkeitsrollen
+
+B15.21C1 integriert `tischtennis-vorstand`, `damen-gymnastik-vorstand` und `behindertensport-vorstand` in das bestehende Rollen-/Permission-System. Diese Rollen erhalten die vorhandenen Permissions `membership_requests.view`, `.edit` und `.forward`; ihre tatsächliche Datensicht wird zusätzlich serverseitig auf die jeweils zuständige Anfrageart begrenzt. `jugendleiter` bleibt der kanonische technische Schlüssel für die Jugendkoordination, während `jugendkoordinator` als bestehender Kompatibilitätsalias akzeptiert wird.
+
+B15.21C2 leitet Membership-Notification-Empfänger aus genau derselben Request-Type-/Rollen-/Permission-Prüfung ab. Eine Notification verleiht keinen Zugriff: Liste, Detailroute und jede Mutation prüfen den Scope erneut serverseitig. Mehrfachrollen erzeugen durch Deduplizierung nach Adminprofil-/User-ID keine mehrfachen Einträge.

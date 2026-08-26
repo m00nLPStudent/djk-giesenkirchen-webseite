@@ -17,7 +17,7 @@ export async function submitMembershipRequestAction(payload) {
       try {
         const notification = await notifyMembershipWorkflow({
           type: "membership_created",
-          request: { ...result.submittedRequest, id: result.data?.id, notificationKey: crypto.randomUUID() },
+          request: { ...result.submittedRequest, id: result.data?.id, created_at: result.data?.created_at },
         });
         logWorkflowNotificationFailure("membership-created", notification.error);
       } catch (notificationError) {

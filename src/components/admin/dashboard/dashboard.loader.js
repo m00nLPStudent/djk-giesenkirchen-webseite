@@ -11,6 +11,7 @@ import { loadEventTypes } from "@/components/admin/events/services/eventTypes.re
 import { resolveEventTypeLabel } from "@/components/admin/events/helpers/eventTypes.core";
 import { ADMIN_NAVIGATION_SECTIONS } from "@/components/admin/navigation/adminNavigation.config";
 import { resolveAdminNavigation } from "@/components/admin/navigation/adminNavigation.resolver";
+import { getAllowedMembershipRequestTypes } from "@/lib/membership/membershipResponsibility.core.mjs";
 import {
   buildDashboardNotices, buildDashboardQuickLinks, buildRecentItems, canOpenMembershipRequestTarget,
   createDashboardDto, createDashboardQueryPlan, resolveDashboardDisplayName,
@@ -46,10 +47,10 @@ async function loadNews(db, canEdit) {
   return (data || []).map((item) => ({ id: item.id, title: item.title_de || "Unbenannte News", categoryKey: item.category_key, categoryLabel: resolveNewsCategoryLabel(categories || [], item.category_key), status: item.is_published ? "Veröffentlicht" : "Entwurf", publishedAt: item.published_at || item.created_at, updatedAt: item.created_at, href: canEdit ? `/admin/news/edit/${item.id}` : "/admin/news" }));
 }
 
-async function loadMembershipCount() {
+async function loadMembershipCount(allowedRequestTypes) {
   const db = createSupabaseAdminClient();
-  if (!db) return 0;
-  const { count } = await db.from("membership_requests").select("id", { count: "exact", head: true }).in("status", ["new", "in_progress"]);
+  if (!db || !allowedRequestTypes.length) return 0;
+  const { count } = await db.from("membership_requests").select("id", { count: "exact", head: true }).in("request_type", allowedRequestTypes).in("status", ["new", "in_progress"]);
   return count || 0;
 }
 
@@ -69,13 +70,14 @@ export const loadDashboard = cache(async () => {
   const navigation = resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys: permissions, roleKeys: roles, scopeContext: scopeResult.context, currentPath: "/admin" });
   const accessContext = { roleKeys: roles, scopeContext: scopeResult.context };
   const plan = createDashboardQueryPlan(permissions, accessContext);
+  const allowedMembershipRequestTypes = getAllowedMembershipRequestTypes({ roleKeys: roles, permissionKeys: permissions, action: "view" });
   const now = new Date();
   const [profile, contributionSummary, upcomingEvents, recentNews, membershipOpenCount] = await Promise.all([
     loadProfileName(auth.supabaseServer, auth.profile?.id),
     plan.contributions ? loadContributionSummary() : null,
     plan.events ? loadEvents(auth.supabaseServer, now.toISOString(), permissions.includes("events.edit")) : [],
     plan.news ? loadNews(auth.supabaseServer, permissions.includes("news.edit")) : [],
-    loadMembershipRequestCountForDashboard({ allowed: plan.membershipRequests, loadCount: loadMembershipCount }),
+    loadMembershipRequestCountForDashboard({ allowed: plan.membershipRequests, loadCount: () => loadMembershipCount(allowedMembershipRequestTypes) }),
   ]);
   const displayName = resolveDashboardDisplayName(profile);
   const notices = buildDashboardNotices({

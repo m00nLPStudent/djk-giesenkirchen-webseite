@@ -3,13 +3,25 @@ import assert from "node:assert/strict";
 import { buildContributionNotification, buildMemberStatusNotification, buildMembershipNotification, getMembershipStatusNotificationPlan, resolveWorkflowTarget } from "./workflowNotification.core.mjs";
 
 test("membership events contain the request identity but no private message or note", () => {
-  const request = { id: "request-1", first_name: "Mia", last_name: "Muster", internal_note: "intern", message: "privat" };
+  const request = { id: "request-1", request_type: "aktives-mitglied-fussball", first_name: "Mia", last_name: "Muster", internal_note: "intern", message: "privat" };
   for (const type of ["membership_created", "membership_assigned", "membership_forwarded", "membership_processing", "membership_completed", "membership_accepted", "membership_rejected", "membership_archived"]) {
     const event = buildMembershipNotification(type, request);
     assert.equal(event.type, type);
     assert.match(event.message, /Mia Muster/);
     assert.doesNotMatch(JSON.stringify(event), /intern|privat/);
   }
+});
+
+test("new membership notification names the request type and keeps metadata data-minimal", () => {
+  const event = buildMembershipNotification("membership_created", {
+    id: "request-1", request_type: "aktives-mitglied-tischtennis", first_name: "Mia", last_name: "Muster",
+    birthdate: "2014-01-01", email: "secret@example.test", phone: "123", address: "Privatweg 1",
+    message: "private form message", year_group: "2014", teams: { name_de: "Team secret" }, created_at: "2026-08-26T10:00:00Z",
+  });
+  assert.equal(event.message, "Mia Muster hat eine neue Anfrage gestellt: Aktives Mitglied Tischtennis.");
+  assert.deepEqual(Object.keys(event.metadata).sort(), ["assignedMembershipRequest", "idempotencyKey", "membershipRecordTarget", "requestId", "requestType"].sort());
+  assert.equal(event.metadata.idempotencyKey, "membership_created:request-1:2026-08-26T10:00:00Z");
+  assert.doesNotMatch(JSON.stringify(event.metadata), /2014|secret|123|Privatweg|private form|Mia|Muster/);
 });
 
 test("financial events never put amounts methods or internal notes into the notification", () => {

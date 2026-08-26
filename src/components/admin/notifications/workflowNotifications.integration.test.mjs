@@ -14,6 +14,7 @@ const recordAccessCore = await read("../membership/membershipRequestRecordAccess
 const membershipDetailPage = await read("../../../app/admin/membership-requests/[id]/page.js");
 const assignedEditor = await read("../membership/AssignedMembershipRequestEditor.js");
 const notificationDetail = await read("./NotificationDetailCard.js");
+const responsibilityCore = await read("../../../lib/membership/membershipResponsibility.core.mjs");
 
 test("all workflow delivery reuses central idempotent notifications and excludes the actor", () => {
   assert.match(service, /createNotificationsOnce/);
@@ -25,6 +26,10 @@ test("recipient relations are loaded in fixed batches without a per-recipient qu
   assert.match(repository, /Promise\.all/);
   for (const table of ["admin_profiles", "admin_user_roles", "admin_roles", "admin_role_permissions", "admin_permissions"]) assert.match(repository, new RegExp(table));
   assert.doesNotMatch(repository, /for[\s\S]{0,200}await/);
+  assert.match(repository, /admin_profiles[\s\S]*\.eq\("is_active", true\)/);
+  assert.match(repository, /admin_roles[\s\S]*\.eq\("is_active", true\)/);
+  assert.doesNotMatch(repository, /\.first\(|\.limit\(1\)/);
+  assert.match(responsibilityCore, /new Map\(\(candidates \|\| \[\]\)/);
 });
 
 test("finance recipients are permission-bound and limited to approved roles", () => {
@@ -41,8 +46,8 @@ test("domain writes complete before notifications and notification failures do n
 });
 
 test("existing permissions guard membership mutations and successful player status changes", () => {
-  assert.match(recordAccess, /membership_requests\.edit/);
-  assert.match(membershipActions, /membership_requests\.forward/);
+  assert.match(responsibilityCore, /membership_requests\.edit/);
+  assert.match(responsibilityCore, /membership_requests\.forward/);
   assert.match(playerActions, /member_activated/);
   assert.match(playerActions, /member_deactivated/);
   assert.match(playerActions, /member_archived/);
@@ -75,8 +80,20 @@ test("trainer completion feeds the existing membership policy after successful m
   assert.match(membershipActions, /getMembershipStatusNotificationPlan/);
   assert.ok(membershipActions.indexOf("await saveMembershipRequestStatus") < membershipActions.indexOf("await notifyMembershipWorkflow"));
   assert.match(service, /recipientMode === "membership_policy"/);
-  assert.match(service, /canAccessMembershipRequests/);
+  assert.match(service, /resolveMembershipNotificationRecipients/);
   assert.match(service, /uniqueWithoutActor/);
+});
+
+test("public submit uses the persisted request identity and keeps notification failure best effort", () => {
+  assert.match(publicActions, /id: result\.data\?\.id, created_at: result\.data\?\.created_at/);
+  assert.doesNotMatch(publicActions, /randomUUID|recipientUserId|roleKeys/);
+  assert.match(publicActions, /try[\s\S]*notifyMembershipWorkflow[\s\S]*catch \(notificationError\)/);
+});
+
+test("new membership recipients receive the record link but record access stays server-authorized", () => {
+  assert.match(service, /type === "membership_created" \|\| recipientMode === "membership_policy"/);
+  assert.match(recordAccess, /canAccessMembershipRequestType/);
+  assert.match(membershipDetailPage, /resolveMembershipRequestRecordAccess\(id\)/);
 });
 
 test("notification fallback renders the structured completion context", () => {

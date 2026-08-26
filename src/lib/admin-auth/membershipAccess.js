@@ -1,12 +1,9 @@
-const keys = (values = []) => new Set((values || []).map((value) => value?.key || value).filter(Boolean));
+import { getAllowedMembershipRequestTypes } from "../membership/membershipResponsibility.core.mjs";
 
 export function canAccessMembershipRequests({ roleKeys = [], permissionKeys = [], scopeContext = {} } = {}) {
-  const roles = keys(roleKeys.length ? roleKeys : scopeContext.roleKeys);
-  const permissions = keys(permissionKeys.length ? permissionKeys : scopeContext.permissionKeys);
-  const isSuperadmin = Boolean(scopeContext.isGlobal || roles.has("superadmin"));
-  const isBoard = roles.has("vorstand") && permissions.has("membership_requests.view");
-  const isYouth = Boolean(scopeContext.canAccessYouthAll || roles.has("jugendleiter") || roles.has("jugendkoordinator"));
-  return isSuperadmin || isBoard || isYouth;
+  const roles = roleKeys.length ? roleKeys : scopeContext.roleKeys || [];
+  const permissions = permissionKeys.length ? permissionKeys : scopeContext.permissionKeys || [];
+  return getAllowedMembershipRequestTypes({ roleKeys: scopeContext.isGlobal ? [...roles, "superadmin"] : roles, permissionKeys: permissions, action: "view" }).length > 0;
 }
 
 export async function loadMembershipRequestsWhenAllowed({ context, load }) {

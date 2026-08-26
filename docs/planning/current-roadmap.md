@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-> B15.21A bis B15.21B2 sind abgeschlossen. B15.21B3 integriert die dynamische Mannschaftsauswahl und serverseitige Saisonvalidierung in den Membership-Submit. B15.21B3.1 ergänzt die verpflichtende, serverseitig validierte Abteilungszuordnung in der Team-Pflege; vor Produktivnutzung ist die neue Request-Type-SQL-Familie manuell auszurollen und zu prüfen.
+> B15.21A bis B15.21C1 sind abgeschlossen; der C1-Rollen-/Permission-Rollout und Postcheck wurden manuell erfolgreich bestätigt. B15.21C2 bindet Membership-Notifications an denselben serverseitigen Responsibility-Scope und hält deren Payload datensparsam und idempotent.
 
 Stand: 26. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 

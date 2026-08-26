@@ -30,11 +30,12 @@ test("hardening proposal removes public insert and adds consent evidence", async
 test("membership admin reads and writes switch to service role only after authorization", async () => {
   const loader = await read("../../components/admin/membership/membershipRequests.loader.js");
   const actions = await read("../../app/admin/membership-requests/actions.js");
+  const recordAccess = await read("../../components/admin/membership/membershipRequestRecordAccess.service.js");
   const dashboard = await read("../../components/admin/dashboard/dashboard.loader.js");
   assert.ok(loader.indexOf("await authenticate") < loader.indexOf("createSupabaseAdminClient()"));
-  assert.ok(actions.indexOf("assertAdminActionPermission") < actions.indexOf("createSupabaseAdminClient()"));
-  assert.match(actions, /forwardMembershipRequest\(request, payload, \{ client: db \}\)/);
-  assert.match(dashboard, /async function loadMembershipCount\(\)[\s\S]*createSupabaseAdminClient\(\)/);
+  assert.ok(recordAccess.indexOf("await authenticate") < recordAccess.indexOf("createSupabaseAdminClient()"));
+  assert.match(actions, /forwardMembershipRequest\(access\.request, target\.data, \{ client: access\.writeClient \}\)/);
+  assert.match(dashboard, /async function loadMembershipCount\(allowedRequestTypes\)[\s\S]*createSupabaseAdminClient\(\)/);
   assert.doesNotMatch(dashboard, /loadMembershipCount\(auth\.supabaseServer\)/);
 });
 
