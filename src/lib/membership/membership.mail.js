@@ -1,5 +1,12 @@
-export async function sendMembershipRequestNotifications() {
-  // TODO: Mailversand über Resend oder SMTP integrieren.
-  // TODO: Nach Admin-Weiterleitung optional Weiterleitungs-Mail an Trainer/Vorstand senden.
-  return { data: null, error: null };
+import "server-only";
+
+import { sendMail } from "../mail/mail.service";
+import { markMembershipRequestMailSent } from "./membership.repository";
+import { executeMembershipRequestConfirmation } from "./membershipMail.core.mjs";
+
+export function sendMembershipRequestConfirmation(request, { client, mailer = sendMail } = {}) {
+  return executeMembershipRequestConfirmation(request, {
+    send: mailer,
+    markSent: (requestId, sentAt) => markMembershipRequestMailSent(requestId, sentAt, client),
+  });
 }

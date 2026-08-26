@@ -1,20 +1,17 @@
 # Aktuelle Roadmap
 
-> B15.21A bis B15.21C1 sind abgeschlossen; der C1-Rollen-/Permission-Rollout und Postcheck wurden manuell erfolgreich bestätigt. B15.21C2 bindet Membership-Notifications an denselben serverseitigen Responsibility-Scope und hält deren Payload datensparsam und idempotent.
+> B15.21A bis B15.21D3 sind abgeschlossen. Die zentrale server-only Mailarchitektur und Membership-Eingangsbestätigung wurden über den echten Formularworkflow erfolgreich mit Resend verifiziert.
 
 Stand: 26. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 
 ## Priorität 1 – Mitglied-werden-Formular
 
-Nächster Fachblock, noch nicht implementieren:
-
-- Geburtsdatum erfassen beziehungsweise vorhandene Eingabe verwenden und den Jahrgang automatisch bestimmen, etwa `02.02.2019 → 2019`.
-- Mitgliedschaftsarten vollständig prüfen und „Aktives Mitglied Fußball“ vollständig abbilden.
-- passende Jugend aus dem Jahrgang bestimmen und Mannschaften automatisch filtern; mehrere Teams desselben Jahrgangs berücksichtigen.
-- Saisonwechsel berücksichtigen.
-- bestehendes Membership-/Notification-System und bestehende Zuweisungs-/Scope-Sicherheit weiterverwenden.
-
-Eine verbindliche bestehende Nummer wurde nicht gefunden. Vorschlag: `B15.21`, vor Beginn ausdrücklich bestätigen.
+- B15.21D3: erster kontrollierter realer Formularversand, interner Notification-Pfad, `mail_sent_at`, Resend-Verarbeitung und Postfacheingang erfolgreich verifiziert.
+- Vor dem Produktivversand weiterhin Datenschutzvertrag, eigene Versanddomain, serverseitige Hosting-Secrets und Produktivumgebung verbindlich einrichten.
+- Maildesign mit Vereinslogo, Vereinskopf und Footer in einem separaten Block überarbeiten.
+- Einen Idempotenz-Retry nur separat und ausdrücklich freigegeben testen; D3 hat keinen Retry ausgelöst.
+- Auth-Mails und normale Vereinsmails getrennt halten; Supabase Custom SMTP für Auth bleibt ein eigener Go-live-Schritt.
+- Keine Edge Function, SQL- oder neue Outbox-Struktur ohne einen neu nachgewiesenen Bedarf einführen.
 
 ## Priorität 2 – Download-Modul
 

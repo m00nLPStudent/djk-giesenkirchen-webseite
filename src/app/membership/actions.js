@@ -3,6 +3,8 @@
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { submitMembershipRequest } from "@/lib/membership/membership.service";
 import { logWorkflowNotificationFailure, notifyMembershipWorkflow } from "@/components/admin/notifications/workflowNotifications.service";
+import { logMailFailure } from "@/lib/mail/mail.service";
+import { sendMembershipRequestConfirmation } from "@/lib/membership/membership.mail";
 
 export async function submitMembershipRequestAction(payload) {
   try {
@@ -22,6 +24,12 @@ export async function submitMembershipRequestAction(payload) {
         logWorkflowNotificationFailure("membership-created", notification.error);
       } catch (notificationError) {
         logWorkflowNotificationFailure("membership-created", notificationError);
+      }
+      try {
+        const mail = await sendMembershipRequestConfirmation(result.data, { client });
+        logMailFailure("membership-request-received", mail);
+      } catch {
+        logMailFailure("membership-request-received", { status: "failed", error: { code: "membership_mail_unexpected" } });
       }
     }
     return { data: null, error: result.error ? { message: result.error.message || "Die Anfrage konnte nicht gespeichert werden." } : null };

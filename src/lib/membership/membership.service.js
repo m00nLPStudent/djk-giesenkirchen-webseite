@@ -2,7 +2,6 @@ import {
   insertMembershipRequest,
   updateMembershipRequest,
 } from "./membership.repository";
-import { sendMembershipRequestNotifications } from "./membership.mail";
 import { prepareMembershipRequest } from "./membershipSubmit.core.mjs";
 import { resolveMembershipFootballTeamSelection } from "./membershipTeamResolver.service";
 
@@ -17,8 +16,6 @@ export async function submitMembershipRequest(payload, { client } = {}) {
   if (result.error) {
     return result;
   }
-
-  await sendMembershipRequestNotifications(prepared.data);
 
   return { ...result, submittedRequest: prepared.data };
 }
