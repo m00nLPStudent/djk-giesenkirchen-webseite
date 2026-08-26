@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
+/* eslint-disable @next/next/no-img-element */
 import RichTextContent from "@/components/website/content/RichTextContent";
+import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
 
 function isPublishedNow(page) {
   if (!page?.is_active || !page?.is_published) return false;
@@ -101,7 +103,12 @@ export default async function ClubHistoryPublicPage() {
       .order("created_at", { ascending: true }),
   ]);
 
-  const images = imagesResult?.data || [];
+  const imageRows = imagesResult?.data || [];
+  const mediaUrls = await loadPublicMediaUrlMap(imageRows.map((image) => image.media_asset_id), "image");
+  const images = imageRows.map((image) => ({
+    ...image,
+    resolved_image_url: image.media_asset_id ? mediaUrls.data.get(image.media_asset_id) || image.image_url || null : image.image_url || null,
+  })).filter((image) => image.resolved_image_url);
   const milestones = milestonesResult?.data || [];
 
   return (
@@ -136,7 +143,7 @@ export default async function ClubHistoryPublicPage() {
                   className="min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-white/5"
                 >
                   <img
-                    src={image.image_url}
+                    src={image.resolved_image_url}
                     alt={pickDeFirst(
                       image.alt_text_de,
                       image.alt_text_en,

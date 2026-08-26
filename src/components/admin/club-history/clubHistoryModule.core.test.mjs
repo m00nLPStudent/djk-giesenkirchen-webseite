@@ -7,6 +7,7 @@ const form = read("./forms/ClubHistoryEditorForm.js");
 const images = read("./components/ClubHistoryImagesManager.js");
 const milestones = read("./components/ClubHistoryMilestonesManager.js");
 const service = read("./services/clubHistory.service.js");
+const actions = read("../../../app/admin/club-history/actions.js");
 
 test("hidden English page values remain in state and the unchanged save payload", () => {
   for (const field of ["title_en", "teaser_en", "content_en"]) {
@@ -16,14 +17,15 @@ test("hidden English page values remain in state and the unchanged save payload"
   assert.doesNotMatch(form, /label="(?:Title|Teaser|Content) \(EN\)"/);
 });
 
-test("hidden English media values remain part of existing create and update payloads", () => {
-  for (const field of ["alt_text_en", "caption_en"]) assert.ok(images.includes(`${field}: item.${field}`));
+test("hidden English media values remain part of central image updates", () => {
+  for (const field of ["alt_text_en", "caption_en"]) assert.ok(actions.includes(`${field}: input.${field}`));
   assert.doesNotMatch(images, /label="(?:Alt Text|Caption) \(EN\)"/);
   assert.match(milestones, /description_en: item\.description_en/);
   assert.doesNotMatch(milestones, /label="Description \(EN\)"/);
 });
 
-test("queries, upload and write functions remain unchanged in the service", () => {
-  for (const table of ["club_history_pages", "club_history_images", "club_history_milestones"]) assert.ok(service.includes(`.from("${table}")`));
-  for (const operation of ["uploadMediaFile", "deleteMediaFile", "upsertClubHistoryPage", "updateClubHistoryImage", "updateClubHistoryMilestone"]) assert.ok(service.includes(operation));
+test("all chronicle writes are server actions and the client service contains no database client", () => {
+  for (const table of ["club_history_pages", "club_history_images", "club_history_milestones"]) assert.ok(actions.includes(`.from("${table}")`));
+  for (const operation of ["saveClubHistoryPageAction", "createClubHistoryMilestoneAction", "updateClubHistoryMilestoneAction", "deleteClubHistoryMilestoneAction", "uploadMediaAsset"]) assert.ok(actions.includes(operation));
+  assert.doesNotMatch(service, /supabase|\.from\(|uploadMediaFile|deleteMediaFile/);
 });

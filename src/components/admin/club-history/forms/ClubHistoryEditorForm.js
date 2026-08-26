@@ -17,10 +17,8 @@ import AdminRichTextEditor from "@/components/admin/richtext/AdminRichTextEditor
 import { hasMeaningfulRichText } from "@/lib/richtext/sanitize";
 import ClubHistoryImagesManager from "../components/ClubHistoryImagesManager";
 import ClubHistoryMilestonesManager from "../components/ClubHistoryMilestonesManager";
-import {
-  CLUB_HISTORY_PAGE_KEY,
-  upsertClubHistoryPage,
-} from "../services/clubHistory.service";
+import { CLUB_HISTORY_PAGE_KEY } from "../services/clubHistory.service";
+import { saveClubHistoryPageAction } from "@/app/admin/club-history/actions";
 
 const TABS = [
   { id: "basic", label: "Grunddaten" },
@@ -113,17 +111,17 @@ export default function ClubHistoryEditorForm({
       sort_order: Number(form.sort_order || 0),
     };
 
-    const { data, error } = await upsertClubHistoryPage(payload, pageId);
+    const result = await saveClubHistoryPageAction(payload, pageId);
 
     setLoading(false);
 
-    if (error) {
-      alert(error.message);
+    if (!result.ok) {
+      alert(result.error);
       return;
     }
 
-    if (data?.id) {
-      setPageId(data.id);
+    if (result.data?.id) {
+      setPageId(result.data.id);
       await revalidatePublicContentAction("club-history");
       alert("Vereinsgeschichte gespeichert.");
     }

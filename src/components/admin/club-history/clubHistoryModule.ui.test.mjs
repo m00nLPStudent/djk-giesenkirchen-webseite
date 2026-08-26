@@ -33,12 +33,13 @@ test("existing page fields remain editable in German", () => {
 
 test("images use shared preview and existing deletes live in a danger zone", () => {
   assert.match(images, /AdminImagePreview/);
-  assert.match(images, /AdminDangerZone title="Bild dauerhaft löschen"/);
-  assert.match(images, /deleteClubHistoryImage/);
+  assert.match(images, /AdminMediaPicker/);
+  assert.match(images, /AdminDangerZone title="Bildzuordnung dauerhaft löschen"/);
+  assert.match(images, /deleteClubHistoryImageAction/);
 });
 
-test("milestone periods, status, sorting and delete remain available", () => {
-  for (const value of ["milestone_year", "milestone_year_until", "sort_order", "is_active", "deleteClubHistoryMilestone"]) assert.ok(milestones.includes(value));
+test("milestone periods, status, sorting and server delete remain available", () => {
+  for (const value of ["milestone_year", "milestone_year_until", "sort_order", "is_active", "deleteClubHistoryMilestoneAction"]) assert.ok(milestones.includes(value));
   assert.match(milestones, /AdminDangerZone title="Meilenstein dauerhaft löschen"/);
   assert.doesNotMatch(milestones, /overflow-x-auto/);
 });

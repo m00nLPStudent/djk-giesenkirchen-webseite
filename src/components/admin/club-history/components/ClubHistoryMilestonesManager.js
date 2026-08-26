@@ -3,12 +3,11 @@
 import { useState } from "react";
 import { InputField, TextareaField } from "@/components/admin/forms";
 import { AdminDangerZone, AdminModuleEmptyState } from "@/components/admin/design-system";
-import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import {
-  createClubHistoryMilestone,
-  deleteClubHistoryMilestone,
-  updateClubHistoryMilestone,
-} from "../services/clubHistory.service";
+  createClubHistoryMilestoneAction,
+  deleteClubHistoryMilestoneAction,
+  updateClubHistoryMilestoneAction,
+} from "@/app/admin/club-history/actions";
 function sortMilestones(items) {
   return [...items].sort((a, b) => {
     const yearA = Number(a.milestone_year || 0);
@@ -59,7 +58,7 @@ export default function ClubHistoryMilestonesManager({
     }
 
     setCreating(true);
-    const { data, error } = await createClubHistoryMilestone(pageId, {
+    const result = await createClubHistoryMilestoneAction(pageId, {
       milestone_year: new Date().getFullYear(),
       milestone_year_until: null,
       description_de: "",
@@ -69,21 +68,20 @@ export default function ClubHistoryMilestonesManager({
     });
     setCreating(false);
 
-    if (error) {
-      alert(error.message);
+    if (!result.ok) {
+      alert(result.error);
       return;
     }
 
-    if (data) {
-      setItems((current) => sortMilestones([...current, data]));
-      setOpenId(data.id);
-      await revalidatePublicContentAction("club-history");
+    if (result.data) {
+      setItems((current) => sortMilestones([...current, result.data]));
+      setOpenId(result.data.id);
     }
   }
 
   async function handleSave(item) {
     setSavingIds((current) => [...current, item.id]);
-    const { data, error } = await updateClubHistoryMilestone(item.id, {
+    const result = await updateClubHistoryMilestoneAction(item.id, {
       milestone_year: item.milestone_year,
       milestone_year_until: item.milestone_year_until,
       description_de: item.description_de,
@@ -93,18 +91,17 @@ export default function ClubHistoryMilestonesManager({
     });
     setSavingIds((current) => current.filter((id) => id !== item.id));
 
-    if (error) {
-      alert(error.message);
+    if (!result.ok) {
+      alert(result.error);
       return;
     }
 
-    if (data) {
+    if (result.data) {
       setItems((current) =>
         sortMilestones(
-          current.map((entry) => (entry.id === data.id ? data : entry)),
+          current.map((entry) => (entry.id === result.data.id ? result.data : entry)),
         ),
       );
-      await revalidatePublicContentAction("club-history");
     }
   }
 
@@ -113,16 +110,15 @@ export default function ClubHistoryMilestonesManager({
     if (!shouldDelete) return;
 
     setDeletingIds((current) => [...current, item.id]);
-    const { error } = await deleteClubHistoryMilestone(item.id);
+    const result = await deleteClubHistoryMilestoneAction(item.id);
     setDeletingIds((current) => current.filter((id) => id !== item.id));
 
-    if (error) {
-      alert(error.message);
+    if (!result.ok) {
+      alert(result.error);
       return;
     }
 
     setItems((current) => current.filter((entry) => entry.id !== item.id));
-    await revalidatePublicContentAction("club-history");
   }
 
   return (
