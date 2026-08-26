@@ -23,8 +23,10 @@ export default function MembershipPersonalData({
         />
       </FormField>
 
-      <FormField label="Telefonnummer">
+      <FormField label="Telefonnummer" required>
         <input
+          type="tel"
+          required
           className={inputClassName}
           value={form.phone}
           onChange={(event) => onUpdateField("phone", event.target.value)}

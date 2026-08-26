@@ -1,19 +1,26 @@
 import {
+  findMembershipTeamById,
   insertMembershipRequest,
   updateMembershipRequest,
 } from "./membership.repository";
 import { sendMembershipRequestNotifications } from "./membership.mail";
+import { prepareMembershipRequest } from "./membershipSubmit.core.mjs";
 
 export async function submitMembershipRequest(payload, { client } = {}) {
-  const result = await insertMembershipRequest(payload, client);
+  const prepared = await prepareMembershipRequest(payload, {
+    findTeamById: (id) => findMembershipTeamById(id, client),
+  });
+  if (prepared.error) return prepared;
+
+  const result = await insertMembershipRequest(prepared.data, client);
 
   if (result.error) {
     return result;
   }
 
-  await sendMembershipRequestNotifications(payload);
+  await sendMembershipRequestNotifications(prepared.data);
 
-  return result;
+  return { ...result, submittedRequest: prepared.data };
 }
 
 export async function saveMembershipRequestStatus(request, payload, { client } = {}) {

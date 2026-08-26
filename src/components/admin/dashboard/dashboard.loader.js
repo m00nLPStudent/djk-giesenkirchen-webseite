@@ -46,7 +46,9 @@ async function loadNews(db, canEdit) {
   return (data || []).map((item) => ({ id: item.id, title: item.title_de || "Unbenannte News", categoryKey: item.category_key, categoryLabel: resolveNewsCategoryLabel(categories || [], item.category_key), status: item.is_published ? "Veröffentlicht" : "Entwurf", publishedAt: item.published_at || item.created_at, updatedAt: item.created_at, href: canEdit ? `/admin/news/edit/${item.id}` : "/admin/news" }));
 }
 
-async function loadMembershipCount(db) {
+async function loadMembershipCount() {
+  const db = createSupabaseAdminClient();
+  if (!db) return 0;
   const { count } = await db.from("membership_requests").select("id", { count: "exact", head: true }).in("status", ["new", "in_progress"]);
   return count || 0;
 }
@@ -73,7 +75,7 @@ export const loadDashboard = cache(async () => {
     plan.contributions ? loadContributionSummary() : null,
     plan.events ? loadEvents(auth.supabaseServer, now.toISOString(), permissions.includes("events.edit")) : [],
     plan.news ? loadNews(auth.supabaseServer, permissions.includes("news.edit")) : [],
-    loadMembershipRequestCountForDashboard({ allowed: plan.membershipRequests, loadCount: () => loadMembershipCount(auth.supabaseServer) }),
+    loadMembershipRequestCountForDashboard({ allowed: plan.membershipRequests, loadCount: loadMembershipCount }),
   ]);
   const displayName = resolveDashboardDisplayName(profile);
   const notices = buildDashboardNotices({

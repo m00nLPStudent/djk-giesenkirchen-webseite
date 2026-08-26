@@ -1,5 +1,7 @@
 # Aktuelle Roadmap
 
+> B15.21A ist anwendungsseitig umgesetzt. Vor dem produktiven Abschluss sind Preflight, Proposal und Postcheck aus `docs/sql/b15-21a-membership-submit-hardening-*.sql` manuell auszuführen. Die weitergehende Mitgliedschaftsarten-, Eligibility- und Saisonlogik bleibt B15.21B ff. vorbehalten.
+
 Stand: 26. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 
 ## Priorität 1 – Mitglied-werden-Formular

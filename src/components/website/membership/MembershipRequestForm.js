@@ -42,10 +42,10 @@ function createInitialForm() {
     birthdate: "",
     email: "",
     request_type: "aktives-mitglied-fussball",
-    year_group: "",
     desired_team_id: "",
     message: "",
     privacy_accepted: false,
+    website: "",
   };
 }
 
@@ -85,10 +85,11 @@ export default function MembershipRequestForm({ teams = [] }) {
     if (
       !form.first_name.trim() ||
       !form.last_name.trim() ||
+      !form.phone.trim() ||
       !form.email.trim() ||
       !form.birthdate
     ) {
-      alert("Bitte Vorname, Nachname, Geburtsdatum und E-Mail ausfüllen.");
+      alert("Bitte Vorname, Nachname, Telefonnummer, Geburtsdatum und E-Mail ausfüllen.");
       return;
     }
 
@@ -106,9 +107,10 @@ export default function MembershipRequestForm({ teams = [] }) {
       birthdate: form.birthdate || null,
       email: form.email.trim(),
       request_type: form.request_type,
-      year_group: showFootballFields ? derivedYearGroup || null : null,
       desired_team_id: showFootballFields ? form.desired_team_id || null : null,
       message: form.message.trim() || null,
+      privacy_accepted: form.privacy_accepted,
+      website: form.website,
     };
 
     const { error } = await submitMembershipRequestAction(payload);
@@ -130,6 +132,18 @@ export default function MembershipRequestForm({ teams = [] }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="absolute left-[-10000px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+        <label htmlFor="membership-website">Website</label>
+        <input
+          id="membership-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={form.website}
+          onChange={(event) => updateField("website", event.target.value)}
+        />
+      </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <MembershipPersonalData
           form={form}

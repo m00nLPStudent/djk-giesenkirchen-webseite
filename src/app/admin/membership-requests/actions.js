@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { forwardMembershipRequest, saveMembershipRequestStatus } from "@/lib/membership/membership.service";
 import { logWorkflowNotificationFailure, notifyMembershipWorkflow } from "@/components/admin/notifications/workflowNotifications.service";
 import { resolveMembershipRequestRecordAccess } from "@/components/admin/membership/membershipRequestRecordAccess.service";
@@ -29,7 +30,9 @@ export async function saveMembershipRequestStatusAction(request, payload) {
 export async function forwardMembershipRequestAction(request, payload) {
   const auth = await assertAdminActionPermission({ requiredPermission: "membership_requests.forward" });
   if (!auth.ok) return failure(auth.message || "Berechtigung fehlt.");
-  const result = await forwardMembershipRequest(request, payload, { client: auth.supabaseServer });
+  const db = createSupabaseAdminClient();
+  if (!db) return failure("Serverzugriff ist derzeit nicht verfügbar.");
+  const result = await forwardMembershipRequest(request, payload, { client: db });
   if (!result.error && result.data) {
     const type = request?.forwarded_to_id ? "membership_forwarded" : "membership_assigned";
     const notification = await notifyMembershipWorkflow({ type, request: result.data, actorUserId: auth.profile?.id, targetEmail: result.data.forwarded_to_email });

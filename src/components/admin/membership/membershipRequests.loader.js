@@ -2,6 +2,7 @@ import "server-only";
 
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canAccessMembershipRequests } from "@/lib/admin-auth/membershipAccess";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { createCoachReadDto } from "@/components/admin/persons/coachReadDto";
 import { getCoachSeasonalReadModelsMap } from "@/components/admin/persons/coachSeasonalReadModelRepository";
 
@@ -16,7 +17,8 @@ export async function loadMembershipRequestsPageData({ authenticate = assertAdmi
   const context = { roleKeys: roleKeys(auth), permissionKeys: permissionKeys(auth) };
   if (!canAccessMembershipRequests(context)) return { ok: false, reason: "membership-access-denied" };
 
-  const db = auth.supabaseServer;
+  const db = createSupabaseAdminClient();
+  if (!db) return { ok: false, reason: "server-access-unavailable" };
   const [requestsResult, recipientsResult, coachesResult, boardMembersResult] = await Promise.all([
     db.from("membership_requests").select("*, teams(name_de)").order("created_at", { ascending: false }),
     db.from("membership_request_recipients").select("*").order("sort_order", { ascending: true }).order("created_at", { ascending: true }),

@@ -1,6 +1,8 @@
 # SQL-Register und Aufbewahrung
 
-Stand: 26. August 2026. Inventar: 143 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
+> B15.21A ist noch manuell auszurollen: zuerst `b15-21a-membership-submit-hardening-preflight-readonly.sql`, dann das Proposal, anschließend der Read-only-Postcheck. Der Rollback ist nur ein Notfallartefakt.
+
+Stand: 26. August 2026. Inventar: 147 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
 
 ## Vollständige Klassifikationsregeln
 
