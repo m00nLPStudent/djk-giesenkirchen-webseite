@@ -62,7 +62,7 @@ Für `departments` habe ich im inspizierten Runtime-Slice keinen belastbaren dir
 
 ### Teams / Saisons / Zuordnungen
 
-Der zentrale Schreibpfad ist [src/components/admin/teams/services/teams.service.js](../src/components/admin/teams/services/teams.service.js), ergänzt durch [src/app/admin/teams/actions.js](../src/app/admin/teams/actions.js), [src/app/admin/teams/page.js](../src/app/admin/teams/page.js) und [src/lib/admin-auth/scopes/scopeRepository.js](../src/lib/admin-auth/scopes/scopeRepository.js).
+Der zentrale Schreibpfad ist [src/components/admin/teams/services/teams.service.js](../../src/components/admin/teams/services/teams.service.js), ergänzt durch [src/app/admin/teams/actions.js](../../src/app/admin/teams/actions.js), [src/app/admin/teams/page.js](../../src/app/admin/teams/page.js) und [src/lib/admin-auth/scopes/scopeRepository.js](../../src/lib/admin-auth/scopes/scopeRepository.js).
 
 - `teams` wird aktiv geschrieben und gelesen.
 - `seasons` wird für die aktuelle Saison und die Team-Saison-Zuordnung gelesen.
@@ -74,12 +74,12 @@ Der zentrale Schreibpfad ist [src/components/admin/teams/services/teams.service.
 
 Die Personenmodule sind klar aktiv:
 
-- [src/components/admin/players/services/players.service.js](../src/components/admin/players/services/players.service.js)
-- [src/app/admin/players/actions.js](../src/app/admin/players/actions.js)
-- [src/components/admin/coaches/services/coaches.service.js](../src/components/admin/coaches/services/coaches.service.js)
-- [src/app/admin/coaches/actions.js](../src/app/admin/coaches/actions.js)
-- [src/components/admin/board/services/board.service.js](../src/components/admin/board/services/board.service.js)
-- [src/app/admin/department/board/actions.js](../src/app/admin/department/board/actions.js)
+- [src/components/admin/players/services/players.service.js](../../src/components/admin/players/services/players.service.js)
+- [src/app/admin/players/actions.js](../../src/app/admin/players/actions.js)
+- [src/components/admin/coaches/services/coaches.service.js](../../src/components/admin/coaches/services/coaches.service.js)
+- [src/app/admin/coaches/actions.js](../../src/app/admin/coaches/actions.js)
+- [src/components/admin/board/services/board.service.js](../../src/components/admin/board/services/board.service.js)
+- [src/app/admin/department/board/actions.js](../../src/app/admin/department/board/actions.js)
 
 Wichtigste Legacy-Felder:
 
@@ -91,13 +91,13 @@ Wichtigste Legacy-Felder:
 
 Die Content-Module sind aktiv und werden sowohl im Admin als auch öffentlich verwendet:
 
-- [src/components/admin/news/services/news.service.js](../src/components/admin/news/services/news.service.js)
-- [src/app/admin/news/page.js](../src/app/admin/news/page.js)
-- [src/app/(website)/news/page.js](<../src/app/(website)/news/page.js>)
-- [src/app/(website)/news/[slug]/page.js](<../src/app/(website)/news/[slug]/page.js>)
-- [src/components/admin/events/services/events.service.js](../src/components/admin/events/services/events.service.js)
-- [src/app/admin/events/page.js](../src/app/admin/events/page.js)
-- [src/app/(website)/termine/[slug]/page.js](<../src/app/(website)/termine/[slug]/page.js>)
+- [src/components/admin/news/services/news.service.js](../../src/components/admin/news/services/news.service.js)
+- [src/app/admin/news/page.js](../../src/app/admin/news/page.js)
+- [src/app/(website)/news/page.js](<../../src/app/(website)/news/page.js>)
+- [src/app/(website)/news/[slug]/page.js](<../../src/app/(website)/news/[slug]/page.js>)
+- [src/components/admin/events/services/events.service.js](../../src/components/admin/events/services/events.service.js)
+- [src/app/admin/events/page.js](../../src/app/admin/events/page.js)
+- [src/app/(website)/termine/[slug]/page.js](<../../src/app/(website)/termine/[slug]/page.js>)
 
 Die wichtigsten Runtime-Spalten sind:
 
@@ -109,7 +109,7 @@ Die wichtigsten Runtime-Spalten sind:
 
 Storage ist klar produktiv angebunden:
 
-- [src/lib/storage.js](../src/lib/storage.js)
+- [src/lib/storage.js](../../src/lib/storage.js)
 - `media`
 - `news-documents`
 - `events-documents`
@@ -120,13 +120,13 @@ Die Dokument-Buckets werden in den News- und Event-Services direkt beschrieben u
 
 Das Berechtigungsmodell ist aktiv und zentral:
 
-- [src/lib/admin-auth/adminActionPermissions.js](../src/lib/admin-auth/adminActionPermissions.js)
-- [src/lib/admin-auth/scopes/scopeRepository.js](../src/lib/admin-auth/scopes/scopeRepository.js)
-- [src/lib/admin-auth/adminDiagnostics.js](../src/lib/admin-auth/adminDiagnostics.js)
-- [src/lib/admin-auth/adminRoles.repository.js](../src/lib/admin-auth/adminRoles.repository.js)
-- [src/lib/admin-auth/adminPermissions.repository.js](../src/lib/admin-auth/adminPermissions.repository.js)
-- [src/lib/admin-auth/userRoles.repository.js](../src/lib/admin-auth/userRoles.repository.js)
-- [src/lib/admin-auth/adminProfiles.repository.js](../src/lib/admin-auth/adminProfiles.repository.js)
+- [src/lib/admin-auth/adminActionPermissions.js](../../src/lib/admin-auth/adminActionPermissions.js)
+- [src/lib/admin-auth/scopes/scopeRepository.js](../../src/lib/admin-auth/scopes/scopeRepository.js)
+- [src/lib/admin-auth/adminDiagnostics.js](../../src/lib/admin-auth/adminDiagnostics.js)
+- [src/lib/admin-auth/adminRoles.repository.js](../../src/lib/admin-auth/adminRoles.repository.js)
+- [src/lib/admin-auth/adminPermissions.repository.js](../../src/lib/admin-auth/adminPermissions.repository.js)
+- [src/lib/admin-auth/userRoles.repository.js](../../src/lib/admin-auth/userRoles.repository.js)
+- [src/lib/admin-auth/adminProfiles.repository.js](../../src/lib/admin-auth/adminProfiles.repository.js)
 
 Wichtige Tabellen:
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Abgeschlossen und produktiv nutzbar.
+Bestehender Workflow produktiv nutzbar. Die jahrgangs- und saisonabhängige Überarbeitung des öffentlichen Formulars ist der nächste geplante Fachblock und in der [aktuellen Roadmap](../planning/current-roadmap.md) beschrieben.
 
 ## Öffentliche Funktionen
 
@@ -30,6 +30,6 @@ Abgeschlossen und produktiv nutzbar.
 - `membership_requests`
 - `membership_request_recipients`
 
-## Release-Hinweis
+## Offene Weiterentwicklung
 
-Öffentliche Website enthält keine offenen Membership-Feature-Baustellen im Responsive-Release.
+Geburtsdatum/Jahrgang, vollständige Mitgliedschaftsarten, automatische Jugend-/Mannschaftsfilterung und Saisonwechsel werden gesondert umgesetzt. Bestehende Notifications, Zuweisungen und Scopes sind dabei weiterzuverwenden.

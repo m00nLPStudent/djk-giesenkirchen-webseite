@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-08-26
+
+### B15.18/B15.19 abgeschlossen und B15.20 dokumentiert
+
+- Notification-/Reminder-System einschließlich Audit-, Idempotenz- und Append-Härtung abgeschlossen; Cron-Produktivaktivierung als Go-live-Punkt zurückgestellt.
+- zentrale Medienbibliothek in Spieler, Trainer, Vorstand, Kontakte, Mannschaften, News, Events, Sponsoren und Vereinschronik integriert.
+- Sponsor-, Event-Dokument-, Chronik-, Board- und Publish-Berechtigungen gehärtet.
+- Event-Mutationsclient, lokale Veröffentlichungszeitpunkte und Admin-Read für Event-Entwürfe korrigiert.
+- aktuelle Roadmap, Abschlussübersicht und SQL-Register als zentrale Planungsgrundlage ergänzt.
+
 ## 2026-07-12
 
 ### Phase B12.2a Feste Profil-/Kachel-Verknuepfung fuer Vorstand und Trainer produktiv vorbereitet

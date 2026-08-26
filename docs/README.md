@@ -41,6 +41,11 @@ Diese Dokumentation beschreibt den finalen Stand der öffentlichen Website (Resp
   - [decisions/architecture-decisions.md](decisions/architecture-decisions.md)
 - `planning/`
   - [planning/b12-role-scope-matrix.md](planning/b12-role-scope-matrix.md)
+  - [planning/project-status.md](planning/project-status.md)
+  - [planning/current-roadmap.md](planning/current-roadmap.md)
+  - [planning/completed-development-blocks.md](planning/completed-development-blocks.md)
+- `sql/`
+  - [sql/README.md](sql/README.md) – Klassifikation, Aufbewahrung und manuell zu verifizierende Ausführungsstände
 - Historie
   - [changelog.md](changelog.md)
 
@@ -60,3 +65,9 @@ Vollständig dokumentiert sind:
 - Permission-Engine/Guard-Struktur vorbereitet (Enforcement aktuell deaktiviert)
 - Login/Logout/Auth-Flow im Adminbereich vorbereitet (AUTH_REQUIRED_FOR_ADMIN = false)
 - Durchgeführte Modularisierungs- und Refactoring-Schritte
+- B15.18 Notification-/Reminder-System einschließlich Security-Härtung
+- B15.19 zentrale Medienbibliothek, Fachintegrationen und Rollen-/Security-Nachläufe
+
+## Planungsregel
+
+Die [aktuelle Roadmap](planning/current-roadmap.md) ist die einzige verbindliche offene To-do-Liste. Ältere Dateien unter `planning/` dokumentieren Entscheidungen und abgeschlossene Entwicklungsstände.

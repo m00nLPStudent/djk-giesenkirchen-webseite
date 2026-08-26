@@ -34,3 +34,5 @@ Abgeschlossen, modularisiert und aktiv genutzt.
 ## Architekturhinweis
 
 Wiederholungen und virtuelle Trainings werden zur Laufzeit berechnet. Es werden keine zusätzlichen Event-Zeilen für jedes Vorkommen gespeichert.
+
+Die autorisierte Adminübersicht lädt auch unveröffentlichte Entwürfe über einen serverseitigen Admin-Read. Öffentliche Eventabfragen bleiben ausdrücklich auf `is_published = true` begrenzt. Create/Edit und Publish sind getrennt autorisiert: Ein Statuswechsel verlangt zusätzlich `events.publish`.

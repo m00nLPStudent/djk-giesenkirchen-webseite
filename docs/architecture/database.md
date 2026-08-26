@@ -54,14 +54,27 @@ Virtuelle Trainings werden zur Laufzeit erzeugt und nicht als persistente Event-
 - `membership_requests`
 - `membership_request_recipients`
 
+## Notifications
+
+- `notifications`
+- `notification_preferences`
+- `notification_audit`
+- serverseitiger, kontrollierter Audit-Append und read-only Superadmin-Monitoring
+
+## Zentrale Medien
+
+- `media_assets`
+- `media_asset_usages`
+- fachliche nullable Media-FKs unter anderem für Personen, Mannschaften, News, Events, Sponsoren und Chronik
+
 ## Modellregeln
 
 - Keine UI- oder Service-Änderung ohne Schema-Abgleich
 - Keine Doku-Aussage ohne tatsächliche Tabellennutzung im Code
 
-## B12.2 Vorschlagsstand (noch nicht produktiv)
+## Historische SQL-Planung
 
-In Phase B12.2 wurden nur SQL-Vorschlaege dokumentiert. Es wurden keine Migrationen ausgefuehrt.
+Die folgenden B12-Abschnitte dokumentieren den damaligen Vorschlagsstand und sind keine aktuelle Ausführungsanweisung. Aktuelle Klassifikation und manuell zu verifizierende Zustände stehen im [SQL-Register](../sql/README.md).
 
 Geplante Erweiterungen:
 

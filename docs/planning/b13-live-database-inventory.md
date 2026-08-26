@@ -4,13 +4,13 @@
 
 Dieses Dokument beschreibt die Ausfuehrung einer Live-Inventur des tatsaechlichen Ist-Stands der produktiven Supabase-PostgreSQL-Datenbank.
 
-Die dazugehoerige Datei [docs/sql/b13-live-database-audit.sql](docs/sql/b13-live-database-audit.sql) enthaelt ausschliesslich read-only Abfragen.
+Die dazugehoerige Datei [docs/sql/b13-live-database-audit.sql](../sql/b13-live-database-audit.sql) enthaelt ausschliesslich read-only Abfragen.
 
 ## Ausfuehrungsanleitung
 
 1. Supabase im Browser oeffnen.
 2. SQL Editor oeffnen.
-3. Inhalt von [docs/sql/b13-live-database-audit.sql](docs/sql/b13-live-database-audit.sql) vollstaendig einfuegen.
+3. Inhalt von [docs/sql/b13-live-database-audit.sql](../sql/b13-live-database-audit.sql) vollstaendig einfuegen.
 4. Abfragen blockweise ausfuehren (Block fuer Block in der Reihenfolge 01 bis 12).
 5. Ergebnisse je Block als CSV oder JSON exportieren.
 6. Exportdateien eindeutig benennen.
@@ -48,7 +48,7 @@ Hinweis: Falls JSON genutzt wird, die gleichen Dateinamen mit `.json` verwenden.
 
 ## Read-Only-Hinweis
 
-Die SQL-Datei [docs/sql/b13-live-database-audit.sql](docs/sql/b13-live-database-audit.sql) enthaelt nur SELECT-Abfragen (inkl. WITH ... SELECT) und keine mutierenden Statements.
+Die SQL-Datei [docs/sql/b13-live-database-audit.sql](../sql/b13-live-database-audit.sql) enthaelt nur SELECT-Abfragen (inkl. WITH ... SELECT) und keine mutierenden Statements.
 
 ## Checkliste fuer Ergebnis-Export
 
