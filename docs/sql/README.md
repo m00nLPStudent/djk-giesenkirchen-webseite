@@ -1,6 +1,6 @@
 # SQL-Register und Aufbewahrung
 
-> B15.21A ist noch manuell auszurollen: zuerst `b15-21a-membership-submit-hardening-preflight-readonly.sql`, dann das Proposal, anschließend der Read-only-Postcheck. Der Rollback ist nur ein Notfallartefakt.
+> B15.21A und B15.21B0 sind produktiv abgeschlossen. Die B15.21B0-Dateifamilie bleibt als Rolloutnachweis erhalten; der Rollback ist nur ein destruktives Notfallartefakt.
 
 Stand: 26. August 2026. Inventar: 147 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
 
@@ -29,6 +29,8 @@ Die erste passende Regel gewinnt und erfasst damit jede SQL-Datei:
 Alle Proposal-/Postcheck-/Rollback-Familien von A bis I bleiben als nachvollziehbare Schema-, RLS-, Grant-, RPC- und Rollbackhistorie erhalten. Commit-Historie und Anwendungscode belegen die Implementierung; ob jede einzelne Proposal-Datei gegen die betrachtete Datenbank ausgeführt wurde, muss bei Bedarf mit ihrem Postcheck manuell bestätigt werden.
 
 ## Noch offen oder manuell zu verifizieren
+
+- Department-Zuordnungen erst nach manueller fachlicher Bestätigung; das B15.21B0-Template enthält bewusst keine geratenen Zuordnungen.
 
 - B12-Dateien mit `noch-nicht-ausführen-` beziehungsweise `nach-Prüfung-ausführbar-`.
 - B13-Legacy-Removal und saisonale Cleanup-Dateien vor dem späteren Datenbank-/Saison-Cleanup.

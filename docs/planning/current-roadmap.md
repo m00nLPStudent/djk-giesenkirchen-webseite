@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-> B15.21A ist anwendungsseitig umgesetzt. Vor dem produktiven Abschluss sind Preflight, Proposal und Postcheck aus `docs/sql/b15-21a-membership-submit-hardening-*.sql` manuell auszuführen. Die weitergehende Mitgliedschaftsarten-, Eligibility- und Saisonlogik bleibt B15.21B ff. vorbehalten.
+> B15.21A und B15.21B0 sind produktiv ausgerollt und geprüft. B15.21B1 stellt die datengetriebene Jahrgangspflege im Dashboard bereit; die öffentliche Nutzung folgt separat in B15.21B2.
 
 Stand: 26. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 

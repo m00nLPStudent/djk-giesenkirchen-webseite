@@ -3,6 +3,7 @@ export const SETTINGS_TABS = [
   { id: "contacts", label: "Allgemeine Kontakte" },
   { id: "pages", label: "Seiten" },
   { id: "team-types", label: "Mannschaftsvorlagen", href: "/admin/settings/team-types", permission: "settings.edit" },
+  { id: "seasons-teams", label: "Saisons & Mannschaften", href: "/admin/settings/seasons-teams", permission: "teams.edit" },
   { id: "categories", label: "Kategorien & Terminarten", href: "/admin/settings/categories", permission: "settings.edit" },
 ];
 

@@ -16,6 +16,9 @@ import { logNotificationFailure, notifyTeamArchived, notifyTeamRosterChange } fr
 import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { normalizeBirthYears } from "@/components/admin/teams/services/teamSeasonYearGroups.core.mjs";
+import { replaceTeamSeasonYearGroups } from "@/components/admin/teams/services/teamSeasonYearGroups.repository";
 
 function buildError(message) {
   return { error: { message } };
@@ -149,6 +152,24 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   revalidatePath(`/admin/teams/${result.teamId}`);
   revalidatePublicContent("teams");
   return { error: null };
+}
+
+export async function saveTeamSeasonYearGroupsAction(teamId, teamSeasonId, values) {
+  const auth = await loadAuthorizedTeamMutationContext("teams.edit");
+  if (!auth.ok) return auth.result;
+  const team = await loadTeamById(auth.supabaseServer, teamId);
+  if (!team || !canAccessTeamOnServer(auth.scopeContext, team)) return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
+  const normalized = normalizeBirthYears(values);
+  if (normalized.error) return buildError(normalized.error.message);
+  const { data: teamSeason, error } = await auth.supabaseServer.from("team_seasons").select("id, team_id").eq("id", teamSeasonId).eq("team_id", teamId).maybeSingle();
+  if (error || !teamSeason) return buildError("Die Mannschaftssaison ist ungueltig.");
+  const adminDb = createSupabaseAdminClient();
+  if (!adminDb) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
+  const result = await replaceTeamSeasonYearGroups(adminDb, teamSeason.id, normalized.data);
+  if (result.error) return buildError("Die Jahrgaenge konnten nicht gespeichert werden.");
+  revalidatePath(`/admin/teams/edit/${teamId}`);
+  revalidatePath("/admin/settings/seasons-teams");
+  return { data: normalized.data, error: null };
 }
 
 async function authorizeTeamMedia(teamId = null) {

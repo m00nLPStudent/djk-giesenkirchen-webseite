@@ -2,7 +2,7 @@
 
 ## Status
 
-B15.21A ist anwendungsseitig umgesetzt. Der produktive Abschluss bleibt bis zur manuellen Ausführung und Prüfung des SQL-Hardening-Proposals offen.
+B15.21A und die Datenmodellgrundlage B15.21B0 sind produktiv ausgerollt und geprüft. B15.21B1 ergänzt die serverseitig autorisierte Pflege unter `Einstellungen → Saisons & Mannschaften`.
 
 ## Öffentliche Funktionen
 
@@ -36,5 +36,7 @@ B15.21A ist anwendungsseitig umgesetzt. Der produktive Abschluss bleibt bis zur 
 Geplante Consent-Nachweisfelder aus B15.21A: `privacy_consent`, `privacy_consent_at`, `privacy_policy_version`. Das finale Proposal aktiviert RLS, entfernt historische App-Metadata-Policies und entzieht `PUBLIC`, `anon` und `authenticated` sämtliche direkten Tabellen- und Spaltenrechte. Öffentlicher Submit und autorisierte Adminpfade laufen danach ausschließlich serverseitig über Service Role. Das Proposal wird ausschließlich manuell ausgeführt.
 
 ## Offene Weiterentwicklung
+
+`team_season_year_groups` ordnet einer Mannschaftssaison null bis mehrere Geburtsjahre zu; derselbe Jahrgang darf mehreren Mannschaftssaisons zugeordnet sein. `membership_requests.desired_team_season_id` ist nullable vorbereitet. Browserrollen erhalten keinen direkten Tabellenzugriff. Die Adminpflege verwendet `teams.edit`, den bestehenden Team-Scope und erst nach Autorisierung den serverseitigen Admin-Client. Das öffentliche Formular wird erst in B15.21B2 angebunden.
 
 Vollständige Mitgliedschaftsarten, automatische Jugend-/Mannschaftsfilterung, Eligibility und Saisonwechsel folgen in B15.21B ff. Persistentes verteiltes Rate Limiting benötigt eine gesonderte Infrastrukturentscheidung; ein Prozessspeicher-Limiter wird bewusst nicht eingesetzt.

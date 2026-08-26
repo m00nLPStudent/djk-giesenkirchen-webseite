@@ -126,6 +126,10 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "exact",
     priority: 500,
   }),
+  buildRule("/admin/settings/seasons-teams", "teams.edit", {
+    matchType: "exact",
+    priority: 500,
+  }),
   buildRule("/admin/contributions/new", "contributions.create", {
     matchType: "exact",
     priority: 500,
