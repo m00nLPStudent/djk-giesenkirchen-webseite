@@ -4,6 +4,7 @@ import { normalizeNotificationTarget, normalizeNotificationType } from "./notifi
 import * as repository from "./notifications.repository";
 import { recordNotificationMonitoringEvent } from "./monitoring/notificationMonitoring.logger";
 import { filterRecipientsByNotificationPreferences } from "./preferences/notificationPreferences.service";
+import { deliverPersistedNotificationEmailsBestEffort } from "./delivery/notificationEmailDelivery.service";
 
 const preferenceAudit = (result) => ({ inputCount: result.inputCount, skippedCount: result.skipped.length, outputCount: result.outputCount, mandatoryType: result.mandatoryType });
 
@@ -26,6 +27,7 @@ export async function createNotification(input, { db }) {
   const preferences = await filterRecipientsByNotificationPreferences(db, [input]);
   const result = preferences.allowed.length ? await repository.insertNotificationInRepository(db, createPayload(input)) : { data: null, error: null };
   await recordNotificationMonitoringEvent({ type: input.type, status: result.error ? "failed" : preferences.skipped.length ? "skipped" : "success", actorId: input.actorUserId, recipientId: input.recipientUserId, recipientCount: 1, afterDedupeCount: 1, successCount: result.error ? 0 : result.data ? 1 : 0, failedCount: result.error ? 1 : 0, skippedCount: preferences.skipped.length, durationMs: Date.now() - started, route: input.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : null, idempotencyKey: input.metadata?.idempotencyKey, recipientAnalysis: input.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) }, { db });
+  if (result.data) await deliverPersistedNotificationEmailsBestEffort([result.data], { db });
   return { ...result, data: result.data ? createNotificationDto(result.data) : null };
 }
 
@@ -34,6 +36,7 @@ export async function createNotifications(inputs, { db }) {
   const preferences = await filterRecipientsByNotificationPreferences(db, inputs);
   const result = preferences.allowed.length ? await repository.insertNotificationsInRepository(db, preferences.allowed.map(createPayload)) : { data: [], error: null };
   await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: result.error ? "failed" : preferences.skipped.length ? "warning" : "success", actorId: inputs[0]?.actorUserId, recipientId: inputs.length === 1 ? inputs[0]?.recipientUserId : null, recipientCount: inputs.length, afterDedupeCount: inputs.length, successCount: result.error ? 0 : result.data?.length || 0, failedCount: result.error ? preferences.allowed.length : 0, skippedCount: preferences.skipped.length, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : null, idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) }, { db });
+  if (result.data?.length) await deliverPersistedNotificationEmailsBestEffort(result.data, { db });
   return { ...result, data: createNotificationDtos(result.data || []) };
 }
 
@@ -68,6 +71,7 @@ export async function createNotificationsOnce(inputs, { db }) {
   const preferenceSkipped = preferences.skipped.length;
   const allDuplicates = duplicateCount + atomicDuplicateCount;
   await recordNotificationMonitoringEvent({ type: inputs[0]?.type, status: result.error ? "failed" : allDuplicates || preferenceSkipped ? "warning" : "success", actorId: inputs[0]?.actorUserId, recipientId: allowedPayloads.length === 1 ? allowedPayloads[0].recipient_user_id : null, recipientCount: inputs.length, afterDedupeCount: unique.length, successCount: result.data?.length || 0, failedCount: result.failedCount || 0, duplicateCount: allDuplicates, skippedCount: allDuplicates + preferenceSkipped, durationMs: Date.now() - started, route: inputs[0]?.targetUrl, errorClass: result.error ? "notification_insert_failed" : preferences.lookupError ? "notification_preference_lookup_failed" : allDuplicates ? "idempotency_duplicate" : null, idempotencyKey: inputs[0]?.metadata?.idempotencyKey, recipientAnalysis: inputs[0]?.monitoringRecipientAnalysis, preferenceAnalysis: preferenceAudit(preferences) }, { db });
+  if (result.data?.length) await deliverPersistedNotificationEmailsBestEffort(result.data, { db });
   return { ...result, duplicateCount: allDuplicates, preferenceSkippedCount: preferenceSkipped, data: createNotificationDtos(result.data || []) };
 }
 

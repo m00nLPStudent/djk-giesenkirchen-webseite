@@ -91,6 +91,10 @@ Unabhängig von D1 sollte vor Go-live für Supabase-Auth-Mails separat Custom SM
 
 Die lokale, von Git ignorierte `.env.local` ist für den späteren ersten Test mit `MAIL_PROVIDER`, `MAIL_FROM` und einem manuell zu ersetzenden Platzhalter für `RESEND_API_KEY` vorbereitet. `MAIL_REPLY_TO` ist im Adapter optional und bleibt beim ersten Test ungesetzt. Der Testabsender verwendet vorübergehend Resends `onboarding@resend.dev`; ohne eigene verifizierte Domain darf damit nur an die E-Mail-Adresse des Resend-Kontos gesendet werden. Der echte API-Key wird ausschließlich vom Benutzer lokal eingetragen. D2 führt keinen Resend-Aufruf und keinen Mailversand aus.
 
+B15.21D5 verwendet dieselbe zentrale Mail-Service-/Provider-Abstraktion zusätzlich für ausdrücklich freigegebene Dashboard-Notification-Typen. Weder Notification-Service noch Fachservice importieren Resend. Ein server-only Coordinator löst die aktive Adminprofil-Adresse auf, rendert einen generischen datensparsamen Hinweis und verwaltet den Zustand in `notification_deliveries`. Der Provider-Idempotenzschlüssel `notification-email/<notification-id>` ist vom Membership-Eingangsbestätigungsschlüssel getrennt. Automatische Retries und E-Mail-Preferences sind noch nicht aktiviert.
+
+B15.21D6 hat diesen Notification-Mailpfad über eine reale Membership-Weiterleitung erfolgreich verifiziert: genau eine Notification, genau eine `sent`-Delivery mit einem Versuch, Resend-Verarbeitung und bestätigter Postfachzustellung. Es gab keinen Retry und keine Doppelzustellung. Die lokale Linkabweichung zwischen konfigurierter Port-3000-Basis-/Tunnel-URL und dem Testserver auf Port 3001 betrifft nicht die Zustellung; vor Go-live muss die finale Vereinsdomain als vertrauenswürdige Basis gesetzt und der `/admin`-Link erneut geprüft werden.
+
 ## D1-Testvertrag
 
 - Template und Anfrageart sind korrekt und enthalten keine ausgeschlossenen Daten.
