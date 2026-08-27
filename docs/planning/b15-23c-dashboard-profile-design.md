@@ -16,6 +16,12 @@ Das projektweite Supabase-Built-in-Mail-Limit blockierte den Endtest zwischenzei
 
 Der finale Desktop-/Mobile-Browsertest bestätigte außerdem Nickname, Telefonnummer, Upload/Auswahl/Wechsel/Entfernen des privaten Profilbilds, Header-Nickname/-Avatar, read-only Name/E-Mail, kompakte Rollen-/Funktionsdarstellung, entfernte Permission-/`created_at`-Anzeige und den Passwortbereich. Trainer-/Vorstandsbilder, Superadmin-Benutzerverwaltung, Rollenmatrix, Login, Logout und Invite-Vertrag bleiben unverändert.
 
+## Nachgelagerte Live-Verifikation B15.23D
+
+Der unveränderte Invite-Vertrag wurde in B15.23D vollständig live bestätigt. Ein neuer Testaccount wurde über die Superadmin-Benutzerverwaltung mit Primärrolle Fußball-Vorstand und zusätzlicher Rolle Trainer angelegt. Einladung und externe Zustellung über Supabase Auth Custom SMTP/Resend, Öffnen des Links, Weiterleitung zu `/admin/set-password`, Passwortvergabe, anschließender Login, Session, Dashboarddarstellung sowie Primär-/Sekundärrolle und bestehendes Permission-Verhalten waren erfolgreich. Es trat kein Fehler in Auth, Redirect, PKCE, Passwortvergabe oder Rollenzuordnung auf; Code-, SQL- und Datenbankkorrekturen waren nicht erforderlich.
+
+Für die Entwicklungs-/Übergangsumgebung sind die Resend-Versanddomain `mail.mavermg.de`, DKIM und Sending-CNAMEs verifiziert. Das derzeit englische Supabase-Invite-Template gehört nicht zu B15.23D und bleibt für einen späteren zentralen Mailtemplate-/Corporate-Design-Block offen. Ebenso bleibt die Umstellung auf den finalen Vereins-Mailserver eine Go-live-Aufgabe.
+
 ## Ausgangsvertrag vor B15.23C
 
 - Route: `/admin/profile`, geschützt über das bestehende Adminrouting mit `dashboard.view`.

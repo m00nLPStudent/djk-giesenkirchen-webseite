@@ -4,7 +4,7 @@ Stand: 26. August 2026. D0 war ausschließlich Analyse und Architekturplanung. B
 
 ## Nachgewiesener Bestand
 
-Admin-Einladungen laufen vom Benutzereditor über `saveAdminUserAction`, `createAdminUserWithInvite` und `inviteAdminAuthUser` zur server-only Supabase-Admin-API `auth.admin.inviteUserByEmail`. Der Service-Role-Client übergibt die mit `ADMIN_AUTH_REDIRECT_URL` beziehungsweise `NEXT_PUBLIC_SITE_URL` gebildete Route `/admin/set-password`. Erzeugung, Template und Zustellung der Auth-Mail liegen danach bei Supabase Auth und dessen im Projekt konfiguriertem Mailtransport. Das Repository kann nicht nachweisen, ob im Supabase-Dashboard Custom SMTP aktiviert ist.
+Admin-Einladungen laufen vom Benutzereditor über `saveAdminUserAction`, `createAdminUserWithInvite` und `inviteAdminAuthUser` zur server-only Supabase-Admin-API `auth.admin.inviteUserByEmail`. Der Service-Role-Client übergibt die mit `ADMIN_AUTH_REDIRECT_URL` beziehungsweise `NEXT_PUBLIC_SITE_URL` gebildete Route `/admin/set-password`. Erzeugung, Template und Zustellung der Auth-Mail liegen danach bei Supabase Auth und dessen konfiguriertem Mailtransport. B15.23D hat Custom SMTP über Resend in der Entwicklungs-/Übergangsumgebung live bestätigt: `mail.mavermg.de`, DKIM und Sending-CNAMEs sind verifiziert; Einladung, externe Zustellung, Set-Password und Login waren erfolgreich. Zugangsdaten bleiben ausschließlich in der externen Konfiguration.
 
 Passwort-Reset-Mails werden an zwei Stellen mit dem normalen Browser-Client direkt über `auth.resetPasswordForEmail` angestoßen: auf `/admin/forgot-password` mit der eingegebenen Adresse und im eigenen Profil mit der Adresse aus der Auth-/Profil-Session. `generateLink` und `signInWithOtp` werden nicht verwendet. Die Zielseite tauscht den Code gegen eine Session beziehungsweise verarbeitet Legacy-Hash-Tokens und setzt anschließend das Passwort über `auth.updateUser`.
 
@@ -85,7 +85,7 @@ Eine absolute Exactly-once-Garantie ist bei einem externen System ohne transakti
 
 Vor dem ersten Versand sind Providerkonto und Datenschutzvertrag zu bestätigen. Danach Domain/DNS-Absender authentifizieren und `MAIL_PROVIDER`, `MAIL_FROM`, optional `MAIL_REPLY_TO` sowie für den vorbereiteten Adapter `RESEND_API_KEY` als Hosting-Secrets anlegen. Keine Variable darf `NEXT_PUBLIC_` tragen. Tracking bleibt deaktiviert; Sandbox/Testempfänger, Bounce-/Complaint-Verhalten und Limits sind vor Produktion zu prüfen. Solange Providername, Key oder Absender fehlen, liefert die zentrale Schicht kontrolliert `skipped`, setzt `mail_sent_at` nicht und verändert den erfolgreichen Membership-Submit nicht.
 
-Unabhängig von D1 sollte vor Go-live für Supabase-Auth-Mails separat Custom SMTP eingerichtet und mit Einladung sowie beiden Resetpfaden getestet werden. D1 selbst benötigt keine RLS-, Grant-, Policy-, Cron-, Vault-, Hook- oder Edge-Function-Änderung.
+Für Supabase-Auth-Mails ist Custom SMTP in der Entwicklungs-/Übergangsumgebung eingerichtet. Einladung und Set-Password wurden in B15.23D, der Recovery-Pfad in B15.23C erfolgreich live getestet. Vor Go-live bleiben die Umstellung auf den finalen Vereins-Mailserver sowie die erneute Prüfung von Absender, finaler Domain, Redirects und Auth-Mailtemplates erforderlich. D1 selbst benötigt keine RLS-, Grant-, Policy-, Cron-, Vault-, Hook- oder Edge-Function-Änderung.
 
 ## D2 – lokale Testvorbereitung
 
