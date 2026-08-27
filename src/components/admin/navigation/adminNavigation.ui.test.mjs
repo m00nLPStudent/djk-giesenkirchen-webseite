@@ -65,6 +65,16 @@ test("active mobile section starts expanded and focus navigation wraps", () => {
   assert.equal(getNextNavigationIndex(2, 3, 1), 0);
 });
 
+test("moved routes activate their new sections on desktop and mobile", () => {
+  const department = applyActivePathToNavigationDto(baseDto, "/admin/department/board/edit/test-id");
+  assert.equal(department.activeSectionKey, "football");
+  assert.equal(department.activeItemKey, "department");
+  const users = applyActivePathToNavigationDto(baseDto, "/admin/users");
+  assert.equal(users.activeSectionKey, "system");
+  assert.equal(users.activeItemKey, "users");
+  assert.deepEqual(getInitialOpenSectionKeys(users), ["system"]);
+});
+
 test("runtime DTO has no planned links and no auth or service data", () => {
   const serialized = JSON.stringify(baseDto);
   assert.ok(baseDto.sections.every((section) => section.items.every((item) => item.status === "active" && item.href)));

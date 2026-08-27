@@ -4,6 +4,8 @@
 
 Stand: 27. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 
+Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und System gegliedert. `/admin/department` ist als „Fußballvorstände“ dem Fußballbereich zugeordnet; Mitgliedsanfragen, Medien und der gemeinsame Einstieg „Seiten, Kontakte & Einstellungen“ bleiben unter Gesamtverein. Offener separater Folgepunkt: Eine eigenständige Gesamtvereins-„Vereinsstruktur“ erst nach Analyse und Einführung einer fachlich getrennten Gesamtvereinsroute sowie einer eindeutig zugeordneten Datenquelle planen; bis dahin keinen künstlichen Navigationseintrag oder neue Route anlegen.
+
 ## Priorität 1 – Mitglied-werden-Formular
 
 - B15.21D3: erster kontrollierter realer Formularversand, interner Notification-Pfad, `mail_sent_at`, Resend-Verarbeitung und Postfacheingang erfolgreich verifiziert.

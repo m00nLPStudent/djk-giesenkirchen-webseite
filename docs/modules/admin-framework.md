@@ -35,6 +35,18 @@ AdminRemoveButton
 
 Neue Adminmodule sollen diese Bausteine nutzen, bevor neue Komponenten erstellt werden.
 
+## Fachliche Adminnavigation
+
+Desktop- und Mobilnavigation werden aus derselben zentralen, serverseitig nach Permissions und Scopes gefilterten Navigation abgeleitet. Die sichtbaren aktiven Bereiche sind fachlich gegliedert:
+
+- Gesamtverein: News, Sponsoren, Termine, Vereinsgeschichte, Mitgliedsanfragen, Medien sowie der gemeinsame Einstieg „Seiten, Kontakte & Einstellungen“.
+- Fußball: Mannschaften, Spieler, Trainer, Vereinsbeiträge und „Fußballvorstände“ unter der bestehenden URL `/admin/department`.
+- System: Benutzer, Rollen, Rechte und das ausschließlich für Superadmins sichtbare Notification Monitoring.
+
+Die Gruppierung verändert weder URLs noch Route Guards, Permissions oder Scopes. Insbesondere bleibt `/admin/department` durch `settings.view` und den bestehenden Board-Scope geschützt und verwaltet fachlich die Vorstände der Fußballabteilung.
+
+Eine eigenständige „Vereinsstruktur“ für den Gesamtverein wird erst in einem separaten Folgeblock geplant. Voraussetzung dafür sind eine fachlich getrennte Gesamtvereinsroute und eine eindeutig zugeordnete Datenquelle; bis dahin gibt es keinen entsprechenden Navigationseintrag.
+
 ## Refactoring-Status
 
 Gemeinsame Admin-Komponenten und Helper wurden eingeführt und in mehrere Module integriert.

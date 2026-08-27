@@ -36,11 +36,14 @@ test("cashier football navigation is compact through permission-filtered items",
   assert.deepEqual(result.visibleItems.map(({ key }) => key), ["contributions"]);
 });
 
-test("superadmin club navigation keeps the existing mega grid", () => {
+test("reorganized administration domains use layouts based on their visible items", () => {
   const permissions = ["news.view", "events.view", "sponsors.view", "club_history.view", "settings.view", "users.view", "roles.view", "permissions.view"];
-  const result = resolvedLayout(permissions, { isGlobal: true }, "club");
-  assert.equal(result.itemCount, 10);
-  assert.equal(result.key, "mega-grid");
+  const club = resolvedLayout(permissions, { isGlobal: true }, "club");
+  const system = resolvedLayout(permissions, { isGlobal: true }, "system");
+  assert.equal(club.itemCount, 6);
+  assert.equal(club.key, "mega-grid");
+  assert.equal(system.itemCount, 3);
+  assert.equal(system.key, "medium-layout");
 });
 
 test("membership policy and permissions determine the visible item count", () => {
