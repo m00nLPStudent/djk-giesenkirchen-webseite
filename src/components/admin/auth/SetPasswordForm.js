@@ -12,61 +12,20 @@ import {
 import PasswordChecklist from "./PasswordChecklist";
 import PasswordStrength from "./PasswordStrength";
 
-async function resolveRecoverySession(supabaseBrowser) {
-  const url = new URL(window.location.href);
-  const code = url.searchParams.get("code");
+const INVALID_LINK_MESSAGE = "Der Link zum Zurücksetzen des Passworts ist ungültig oder abgelaufen. Bitte fordere einen neuen Link an.";
 
-  if (code) {
-    const { error } = await supabaseBrowser.auth.exchangeCodeForSession(code);
-    if (error) {
-      return {
-        ok: false,
-        message:
-          error.message || "Einladungslink konnte nicht verarbeitet werden.",
-      };
-    }
-  }
-
-  const hash = window.location.hash.replace(/^#/, "");
-  const hashParams = new URLSearchParams(hash);
-  const accessToken = hashParams.get("access_token");
-  const refreshToken = hashParams.get("refresh_token");
-
-  if (accessToken && refreshToken) {
-    const { error } = await supabaseBrowser.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
-
-    if (error) {
-      return {
-        ok: false,
-        message:
-          error.message || "Recovery-Session konnte nicht hergestellt werden.",
-      };
-    }
-  }
-
-  const { data, error } = await supabaseBrowser.auth.getSession();
-  if (error) {
-    return {
-      ok: false,
-      message: error.message || "Session konnte nicht gelesen werden.",
-    };
-  }
-
-  if (!data?.session?.user?.id) {
-    return {
-      ok: false,
-      message:
-        "Kein gueltiger Einladungs- oder Reset-Link gefunden. Bitte neuen Link anfordern.",
-    };
-  }
-
-  return { ok: true };
+async function resolveExistingInviteSession(supabaseBrowser) {
+  const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+  const isInvite = params.get("type") === "invite";
+  const accessToken = params.get("access_token");
+  const refreshToken = params.get("refresh_token");
+  if (!isInvite || !accessToken || !refreshToken) return false;
+  window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  const { data, error } = await supabaseBrowser.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+  return !error && Boolean(data?.session?.user?.id);
 }
 
-export default function SetPasswordForm() {
+export default function SetPasswordForm({ initialRecoverySession = false }) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -74,7 +33,7 @@ export default function SetPasswordForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialRecoverySession ? "" : INVALID_LINK_MESSAGE);
   const [success, setSuccess] = useState("");
   const [hasRecoverySession, setHasRecoverySession] = useState(false);
 
@@ -104,20 +63,25 @@ export default function SetPasswordForm() {
         return;
       }
 
-      const result = await resolveRecoverySession(supabaseBrowser);
+      let valid = false;
+      if (initialRecoverySession) {
+        const { data, error: sessionError } = await supabaseBrowser.auth.getSession();
+        valid = !sessionError && Boolean(data?.session?.user?.id);
+      } else {
+        valid = await resolveExistingInviteSession(supabaseBrowser);
+      }
       if (!active) return;
-
-      setHasRecoverySession(Boolean(result.ok));
-      setError(result.ok ? "" : result.message);
+      setHasRecoverySession(valid);
+      setError(valid ? "" : INVALID_LINK_MESSAGE);
       setLoading(false);
     }
 
-    initialize();
+    void Promise.resolve().then(initialize);
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [initialRecoverySession]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -140,7 +104,7 @@ export default function SetPasswordForm() {
 
     if (updateError) {
       setSaving(false);
-      setError(updateError.message || "Passwort konnte nicht gesetzt werden.");
+      setError("Passwort konnte nicht gesetzt werden. Bitte fordere gegebenenfalls einen neuen Link an.");
       return;
     }
 

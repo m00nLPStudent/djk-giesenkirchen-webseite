@@ -10,7 +10,7 @@ import { getMediaFileSizeError } from "./mediaValidation.core.mjs";
 const PAGE_SIZE = 12;
 const initialFilters = (purpose) => ({ search: "", visibility: "all", purpose, page: 1, pageSize: PAGE_SIZE });
 
-export default function AdminMediaPickerDialog({ open, onClose, onSelect, loadAction, uploadAction, mediaKind = "image", defaultPurpose = "coach", allowUpload = true }) {
+export default function AdminMediaPickerDialog({ open, onClose, onSelect, loadAction, uploadAction, mediaKind = "image", defaultPurpose = "coach", allowUpload = true, fixedScope = false }) {
   const dialogRef = useRef(null);
   const searchRef = useRef(null);
   const [filters, setFilters] = useState(initialFilters(defaultPurpose));
@@ -61,8 +61,8 @@ export default function AdminMediaPickerDialog({ open, onClose, onSelect, loadAc
     <div className="flex max-h-[92vh] flex-col"><header className="flex items-center justify-between border-b border-white/10 p-5"><div><h2 id="media-picker-title" className="text-xl font-black">Medium auswählen</h2><p className="mt-1 text-sm text-white/50">{isDocument ? "Ein vorhandenes Dokument auswählen oder direkt neu hochladen." : "Ein vorhandenes Bild auswählen oder direkt neu hochladen."}</p></div><button type="button" onClick={close} className="rounded-full border border-white/15 px-4 py-2 font-bold">Abbrechen</button></header>
       <div className="overflow-y-auto p-5"><div onKeyDown={(event) => { if (event.key === "Enter" && event.target === searchRef.current) void search(event); }} className="grid gap-3 sm:grid-cols-4">
         <input ref={searchRef} value={filters.search} onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))} placeholder="Name, Datei, Alttext, Beschreibung …" className="rounded-2xl border border-white/10 bg-black/20 p-3 sm:col-span-2"/>
-        <select value={filters.visibility} onChange={(event) => setFilters((current) => ({ ...current, visibility: event.target.value }))} className="rounded-2xl border border-white/10 bg-neutral-900 p-3"><option value="all">Alle Sichtbarkeiten</option><option value="public">Öffentlich</option><option value="admin">Adminbereich</option><option value="restricted">Eingeschränkt</option></select>
-        <select aria-label="Verwendung" value={filters.purpose} onChange={(event) => void changePurpose(event.target.value)} className="rounded-2xl border border-white/10 bg-neutral-900 p-3"><option value="all">Alle Verwendungen</option>{purposeOptions.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}</select>
+        {!fixedScope ? <select value={filters.visibility} onChange={(event) => setFilters((current) => ({ ...current, visibility: event.target.value }))} className="rounded-2xl border border-white/10 bg-neutral-900 p-3"><option value="all">Alle Sichtbarkeiten</option><option value="public">Öffentlich</option><option value="admin">Adminbereich</option><option value="restricted">Eingeschränkt</option></select> : null}
+        {!fixedScope ? <select aria-label="Verwendung" value={filters.purpose} onChange={(event) => void changePurpose(event.target.value)} className="rounded-2xl border border-white/10 bg-neutral-900 p-3"><option value="all">Alle Verwendungen</option>{purposeOptions.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}</select> : null}
         <button type="button" onClick={search} className="w-fit rounded-full border border-white/15 px-5 py-2 font-bold">Suchen</button>
         {allowUpload ? <label className="w-fit cursor-pointer rounded-full bg-red-600 px-5 py-2 font-bold"><input type="file" accept={isDocument ? "application/pdf" : "image/jpeg,image/png,image/webp"} className="sr-only" disabled={uploading} onChange={upload}/>{uploading ? "Upload läuft …" : `Neues ${isDocument ? "Dokument" : "Bild"} hochladen`}</label> : null}
       </div>

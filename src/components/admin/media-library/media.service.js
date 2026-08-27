@@ -35,6 +35,49 @@ export async function loadMediaLibrary(filters = {}) {
   return { data, count: result.count || 0, error: null };
 }
 
+export async function loadOwnProfileMediaLibrary(actorUserId, filters = {}) {
+  if (!actorUserId) return { data: [], count: 0, error: new Error("Profilkontext fehlt.") };
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: [], count: 0, error: new Error("Media-Service-Client ist nicht konfiguriert.") };
+  const safePage = Math.max(Number(filters.page) || 1, 1);
+  const safePageSize = Math.min(Math.max(Number(filters.pageSize) || 12, 1), 50);
+  const from = (safePage - 1) * safePageSize;
+  const safeSearch = String(filters.search || "").trim().replace(/[%_,().]/g, " ").slice(0, 100);
+  let query = db.from("media_assets")
+    .select(repository.MEDIA_ASSET_SELECT, { count: "exact" })
+    .eq("uploaded_by_user_id", actorUserId)
+    .eq("purpose", "profile")
+    .eq("media_kind", "image")
+    .eq("visibility", "admin")
+    .eq("storage_bucket", "media-library-private")
+    .eq("is_archived", false)
+    .range(from, from + safePageSize - 1)
+    .order("created_at", { ascending: false })
+    .order("id", { ascending: true });
+  if (safeSearch) query = query.or(`display_name.ilike.%${safeSearch}%,original_filename.ilike.%${safeSearch}%,alt_text.ilike.%${safeSearch}%`);
+  const result = await query;
+  if (result.error) return { data: [], count: 0, error: result.error };
+  const assets = result.data || [];
+  const signed = assets.length ? await db.storage.from("media-library-private").createSignedUrls(assets.map((asset) => asset.storage_path), 300) : { data: [], error: null };
+  if (signed.error) return { data: [], count: 0, error: signed.error };
+  const signedByPath = new Map((signed.data || []).map((item) => [item.path, item.signedUrl]));
+  return { data: assets.map((asset) => withPickerFields({ ...asset, previewUrl: signedByPath.get(asset.storage_path) || null })), count: result.count || 0, error: null };
+}
+
+export async function loadOwnProfileMediaAsset(actorUserId, mediaAssetId) {
+  if (!actorUserId || !mediaAssetId) return { data: null, error: null };
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: null, error: new Error("Media-Service-Client ist nicht konfiguriert.") };
+  const result = await db.from("media_assets").select(repository.MEDIA_ASSET_SELECT)
+    .eq("id", mediaAssetId).eq("uploaded_by_user_id", actorUserId).eq("purpose", "profile")
+    .eq("media_kind", "image").eq("visibility", "admin").eq("storage_bucket", "media-library-private")
+    .eq("is_archived", false).maybeSingle();
+  if (result.error || !result.data) return { data: null, error: result.error || null };
+  const signed = await db.storage.from("media-library-private").createSignedUrl(result.data.storage_path, 300);
+  if (signed.error) return { data: null, error: signed.error };
+  return { data: withPickerFields({ ...result.data, previewUrl: signed.data?.signedUrl || null }), error: null };
+}
+
 export async function loadMediaAssetForPicker(id) {
   if (!id) return { data: null, error: null };
   const db = createSupabaseAdminClient();

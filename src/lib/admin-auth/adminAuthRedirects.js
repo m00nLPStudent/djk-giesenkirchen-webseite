@@ -38,6 +38,13 @@ export function buildAdminRedirectUrl(pathname, options = {}) {
   return `${base}${path}`;
 }
 
+export function buildAdminPasswordCallbackUrl(options = {}) {
+  return buildAdminRedirectUrl(
+    "/admin/auth/callback?next=%2Fadmin%2Fset-password",
+    options,
+  );
+}
+
 export function normalizeAdminRedirectPath(value = "") {
   const raw = String(value || "").trim();
   if (!raw) return "";

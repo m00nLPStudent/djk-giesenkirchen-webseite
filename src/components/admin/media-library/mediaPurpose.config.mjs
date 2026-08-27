@@ -11,6 +11,7 @@ export const MEDIA_PURPOSE_OPTIONS = Object.freeze([
   { key: "document", label: "Dokument", mediaKind: "document", pickerFilterable: true },
   { key: "download", label: "Download", mediaKind: "document", pickerFilterable: true },
   { key: "system", label: "System", mediaKind: "image", pickerFilterable: true },
+  { key: "profile", label: "Dashboard-Profil", mediaKind: "image", pickerFilterable: true },
 ]);
 
 export const MEDIA_PURPOSES = Object.freeze(MEDIA_PURPOSE_OPTIONS.map((option) => option.key));

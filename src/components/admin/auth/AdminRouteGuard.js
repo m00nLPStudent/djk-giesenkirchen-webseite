@@ -46,6 +46,7 @@ export default function AdminRouteGuard({ children, route, userContext }) {
     pathname === "/admin/login" ||
     pathname === "/admin/forgot-password" ||
     pathname === "/admin/set-password" ||
+    pathname === "/admin/auth/callback" ||
     pathname === "/admin/unauthorized";
 
   if (isPublicAuthRoute) {

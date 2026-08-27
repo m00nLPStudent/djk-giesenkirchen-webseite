@@ -4,4 +4,6 @@ export const ADMIN_AUTH_PUBLIC_ROUTES = [
   "/admin/login",
   "/admin/unauthorized",
   "/admin/forgot-password",
+  "/admin/set-password",
+  "/admin/auth/callback",
 ];

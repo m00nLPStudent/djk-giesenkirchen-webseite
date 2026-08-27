@@ -240,15 +240,10 @@ export async function getCurrentAdminContext() {
   }
 }
 
-export async function updateLastLoginAt(userId) {
-  if (!userId) return { ok: false, reason: "missing-user-id" };
-
+export async function updateLastLoginAt() {
   try {
     const supabaseBrowser = getSupabaseBrowserClient();
-    const { error } = await supabaseBrowser
-      .from("admin_profiles")
-      .update({ last_login_at: new Date().toISOString() })
-      .eq("id", userId);
+    const { error } = await supabaseBrowser.rpc("touch_own_admin_profile_last_login");
 
     if (error) {
       logAdminDebugError("update-last-login", error);

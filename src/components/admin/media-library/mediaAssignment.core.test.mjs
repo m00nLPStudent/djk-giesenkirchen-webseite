@@ -49,3 +49,11 @@ test("sponsor logos use the shared image assignment contract", () => {
   assert.equal(result.ok, true);
   assert.deepEqual(result.payload, { p_entity_type: "sponsor", p_entity_id: "sponsor-1", p_media_asset_id: "asset-1", p_field_name: "image" });
 });
+
+test("dashboard avatars use the dedicated admin profile field", () => {
+  assert.deepEqual(buildMediaAssignmentPayload("admin_profile", "profile-1", "asset-1", "avatar"), {
+    ok: true,
+    payload: { p_entity_type: "admin_profile", p_entity_id: "profile-1", p_media_asset_id: "asset-1", p_field_name: "avatar" },
+  });
+  assert.equal(buildMediaAssignmentPayload("admin_profile", "profile-1", "asset-1", "image").ok, false);
+});

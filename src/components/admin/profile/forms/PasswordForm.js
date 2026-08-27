@@ -18,6 +18,7 @@ export default function PasswordForm({ loading, onSubmit, onResetEmail }) {
   const strength = getPasswordStrength(password);
   const validation = validateAdminPassword(password, repeatPassword);
   const canSubmit = validation.isValid && !loading;
+  const strengthStyle = strength === "Stark" ? "w-full bg-emerald-500" : strength === "Mittel" ? "w-2/3 bg-amber-400" : "w-1/3 bg-red-500";
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -37,9 +38,10 @@ export default function PasswordForm({ loading, onSubmit, onResetEmail }) {
   }
 
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block space-y-2">
+    <div className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="grid gap-3 lg:grid-cols-2">
+        <label className="block space-y-1.5">
           <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
             Neues Passwort
           </span>
@@ -60,7 +62,7 @@ export default function PasswordForm({ loading, onSubmit, onResetEmail }) {
           </div>
         </label>
 
-        <label className="block space-y-2">
+        <label className="block space-y-1.5">
           <span className="text-xs font-black uppercase tracking-[0.2em] text-white/45">
             Passwort wiederholen
           </span>
@@ -80,28 +82,22 @@ export default function PasswordForm({ loading, onSubmit, onResetEmail }) {
             </button>
           </div>
         </label>
-
-        <div className="rounded-xl border border-white/10 bg-black/25 px-3 py-2.5">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-white/45">
-            Passwortstaerke
-          </p>
-          <p className="mt-1 text-sm font-bold text-white/85">{strength}</p>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-black/25 px-3 py-2.5">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-white/45">
-            Checkliste
-          </p>
-          <div className="mt-2 space-y-1.5">
+        <div>
+          <div className="mb-1 flex justify-between text-xs"><span className="font-black uppercase tracking-[0.14em] text-white/45">Passwortstärke</span><span className="font-bold text-white/70">{strength}</span></div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><div className={`h-full rounded-full transition-all ${strengthStyle}`} /></div>
+        </div>
+
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5">
             {checklist.map((entry) => (
-              <p
+              <span
                 key={entry.key}
-                className={`text-sm ${entry.valid ? "text-emerald-200" : "text-white/60"}`}
+                className={`text-xs ${entry.valid ? "text-emerald-200" : "text-white/50"}`}
               >
-                {entry.valid ? "Erfuellt" : "Offen"}: {entry.label}
-              </p>
+                {entry.valid ? "✓" : "○"} {entry.label}
+              </span>
             ))}
-          </div>
         </div>
 
         {localError ? (

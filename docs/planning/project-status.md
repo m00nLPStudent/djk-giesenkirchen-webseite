@@ -21,9 +21,9 @@ Stand: 27. August 2026
 - Kompakter Abschlussnachweis: [Abgeschlossene Entwicklungsblöcke](completed-development-blocks.md).
 - SQL-Status und Aufbewahrungsregeln: [SQL-Register](../sql/README.md).
 
-## Nächster Fachblock
+## Letzter abgeschlossener Fachblock
 
-Nächster Fachblock ist B15.23C – Dashboard-Profiloberfläche mit optionalem Nickname, Rollenübersicht und einem eigenen zentralen Dashboardbild, unabhängig von Trainer- und Vorstandsbild. Noch keine Implementierung. Die finale öffentliche Website-/Footer-/Mobile-Gestaltung bleibt Teil des späteren Redesign- und Abnahmeblocks.
+B15.23C/C1–C4 ist vollständig abgeschlossen. SQL und Postcheck sind live bestätigt; Dashboardprofil, private Avatarintegration, read-only Stammdaten, Rollen-/Passwortdarstellung, SSR-PKCE-Recovery und Auth-Mail-Rate-Limit-UX bestanden die automatisierten und manuellen Tests. Der finale Recovery-Test konnte ein neues Passwort setzen und anschließend erfolgreich anmelden. Superadmin-Verwaltung, Invite/Login, Trainer-/Vorstandsbilder, Rollenmatrix und Accountarchitektur blieben unverändert. Der nächste Fachblock kann gemäß Roadmap begonnen werden.
 
 ## Bewusst offene Betriebs- und Folgepunkte
 

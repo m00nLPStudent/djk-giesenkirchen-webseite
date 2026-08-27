@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, UserCog, UserCircle } from "lucide-react";
@@ -7,6 +8,7 @@ import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import { logAdminDebugError } from "@/lib/admin-auth/adminDiagnostics";
 import { adminLogoutAction } from "@/app/admin/logout/actions";
 import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
+import { loadOwnProfileAvatarAction } from "@/app/admin/profile/actions";
 
 export default function ProfileMenu() {
   const ref = useRef(null);
@@ -20,6 +22,7 @@ export default function ProfileMenu() {
     roleLabel: "Laedt ...",
     statusLabel: "",
     email: "",
+    avatarUrl: null,
   });
 
   useEffect(() => {
@@ -48,6 +51,7 @@ export default function ProfileMenu() {
           roleLabel: "Fehler",
           statusLabel: "Bitte erneut versuchen",
           email: "",
+          avatarUrl: null,
         });
         return;
       }
@@ -59,6 +63,7 @@ export default function ProfileMenu() {
           roleLabel: "Keine aktive Sitzung",
           statusLabel: "",
           email: "",
+          avatarUrl: null,
         });
         return;
       }
@@ -80,6 +85,7 @@ export default function ProfileMenu() {
           ? "Inaktiv"
           : "Aktiv";
       const profileName =
+        context?.profile?.nickname ||
         context?.fullName ||
         context?.profile?.full_name ||
         context?.profile?.name ||
@@ -89,12 +95,14 @@ export default function ProfileMenu() {
         context?.user?.email ||
         "Admin";
 
+      const avatarResult = await loadOwnProfileAvatarAction();
       setUserState({
         isLoggedIn: true,
         name: profileName,
         roleLabel: primaryRoleName,
         statusLabel,
         email: context?.user?.email || "",
+        avatarUrl: avatarResult?.item?.previewUrl || null,
       });
     } catch (error) {
       logAdminDebugError("profile-menu", error);
@@ -105,6 +113,7 @@ export default function ProfileMenu() {
         roleLabel: "Fehler",
         statusLabel: "Bitte erneut versuchen",
         email: "",
+        avatarUrl: null,
       });
     } finally {
       setLoadingContext(false);
@@ -112,12 +121,12 @@ export default function ProfileMenu() {
   }
 
   useEffect(() => {
-    loadAuthContext();
+    void Promise.resolve().then(loadAuthContext);
   }, []);
 
   useEffect(() => {
     if (open) {
-      loadAuthContext();
+      void Promise.resolve().then(loadAuthContext);
     }
   }, [open]);
 
@@ -200,7 +209,7 @@ export default function ProfileMenu() {
         onClick={() => setOpen((current) => !current)}
         className="flex h-11 items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-3 text-left transition hover:border-red-500/70 hover:bg-white/[0.07]"
       >
-        <UserCircle size={27} className="text-white/75" />
+        {userState.avatarUrl ? <img src={userState.avatarUrl} alt="" className="h-8 w-8 rounded-full object-cover" /> : <UserCircle size={27} className="text-white/75" />}
         <div className="hidden leading-tight lg:block">
           <p className="text-sm font-black text-white">{userState.name}</p>
           <p className="text-xs text-white/40">

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { buildAdminRedirectUrl } from "@/lib/admin-auth/adminAuthRedirects";
+import { getAuthMailErrorMessage } from "@/lib/admin-auth/authMailErrors.mjs";
 import {
   createSupabaseAdminClient,
   getSupabaseAdminEnvStatus,
@@ -68,7 +69,7 @@ export async function inviteAdminAuthUser(email) {
       ok: false,
       message: alreadyExists
         ? "E-Mail ist bereits in Auth registriert. Bitte bestehenden Benutzer verwenden oder Passwort-Reset senden."
-        : error.message || "Einladung konnte nicht gesendet werden.",
+        : getAuthMailErrorMessage(error, "Einladung konnte nicht gesendet werden."),
       requiresServiceRole: false,
     };
   }

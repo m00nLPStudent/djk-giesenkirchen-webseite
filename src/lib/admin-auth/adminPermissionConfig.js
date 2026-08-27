@@ -337,6 +337,7 @@ export const ADMIN_PUBLIC_ROUTE_PATTERNS = [
   "/admin/login",
   "/admin/forgot-password",
   "/admin/set-password",
+  "/admin/auth/callback",
   "/admin/unauthorized",
 ];
 

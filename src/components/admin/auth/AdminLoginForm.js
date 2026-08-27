@@ -134,7 +134,7 @@ export default function AdminLoginForm({
       const finalTarget = redirectTarget || "/admin";
 
       if (data?.user?.id) {
-        await updateLastLoginAt(data.user.id);
+        await updateLastLoginAt();
       }
 
       if (!data?.user?.id) {

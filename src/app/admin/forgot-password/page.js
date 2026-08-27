@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
-import { buildAdminRedirectUrl } from "@/lib/admin-auth/adminAuthRedirects";
+import { buildAdminPasswordCallbackUrl } from "@/lib/admin-auth/adminAuthRedirects";
+import { getAuthMailErrorMessage } from "@/lib/admin-auth/authMailErrors.mjs";
 
 export default function AdminForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ export default function AdminForgotPasswordPage() {
       return;
     }
 
-    const redirectTo = buildAdminRedirectUrl("/admin/set-password", {
+    const redirectTo = buildAdminPasswordCallbackUrl({
       browserOrigin: window.location.origin,
     });
 
@@ -42,7 +43,7 @@ export default function AdminForgotPasswordPage() {
     setLoading(false);
 
     if (resetError) {
-      setError("Reset-Link konnte nicht gesendet werden.");
+      setError(getAuthMailErrorMessage(resetError, "Reset-Link konnte nicht gesendet werden."));
       return;
     }
 

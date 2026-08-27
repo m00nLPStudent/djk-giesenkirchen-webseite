@@ -6,17 +6,16 @@ import {
   getReadableErrorMessage,
   logAdminDebugError,
 } from "@/lib/admin-auth/adminDiagnostics";
-import { revalidateAdminProfileAction } from "@/app/admin/profile/actions";
+import { assignOwnProfileAvatarAction, loadOwnProfileAvatarAction, loadOwnProfileMediaAction, updateOwnDashboardProfileAction, uploadOwnProfileMediaAction } from "@/app/admin/profile/actions";
+import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker";
 import ProfileSummaryCard from "./ProfileSummaryCard";
 import ProfileRolesCard from "./ProfileRolesCard";
-import ProfilePermissionsCard from "./ProfilePermissionsCard";
 import ProfileSecurityCard from "./ProfileSecurityCard";
 import ProfileForm from "../forms/ProfileForm";
 import {
   changeOwnPassword,
   getOwnAdminProfileData,
   sendOwnPasswordResetEmail,
-  updateOwnProfileFullName,
 } from "../services/profile.service";
 
 export default function AdminProfilePageShell() {
@@ -26,6 +25,7 @@ export default function AdminProfilePageShell() {
   const [securityMessage, setSecurityMessage] = useState("");
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingSecurity, setSavingSecurity] = useState(false);
+  const [avatar, setAvatar] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -34,7 +34,10 @@ export default function AdminProfilePageShell() {
       try {
         const nextData = await getOwnAdminProfileData();
         if (!active) return;
+        const avatarResult = await loadOwnProfileAvatarAction();
+        if (!active) return;
         setData(nextData);
+        setAvatar(avatarResult?.item || null);
       } catch (loadError) {
         if (!active) return;
         logAdminDebugError("admin-profile", loadError);
@@ -59,26 +62,31 @@ export default function AdminProfilePageShell() {
     setData(nextData);
   }
 
-  async function handleSaveProfile(fullName) {
+  async function handleSaveProfile(input) {
     setProfileMessage("");
     setSavingProfile(true);
 
-    const result = await updateOwnProfileFullName(fullName);
+    const result = await updateOwnDashboardProfileAction(input);
     setSavingProfile(false);
 
     if (!result?.ok) {
-      const suffix = result?.needsRlsUpdatePolicy
-        ? " RLS-UPDATE-Policy fuer eigenes Profil ist vermutlich noetig."
-        : "";
-      setProfileMessage(
-        `${result?.message || "Speichern fehlgeschlagen."}${suffix}`,
-      );
-      return;
+      setProfileMessage(result?.error || "Speichern fehlgeschlagen.");
+      return result;
     }
 
     setProfileMessage(result.message || "Profil gespeichert.");
-    await revalidateAdminProfileAction();
     await refreshData();
+    return result;
+  }
+
+  async function handleAvatarChange(item) {
+    setProfileMessage("");
+    setSavingProfile(true);
+    const result = await assignOwnProfileAvatarAction(item?.id || null);
+    setSavingProfile(false);
+    if (!result?.ok) { setProfileMessage(result?.error || "Profilbild konnte nicht gespeichert werden."); return; }
+    setAvatar(result.item || null);
+    setProfileMessage(result.message || "Profilbild wurde gespeichert.");
   }
 
   async function handleChangePassword(newPassword) {
@@ -102,11 +110,11 @@ export default function AdminProfilePageShell() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminPageHeader
         eyebrow="Profil"
         title="Mein Admin-Profil"
-        description="Persoenliche Profildaten verwalten, Rollen und Rechte einsehen und Zugangsdaten aktualisieren."
+        description="Persönliche Dashboarddaten, Profilbild und Zugangsdaten verwalten."
       />
 
       {error ? (
@@ -117,42 +125,38 @@ export default function AdminProfilePageShell() {
 
       {!data ? null : (
         <>
-          <div className="grid gap-5 xl:grid-cols-2">
-            <ProfileSummaryCard profileData={data} />
-            <ProfileRolesCard profileData={data} />
-          </div>
-
-          <div className="grid gap-5 xl:grid-cols-2">
-            <ProfilePermissionsCard profileData={data} />
-            <ProfileSecurityCard
-              loading={savingSecurity}
-              statusMessage={securityMessage}
-              onChangePassword={handleChangePassword}
-              onSendReset={handleSendReset}
-            />
-          </div>
+          <ProfileSummaryCard profileData={data} avatar={avatar} />
 
           <div className="grid gap-5 xl:grid-cols-2">
             <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-6 shadow-[0_20px_70px_rgba(0,0,0,0.18)] md:p-7">
               <p className="text-xs font-black uppercase tracking-[0.22em] text-red-300">
-                Profil bearbeiten
+                Persönliches Dashboardprofil
               </p>
-              <h2 className="mt-2 text-xl font-black text-white">Name</h2>
+              <h2 className="mt-2 text-xl font-black text-white">Profildaten</h2>
               <p className="mt-2 text-sm text-white/60">
-                E-Mail, Rollen und Aktivstatus bleiben vorerst read only.
+                Offizieller Name und Login-E-Mail können nur in der Superadmin-Benutzerverwaltung geändert werden.
               </p>
 
               <div className="mt-5">
                 <ProfileForm
-                  initialFullName={data.fullName}
+                  fullName={data.fullName}
                   email={data.email}
+                  initialNickname={data.nickname}
+                  initialPhone={data.phone}
                   loading={savingProfile}
                   onSubmit={handleSaveProfile}
                   statusMessage={profileMessage}
                 />
+                <div className="mt-6 border-t border-white/10 pt-5">
+                  <p className="mb-4 text-xs font-black uppercase tracking-[0.2em] text-white/45">Dashboard-Profilbild</p>
+                  <AdminMediaPicker value={avatar} onChange={handleAvatarChange} loadAction={loadOwnProfileMediaAction} uploadAction={uploadOwnProfileMediaAction} usageContext="profile" defaultPurpose="profile" entityLabel="Profilbild" />
+                </div>
               </div>
             </div>
+            <ProfileRolesCard profileData={data} />
           </div>
+
+          <ProfileSecurityCard loading={savingSecurity} statusMessage={securityMessage} lastLoginAt={data.lastLoginAt} onChangePassword={handleChangePassword} onSendReset={handleSendReset} />
         </>
       )}
     </div>

@@ -18,6 +18,7 @@ const PUBLIC_ADMIN_ROUTES = new Set([
   "/admin/login",
   "/admin/forgot-password",
   "/admin/set-password",
+  "/admin/auth/callback",
   "/admin/unauthorized",
 ]);
 

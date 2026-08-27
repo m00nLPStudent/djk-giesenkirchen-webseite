@@ -2,13 +2,12 @@ import { getSupabaseBrowserClient } from "@/lib/supabase.browser";
 import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import {
   formatSupabaseError,
-  isLikelyRlsError,
   toAdminError,
 } from "@/lib/admin-auth/adminDiagnostics";
 import { validateAdminPassword } from "@/lib/admin-auth/passwordPolicy";
-import { buildAdminRedirectUrl } from "@/lib/admin-auth/adminAuthRedirects";
+import { buildAdminPasswordCallbackUrl } from "@/lib/admin-auth/adminAuthRedirects";
+import { getAuthMailErrorMessage } from "@/lib/admin-auth/authMailErrors.mjs";
 import {
-  formatPermissionCount,
   formatRoleList,
 } from "../helpers/profile.formatters";
 import {
@@ -41,16 +40,16 @@ function mapProfileData(context, links = {}) {
     userId: context?.user?.id || context?.userId || "-",
     profileId: context?.profile?.id || "-",
     fullName: context?.fullName || context?.profile?.full_name || "",
+    nickname: context?.profile?.nickname || "",
+    phone: context?.profile?.phone || "",
+    profileImageMediaAssetId: context?.profile?.profile_image_media_asset_id || null,
     email: context?.user?.email || context?.profile?.email || "-",
     isActive: Boolean(context?.isActive),
     primaryRole,
     additionalRoles,
     roles,
-    permissions: context?.permissions || [],
-    permissionCount: formatPermissionCount(context?.permissions),
     roleLabels: formatRoleList(roles),
     lastLoginAt: context?.profile?.last_login_at || null,
-    createdAt: context?.profile?.created_at || null,
     linkedBoardMember: links?.linkedBoardMember || null,
     linkedCoach: links?.linkedCoach || null,
   };
@@ -79,43 +78,6 @@ export async function getOwnAdminProfileData() {
     linkedBoardMember: boardResult?.data || null,
     linkedCoach: coachResult?.data || null,
   });
-}
-
-export async function updateOwnProfileFullName(fullName) {
-  const supabaseBrowser = getSupabaseBrowserClient();
-  const context = await getCurrentAdminContext();
-
-  if (!context?.profile?.id) {
-    return {
-      ok: false,
-      message: "Kein Admin-Profil gefunden.",
-      needsRlsUpdatePolicy: false,
-    };
-  }
-
-  const payload = {
-    full_name: (fullName || "").trim(),
-    updated_at: new Date().toISOString(),
-  };
-
-  const { error } = await supabaseBrowser
-    .from("admin_profiles")
-    .update(payload)
-    .eq("id", context.profile.id);
-
-  if (error) {
-    const message = formatSupabaseError(
-      error,
-      "Profil konnte nicht gespeichert werden.",
-    );
-    return {
-      ok: false,
-      message,
-      needsRlsUpdatePolicy: isLikelyRlsError(message),
-    };
-  }
-
-  return { ok: true, message: "Profil wurde gespeichert." };
 }
 
 export async function changeOwnPassword(newPassword) {
@@ -158,7 +120,7 @@ export async function sendOwnPasswordResetEmail() {
     throw toAdminError("profile.security", null, "Browser-Kontext fehlt.");
   }
 
-  const redirectTo = buildAdminRedirectUrl("/admin/set-password", {
+  const redirectTo = buildAdminPasswordCallbackUrl({
     browserOrigin: window.location.origin,
   });
   if (!redirectTo) {
@@ -176,10 +138,7 @@ export async function sendOwnPasswordResetEmail() {
   if (error) {
     return {
       ok: false,
-      message: formatSupabaseError(
-        error,
-        "Reset-E-Mail konnte nicht gesendet werden.",
-      ),
+      message: getAuthMailErrorMessage(error, "Reset-E-Mail konnte nicht gesendet werden."),
     };
   }
 

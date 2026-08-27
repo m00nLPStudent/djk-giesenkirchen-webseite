@@ -1,6 +1,15 @@
 import SetPasswordForm from "@/components/admin/auth/SetPasswordForm";
+import { cookies } from "next/headers";
+import { createServerActionSupabaseClient } from "@/lib/supabase.server";
 
-export default function AdminSetPasswordPage() {
+const RECOVERY_COOKIE = "admin-password-recovery";
+
+export default async function AdminSetPasswordPage() {
+  const cookieStore = await cookies();
+  const hasRecoveryMarker = cookieStore.get(RECOVERY_COOKIE)?.value === "1";
+  const supabase = await createServerActionSupabaseClient();
+  const { data: { user } } = hasRecoveryMarker ? await supabase.auth.getUser() : { data: { user: null } };
+  const hasRecoverySession = Boolean(hasRecoveryMarker && user?.id);
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.14),transparent_35%),radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent_28%),#101014] text-white">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
@@ -14,7 +23,7 @@ export default function AdminSetPasswordPage() {
           </p>
 
           <div className="mt-6">
-            <SetPasswordForm />
+            <SetPasswordForm initialRecoverySession={hasRecoverySession} />
           </div>
         </section>
       </div>
