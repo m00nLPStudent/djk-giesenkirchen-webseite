@@ -66,7 +66,8 @@ export const ADMIN_NAVIGATION_SECTIONS = [
       active("users", "Benutzer", "/admin/users", "users", "users.view", "permission_only", 10, "Administrationskonten verwalten."),
       active("roles", "Rollen", "/admin/roles", "key-round", "roles.view", "permission_only", 20, "Rollen verwalten."),
       active("permissions", "Rechte", "/admin/permissions", "lock-keyhole", "permissions.view", "permission_only", 30, "Permission-Matrix verwalten."),
-      { ...active("notification-monitoring", "Notification Monitoring", "/admin/system/notifications", "activity", null, "permission_only", 40, "Zustellungen und Fehler der Notification-Infrastruktur überwachen."), accessPolicy: "superadmin_only" },
+      { ...active("notification-email-settings", "E-Mail-Benachrichtigungen", "/admin/system/notification-email-settings", "mail", null, "permission_only", 40, "Globalen Notification-E-Mail-Versand steuern."), accessPolicy: "superadmin_only" },
+      { ...active("notification-monitoring", "Notification Monitoring", "/admin/system/notifications", "activity", null, "permission_only", 50, "Zustellungen und Fehler der Notification-Infrastruktur überwachen."), accessPolicy: "superadmin_only" },
     ],
   },
   {

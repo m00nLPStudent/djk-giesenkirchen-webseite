@@ -11,6 +11,15 @@ const EMAIL_COPY = Object.freeze({
   trainer_assigned: "Du wurdest einer Mannschaft als Trainer oder Betreuer zugewiesen.",
   trainer_removed: "Eine deiner Mannschaftszuordnungen wurde beendet.",
   trainer_changed: "Deine Funktion in einer Mannschaft wurde geändert.",
+  player_assigned: "Deiner Mannschaft wurde ein neuer Spieler zugeordnet.",
+  team_changed: "Eine für dich relevante Mannschaft wurde geändert.",
+  membership_processing: "Eine relevante Mitgliedsanfrage wird jetzt bearbeitet.",
+  membership_payment_overdue: "Im Bereich Vereinsbeiträge liegt eine neue überfällige Beitragsinformation vor.",
+  membership_payment_partial_open: "Zu einem Vereinsbeitrag besteht weiterhin ein offener Restbetrag.",
+  member_activated: "In deinem Zuständigkeitsbereich wurde ein Mitglied aktiviert.",
+  member_deactivated: "In deinem Zuständigkeitsbereich wurde ein Mitglied deaktiviert.",
+  member_archived: "In deinem Zuständigkeitsbereich wurde ein Mitglied archiviert.",
+  event_updated: "Ein für dich relevanter Termin oder eine Trainingsinformation wurde geändert.",
 });
 
 export const NOTIFICATION_EMAIL_TYPES = Object.freeze(Object.keys(EMAIL_COPY));
@@ -91,15 +100,23 @@ export function canClaimNotificationDelivery(delivery, now = new Date()) {
 const deliveryResult = (status, extra = {}) => ({ ok: status === "sent" || status === "skipped" || status === "already_sent", status, ...extra });
 
 export async function executeNotificationEmailDelivery(notification, {
-  db, mailer, store, now = () => new Date(), siteUrl = "", providerName = "",
+  db, mailer, store, now = () => new Date(), siteUrl = "", providerName = "", deliveryPolicy = null,
 } = {}) {
   if (!db || !notification?.id || !notification?.recipient_user_id || typeof mailer !== "function" || !store) return deliveryResult("failed", { code: "notification_email_input_invalid" });
-  const policy = getNotificationEmailPolicy(notification.type);
+  const rendererPolicy = getNotificationEmailPolicy(notification.type);
+  const skipReason = deliveryPolicy?.lookupFailed
+    ? "notification_email_settings_unavailable"
+    : deliveryPolicy?.globalEnabled !== true
+      ? "notification_email_global_disabled"
+      : deliveryPolicy?.typeEnabled !== true
+        ? "notification_email_type_disabled"
+        : !rendererPolicy.enabled ? "notification_email_renderer_unavailable" : null;
+  const enabled = skipReason === null;
   const createdAt = now();
-  const ensured = await store.ensureNotificationDelivery(db, notification.id, policy.enabled ? "pending" : "skipped", createdAt.toISOString(), policy.enabled ? null : "notification_email_type_denied");
+  const ensured = await store.ensureNotificationDelivery(db, notification.id, enabled ? "pending" : "skipped", createdAt.toISOString(), skipReason);
   if (ensured.error || !ensured.data) return deliveryResult("failed", { code: "notification_delivery_ensure_failed" });
   let delivery = ensured.data;
-  if (!policy.enabled || delivery.status === "skipped") return deliveryResult("skipped", { code: policy.enabled ? delivery.last_error_class : "notification_email_type_denied" });
+  if (!enabled || delivery.status === "skipped") return deliveryResult("skipped", { code: skipReason || delivery.last_error_class });
   if (delivery.status === "sent") return deliveryResult("already_sent");
   if (delivery.status === "sending" || !canClaimNotificationDelivery(delivery, createdAt)) return deliveryResult("not_claimed");
 

@@ -38,7 +38,7 @@ test("active navigation follows the agreed club, football and system structure",
     .map((item) => item.key);
   assert.deepEqual(keys("club"), ["news", "sponsors", "events", "club-history", "membership-requests", "media", "settings"]);
   assert.deepEqual(keys("football"), ["teams", "players", "coaches", "contributions", "department"]);
-  assert.deepEqual(keys("system"), ["users", "roles", "permissions", "notification-monitoring"]);
+  assert.deepEqual(keys("system"), ["users", "roles", "permissions", "notification-email-settings", "notification-monitoring"]);
 });
 
 test("active items are valid admin routes with permission metadata", () => {
@@ -68,6 +68,11 @@ test("media library navigation is visible only to superadmin and webmaster", () 
 test("notification monitoring navigation is visible only to superadmin", () => {
   assert.ok(!itemKeys(dto(allPermissions)).includes("notification-monitoring"));
   assert.ok(itemKeys(dto(allPermissions, globalScope, "/admin/system/notifications", ["superadmin"])).includes("notification-monitoring"));
+});
+
+test("global notification e-mail settings navigation is visible only to superadmin", () => {
+  assert.ok(!itemKeys(dto(allPermissions)).includes("notification-email-settings"));
+  assert.ok(itemKeys(dto(allPermissions, globalScope, "/admin/system/notification-email-settings", ["superadmin"])).includes("notification-email-settings"));
 });
 
 test("system administration remains permission-gated in the system section", () => {
@@ -161,6 +166,7 @@ test("route matching covers details and avoids similar prefixes", () => {
     ["/admin/news", "news"], ["/admin/events", "events"], ["/admin/settings", "settings"],
     ["/admin/department", "department"], ["/admin/users", "users"], ["/admin/roles", "roles"],
     ["/admin/permissions", "permissions"], ["/admin/system/notifications", "notification-monitoring"],
+    ["/admin/system/notification-email-settings", "notification-email-settings"],
     ["/admin/playerstats", null], ["/admin/unknown", null], ["/unknown", null],
   ]);
   for (const [path, expected] of cases) {

@@ -73,6 +73,10 @@ test("moved routes activate their new sections on desktop and mobile", () => {
   assert.equal(users.activeSectionKey, "system");
   assert.equal(users.activeItemKey, "users");
   assert.deepEqual(getInitialOpenSectionKeys(users), ["system"]);
+  const superadminDto = resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys: permissions, roleKeys: ["superadmin"], scopeContext: { isGlobal: true, roleScopeTypes: ["global"] } });
+  const emailSettings = applyActivePathToNavigationDto(superadminDto, "/admin/system/notification-email-settings");
+  assert.equal(emailSettings.activeSectionKey, "system");
+  assert.equal(emailSettings.activeItemKey, "notification-email-settings");
 });
 
 test("runtime DTO has no planned links and no auth or service data", () => {

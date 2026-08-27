@@ -18,6 +18,14 @@ Providererfolg setzt `sent`, `sent_at`, Provider-Key und optional nur die Provid
 
 Die vorhandenen In-App-Preferences bleiben unverändert; `in_app_enabled` wird nicht als Mailpreference verwendet. Eine spätere unabhängige `email_enabled`-Preference benötigt einen eigenen Datenbank-Sicherheitsblock. `notification_audit` bleibt unverändert und ist nicht der Delivery-State.
 
+## B15.21D8/D9 – Globale E-Mail-Steuerung
+
+Die feste D5-Registry wurde durch eine globale, ausschließlich vom Superadmin änderbare Datenbankpolicy ergänzt. `notification_preferences` bleibt unverändert benutzerbezogen und steuert weiterhin nur In-App-Notifications. `notification_email_settings` enthält die explizite Freigabe der 27 produktiven Type-Keys; `notification_email_global_settings` stellt den atomaren Master-Schalter für Import, Go-live und Not-Aus bereit.
+
+Die Semantik ist strikt default-deny: Master aus, fehlende Masterzeile, fehlende Typzeile, deaktivierter Typ, Lookupfehler oder fehlender sicherer Renderer bedeuten keine Mail. Dashboard-Notifications bleiben davon unberührt. Der Coordinator legt auch in diesen Fällen eine terminale `skipped`-Delivery mit sanitisiertem Grund an. Eine spätere Aktivierung versendet daher niemals alte Notifications rückwirkend. Batchpfade laden Master einmal und alle benötigten Typen gesammelt; ein Cache ist nicht vorgesehen.
+
+Die Seite `System → E-Mail-Benachrichtigungen` unter `/admin/system/notification-email-settings` ist ausschließlich für die aktive Rolle `superadmin` sichtbar und änderbar. Sie bietet Master, einzelne Type-Toggles, „Alle Typen deaktivieren“ und die bestätigte 16/11-Empfehlungsmatrix. Bulk-Aktionen schalten zuerst den Master aus; Restore aktiviert ihn nie automatisch. Normale Browserrollen erhalten keine Rechte auf den server-only Tabellen. Spätere individuelle E-Mail-Präferenzen werden nach globalem Master und globaler Typfreigabe additiv geprüft und nicht mit `in_app_enabled` vermischt. Details stehen in [`b15-21d8-global-notification-email-settings-architecture.md`](../planning/b15-21d8-global-notification-email-settings-architecture.md).
+
 ## B15.21D6 – Erster realer Notification-Mail-Test
 
 Der kontrollierte Test über den aktuellen D5-Dev-Server erzeugte genau eine `membership_forwarded`-Notification und genau eine zugehörige E-Mail-Delivery. Das Ledger bestätigte `status = sent`, `attempt_count = 1`, gesetztes `sent_at`, `provider_key = resend`, eine vorhandene Provider-Message-ID, ein entferntes Lock und keine Fehlerklasse. Es gab keine zweite Delivery, keine doppelte Notification-Idempotenzgruppe und keine offenen `pending`-, `sending`- oder `failed`-Zustände. Der Benutzer bestätigte sowohl den einzelnen Versand im Resend-Dashboard als auch den Eingang im Testpostfach. Betreff und Inhalt entsprachen dem datensparsamen Renderer.

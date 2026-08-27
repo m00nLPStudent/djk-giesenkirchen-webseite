@@ -46,6 +46,10 @@ function buildRule(
 }
 
 const ADMIN_ROUTE_PERMISSION_RULES = [
+  buildRule("/admin/system/notification-email-settings", "dashboard.view", {
+    matchType: "prefix",
+    priority: 310,
+  }),
   buildRule("/admin/notifications", "dashboard.view", {
     matchType: "exact",
     priority: 500,
@@ -338,6 +342,7 @@ export const ADMIN_PUBLIC_ROUTE_PATTERNS = [
 export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin": "dashboard.view",
   "/admin/notifications": "dashboard.view",
+  "/admin/system/notification-email-settings": "dashboard.view",
   "/admin/news": "news.view",
   "/admin/department": "settings.view",
   "/admin/sponsors": "sponsors.view",

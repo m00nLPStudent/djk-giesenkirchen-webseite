@@ -41,7 +41,7 @@ Desktop- und Mobilnavigation werden aus derselben zentralen, serverseitig nach P
 
 - Gesamtverein: News, Sponsoren, Termine, Vereinsgeschichte, Mitgliedsanfragen, Medien sowie der gemeinsame Einstieg „Seiten, Kontakte & Einstellungen“.
 - Fußball: Mannschaften, Spieler, Trainer, Vereinsbeiträge und „Fußballvorstände“ unter der bestehenden URL `/admin/department`.
-- System: Benutzer, Rollen, Rechte und das ausschließlich für Superadmins sichtbare Notification Monitoring.
+- System: Benutzer, Rollen, Rechte sowie die ausschließlich für Superadmins sichtbaren Bereiche „E-Mail-Benachrichtigungen“ und Notification Monitoring.
 
 Die Gruppierung verändert weder URLs noch Route Guards, Permissions oder Scopes. Insbesondere bleibt `/admin/department` durch `settings.view` und den bestehenden Board-Scope geschützt und verwaltet fachlich die Vorstände der Fußballabteilung.
 

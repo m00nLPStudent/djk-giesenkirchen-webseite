@@ -8,6 +8,7 @@ import {
 
 const notification = { id: "11111111-1111-4111-8111-111111111111", recipient_user_id: "user-1", type: "membership_assigned", title: "Mia Muster", message: "private", metadata: { requestId: "secret" } };
 const fixedNow = () => new Date("2026-08-27T10:00:00.000Z");
+const enabledPolicy = { globalEnabled: true, typeEnabled: true };
 
 function createStore({ email = "trainer@example.org", active = true } = {}) {
   const rows = new Map();
@@ -43,8 +44,9 @@ function createStore({ email = "trainer@example.org", active = true } = {}) {
   };
 }
 
-test("registry is explicit and default-deny", () => {
-  assert.deepEqual(NOTIFICATION_EMAIL_TYPES, ["membership_created", "membership_assigned", "membership_forwarded", "membership_completed", "trainer_assigned", "trainer_removed", "trainer_changed"]);
+test("registry contains all 16 globally recommended renderers and remains default-deny", () => {
+  assert.equal(NOTIFICATION_EMAIL_TYPES.length, 16);
+  for (const type of ["membership_created", "player_assigned", "team_changed", "membership_processing", "membership_payment_overdue", "membership_payment_partial_open", "member_activated", "member_deactivated", "member_archived", "event_updated"]) assert.ok(NOTIFICATION_EMAIL_TYPES.includes(type));
   assert.equal(getNotificationEmailPolicy("membership_created").enabled, true);
   assert.equal(getNotificationEmailPolicy("event_cancelled").enabled, false);
   assert.equal(getNotificationEmailPolicy("future_type").enabled, false);
@@ -56,6 +58,16 @@ test("renderer is generic and excludes dashboard content, metadata and ids", () 
   for (const forbidden of [notification.title, notification.message, notification.id, "requestId", "secret"]) assert.doesNotMatch(combined, new RegExp(forbidden));
   assert.match(combined, /Vereinsdashboard/);
   assert.match(rendered.data.html, /&lt;|<p>/);
+});
+
+test("all 16 configured active types have datensparse renderers", () => {
+  const forbidden = [notification.title, notification.message, notification.id, "requestId", "secret", "100,00", "Geburtsdatum"];
+  for (const type of NOTIFICATION_EMAIL_TYPES) {
+    const rendered = renderNotificationEmail(type, { dashboardUrl: "https://verein.example/admin" });
+    assert.equal(rendered.error, null);
+    const combined = `${rendered.data.subject}\n${rendered.data.text}\n${rendered.data.html}`;
+    for (const value of forbidden) assert.doesNotMatch(combined, new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
 });
 
 test("recipient validation and dashboard URL accept only plausible trusted values", () => {
@@ -70,7 +82,7 @@ test("parallel delivery claims once and sends exactly once", async () => {
   const store = createStore();
   const messages = [];
   const mailer = async (message) => { messages.push(message); return { ok: true, status: "sent", providerMessageId: "provider-1" }; };
-  const options = { db: {}, store, mailer, now: fixedNow, siteUrl: "https://verein.example", providerName: "resend" };
+  const options = { db: {}, store, mailer, now: fixedNow, siteUrl: "https://verein.example", providerName: "resend", deliveryPolicy: enabledPolicy };
   const outcomes = await Promise.all([executeNotificationEmailDelivery(notification, options), executeNotificationEmailDelivery(notification, options)]);
   assert.equal(messages.length, 1);
   assert.equal(outcomes.filter((item) => item.status === "sent").length, 1);
@@ -83,7 +95,7 @@ test("sent is terminal while provider failure is sanitized and retry-ready", asy
   const store = createStore();
   let sends = 0;
   const failing = async () => { sends += 1; return { ok: false, status: "failed", error: { code: "provider_http_503", message: "private payload" } }; };
-  const options = { db: {}, store, mailer: failing, now: fixedNow, providerName: "resend" };
+  const options = { db: {}, store, mailer: failing, now: fixedNow, providerName: "resend", deliveryPolicy: enabledPolicy };
   const failed = await executeNotificationEmailDelivery(notification, options);
   assert.equal(failed.code, "provider_http_503");
   assert.equal(store.rows.get(notification.id).status, "failed");
@@ -101,16 +113,31 @@ test("denied types and unavailable recipients become skipped without mail", asyn
   let sends = 0;
   const mailer = async () => { sends += 1; return { ok: true, status: "sent" }; };
   const deniedStore = createStore();
-  const denied = await executeNotificationEmailDelivery({ ...notification, type: "player_updated" }, { db: {}, store: deniedStore, mailer, now: fixedNow });
+  const denied = await executeNotificationEmailDelivery({ ...notification, type: "player_updated" }, { db: {}, store: deniedStore, mailer, now: fixedNow, deliveryPolicy: enabledPolicy });
   assert.equal(denied.status, "skipped");
   assert.equal(deniedStore.rows.get(notification.id).status, "skipped");
-  assert.equal(deniedStore.rows.get(notification.id).last_error_class, "notification_email_type_denied");
+  assert.equal(deniedStore.rows.get(notification.id).last_error_class, "notification_email_renderer_unavailable");
   for (const recipientState of [{ email: null }, { email: "invalid" }, { email: "trainer@example.org", active: false }]) {
     const store = createStore(recipientState);
-    const outcome = await executeNotificationEmailDelivery(notification, { db: {}, store, mailer, now: fixedNow });
+    const outcome = await executeNotificationEmailDelivery(notification, { db: {}, store, mailer, now: fixedNow, deliveryPolicy: enabledPolicy });
     assert.equal(outcome.status, "skipped");
   }
   assert.equal(sends, 0);
+});
+
+test("global and type settings fail closed with distinct skipped reasons", async () => {
+  for (const [policy, reason] of [
+    [{ globalEnabled: false, typeEnabled: true }, "notification_email_global_disabled"],
+    [{ globalEnabled: true, typeEnabled: false }, "notification_email_type_disabled"],
+    [{ globalEnabled: false, typeEnabled: false, lookupFailed: true }, "notification_email_settings_unavailable"],
+  ]) {
+    let sends = 0;
+    const store = createStore();
+    const outcome = await executeNotificationEmailDelivery(notification, { db: {}, store, now: fixedNow, deliveryPolicy: policy, mailer: async () => { sends += 1; return { ok: true, status: "sent" }; } });
+    assert.equal(outcome.status, "skipped");
+    assert.equal(store.rows.get(notification.id).last_error_class, reason);
+    assert.equal(sends, 0);
+  }
 });
 
 test("unknown provider errors collapse to a safe class", () => {
@@ -119,7 +146,7 @@ test("unknown provider errors collapse to a safe class", () => {
 
 test("throwing mailer is converted to failed and releases the lock", async () => {
   const store = createStore();
-  const outcome = await executeNotificationEmailDelivery(notification, { db: {}, store, now: fixedNow, mailer: async () => { throw new Error("private"); } });
+  const outcome = await executeNotificationEmailDelivery(notification, { db: {}, store, now: fixedNow, deliveryPolicy: enabledPolicy, mailer: async () => { throw new Error("private"); } });
   assert.equal(outcome.status, "failed");
   assert.equal(outcome.code, "mail_provider_failed");
   assert.equal(store.rows.get(notification.id).status, "failed");
