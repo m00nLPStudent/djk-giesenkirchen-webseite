@@ -41,8 +41,12 @@ Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und Syste
 
 ## Priorität 4 – Benutzer und Profile
 
+- B15.23A – Bestandsanalyse abgeschlossen. Das bestehende Auth-/Adminprofil-, Rollen-, Trainer-, Vorstands- und Kontaktmodell bleibt verbindlich bestehen; eine neue `persons`-Tabelle oder umfassende Personenmigration ist nicht geplant.
+- B15.23B – Security-Analyse bestehender Trainer-/Vorstands-/Kontaktstrukturen abgeschlossen; der Read-only-Live-Preflight bestätigte die historischen direkten Browser-Schreibrechte.
+- B15.23B1 – Security-Hardening für `coaches`, `board_members` und `club_contacts` live umgesetzt. RLS/Grants/Policies und service_role-only RPCs wurden per Postcheck bestätigt; Superadmin-, berechtigte Rollen-, Public-, Kontakt-, Vorstand- und Media-Browsertests bestanden. Trainer bleiben im normalen Fachworkflow archiviert statt physisch gelöscht. Public-Read-Spaltenminimierung bleibt ein separater späterer Prüfpunkt.
+- B15.23C – Dashboard-Profil als separater Folgeblock erweitern: Profilübersicht, optionaler Nickname, Accountstatus/Rollen und ein eigenes zentrales Dashboardbild. Trainer- und Vorstandsbild bleiben unabhängig; keine E-Mail- oder Personenarchitektur ändern.
 - Einladung vollständig live testen.
-- Trainer- und Vorstandskarte vom Adminprofil lösen.
+- Bestehende explizite Trainer-/Vorstandslinks zum Adminprofil erhalten; keine Zuordnung oder Autorisierung über E-Mail-/Namensabgleich ausbauen.
 - E-Mail-Änderung und Auth-Synchronisierung.
 - später Rollen für weitere Abteilungen.
 
