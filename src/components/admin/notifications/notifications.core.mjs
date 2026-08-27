@@ -1,4 +1,37 @@
 export const NOTIFICATION_FILTERS = Object.freeze({ ALL: "all", UNREAD: "unread", READ: "read" });
+export const MAX_NOTIFICATION_SELECTION = 250;
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export function normalizeNotificationIds(values, { limit = MAX_NOTIFICATION_SELECTION } = {}) {
+  if (!Array.isArray(values)) return { ok: false, ids: [], reason: "invalid_type" };
+  if (values.length > limit) return { ok: false, ids: [], reason: "too_many_ids" };
+
+  const ids = [];
+  const seen = new Set();
+  for (const value of values) {
+    const id = typeof value === "string" ? value.trim().toLowerCase() : "";
+    if (!id) continue;
+    if (!UUID_PATTERN.test(id)) return { ok: false, ids: [], reason: "invalid_id" };
+    if (!seen.has(id)) {
+      seen.add(id);
+      ids.push(id);
+    }
+  }
+
+  if (!ids.length) return { ok: false, ids: [], reason: "empty_selection" };
+  return { ok: true, ids, reason: null };
+}
+
+export function getVisibleNotificationIds(items = []) {
+  return items.map((item) => item?.id).filter(Boolean);
+}
+
+export function toggleVisibleNotificationSelection(selectedIds = [], visibleItems = []) {
+  const visibleIds = getVisibleNotificationIds(visibleItems);
+  const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.includes(id));
+  return allVisibleSelected ? [] : visibleIds;
+}
 
 export function normalizeNotificationType(value) {
   return String(value || "future_custom").trim().toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "") || "future_custom";

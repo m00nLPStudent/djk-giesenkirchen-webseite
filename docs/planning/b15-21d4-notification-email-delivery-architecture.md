@@ -142,7 +142,7 @@ In D4 vorbereitet und vor D5 manuell ausgeführt beziehungsweise geprüft:
 
 Das Proposal aktiviert RLS, erzeugt keine Browserpolicy, entzieht `PUBLIC`, `anon` und `authenticated` alle Tabellenrechte und belässt ausschließlich `service_role` mit Zugriff. Es erzeugt keine zweite Notification- oder Auditarchitektur; das Ledger speichert nur kanalbezogenen Betriebszustand. `recipient_user_id` und ein separater Idempotenztext werden bewusst nicht dupliziert: Empfänger und Provider-Schlüssel werden aus der referenzierten Notification beziehungsweise aus `notification_id + channel` abgeleitet. Das vermeidet widersprüchliche Wahrheiten. Der D4.1-Live-Preflight wurde manuell erfolgreich geprüft; anschließend wurden Proposal und Postcheck vor Beginn von D5 manuell erfolgreich ausgeführt.
 
-## Voraussichtlicher Implementierungsblock
+## Historischer Implementierungsplan (durch D5 umgesetzt)
 
 - neue server-only Delivery-Policy/Registry und reine Tests
 - neue typspezifische, datensparsame Notification-Mail-Renderer und Tests
@@ -150,8 +150,7 @@ Das Proposal aktiviert RLS, erzeugt keine Browserpolicy, entzieht `PUBLIC`, `ano
 - Delivery-Repository/Service mit atomarem Claim und Zustandsübergängen
 - zentraler Coordinator, aufgerufen nur vom Notification-Service nach erfolgreichem Insert
 - Erweiterung des Audit-Loggers um streng allowlistete E-Mail-Delivery-Fehlerklassen
-- Anpassung der In-App-Preference-Auswertung, bevor unabhängige Mailpreferences aktiviert werden
-- später additive `email_enabled`-Preference und UI in einem eigenen Teilblock
+- Beibehaltung der getrennten In-App-Preference-Auswertung
 - keine Änderung der Fachservices außer gegebenenfalls unvermeidbaren Rückgabe-/Fehlerprotokollierungsanpassungen am zentralen Notification-Aufruf
 
 Erforderliche Tests: vollständiges Typinventar, Default-deny unbekannter Typen, Renderer-Datensparsamkeit, keine rohe Metadata/Route/ID im Mailmodell, serverseitige Adressauflösung, inaktive/fehlende Profile, kein Browserempfänger, erfolgreiche Dashboard-Persistenz vor Mail, Mailfehler ohne Fachrollback, genau ein Claim bei Parallelität, stabiler Schlüssel, Retry ohne Doppelmail, Providerwechsel, Preference-Trennung, Audit-Sanitisierung, keine Clientimports/Secrets sowie Regression aller bestehenden Notification-Erzeuger, Scheduler und Membership-D1-Mail.
@@ -174,10 +173,10 @@ Der technische Providername in `provider_key` ist vom stabilen Provider-Idempote
 
 Der Linktest bleibt eine Go-live-Aufgabe: Die lokale Basis-/Tunnel-URL zeigte während D6 auf Port 3000, der kontrollierte Workflow lief auf Port 3001. Das beeinträchtigte weder Versand noch Zustellung. Vor Produktion muss `NEXT_PUBLIC_SITE_URL` auf die finale Vereinsdomain gesetzt und der daraus normalisierte `/admin`-Link in der Deploymentumgebung geprüft werden. In D6 wurde keine Konfiguration geändert und kein Retry ausgelöst.
 
-## B15.21D8 – Geplante globale Policy-Schicht
+## B15.21D8 – Historisch geplante, durch D9 umgesetzte globale Policy-Schicht
 
 D8 plant oberhalb der bestehenden D5-Registry eine service-role-only, global durch Superadmins steuerbare Policy. `notification_email_settings` hält explizite Freigaben pro produktivem Typ; ein getrenntes Singleton `notification_email_global_settings` stellt einen zunächst deaktivierten Import-/Go-live-/Not-Aus-Schalter bereit. Fehlende Zeilen und Lookupfehler bleiben default-deny. Die sichere Renderer-Registry bleibt ein unabhängiger zweiter Gurt: Datenbankfreigabe ohne expliziten datensparsamen Renderer darf keinen Versand ermöglichen.
 
-Die Prüfung bleibt im zentralen Coordinator. Deaktivierte Entscheidungen erzeugen weiterhin terminale `skipped`-Ledgerzeilen und werden nie rückwirkend versendet. `notification_preferences.in_app_enabled` wird nicht zweckentfremdet; eine spätere individuelle Mailpräferenz folgt erst nach globaler Freigabe. Architektur, initiale 16/11-Auswahl und die vier nicht ausgeführten SQL-Artefakte sind in [`b15-21d8-global-notification-email-settings-architecture.md`](b15-21d8-global-notification-email-settings-architecture.md) dokumentiert.
+Die Prüfung bleibt im zentralen Coordinator. Deaktivierte Entscheidungen erzeugen weiterhin terminale `skipped`-Ledgerzeilen und werden nie rückwirkend versendet. `notification_preferences.in_app_enabled` wird nicht zweckentfremdet. Persönliche E-Mail-Schalter pro Benutzer sind nach Abschluss von D10 bewusst nicht vorgesehen; die globale Type-Entscheidung verbleibt beim Superadmin. Architektur, initiale 16/11-Auswahl und SQL-Artefakte sind in [`b15-21d8-global-notification-email-settings-architecture.md`](b15-21d8-global-notification-email-settings-architecture.md) dokumentiert.
 
 D9 hat diese Policy-Schicht implementiert. Der Coordinator lädt die globale und typbezogene Policy gesammelt vor Empfängerauflösung und Provideraufruf; Lookupfehler, Master AUS, Type AUS und fehlender Renderer sind getrennte sanitiserte `skipped`-Gründe. Die Renderer-Registry umfasst nun die 16 empfohlen aktiven Typen. Der globale Master blieb bei der Implementierung AUS, es wurde keine Mail versendet und kein bestehender Ledgerzustand reaktiviert.

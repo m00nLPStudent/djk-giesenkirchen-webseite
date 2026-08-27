@@ -45,6 +45,10 @@ Desktop- und Mobilnavigation werden aus derselben zentralen, serverseitig nach P
 
 Die Gruppierung verändert weder URLs noch Route Guards, Permissions oder Scopes. Insbesondere bleibt `/admin/department` durch `settings.view` und den bestehenden Board-Scope geschützt und verwaltet fachlich die Vorstände der Fußballabteilung.
 
+Die persönlichen In-App-Benachrichtigungseinstellungen und die globale Superadmin-E-Mail-Steuerung verwenden dieselben kompakten, responsiven Listenbausteine. Persönliche Preferences ändern ausschließlich den In-App-Kanal; globale E-Mail-Typen und Master bleiben davon getrennt.
+
+Das persönliche Notification Center verwendet ebenfalls die responsiven Listenbausteine und ergänzt sie um eine kompakte Auswahlleiste für aktuell sichtbare Zeilen. Mehrfachauswahl, Sammellöschung und deutsche Typfilter wurden auf Desktop und Mobile manuell abgenommen; bestehende Permissions und Own-user-Grenzen bleiben unverändert.
+
 Eine eigenständige „Vereinsstruktur“ für den Gesamtverein wird erst in einem separaten Folgeblock geplant. Voraussetzung dafür sind eine fachlich getrennte Gesamtvereinsroute und eine eindeutig zugeordnete Datenquelle; bis dahin gibt es keinen entsprechenden Navigationseintrag.
 
 ## Refactoring-Status

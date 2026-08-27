@@ -1,17 +1,20 @@
 # Aktuelle Roadmap
 
-> B15.21A bis B15.21D6 sind abgeschlossen. Die zentrale, server-only und default-deny E-Mail-Ausleitung für ausgewählte Dashboard-Notifications wurde mit einem realen Membership-Weiterleitungsworkflow, Resend-Verarbeitung und Postfacheingang erfolgreich verifiziert.
+> B15.21A bis B15.21D11 sind abgeschlossen. Mitgliedsanfragen, saisonale Mannschaftsauflösung, Zuständigkeiten, Weiterleitung, transaktionale Membership-Mail, zentrale Notification-Mail-Delivery, globale Superadmin-Steuerung, persönliche In-App-Preferences sowie die Notification-Center-Mehrfachauswahl sind umgesetzt und verifiziert.
 
 Stand: 27. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 
 Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und System gegliedert. `/admin/department` ist als „Fußballvorstände“ dem Fußballbereich zugeordnet; Mitgliedsanfragen, Medien und der gemeinsame Einstieg „Seiten, Kontakte & Einstellungen“ bleiben unter Gesamtverein. Offener separater Folgepunkt: Eine eigenständige Gesamtvereins-„Vereinsstruktur“ erst nach Analyse und Einführung einer fachlich getrennten Gesamtvereinsroute sowie einer eindeutig zugeordneten Datenquelle planen; bis dahin keinen künstlichen Navigationseintrag oder neue Route anlegen.
 
-## Priorität 1 – Mitglied-werden-Formular
+## Priorität 1 – Mitgliedschaft, Notifications und transaktionale E-Mails
 
+- B15.21A–C abgeschlossen: Das öffentliche Mitglied-werden-Formular validiert Geburtsdatum und Jahrgang serverseitig, löst saisonal passende Mannschaften auf und unterstützt die gehärteten Zuständigkeits-, Sichtbarkeits-, Bearbeitungs- und Weiterleitungsworkflows.
 - B15.21D3: erster kontrollierter realer Formularversand, interner Notification-Pfad, `mail_sent_at`, Resend-Verarbeitung und Postfacheingang erfolgreich verifiziert.
 - B15.21D4/D4.1 abgeschlossen: Analyse und Live-Preflight bestätigten das zentrale Delivery-Modell ohne Namenskonflikt. Das server-only Ledger-Proposal wurde anschließend manuell ausgeführt und der Postcheck bestätigte RLS, fehlende Browserrechte, ausschließlichen Service-Role-Zugriff sowie unveränderte Bestandsnotifications. Details stehen unter [`b15-21d4-notification-email-delivery-architecture.md`](b15-21d4-notification-email-delivery-architecture.md).
 - B15.21D5/D6 abgeschlossen: Der zentrale Notification-Service leitet ausschließlich neu persistierte, explizit freigegebene Membership-/Trainer-Notifications an den bestehenden Mail-Service aus. Der erste reale Test erzeugte genau eine `membership_forwarded`-Notification und eine erfolgreiche `sent`-Delivery mit einem Versuch, ohne Lock, Fehler, Retry oder Doppelzustellung. Resend-Verarbeitung und Postfacheingang wurden bestätigt. Kein Cron und kein automatischer Retry wurden aktiviert.
-- B15.21D8/D9: Live-Preflight, manuell ausgeführtes Schema und Postcheck bestätigten die server-only globale Mailpolicy. Die Superadmin-Seite `System → E-Mail-Benachrichtigungen`, Master, 27 Type-Toggles, 16 sichere Renderer, Bulk-Deaktivierung und Restore sind implementiert. Master/Type/Renderer bleiben dreifach default-deny; deaktivierte Entscheidungen werden terminal `skipped` und niemals rückwirkend versendet. Der Master bleibt bis zum ausdrücklich freigegebenen manuellen Test AUS. Spätere individuelle Benutzer-Mailpräferenzen bleiben ein separater additiver Block.
+- B15.21D8/D9 abgeschlossen: Live-Preflight, manuell ausgeführtes Schema und Postcheck bestätigten `notification_email_settings`, `notification_email_global_settings` und die server-only globale Mailpolicy. Die Superadmin-Seite `System → E-Mail-Benachrichtigungen`, der standardmäßig deaktivierte Master, 27 Type-Toggles, die 16/11-Empfehlungsmatrix, 16 sichere Renderer, Bulk-Deaktivierung und Restore sind implementiert. Master/Type/Renderer bleiben dreifach default-deny; deaktivierte Entscheidungen werden terminal `skipped` und niemals rückwirkend versendet.
+- B15.21D10 abgeschlossen: Die persönlichen In-App-Benachrichtigungseinstellungen verwenden eine kompakte Desktop-Tabelle mit konsistenter Spaltengeometrie und eine kompakte Mobile-Liste. Erforderliche Notifications bleiben nicht abschaltbar; optionale Toggles, „Alle optionalen aktivieren/deaktivieren“ und „Standard wiederherstellen“ verwenden unverändert die bestehende Preference-Fachlogik.
+- Persönliche E-Mail-Schalter pro Benutzer sind derzeit bewusst nicht vorgesehen. Der Superadmin bestimmt zentral, welche Notification-Typen E-Mails erzeugen; persönliche `in_app_enabled`-Preferences bleiben davon getrennt.
 - Go-live-Prüfung für Notification-Mail-Links: `NEXT_PUBLIC_SITE_URL` in der Deploymentumgebung auf die finale Vereinsdomain setzen und den normalisierten `/admin`-Link prüfen. Die lokale D6-Basis-/Tunnel-URL zeigte auf Port 3000, während der Testworkflow auf Port 3001 lief; dies war kein Versandfehler und wurde nicht spontan umkonfiguriert.
 - Vor dem Produktivversand weiterhin Datenschutzvertrag, eigene Versanddomain, serverseitige Hosting-Secrets und Produktivumgebung verbindlich einrichten.
 - Offener späterer Block „Professionelles Vereins-E-Mail-Template / Corporate Design“: ein zentrales, wiederverwendbares Grundlayout für transaktionale Vereinsmails entwickeln, nicht nur für die Membership-Eingangsbestätigung. Vorzusehen sind das offizielle Logo des DJK/VfL Giesenkirchen, ein einheitlicher Vereinskopf im Corporate Design der Website, responsive Darstellung für Desktop und Mobilgeräte sowie ein professioneller Footer mit den notwendigen Vereins-/Impressumsangaben, Vereinsanschrift, offiziellen Kontaktmöglichkeiten, Website und gegebenenfalls Social-Media-Verweisen oder rechtlich beziehungsweise organisatorisch sinnvollen Hinweisen. Text- und HTML-Version müssen erhalten bleiben; die Umsetzung soll datensparsam, ohne unnötige Trackingelemente und in üblichen Mailclients zuverlässig darstellbar sein. Das Layout soll künftig unter anderem für Eingangsbestätigungen, Bearbeitungsinformationen, Rückfragen, Beitragsinformationen und weitere Vereinsworkflows genutzt werden können. Konkrete Vereinsdaten, endgültiges Logo und gewünschte Footer-Angaben werden vor diesem separaten Block vom Benutzer bereitgestellt.
@@ -27,10 +30,14 @@ Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und Syste
 - öffentliche Downloadseite sowie interne Downloads und Berechtigungen.
 - sichere Dateizugriffe; Versionierung nur nach eigener Anforderungsanalyse.
 
-## Priorität 3 – Notification Center UX
+## Priorität 3 – B15.21D11 Notification Center UX (abgeschlossen)
 
-- Checkbox je Notification, Einzelauswahl, Mehrfachauswahl, alle auswählen und Auswahl aufheben.
-- ausgewählte eigene Notifications nach Bestätigung gemeinsam löschen; mobile Bedienung absichern.
+- Checkbox je Notification, Einzel-/Mehrfachauswahl, Auswahlzahl, sichtbare Gesamtauswahl und bestätigtes Sammellöschen sind für Desktop und Mobile implementiert. Die kompakte Aktionsleiste enthält außerdem „Alle als gelesen markieren“; der redundante UI-Einstieg „Gelesene löschen“ ist entfernt, während der interne Bestandsvertrag erhalten bleibt.
+- Der Typfilter zeigt nur tatsächlich geladene Typen mit den deutschen Labels der zentralen Preference-Registry; die Tabelle ergänzt darunter dezent den technischen Key und unbekannte Typen erhalten einen neutralen Fallback.
+- „Alle auswählen“ bezeichnet ausschließlich alle aktuell geladenen und durch die aktiven Filter sichtbaren Notifications, niemals ungeprüft zukünftige paginierte Datenbankseiten; Filterwechsel leeren die Auswahl.
+- Action, Service und Repository verwenden serverseitige Session-Ownership, maximal 250 normalisierte UUIDs sowie `id IN (...) AND recipient_user_id = userId`. Fremde oder fehlende IDs erzeugen kein Existenzleck.
+- Die freigegebene FK-Semantik bleibt bewusst bestehen: Das Löschen einer Notification entfernt wegen `notification_deliveries.notification_id ... ON DELETE CASCADE` auch deren operative Delivery-Ledgerzeilen. Das append-only `notification_audit` bleibt unabhängig erhalten. Es war keine SQL-Änderung erforderlich. Details: [`b15-21d11-notification-center-bulk-delete-analysis.md`](b15-21d11-notification-center-bulk-delete-analysis.md).
+- Der manuelle Browsertest für Desktop, Mobile, Einzel-/Mehrfachauswahl, Auswahlzähler, Filter, Read/Unread, Sammellöschung, kompakte Aktionsleiste und deutsche Typbezeichnungen ist erfolgreich abgeschlossen.
 - optional danach echte Pagination, Realtime/Tab-Synchronisierung, Retry-System und Audit-Aufbewahrung.
 
 ## Priorität 4 – Benutzer und Profile
@@ -58,7 +65,7 @@ Reihenfolge: Tischtennis, Gymnastik Damen, Behindertensport. Je Bereich später 
 
 ## Priorität 8 – Technischer Cleanup
 
-- bekannte Fehler in `teamCoachAssignments.core.test.mjs` und den News-UI-Strukturtests neu analysieren.
+- Die veralteten Annahmen in `teamCoachAssignments.core.test.mjs` und den beiden News-UI-Strukturtests sind korrigiert. Der aktuelle vollständige Lauf umfasst einschließlich der D11-Regression und UI-Nachbesserung 910/910 bestandene Tests.
 - ESLint-Bestand, Dependency-Audit, Dateigrößen und Architektur neu inventarisieren; keine alten Zahlen ungeprüft übernehmen.
 
 ## Priorität 9 – Spätere große Module
@@ -71,7 +78,7 @@ Reihenfolge: Tischtennis, Gymnastik Damen, Behindertensport. Je Bereich später 
 - dauerhaftes Hosting, finale Domain, SSL und Mailserver.
 - Umgebungsvariablen, Supabase-Produktivkonfiguration und Auth Redirect URLs.
 - Einladungsmails, Passwort-Reset, Recovery und Session-Cookies.
-- Echtdaten, Datenschutz, Impressum, Cookie-/Trackingprüfung und Jugendschutzdarstellung.
+- bestehende Testdaten vor Produktivstart kontrolliert bereinigen und anschließend Echtdaten einspielen; Datenschutz, Impressum, Cookie-/Trackingprüfung und Jugendschutzdarstellung abnehmen.
 - vollständige Rollenabnahme und Tests auf mobilen Endgeräten.
 - Contribution Reminder: `CONTRIBUTION_REMINDER_CRON_SECRET` im Hosting setzen, identisches Secret im Supabase Vault hinterlegen, finalen Produktiv-Endpunkt verwenden und keine temporäre `trycloudflare.com`-Adresse einsetzen.
 - finalen Idempotenz-Preflight/Postcheck ausführen, Cron aktivieren, ersten Lauf überwachen, Audit kontrollieren, Rollen-Livetest und Secret-Rotation durchführen und die Funktion danach offiziell freigeben.

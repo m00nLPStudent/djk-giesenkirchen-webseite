@@ -41,6 +41,7 @@ export const notificationPreferenceGroups = Object.freeze([
 ]);
 const byType = new Map(definitions.map((item) => [item.type, item]));
 export const getNotificationPreferenceDefinition = (type) => byType.get(String(type || "")) || null;
+export const getNotificationTypeLabel = (type) => getNotificationPreferenceDefinition(type)?.label || "Weitere Benachrichtigung";
 export const getNotificationPreferenceGroup = (type) => getNotificationPreferenceDefinition(type)?.group || null;
 export const isNotificationTypeMandatory = (type) => getNotificationPreferenceDefinition(type)?.mandatory === true;
 export const isNotificationTypeConfigurable = (type) => getNotificationPreferenceDefinition(type)?.configurable === true;

@@ -103,6 +103,11 @@ export function deleteNotification({ db, userId, id }) {
   return repository.deleteNotificationFromRepository(db, userId, id);
 }
 
+export async function deleteSelectedNotifications({ db, userId, notificationIds }) {
+  const result = await repository.deleteSelectedNotificationsForUser({ db, userId, notificationIds });
+  return { ...result, deletedCount: result.error ? 0 : result.count || 0 };
+}
+
 export function deleteAllRead({ db, userId }) {
   return repository.deleteAllReadFromRepository(db, userId);
 }

@@ -46,6 +46,10 @@ export function deleteNotificationFromRepository(db, recipientUserId, id) {
   return db.from("notifications").delete().eq("id", id).eq("recipient_user_id", recipientUserId);
 }
 
+export function deleteSelectedNotificationsForUser({ db, userId, notificationIds }) {
+  return db.from("notifications").delete({ count: "exact" }).in("id", notificationIds).eq("recipient_user_id", userId);
+}
+
 export function deleteAllReadFromRepository(db, recipientUserId) {
   return db.from("notifications").delete().eq("recipient_user_id", recipientUserId).eq("is_read", true);
 }

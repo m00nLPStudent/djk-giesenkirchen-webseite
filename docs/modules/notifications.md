@@ -4,7 +4,7 @@
 
 Dashboard-Notifications werden nach erfolgreicher Fachmutation serverseitig persistiert. B15.21D5 ergänzt direkt danach einen zentralen Best-Effort-E-Mail-Kanal. Fachservices erzeugen weiterhin ausschließlich Notifications und kennen weder Mailprovider noch Empfängeradresse.
 
-Der zentrale Hook verarbeitet nur tatsächlich neu persistierte Rohzeilen aus `createNotification`, `createNotifications` und `createNotificationsOnce`. Eine explizite Default-deny-Registry erlaubt zunächst ausschließlich `membership_created`, `membership_assigned`, `membership_forwarded`, `membership_completed`, `trainer_assigned`, `trainer_removed` und `trainer_changed`. Alle anderen Typen erhalten einen `skipped`-Ledgerzustand und lösen keinen Mailaufruf aus. `event_cancelled` bleibt deaktiviert, weil der Typ echte Trainingsabsagen und das Entfernen normaler Trainingszeiten noch nicht eindeutig trennt.
+Der zentrale Hook verarbeitet nur tatsächlich neu persistierte Rohzeilen aus `createNotification`, `createNotifications` und `createNotificationsOnce`. Versand ist ausschließlich zulässig, wenn der standardmäßig deaktivierte globale Master, die serverseitige Type-Einstellung und ein expliziter sicherer Renderer gemeinsam freigeben. Die Renderer-Registry umfasst die 16 empfohlenen Typen der 16/11-Matrix; unbekannte, deaktivierte oder nicht sicher gerenderte Typen erhalten einen terminalen `skipped`-Ledgerzustand und lösen keinen Provideraufruf aus.
 
 ## Datenschutz und Empfänger
 
@@ -16,15 +16,29 @@ Die Empfängeradresse wird ausschließlich über `notification.recipient_user_id
 
 Providererfolg setzt `sent`, `sent_at`, Provider-Key und optional nur die Provider-Message-ID. Fehler werden auf eine kleine technische Fehlerklasse reduziert, lösen das Lock, setzen `failed` und berechnen ein exponentielles `next_attempt_at` ab 15 Minuten, begrenzt auf 24 Stunden. Es gibt in D5 keinen Cron und keinen automatischen Retry. `sent` und `skipped` sind terminal. Ein Ledger- oder Mailfehler verändert weder Fachaktion noch Dashboard-Notification.
 
-Die vorhandenen In-App-Preferences bleiben unverändert; `in_app_enabled` wird nicht als Mailpreference verwendet. Eine spätere unabhängige `email_enabled`-Preference benötigt einen eigenen Datenbank-Sicherheitsblock. `notification_audit` bleibt unverändert und ist nicht der Delivery-State.
+Die vorhandenen In-App-Preferences bleiben unverändert; `in_app_enabled` wird nicht als Mailpreference verwendet. Persönliche E-Mail-Schalter pro Benutzer sind aktuell bewusst nicht vorgesehen. Die globale Entscheidung über E-Mail-Typen verbleibt beim Superadmin. `notification_audit` bleibt unverändert und ist nicht der Delivery-State.
 
 ## B15.21D8/D9 – Globale E-Mail-Steuerung
 
-Die feste D5-Registry wurde durch eine globale, ausschließlich vom Superadmin änderbare Datenbankpolicy ergänzt. `notification_preferences` bleibt unverändert benutzerbezogen und steuert weiterhin nur In-App-Notifications. `notification_email_settings` enthält die explizite Freigabe der 27 produktiven Type-Keys; `notification_email_global_settings` stellt den atomaren Master-Schalter für Import, Go-live und Not-Aus bereit.
+Die feste D5-Registry wurde durch eine globale, ausschließlich vom Superadmin änderbare Datenbankpolicy ergänzt. `notification_preferences` bleibt unverändert benutzerbezogen und steuert weiterhin nur In-App-Notifications. `notification_email_settings` enthält die explizite Freigabe der 27 produktiven Type-Keys mit 16 empfohlenen Aktivierungen und 11 Deaktivierungen; `notification_email_global_settings` stellt den standardmäßig ausgeschalteten atomaren Master-Schalter für Import, Go-live und Not-Aus bereit.
 
 Die Semantik ist strikt default-deny: Master aus, fehlende Masterzeile, fehlende Typzeile, deaktivierter Typ, Lookupfehler oder fehlender sicherer Renderer bedeuten keine Mail. Dashboard-Notifications bleiben davon unberührt. Der Coordinator legt auch in diesen Fällen eine terminale `skipped`-Delivery mit sanitisiertem Grund an. Eine spätere Aktivierung versendet daher niemals alte Notifications rückwirkend. Batchpfade laden Master einmal und alle benötigten Typen gesammelt; ein Cache ist nicht vorgesehen.
 
-Die Seite `System → E-Mail-Benachrichtigungen` unter `/admin/system/notification-email-settings` ist ausschließlich für die aktive Rolle `superadmin` sichtbar und änderbar. Sie bietet Master, einzelne Type-Toggles, „Alle Typen deaktivieren“ und die bestätigte 16/11-Empfehlungsmatrix. Bulk-Aktionen schalten zuerst den Master aus; Restore aktiviert ihn nie automatisch. Normale Browserrollen erhalten keine Rechte auf den server-only Tabellen. Spätere individuelle E-Mail-Präferenzen werden nach globalem Master und globaler Typfreigabe additiv geprüft und nicht mit `in_app_enabled` vermischt. Details stehen in [`b15-21d8-global-notification-email-settings-architecture.md`](../planning/b15-21d8-global-notification-email-settings-architecture.md).
+Die Seite `System → E-Mail-Benachrichtigungen` unter `/admin/system/notification-email-settings` ist ausschließlich für die aktive Rolle `superadmin` sichtbar und änderbar. Sie bietet Master, einzelne Type-Toggles, „Alle Typen deaktivieren“ und die bestätigte 16/11-Empfehlungsmatrix. Bulk-Aktionen schalten zuerst den Master aus; Restore aktiviert ihn nie automatisch. Normale Browserrollen erhalten keine Rechte auf den server-only Tabellen. Details stehen in [`b15-21d8-global-notification-email-settings-architecture.md`](../planning/b15-21d8-global-notification-email-settings-architecture.md).
+
+## B15.21D10 – Persönliche In-App-Preferences
+
+Die persönliche Seite `/admin/notifications/settings` verwendet eine kompakte Desktop-Tabelle mit gemeinsamer Spaltengeometrie sowie kompakte Mobile-Listen. Erforderliche Typen bleiben als „Erforderlich“ gekennzeichnet und nicht abschaltbar. Optionale Einzeltoggles, „Alle optionalen aktivieren“, „Alle optionalen deaktivieren“ und „Standard wiederherstellen“ behalten unverändert die bestehende Own-user-Preference-Semantik.
+
+## B15.21D11 – Notification-Center-Mehrfachauswahl
+
+Das Notification Center ergänzt die serverseitig authentifizierten Einzel- und Gelesenen-Löschpfade um `deleteSelectedNotificationsAction(ids)`. Die Action ermittelt den Benutzer ausschließlich aus der Session, normalisiert höchstens 250 UUIDs, entfernt Duplikate und übergibt nur eine gültige, nichtleere Liste. Das Repository kombiniert `id IN (...)` zwingend mit dem serverseitigen `recipient_user_id`; die Own-row-RLS bleibt zusätzliche Schutzschicht. Fremde oder nicht vorhandene IDs werden nicht gesondert offengelegt, zurückgegeben wird nur die Löschanzahl.
+
+Desktop und Mobile bieten Checkboxen, Auswahlzahl und eine bestätigte Sammellöschung. „Alle auswählen“ meint ausschließlich die aktuell geladenen und durch Suche, Status und Typ sichtbar gefilterten Zeilen. Filterwechsel leeren die Auswahl; Einzellöschung entfernt die betroffene ID ebenfalls aus dem Auswahlzustand. Die kompakte Listenleiste enthält zusätzlich „Alle als gelesen markieren“. Der redundante sichtbare Einstieg „Gelesene löschen“ wurde entfernt; Action, Service und Repository für `deleteAllRead` bleiben ohne Refactoring intern erhalten.
+
+Der Typfilter enthält weiterhin nur Typen, die in den aktuell geladenen Notifications vorkommen. Seine sichtbaren deutschen Labels stammen aus der zentralen persönlichen Preference-Registry. Unbekannte zukünftige Typen erhalten den neutralen Fallback „Weitere Benachrichtigung“. In der Desktop-Tabelle steht das verständliche Label primär und der technische Type-Key klein darunter.
+
+Beim Löschen einer Notification entfernt der bestehende FK `notification_deliveries.notification_id ... ON DELETE CASCADE` bewusst auch die zugehörige operative Delivery-Ledgerzeile. D11 behält damit exakt die bestehende Semantik von Einzel- und „Gelesene löschen“ bei. `notification_audit` besitzt keine Notification-FK und bleibt erhalten. Eine abweichende dauerhafte Delivery-Aufbewahrung wäre ein eigener SQL-/Datenmodellblock. D11 selbst benötigte keine SQL-Änderung. Analyse und Umsetzung stehen in [`b15-21d11-notification-center-bulk-delete-analysis.md`](../planning/b15-21d11-notification-center-bulk-delete-analysis.md).
 
 ## B15.21D6 – Erster realer Notification-Mail-Test
 

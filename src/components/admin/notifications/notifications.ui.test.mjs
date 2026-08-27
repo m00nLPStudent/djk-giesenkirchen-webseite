@@ -42,3 +42,39 @@ test("selected details stay scoped to the current user's loaded notifications an
   assert.match(detailSource, /AdminInformationSection/);
   assert.match(detailSource, /item\.message/);
 });
+
+test("bulk selection is limited to visible rows and requires confirmation", () => {
+  for (const marker of ["selectedIds", "toggleAllVisible", "Alle auswählen", "Alle abwählen", "ausgewählt", "Ausgewählte löschen", "window.confirm", "deleteSelectedNotificationsAction"]) assert.match(moduleSource, new RegExp(marker));
+  assert.match(moduleSource, /toggleVisibleNotificationSelection\(current, filtered\)/);
+  assert.match(moduleSource, /getVisibleNotificationIds\(filtered\)/);
+  assert.match(moduleSource, /selectedIds\.filter\(\(id\) => visibleIds\.has\(id\)\)/);
+  assert.match(moduleSource, /disabled=\{!selectedCount \|\| pending\}/);
+});
+
+test("desktop and mobile rows expose accessible selection controls", () => {
+  assert.match(moduleSource, /label: "Auswahl"/);
+  assert.match(moduleSource, /type="checkbox"/g);
+  assert.match(moduleSource, /className="h-5 w-5 accent-red-500"/);
+  assert.match(moduleSource, /xl:hidden/);
+  assert.match(moduleSource, /xl:block/);
+});
+
+test("single deletion keeps selection state consistent while delete-all-read stays out of the UI", () => {
+  assert.match(moduleSource, /selectedId !== id/);
+  assert.match(moduleSource, /setSelectedIds\(\[\]\)/);
+  assert.doesNotMatch(moduleSource, /Gelesene löschen|deleteAllReadNotificationsAction|removeRead/);
+});
+
+test("header is action-free and mark-all-read lives in the compact bulk toolbar", () => {
+  assert.doesNotMatch(moduleSource, /AdminModuleHeader[^\n]*actions=/);
+  assert.match(moduleSource, /onMarkAll=\{markAll\}/);
+  assert.match(moduleSource, /<AdminButton onClick=\{onMarkAll\}>Alle als gelesen markieren<\/AdminButton>/);
+  assert.match(moduleSource, /flex flex-col gap-2 sm:flex-row/);
+});
+
+test("type filter and table use central German labels with a subtle technical key", () => {
+  assert.match(moduleSource, /getNotificationTypeLabel\(value\)/);
+  assert.match(moduleSource, /getNotificationTypeLabel\(item\.type\)/);
+  assert.match(moduleSource, /<code[^>]*>\{item\.type\}<\/code>/);
+  assert.match(moduleSource, /getNotificationTypes\(items\)/);
+});

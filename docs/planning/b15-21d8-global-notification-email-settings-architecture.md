@@ -98,19 +98,19 @@ Vor Import bleibt der Master `AUS`. Benutzer, Trainer, Betreuer, Spieler, Beitr�
 
 Der Master ist zusätzlich zu Typ-Toggles sinnvoll: ein atomarer Not-Aus ist schneller und sicherer als 27 Einzelupdates und bewahrt die gewünschte Konfiguration für die spätere Wiederaktivierung. Nachteil ist eine zweite Entscheidungsebene; dieser wird durch eine eindeutige UI-Anzeige „Global AUS – Typauswahl derzeit ohne Versandwirkung“ begrenzt.
 
-## Spätere individuelle Mailpräferenzen
+## Persönliche Mailpräferenzen – derzeit bewusst nicht vorgesehen
 
-Die Architektur bleibt additiv erweiterbar:
+Die Architektur wäre technisch additiv erweiterbar:
 
 ```text
 globaler Master an?
 → globaler Typ explizit an?
 → sicherer Renderer vorhanden?
-→ spätere individuelle E-Mail-Präferenz erlaubt?
+→ derzeit keine zusätzliche individuelle E-Mail-Prüfung
 → zustellen
 ```
 
-Die spätere Benutzerpräferenz darf `in_app_enabled` nicht umdeuten. Ob sie als additive Spalte oder getrennte Kanaltabelle umgesetzt wird, benötigt einen eigenen Security- und Persistenzblock, insbesondere weil In-App-Präferenzen heute bereits vor der kanonischen Notification-Persistenz filtern.
+Nach Abschluss von D10 wurde fachlich entschieden, derzeit keine persönlichen E-Mail-Schalter pro Benutzer einzuführen. Der Superadmin steuert zentral, welche Notification-Typen E-Mails erzeugen; persönliche `in_app_enabled`-Preferences steuern ausschließlich In-App-Notifications. Das obige Erweiterungsmodell ist daher keine aktive Roadmap-Aufgabe. Eine spätere Neubewertung müsste einen eigenen Security- und Persistenzblock erhalten und dürfte `in_app_enabled` nicht umdeuten.
 
 ## SQL-Sicherheitsverfahren
 
