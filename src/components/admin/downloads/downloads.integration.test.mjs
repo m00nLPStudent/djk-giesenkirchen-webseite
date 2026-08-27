@@ -1,0 +1,14 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const read=(path)=>readFile(new URL(path,import.meta.url),"utf8");
+const [actions,service,repository,module,page,mediaRepository,assignmentCore,nav,permissions]=await Promise.all([read("../../../app/admin/downloads/actions.js"),read("./downloads.service.js"),read("./downloads.repository.js"),read("./DownloadsModule.js"),read("../../../app/admin/downloads/page.js"),read("../media-library/media.repository.js"),read("../media-library/mediaAssignment.core.mjs"),read("../navigation/adminNavigation.config.js"),read("../../../lib/admin-auth/adminPermissionConfig.js")]);
+
+test("route, navigation and actions use dedicated download permissions",()=>{assert.match(page,/downloads\.view/);assert.match(nav,/\/admin\/downloads[\s\S]*downloads\.view/);assert.match(permissions,/\/admin\/downloads[\s\S]*downloads\.view/);for(const key of ["downloads.create","downloads.edit","downloads.delete","downloads.publish"])assert.match(actions,new RegExp(key.replace(".","\\.")));});
+test("service validates category and private PDF before writes",()=>{for(const marker of ["isEligibleDownloadAsset","category.data.is_active","downloads.publish","synchronizeMediaAssignment(\"download\"","\"file\""])assert.match(service,new RegExp(marker.replace(/[()]/g,"\\$&")));assert.match(service,/repository\.deleteDownload/);});
+test("application assignment allowlist forwards download/file to the installed RPC",()=>{assert.match(assignmentCore,/TARGETS[\s\S]*\"download\"/);assert.match(assignmentCore,/\[\"news_document", \"event_document", \"download"\]/);});
+test("repository stores only media reference and never file metadata",()=>{assert.match(repository,/media_asset_id/);assert.doesNotMatch(repository,/file_path|file_url|storage\.from/);});
+test("picker lists all active PDFs and classifies selection server-side",()=>{assert.match(actions,/mimeType:\"application\/pdf\"/);assert.doesNotMatch(actions,/storageBucket:\"media-library-private\"/);assert.match(actions,/classifyDownloadPickerAsset/);assert.match(mediaRepository,/mimeType/);});
+test("compact desktop/mobile UI reuses picker and leaves asset deletion out",()=>{assert.match(module,/AdminListHeader/);assert.match(module,/AdminListMobileCard/);assert.match(module,/AdminMediaPickerDialog/);assert.match(module,/defaultPurpose=\"all\"/);assert.match(module,/Die Datei bleibt in der Medienbibliothek/);assert.doesNotMatch(actions,/storage\.from\([^)]*\)\.remove/);});
+test("generic picker uses document wording and disables unsafe items",async()=>{const picker=await read("../media-library/AdminMediaPickerDialog.js");assert.match(picker,/Ein vorhandenes Dokument auswählen/);assert.match(picker,/disabled=\{item\.selectable === false\}/);assert.match(picker,/selectionHint/);});

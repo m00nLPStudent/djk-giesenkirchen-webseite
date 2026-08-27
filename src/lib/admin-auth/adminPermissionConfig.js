@@ -171,6 +171,7 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     priority: 500,
   }),
   buildRule("/admin/news", "news.view", { matchType: "prefix", priority: 300 }),
+  buildRule("/admin/downloads", "downloads.view", { matchType: "prefix", priority: 300 }),
   buildRule("/admin/events", "events.view", {
     matchType: "prefix",
     priority: 300,
@@ -344,6 +345,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin/notifications": "dashboard.view",
   "/admin/system/notification-email-settings": "dashboard.view",
   "/admin/news": "news.view",
+  "/admin/downloads": "downloads.view",
   "/admin/department": "settings.view",
   "/admin/sponsors": "sponsors.view",
   "/admin/teams": "teams.view",
@@ -363,6 +365,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
 
 export const ADMIN_DASHBOARD_ACTION_PERMISSION_MAP = {
   "/admin/news/new": "news.create",
+  "/admin/downloads": "downloads.view",
   "/admin/events/new": "events.create",
   "/admin/users": "users.view",
   "/admin/roles": "roles.view",

@@ -1,5 +1,5 @@
 import {
-  Activity, BookOpen, Building2, CalendarDays, CalendarRange, CircleDot,
+  Activity, BookOpen, Building2, CalendarDays, CalendarRange, CircleDot, Download,
   Contact, Handshake, HeartHandshake, Image, Inbox, KeyRound, Landmark,
   LayoutDashboard, LockKeyhole, Mail, Menu, Newspaper, Settings, Shield,
   Trophy, UserRound, Users, Wallet,
@@ -13,6 +13,7 @@ const ICONS = Object.freeze({
   "calendar-range": CalendarRange,
   "circle-dot": CircleDot,
   contact: Contact,
+  download: Download,
   handshake: Handshake,
   "heart-handshake": HeartHandshake,
   image: Image,

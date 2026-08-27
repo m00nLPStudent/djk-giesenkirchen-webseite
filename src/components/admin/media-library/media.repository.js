@@ -2,7 +2,7 @@ import "server-only";
 
 export const MEDIA_ASSET_SELECT = "id, storage_bucket, storage_path, original_filename, display_name, media_kind, mime_type, file_extension, file_size_bytes, width, height, alt_text, description, copyright_notice, source_label, visibility, purpose, is_archived, uploaded_by_user_id, created_at, updated_at, media_asset_usages(id, entity_type, entity_id, field_name, created_at)";
 
-export async function listMediaAssets(db, { search = "", kind = "all", visibility = "all", purpose = "all", archived = "active", sort = "newest", page = 1, pageSize = 100 } = {}) {
+export async function listMediaAssets(db, { search = "", kind = "all", visibility = "all", purpose = "all", mimeType = "all", storageBucket = "all", archived = "active", sort = "newest", page = 1, pageSize = 100 } = {}) {
   const safePageSize = Math.min(Math.max(Number(pageSize) || 100, 1), 200);
   const safePage = Math.max(Number(page) || 1, 1);
   const from = (safePage - 1) * safePageSize;
@@ -15,6 +15,8 @@ export async function listMediaAssets(db, { search = "", kind = "all", visibilit
   if (Array.isArray(visibility) && visibility.length) query = query.in("visibility", visibility);
   else if (visibility !== "all") query = query.eq("visibility", visibility);
   if (purpose !== "all") query = query.eq("purpose", purpose);
+  if (mimeType !== "all") query = query.eq("mime_type", mimeType);
+  if (storageBucket !== "all") query = query.eq("storage_bucket", storageBucket);
   const orders = { newest: ["created_at", false], oldest: ["created_at", true], name: ["display_name", true], largest: ["file_size_bytes", false] };
   const [column, ascending] = orders[sort] || orders.newest;
   return query.order(column, { ascending }).order("id", { ascending: true });

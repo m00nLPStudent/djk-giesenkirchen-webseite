@@ -11,6 +11,7 @@ Stand: 27. August 2026
 - B15.21D8 und D9 sind abgeschlossen: globale Superadmin-Steuerung mit standardmäßig deaktiviertem Master, 27 Typen, 16/11-Empfehlungsmatrix, sicheren Renderern und terminalen Skip-Entscheidungen ist umgesetzt.
 - B15.21D10 ist abgeschlossen: Die kompakte persönliche In-App-Preference-UI behält erforderliche und optionale Semantik unverändert bei.
 - B15.21D11 ist ohne SQL-Änderung abgeschlossen und im Browser freigegeben: sichtbare Mehrfachauswahl, Auswahlzähler, Filter, bestätigtes Sammellöschen, serverseitige Own-user-Bindung und das bestehende Delivery-Cascade-Verhalten sind abgedeckt.
+- B15.22A–C sind abgeschlossen. Das Download-Schema ist live und nachgeprüft; Admin-CRUD, zentrale private PDF-Medienanbindung, Navigation, Superadmin-/Vorstand-/Webmaster-Zugriff, Trainer-Ausschluss, Publish/Unpublish, Usage- und Asset-erhaltende Löschsemantik wurden manuell erfolgreich geprüft. Der vollständige automatisierte Stand liegt bei 925/925 Tests.
 - Das Notification-Mail-System wurde über einen realen Membership-Weiterleitungsworkflow mit erfolgreicher Resend-Verarbeitung und bestätigtem Postfacheingang getestet.
 - Die Adminnavigation ist in Gesamtverein, Fußball und System gegliedert; die fachlichen Zuordnungen sind in der aktuellen Roadmap und im Admin-Framework dokumentiert.
 - Der aktuelle vollständige Testlauf ist einschließlich D11 und UI-Nachbesserung mit 910/910 Tests grün.
@@ -20,7 +21,7 @@ Stand: 27. August 2026
 
 ## Nächster Fachblock
 
-Laut aktueller Roadmap folgt als nächster eindeutig offener Fachblock das Download-Modul mit Adminverwaltung, zentraler Medienanbindung, öffentlicher beziehungsweise interner Ausgabe und sicheren Dateizugriffen. Eine neue Block-ID wird erst mit einem eigenen freigegebenen Auftrag vergeben.
+B15.22D folgt als nächster Fachblock: öffentliche Download-Seite und kontrollierter privater Dateiabruf. Der optionale atomare Komfortpfad für unbenutzte private `purpose=document`-Bestandsassets ist kein V1-Blocker und bleibt separat.
 
 ## Bewusst offene Betriebs- und Folgepunkte
 

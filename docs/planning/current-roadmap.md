@@ -24,6 +24,9 @@ Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und Syste
 
 ## Priorität 2 – Download-Modul
 
+- B15.22A/A1 abgeschlossen; B15.22B live installiert und per Read-only-Postcheck bestätigt; B15.22C abgeschlossen und manuell freigegeben. Das geschützte Admin-CRUD unter `/admin/downloads`, Navigation, Rollen, Create/Edit/Delete, Publish/Unpublish, privater zentraler PDF-Upload, Picker, Usage-Synchronisation und Asset-erhaltende Löschung funktionieren. Es existiert keine zweite Upload-/Dateiverwaltung. Details: [`b15-22a-download-module-analysis.md`](b15-22a-download-module-analysis.md), [`b15-22a1-download-module-live-design.md`](b15-22a1-download-module-live-design.md) und [`../modules/downloads.md`](../modules/downloads.md).
+- Optionaler späterer Komfortpunkt, kein V1-Pflichtblock: Ein bestehendes privates, unbenutztes `purpose=document`-PDF über eine künftig atomare Usage-/Purpose-Operation in `purpose=download` übernehmen. Keine race-anfällige SELECT/UPDATE-Lösung bauen; öffentliche PDFs weiterhin nicht direkt umklassifizieren.
+- Nächster Fachblock: B15.22D – öffentliche Download-Seite und kontrollierter Dateiabruf aus dem privaten Media-Bucket über eine kurzlebige Signed URL.
 - Adminübersicht sowie Create/Edit.
 - Direktupload und Auswahl aus der zentralen Medienbibliothek.
 - vorhandene Download-Kategorien, Titel, Beschreibung, Status und Sortierung.

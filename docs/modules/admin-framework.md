@@ -39,11 +39,13 @@ Neue Adminmodule sollen diese Bausteine nutzen, bevor neue Komponenten erstellt 
 
 Desktop- und Mobilnavigation werden aus derselben zentralen, serverseitig nach Permissions und Scopes gefilterten Navigation abgeleitet. Die sichtbaren aktiven Bereiche sind fachlich gegliedert:
 
-- Gesamtverein: News, Sponsoren, Termine, Vereinsgeschichte, Mitgliedsanfragen, Medien sowie der gemeinsame Einstieg „Seiten, Kontakte & Einstellungen“.
+- Gesamtverein: News, Sponsoren, Termine, Vereinsgeschichte, Downloads, Mitgliedsanfragen, Medien sowie der gemeinsame Einstieg „Seiten, Kontakte & Einstellungen“.
 - Fußball: Mannschaften, Spieler, Trainer, Vereinsbeiträge und „Fußballvorstände“ unter der bestehenden URL `/admin/department`.
 - System: Benutzer, Rollen, Rechte sowie die ausschließlich für Superadmins sichtbaren Bereiche „E-Mail-Benachrichtigungen“ und Notification Monitoring.
 
 Die Gruppierung verändert weder URLs noch Route Guards, Permissions oder Scopes. Insbesondere bleibt `/admin/department` durch `settings.view` und den bestehenden Board-Scope geschützt und verwaltet fachlich die Vorstände der Fußballabteilung.
+
+Das Download-Adminmodul unter `/admin/downloads` verwendet die dedizierten `downloads.*`-Permissions. Seine kompakte Desktop-/Mobile-Liste und der Editor greifen ausschließlich auf die zentrale Medienbibliothek zu; allgemeine Media-Rechte werden dadurch nicht erweitert.
 
 Die persönlichen In-App-Benachrichtigungseinstellungen und die globale Superadmin-E-Mail-Steuerung verwenden dieselben kompakten, responsiven Listenbausteine. Persönliche Preferences ändern ausschließlich den In-App-Kanal; globale E-Mail-Typen und Master bleiben davon getrennt.
 
