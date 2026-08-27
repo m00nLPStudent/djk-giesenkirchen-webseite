@@ -26,12 +26,8 @@ Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und Syste
 
 - B15.22A/A1 abgeschlossen; B15.22B live installiert und per Read-only-Postcheck bestätigt; B15.22C abgeschlossen und manuell freigegeben. Das geschützte Admin-CRUD unter `/admin/downloads`, Navigation, Rollen, Create/Edit/Delete, Publish/Unpublish, privater zentraler PDF-Upload, Picker, Usage-Synchronisation und Asset-erhaltende Löschung funktionieren. Es existiert keine zweite Upload-/Dateiverwaltung. Details: [`b15-22a-download-module-analysis.md`](b15-22a-download-module-analysis.md), [`b15-22a1-download-module-live-design.md`](b15-22a1-download-module-live-design.md) und [`../modules/downloads.md`](../modules/downloads.md).
 - Optionaler späterer Komfortpunkt, kein V1-Pflichtblock: Ein bestehendes privates, unbenutztes `purpose=document`-PDF über eine künftig atomare Usage-/Purpose-Operation in `purpose=download` übernehmen. Keine race-anfällige SELECT/UPDATE-Lösung bauen; öffentliche PDFs weiterhin nicht direkt umklassifizieren.
-- Nächster Fachblock: B15.22D – öffentliche Download-Seite und kontrollierter Dateiabruf aus dem privaten Media-Bucket über eine kurzlebige Signed URL.
-- Adminübersicht sowie Create/Edit.
-- Direktupload und Auswahl aus der zentralen Medienbibliothek.
-- vorhandene Download-Kategorien, Titel, Beschreibung, Status und Sortierung.
-- öffentliche Downloadseite sowie interne Downloads und Berechtigungen.
-- sichere Dateizugriffe; Versionierung nur nach eigener Anforderungsanalyse.
+- B15.22D abgeschlossen und manuell verifiziert: `/downloads` zeigt nur vollständig konsistente veröffentlichte Einträge in aktiven Kategorien. `GET /downloads/[id]/file` revalidiert Download, Kategorie, privates PDF-Asset und exakte Usage serverseitig und leitet erst dann auf eine 120 Sekunden gültige Signed URL weiter. Ablauf, Deaktivierung mit anschließendem 404 und Wiederveröffentlichung wurden real geprüft.
+- B15.22E abgeschlossen und manuell verifiziert: Der bestehende Footer verlinkt unter „Verein“ intern auf `/downloads`; Seite und Dateiabruf funktionieren weiterhin. Damit ist B15.22A–E funktional abgeschlossen. Die finale manuelle Mobile-/Design-Abnahme wurde nicht durchgeführt und bleibt beim öffentlichen Website-Redesign; Versionierung und der optionale atomare Adoption-Pfad bleiben bis zu eigenen Anforderungsblöcken außen vor.
 
 ## Priorität 3 – B15.21D11 Notification Center UX (abgeschlossen)
 
@@ -52,7 +48,7 @@ Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und Syste
 
 ## Priorität 5 – Öffentliche Website
 
-- Erscheinungsbild, Navigation, Footer und Responsive-Verhalten prüfen.
+- Erscheinungsbild, Navigation, Footer und Responsive-Verhalten umfassend prüfen und überarbeiten. `/downloads` ist funktional und bereits im aktuellen Footer verlinkt; seine finale optische und mobile Integration erfolgt ausdrücklich in diesem späteren Website-Redesign-/Abnahmeblock.
 - Bereich Verein vervollständigen; Fußball und Trainingszeiten kontrollieren.
 - Downloads nach Fertigstellung des Moduls integrieren.
 

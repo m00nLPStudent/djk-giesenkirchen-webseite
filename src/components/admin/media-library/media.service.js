@@ -8,6 +8,16 @@ import { buildMediaAssignmentPayload } from "./mediaAssignment.core.mjs";
 export const canManageMedia = (roles = []) => roles.some((role) => ["superadmin", "webmaster"].includes(role?.key));
 const withPickerFields = (asset) => ({ ...asset, displayName: asset.display_name, storageBucket: asset.storage_bucket, storagePath: asset.storage_path, mediaKind: asset.media_kind, visibility: asset.visibility });
 
+export async function createPrivateMediaSignedUrl(storagePath, expiresIn = 120) {
+  const safePath = String(storagePath || "").trim();
+  const safeExpiry = Math.min(Math.max(Number(expiresIn) || 120, 60), 300);
+  if (!safePath) return { data: null, error: new Error("Media-Pfad fehlt.") };
+  const db = createSupabaseAdminClient();
+  if (!db) return { data: null, error: new Error("Media-Service-Client ist nicht konfiguriert.") };
+  const result = await db.storage.from("media-library-private").createSignedUrl(safePath, safeExpiry);
+  return { data: result.data?.signedUrl || null, error: result.error || null };
+}
+
 export async function loadMediaLibrary(filters = {}) {
   const db = createSupabaseAdminClient();
   if (!db) return { data: [], error: new Error("Media-Service-Client ist nicht konfiguriert.") };

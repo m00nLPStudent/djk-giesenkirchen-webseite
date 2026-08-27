@@ -46,6 +46,7 @@ export default async function Footer() {
         { label: "News", href: "/news" },
         { label: "News Übersicht", href: "/news/uebersicht" },
         { label: "Termine", href: "/termine" },
+        { label: "Downloads", href: "/downloads" },
         { label: "Vereinsgeschichte", href: "/fussball/vereinsgeschichte" },
       ],
     },
