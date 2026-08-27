@@ -1,9 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
+import fs from "node:fs";
+
+const coreSource = fs.readFileSync(new URL("./teamCoachAssignments.core.mjs", import.meta.url), "utf8");
+const roleSummaryUrl = new URL("../persons/coachRoleSummary.mjs", import.meta.url).href;
+const nodeCompatibleCoreSource = coreSource.replace(
+  "@/components/admin/persons/coachRoleSummary.mjs",
+  roleSummaryUrl,
+);
+assert.notEqual(nodeCompatibleCoreSource, coreSource, "expected the production Next.js alias import");
+const {
   buildTeamCoachSelectionState,
   planTeamCoachAssignmentSync,
-} from "./teamCoachAssignments.core.mjs";
+} = await import(`data:text/javascript;base64,${Buffer.from(nodeCompatibleCoreSource).toString("base64")}`);
 
 const COACHES = [
   {

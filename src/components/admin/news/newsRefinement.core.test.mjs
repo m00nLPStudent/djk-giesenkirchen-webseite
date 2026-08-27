@@ -53,7 +53,8 @@ test("image preview supports failure fallback dialog close paths and focus retur
 test("documents expose safe new-tab links and retain existing mutations", () => {
   assert.match(documents, /target="_blank"/);
   assert.match(documents, /rel="noopener noreferrer"/);
-  assert.match(documents, /handleDocumentFieldSave/);
-  assert.match(documents, /handleDelete/);
+  assert.match(documents, /updateDocumentAction/);
+  assert.match(documents, /async function save/);
+  assert.match(documents, /onDeleteDocument/);
   assert.doesNotMatch(documents, /iframe/);
 });
