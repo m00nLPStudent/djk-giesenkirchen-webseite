@@ -15,6 +15,9 @@ test("password reset starts use the stable SSR callback URL", () => {
   assert.match(profileService, /buildAdminPasswordCallbackUrl/);
   assert.match(forgot, /resetPasswordForEmail\(email, \{ redirectTo \}\)/);
   assert.match(profileService, /resetPasswordForEmail\(email, \{[\s\S]*redirectTo/);
+  assert.match(forgot, /browserOrigin: window\.location\.origin/);
+  assert.match(profileService, /browserOrigin: window\.location\.origin/);
+  assert.match(redirects, /if \(rawBrowserOrigin\)[\s\S]*normalizeAdminOrigin\(rawBrowserOrigin\)/);
 });
 
 test("callback exchanges a valid code server-side and writes returned auth cookies", () => {
@@ -23,12 +26,20 @@ test("callback exchanges a valid code server-side and writes returned auth cooki
   assert.match(callback, /exchangeCodeForSession\(code\)/);
   assert.match(callback, /pendingCookies\.forEach[\s\S]*response\.cookies\.set/);
   assert.match(callback, /httpOnly: true/);
+  assert.match(callback, /buildAdminRequestRedirectUrl\(request, next\)/);
 });
 
 test("callback without or with invalid code fails with a sanitized redirect", () => {
-  assert.match(callback, /if \(!code\) return NextResponse\.redirect/);
+  assert.match(callback, /if \(!code\)/);
   assert.match(callback, /error=invalid-or-expired/);
+  assert.match(callback, /Invalid request origin/);
   assert.doesNotMatch(callback, /error\.message|error_description|access_token|refresh_token/);
+});
+
+test("callback never combines the final path with the internal request.url origin", () => {
+  assert.doesNotMatch(callback, /new URL\(next, requestUrl\.origin\)/);
+  assert.doesNotMatch(callback, /new URL\(INVALID_TARGET, requestUrl\.origin\)/);
+  assert.match(callback, /buildAdminRequestRedirectUrl/);
 });
 
 test("password form is gated by server-validated recovery session", () => {

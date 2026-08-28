@@ -11,6 +11,7 @@ import UserDetailsDialog from "../dialogs/UserDetailsDialog";
 import UserEditorDialog from "../dialogs/UserEditorDialog";
 import AdminLoginRequiredNotice from "@/components/admin/common/AdminLoginRequiredNotice";
 import {
+  requestAdminUserEmailChangeAction,
   saveAdminUserAction,
   updateAdminUserStatusAction,
 } from "@/app/admin/users/actions";
@@ -128,6 +129,20 @@ export default function AdminUsersPageShell({ initialData }) {
     return result;
   }
 
+  async function handleChangeUserEmail(email) {
+    const result = await requestAdminUserEmailChangeAction({
+      userId: vm.editingUser?.id || null,
+      email,
+    });
+
+    if (result?.ok) {
+      await refreshUsersData();
+      setNotice(result?.message || "Bestätigungs-E-Mail wurde versendet.");
+    }
+
+    return result;
+  }
+
   if (runtimeData?.loadState?.status === "no-session") {
     return (
       <AdminModulePage>
@@ -200,6 +215,7 @@ export default function AdminUsersPageShell({ initialData }) {
         currentUserIsSuperAdmin={vm.currentUserIsSuperAdmin}
         createCapabilities={createCapabilities}
         onSubmit={handleSubmitUserEditor}
+        onChangeEmail={handleChangeUserEmail}
         onClose={vm.closeEditor}
       />
     </AdminModulePage>

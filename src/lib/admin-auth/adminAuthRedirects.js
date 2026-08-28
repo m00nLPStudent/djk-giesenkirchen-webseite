@@ -2,26 +2,36 @@ function trimTrailingSlash(value = "") {
   return value.replace(/\/+$/, "");
 }
 
-function normalizeUrlCandidate(value = "") {
+export function normalizeAdminOrigin(value = "") {
   const trimmed = String(value || "").trim();
   if (!trimmed) return "";
 
-  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    return trimTrailingSlash(trimmed);
-  }
+  try {
+    const parsed = new URL(trimmed);
+    const isLocalHttp =
+      parsed.protocol === "http:" &&
+      ["localhost", "127.0.0.1", "[::1]"].includes(parsed.hostname);
+    if (parsed.protocol !== "https:" && !isLocalHttp) return "";
+    if (parsed.username || parsed.password) return "";
+    if (parsed.pathname !== "/" || parsed.search || parsed.hash) return "";
 
-  return "";
+    return trimTrailingSlash(parsed.origin);
+  } catch {
+    return "";
+  }
 }
 
 export function getAdminSiteUrl({ browserOrigin = "" } = {}) {
+  const rawBrowserOrigin = String(browserOrigin || "").trim();
+  if (rawBrowserOrigin) {
+    return normalizeAdminOrigin(rawBrowserOrigin);
+  }
+
   const configured =
-    normalizeUrlCandidate(process.env.ADMIN_AUTH_REDIRECT_URL) ||
-    normalizeUrlCandidate(process.env.NEXT_PUBLIC_SITE_URL);
+    normalizeAdminOrigin(process.env.ADMIN_AUTH_REDIRECT_URL) ||
+    normalizeAdminOrigin(process.env.NEXT_PUBLIC_SITE_URL);
 
   if (configured) return configured;
-
-  const browser = normalizeUrlCandidate(browserOrigin);
-  if (browser) return browser;
 
   if (process.env.NODE_ENV === "development") {
     return "http://localhost:3000";

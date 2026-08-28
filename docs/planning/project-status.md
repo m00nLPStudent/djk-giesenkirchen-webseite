@@ -1,6 +1,6 @@
 # Projektstatus
 
-Stand: 27. August 2026
+Stand: 28. August 2026
 
 ## Gesamtstatus
 
@@ -24,6 +24,22 @@ Stand: 27. August 2026
 ## Letzter abgeschlossener Fachblock
 
 B15.23D ist vollständig abgeschlossen. Der bestehende Admin-Einladungsflow wurde live Ende-zu-Ende verifiziert: Benutzeranlage mit Primärrolle Fußball-Vorstand und zusätzlicher Rolle Trainer, Einladung über Supabase Auth Custom SMTP/Resend, externe Zustellung, `/admin/set-password`, Passwortvergabe, Login, Session, Dashboard und bestehende Rollen-/Permission-Auswertung waren erfolgreich. Die Entwicklungs-/Übergangs-Versanddomain `mail.mavermg.de`, DKIM und Sending-CNAMEs sind verifiziert. Es war keine Code-, SQL- oder Datenbankkorrektur erforderlich. Das englische Supabase-Invite-Template und die finale SMTP-/Mailserver-Umstellung bleiben getrennte spätere Aufgaben. Nächster offener Fachpunkt gemäß Roadmap ist die E-Mail-Änderung und Auth-Synchronisierung.
+
+## Aktueller Analyseblock
+
+Historischer Zwischenstand E5.2.5 vor Guard-Aktivierung: Compensation-State-Migration/Postcheck waren live **PASS**. Der zentrale Claim war implementiert und getestet; kein Auth-Reverse lief mehr ohne atomaren und erneut verifizierten `compensating`-Zustand.
+
+Historischer Zwischenstand E5.3 vor der Live-Auswertung: Der sanitisierte Read-only-Preflight für Owner, Trigger, Spalten, Pending-Counts, Namenskollisionen und den tatsächlichen `supabase_auth_admin`-Zugriff war vorbereitet.
+
+Historischer Zwischenstand E5.3.1 vor der Guard-Aktivierung: Der manuelle Guard-Live-Preflight war **PASS** und bestätigte 26 ausschließlich interne `auth.users`-Trigger, keine Guard-Kollision, null native Pending-Zustände und keinen Request-Table-SELECT für `supabase_auth_admin`.
+
+E5-Live-Regression: Der Guard ist live. Nativer Self-Service wird ohne Pending-Rückstand blockiert; Passwort, Login/Logout/Session, vollständige Recovery einschließlich Tunnel-Callback, Invite und E3-Forward sind live PASS. Der zusätzliche künstliche Compensation-Livetest wurde bewusst nicht ausgeführt: **NOT LIVE EXECUTED – COVERED BY AUTOMATED TESTS**. Temporäre Failure-Injection-Artefakte gehören nicht zum finalen Produktstand; der fehlende Livetest ist kein Blocker.
+
+E5.2.4: Der manuelle Compensation-State-Live-Preflight ist **PASS**. Der server-only Livevertrag, vier valide Bestandszeilen und das Fehlen externer Statusabhängigkeiten sind bestätigt. Proposal, Rollback und Postcheck sind vorbereitet; **MIGRATION NOT YET APPLIED**. Nächster Block nach manueller Migration und Postcheck ist B15.23E5.2.5. Ein Auth-Guard wurde nicht erstellt.
+
+E5.2.3: Der vollständige read-only Compensation-State-Preflight sowie DB-, Rollback- und Produktcode-Design sind vorbereitet. Weil die aktuellen Live-Constraints, Indizes und Abhängigkeiten noch erneut bestätigt werden müssen, greift die Stoppregel vor Proposal, Rollback und Postcheck. Produktcode, Schema und Live-Datenbank wurden nicht verändert.
+
+B15.23E ist technisch **COMPLETE – LIVE CORE FLOWS VERIFIED**. Der Guard blockiert den nachgewiesenen nativen Self-Service-Bypass; E3-Forward, Auth/Profile-Synchronisierung, Recovery, Invite, Passwort und Session wurden live bestätigt. Der finale manuelle Read-only-DB-Postcheck ist vollständig **PASS**; alle acht aggregierten Abschlussprüfungen sind wahr. **COMPENSATION LIVE FAILURE INJECTION NOT EXECUTED / COMPENSATION COVERED BY AUTOMATED TESTS.** Der Guard im Supabase-managed Auth-Schema bleibt upgrade-sensitiv und verlangt nach relevanten Supabase-/GoTrue-Upgrades erneute Guard-, Auth- und Compensation-Regressionen. Corporate-Design-Mailtemplate, Retention/Cleanup sowie optionale Reauth-/MFA-/Old-Mail-Approval-Härtung bleiben separat offen.
 
 ## Bewusst offene Betriebs- und Folgepunkte
 

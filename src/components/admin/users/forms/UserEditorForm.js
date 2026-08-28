@@ -58,9 +58,11 @@ export default function UserEditorForm({
   loading,
   currentUserId,
   canManageCardLinks,
+  canChangeLoginEmail,
   selfSuperadminRoleId,
   matchPreview,
   onSubmit,
+  onChangeEmail,
   message,
   formErrors,
 }) {
@@ -198,13 +200,29 @@ export default function UserEditorForm({
         </span>
         <input
           type="email"
+          maxLength={254}
           value={values.email}
-          readOnly={mode === "edit"}
+          readOnly={mode === "edit" && !canChangeLoginEmail}
           onChange={(event) => handleChange("email", event.target.value)}
           className="h-11 w-full rounded-xl border border-white/10 bg-black/25 px-3 text-sm text-white"
         />
         {formErrors?.email ? (
           <p className="text-xs text-red-200">{formErrors.email}</p>
+        ) : null}
+        {mode === "edit" && canChangeLoginEmail ? (
+          <>
+            <p className="text-xs text-amber-100/80">
+              Die bisherige Login-E-Mail bleibt aktiv, bis die neue Adresse bestätigt wurde.
+            </p>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => onChangeEmail(values.email)}
+              className="inline-flex h-9 items-center justify-center rounded-xl border border-amber-300/35 bg-amber-500/10 px-3 text-xs font-black text-amber-100 transition hover:bg-amber-500/20 disabled:opacity-60"
+            >
+              Bestätigung anfordern
+            </button>
+          </>
         ) : null}
       </label>
 

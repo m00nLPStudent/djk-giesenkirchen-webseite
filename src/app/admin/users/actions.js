@@ -22,6 +22,52 @@ import { createAdminUserWithInvite } from "@/lib/admin-auth/adminUserCreate.serv
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { previewProfileCardEmailMatches } from "@/lib/admin-auth/profileCardLinkMatching.service";
 import { applyCardLinkChanges } from "./actions.cardLinks";
+import { requestAdminEmailChange } from "@/lib/admin-auth/adminEmailChange.service";
+
+export async function requestAdminUserEmailChangeAction({ userId, email }) {
+  const supabaseServer = await createServerActionSupabaseClient();
+  const actorContext = await assertAdminActionPermission({
+    requiredPermission: "users.edit",
+    supabaseServer,
+  });
+
+  if (!actorContext.ok) {
+    return {
+      ok: false,
+      reason: actorContext.reason,
+      message: "Du bist für diese Änderung nicht berechtigt.",
+    };
+  }
+
+  const isSuperadmin = (actorContext.roles || []).some(
+    (role) => role?.key === "superadmin" && role?.is_active !== false,
+  );
+  if (!isSuperadmin) {
+    return {
+      ok: false,
+      reason: "not-superadmin",
+      message: "Du bist für diese Änderung nicht berechtigt.",
+    };
+  }
+
+  const result = await requestAdminEmailChange({
+    actorUserId: actorContext.userId,
+    targetUserId: userId,
+    requestedEmail: email,
+  });
+
+  if (result?.requiresManualReview) {
+    console.error("[admin-email-change-request] manual review required", {
+      reason: result.reason || "unknown",
+    });
+  }
+
+  if (result?.ok) {
+    revalidatePath("/admin/users");
+  }
+
+  return result;
+}
 
 export async function saveAdminUserAction({ userId, values, currentUserId }) {
   const supabaseServer = await createServerActionSupabaseClient();

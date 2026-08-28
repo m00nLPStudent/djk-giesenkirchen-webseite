@@ -2,7 +2,7 @@
 
 > B15.21A bis B15.21D11 sind abgeschlossen. Mitgliedsanfragen, saisonale Mannschaftsauflösung, Zuständigkeiten, Weiterleitung, transaktionale Membership-Mail, zentrale Notification-Mail-Delivery, globale Superadmin-Steuerung, persönliche In-App-Preferences sowie die Notification-Center-Mehrfachauswahl sind umgesetzt und verifiziert.
 
-Stand: 27. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
+Stand: 28. August 2026. Dieses Dokument ist die verbindliche offene Planung. Historische B12–B15-Dateien bleiben als Nachweise erhalten, sind aber keine zweite aktuelle To-do-Liste.
 
 Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und System gegliedert. `/admin/department` ist als „Fußballvorstände“ dem Fußballbereich zugeordnet; Mitgliedsanfragen, Medien und der gemeinsame Einstieg „Seiten, Kontakte & Einstellungen“ bleiben unter Gesamtverein. Offener separater Folgepunkt: Eine eigenständige Gesamtvereins-„Vereinsstruktur“ erst nach Analyse und Einführung einer fachlich getrennten Gesamtvereinsroute sowie einer eindeutig zugeordneten Datenquelle planen; bis dahin keinen künstlichen Navigationseintrag oder neue Route anlegen.
 
@@ -47,7 +47,7 @@ Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und Syste
 - B15.23C/C1–C4 – vollständig abgeschlossen. SQL/Postcheck, Dashboardprofil mit Nickname/Telefon/privatem Avatar, read-only Stammdaten, kompakter Rollen-/Passwortbereich, SSR-PKCE-Recovery und deutsche Auth-Mail-Rate-Limit-UX sind live beziehungsweise manuell bestätigt. Der finale Recovery-Test einschließlich Passwortspeicherung und anschließendem Login bestand; Trainer-/Vorstandsbilder, Superadmin-Verwaltung und Rollenmatrix blieben unverändert.
 - B15.23D – vollständig abgeschlossen. Der bestehende Admin-Einladungsflow wurde live Ende-zu-Ende mit Primärrolle Fußball-Vorstand und zusätzlicher Rolle Trainer verifiziert: Benutzeranlage, Einladung über Supabase Auth Custom SMTP/Resend, externe Zustellung, `/admin/set-password`, Passwortvergabe, Login, Session, Dashboard und Rollen-/Permission-Auswertung bestanden ohne Code-, SQL- oder Datenbankkorrektur. `mail.mavermg.de` sowie DKIM und Sending-CNAMEs sind verifiziert. Das derzeit englische Supabase-Invite-Template bleibt ein späterer separater Mailtemplate-/Corporate-Design-Punkt; die finale SMTP-/Mailserver-Umstellung bleibt Go-live-Aufgabe.
 - Bestehende explizite Trainer-/Vorstandslinks zum Adminprofil erhalten; keine Zuordnung oder Autorisierung über E-Mail-/Namensabgleich ausbauen.
-- E-Mail-Änderung und Auth-Synchronisierung.
+- B15.23E – **COMPLETE – LIVE CORE FLOWS VERIFIED.** Der enge `auth.users`-Guard ist live. Self-Service-Block, Passwort, Login/Logout/Session, vollständige Recovery, Invite und E3-Forward wurden live erfolgreich bestätigt. Der finale manuelle Read-only-DB-Postcheck ist vollständig **PASS** (8/8 Abschlussprüfungen wahr, keine Pending-Zustände, keine aktiven Requests und keine Auth/Profile-Inkonsistenzen). Der zusätzliche künstliche Compensation-Livetest wird bewusst nicht ausgeführt: **COMPENSATION LIVE FAILURE INJECTION NOT EXECUTED / COMPENSATION COVERED BY AUTOMATED TESTS**. Dies ist kein Abschlussblocker. Der Guard im Supabase-managed Auth-Schema bleibt upgrade-sensitiv; nach relevanten Supabase-/GoTrue-Upgrades sind Guard-, Auth- und Compensation-Regressionen verpflichtend.
 - später Rollen für weitere Abteilungen.
 
 ## Priorität 5 – Öffentliche Website

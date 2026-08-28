@@ -38,6 +38,7 @@ export default function UserEditorDialog({
   currentUserIsSuperAdmin,
   createCapabilities,
   onSubmit,
+  onChangeEmail,
   onClose,
 }) {
   const [loading, setLoading] = useState(false);
@@ -98,6 +99,24 @@ export default function UserEditorDialog({
     onClose();
   }
 
+  async function handleChangeEmail(email) {
+    setMessage("");
+    setFormErrors({});
+    setLoading(true);
+
+    const result = await onChangeEmail(email);
+    setLoading(false);
+
+    if (!result?.ok) {
+      setMessage(result?.message || "Login-E-Mail konnte nicht geändert werden.");
+      setFormErrors(result?.errors || {});
+      return;
+    }
+
+    setMessage(result?.message || "Bestätigungs-E-Mail wurde versendet.");
+    onClose();
+  }
+
   useEffect(() => {
     if (!open) return;
     handleLoadPreview();
@@ -151,9 +170,13 @@ export default function UserEditorDialog({
               loading={loading}
               currentUserId={currentUserId}
               canManageCardLinks={canManageCardLinks}
+              canChangeLoginEmail={
+                mode === "edit" && Boolean(currentUserIsSuperAdmin)
+              }
               selfSuperadminRoleId={selfSuperadminRoleId}
               matchPreview={matchPreview}
               onSubmit={handleSubmit}
+              onChangeEmail={handleChangeEmail}
               message={message}
               formErrors={formErrors}
             />

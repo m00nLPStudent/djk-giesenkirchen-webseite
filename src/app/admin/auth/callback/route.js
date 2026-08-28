@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { buildAdminRequestRedirectUrl } from "@/lib/admin-auth/adminRequestOrigin.mjs";
 
 const RECOVERY_COOKIE = "admin-password-recovery";
-const INVALID_TARGET = "/admin/set-password?error=invalid-or-expired";
 
 function safeNext(value) {
   return value === "/admin/set-password" ? value : "/admin/set-password";
@@ -12,7 +12,15 @@ export async function GET(request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
   const next = safeNext(requestUrl.searchParams.get("next"));
-  if (!code) return NextResponse.redirect(new URL(INVALID_TARGET, requestUrl.origin));
+  const invalidRedirect = buildAdminRequestRedirectUrl(request, "/admin/set-password");
+  if (!invalidRedirect) {
+    return new Response("Invalid request origin", { status: 400 });
+  }
+  if (!code) {
+    const invalidUrl = new URL(invalidRedirect);
+    invalidUrl.search = "?error=invalid-or-expired";
+    return NextResponse.redirect(invalidUrl);
+  }
 
   const pendingCookies = [];
   const supabase = createServerClient(
@@ -28,10 +36,16 @@ export async function GET(request) {
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error || !data?.session?.user?.id) {
     console.warn("[admin-auth-callback] recovery exchange failed", { code: error?.code || "RECOVERY_EXCHANGE_FAILED", status: error?.status || null });
-    return NextResponse.redirect(new URL(INVALID_TARGET, requestUrl.origin));
+    const invalidUrl = new URL(invalidRedirect);
+    invalidUrl.search = "?error=invalid-or-expired";
+    return NextResponse.redirect(invalidUrl);
   }
 
-  const response = NextResponse.redirect(new URL(next, requestUrl.origin));
+  const redirectUrl = buildAdminRequestRedirectUrl(request, next);
+  if (!redirectUrl) {
+    return new Response("Invalid request origin", { status: 400 });
+  }
+  const response = NextResponse.redirect(redirectUrl);
   pendingCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
   response.cookies.set(RECOVERY_COOKIE, "1", {
     httpOnly: true,
