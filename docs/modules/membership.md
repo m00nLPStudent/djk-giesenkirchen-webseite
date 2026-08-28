@@ -2,7 +2,7 @@
 
 ## Status
 
-B15.21A und die Datenmodellgrundlage B15.21B0 sind produktiv ausgerollt und geprüft. B15.21B1 ergänzt die serverseitig autorisierte Pflege unter `Einstellungen → Saisons & Mannschaften`. B15.21D3 hat den ersten kontrollierten realen Versand der Membership-Eingangsbestätigung erfolgreich abgeschlossen.
+B15.21A–C sind produktiv ausgerollt und geprüft: gehärteter Submit, Datenmodell, saisonale Jahrgänge, Adminpflege, Resolver, Formular-/Submit-Integration, Anfragearten, Zuständigkeiten und Empfängerauflösung sind abgeschlossen. B15.21D3 hat den ersten kontrollierten realen Versand der Membership-Eingangsbestätigung erfolgreich abgeschlossen. Die nachfolgenden B0–B3-Abschnitte bewahren die Implementierungsreihenfolge; Zukunftsformulierungen darin sind historisch und keine offenen Rollout-Aufgaben.
 
 ## Öffentliche Funktionen
 
@@ -49,7 +49,7 @@ Der öffentliche technische Zugriff erfolgt per `POST /api/membership/team-optio
 
 Das öffentliche Formular zeigt den serverseitig weiterhin unverbindlichen Jahrgang unmittelbar an. Nur für aktive Fußballanfragen wird der B2-Resolver debounced und abbrechbar aufgerufen. Ein einzelner Treffer wird transparent vorausgewählt, mehrere Treffer erfordern eine Auswahl, und ohne Treffer beziehungsweise bei technischer Nichtverfügbarkeit bleibt der Antrag ohne Mannschaft möglich. Beim Wechsel der Anfrageart werden saisonale Auswahlwerte verworfen. Traineranfragen erhalten einen Qualifikationshinweis; die Nachricht bleibt optional.
 
-Der Browser sendet ausschließlich `desired_team_season_id`. Der Submit validiert diese erneut gegen Geburtsjahr, aktuelle Saison, aktive Mannschaftssaison, aktive Fußballabteilung und `team_season_year_groups`; erst danach wird `desired_team_id` serverseitig abgeleitet. Nicht-Fußballanfragen erzwingen beide Referenzen auf `null`. Die sechs neuen öffentlichen Anfragearten benötigen vor Produktivnutzung den manuellen B15.21B3-Constraint-Rollout; `sonstiges` bleibt nur als DB-Legacywert erhalten.
+Der Browser sendet ausschließlich `desired_team_season_id`. Der Submit validiert diese erneut gegen Geburtsjahr, aktuelle Saison, aktive Mannschaftssaison, aktive Fußballabteilung und `team_season_year_groups`; erst danach wird `desired_team_id` serverseitig abgeleitet. Nicht-Fußballanfragen erzwingen beide Referenzen auf `null`. Der B15.21B3-Constraint-Rollout und die Produktivprüfung sind abgeschlossen; `sonstiges` bleibt nur als DB-Legacywert erhalten.
 
 Der Membership-Resolver klassifiziert Mannschaften ausschließlich über `teams.department_id`. Eine korrekte Abteilungszuordnung ist Voraussetzung für die automatische Mitgliedsanfrage-Zuordnung. Teams ohne Abteilung werden bewusst nicht anhand von Namen, Slugs oder Altersgruppen als Fußballmannschaft interpretiert.
 
@@ -61,4 +61,4 @@ B15.21D1 implementiert die in D0 geplante Eingangsbestätigung: Der Service-Role
 
 B15.21D3 verifiziert die vollständige reale Kette über das öffentliche Formular mit der Resend-Testdomain: genau ein Membership-Insert im Testfenster, genau eine zugehörige interne Notification, ein erfolgreicher Notification-Audit-Eintrag ohne Fehler-, Duplikat- oder Skip-Zähler und gesetztes `mail_sent_at`. Browser-Submit, Resend-Dashboard und tatsächlicher Postfacheingang waren erfolgreich. Es wurde kein Retry ausgelöst; dessen kontrollierte Prüfung bleibt ein eigener, ausdrücklich freizugebender Schritt. Vereinslogo, Vereinskopf und Footer der Mail folgen ebenfalls separat.
 
-Vollständige Mitgliedschaftsarten, automatische Jugend-/Mannschaftsfilterung, Eligibility und Saisonwechsel folgen in B15.21B ff. Persistentes verteiltes Rate Limiting benötigt eine gesonderte Infrastrukturentscheidung; ein Prozessspeicher-Limiter wird bewusst nicht eingesetzt.
+Mitgliedschaftsarten, automatische Jugend-/Mannschaftsfilterung, Eligibility und Saisonwechsel sind im abgeschlossenen B15.21B-Vertrag umgesetzt. Persistentes verteiltes Rate Limiting benötigt weiterhin eine gesonderte Infrastrukturentscheidung; ein Prozessspeicher-Limiter wird bewusst nicht eingesetzt.

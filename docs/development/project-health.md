@@ -1,6 +1,6 @@
 # Project Health
 
-Stand: 26. August 2026
+Stand: 28. August 2026
 
 ## Aktueller Stand
 
@@ -8,7 +8,7 @@ Stand: 26. August 2026
 - Adminbereich modularisiert; Settings/CMS, Membership, News, Events, Teams, Personen, Sponsoren und Chronik aktiv integriert.
 - B15.18 Notification-/Reminder-System einschließlich Audit-, Idempotenz- und Append-Härtung abgeschlossen; operative Cron-Aktivierung bleibt Go-live.
 - B15.19 zentrale Medienbibliothek und Fachintegrationen einschließlich Rollen-/Security-Nachläufen abgeschlossen.
-- öffentliche Kernbereiche sind vorhanden; visuelle, responsive und vollständige Go-live-Abnahme bleibt geplant.
+- öffentliche Kernbereiche sind vorhanden. B15.24A hat den tatsächlichen Bestand als 30 Seiten und zwei öffentliche Handler inventarisiert; visuelle, responsive und vollständige Go-live-Abnahme bleibt geplant.
 
 ## Architekturregeln
 
@@ -18,8 +18,8 @@ Stand: 26. August 2026
 
 ## Bekannte Qualitätspunkte
 
-Der zuletzt dokumentierte Gesamtlauf vor B15.20 hatte 766 Tests mit drei unabhängigen Fehlern: zwei News-UI-Strukturtests und `teamCoachAssignments.core.test.mjs`. ESLint-, Dependency- und Dateigrößenbestand sind im technischen Cleanup neu zu messen; alte Zahlen gelten nicht als aktuell.
+Die drei früher dokumentierten Testfehler wurden in einem kleinen Wartungsblock korrigiert. Der B15.23E-Abschlusslauf war mit 1046/1046 Tests grün. Die Repository-ESLint-Baseline bleibt bei 8 Fehlern und 35 Warnungen; der fokussierte öffentliche Scope aus B15.24A enthält davon einen Fehler im Football.de-Widget sowie 16 `no-img-element`-Warnungen. Dependency- und Dateigrößenbestand bleiben im technischen Cleanup gesondert zu bewerten.
 
 ## Planung
 
-Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). Nächster Fachblock ist die Überarbeitung des Mitglied-werden-Formulars; Go-live bleibt davon getrennt.
+Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). B15.24A ist der aktuelle abgeschlossene Analyseblock; nächster Fachblock ist B15.24B – Gesamtvereins-Informationsarchitektur und Navigation. Go-live bleibt davon getrennt.

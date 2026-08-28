@@ -50,11 +50,13 @@ Die Adminnavigation ist in die aktiven Bereiche Gesamtverein, Fußball und Syste
 - B15.23E – **COMPLETE – LIVE CORE FLOWS VERIFIED.** Der enge `auth.users`-Guard ist live. Self-Service-Block, Passwort, Login/Logout/Session, vollständige Recovery, Invite und E3-Forward wurden live erfolgreich bestätigt. Der finale manuelle Read-only-DB-Postcheck ist vollständig **PASS** (8/8 Abschlussprüfungen wahr, keine Pending-Zustände, keine aktiven Requests und keine Auth/Profile-Inkonsistenzen). Der zusätzliche künstliche Compensation-Livetest wird bewusst nicht ausgeführt: **COMPENSATION LIVE FAILURE INJECTION NOT EXECUTED / COMPENSATION COVERED BY AUTOMATED TESTS**. Dies ist kein Abschlussblocker. Der Guard im Supabase-managed Auth-Schema bleibt upgrade-sensitiv; nach relevanten Supabase-/GoTrue-Upgrades sind Guard-, Auth- und Compensation-Regressionen verpflichtend.
 - später Rollen für weitere Abteilungen.
 
-## Priorität 5 – Öffentliche Website
+## Priorität 5 – B15.24 Öffentliche Website (aktiv)
 
-- Erscheinungsbild, Navigation, Footer und Responsive-Verhalten umfassend prüfen und überarbeiten. `/downloads` ist funktional und bereits im aktuellen Footer verlinkt; seine finale optische und mobile Integration erfolgt ausdrücklich in diesem späteren Website-Redesign-/Abnahmeblock.
-- Bereich Verein vervollständigen; Fußball und Trainingszeiten kontrollieren.
-- Downloads nach Fertigstellung des Moduls integrieren.
+- B15.24A abgeschlossen: Dokumentationskonsolidierung und vollständige Code-IST-Analyse inventarisieren 30 öffentliche Seiten, zwei öffentliche Handler, Navigation, Header, Footer, Designbasis, Responsive-Risiken, Inhalte, Datenquellen, Accessibility, Performance, SEO und rechtliche Go-live-Flächen. Details: [`b15-24a-public-website-inventory.md`](b15-24a-public-website-inventory.md).
+- Die Website wird als Auftritt des Gesamtvereins mit den gleichrangigen Abteilungen Fußball, Tischtennis, Behindertensport und Gymnastikdamen weiterentwickelt. Das bestehende Grunddesign bleibt Ausgangspunkt; eine externe Referenzwebsite für Helligkeit, Flächenwirkung, Farbverteilung und Kontrast ist noch **OPEN INPUT**. Bis dahin keine finale Farbpalette festlegen.
+- Nächster Block B15.24B: Gesamtvereins-Informationsarchitektur, Routenentscheidungen und barrierefreie Desktop-/Mobile-Navigation fachlich festlegen. Noch keine fehlenden Abteilungsdaten oder Tabellen ohne separaten Preflight einführen.
+- Danach folgen Designbasis, Header, Footer, Gesamtvereinsseiten, Fußball sowie die drei weiteren Abteilungen, Responsive/Mobile, Accessibility/Performance/SEO und die öffentliche Abschlussabnahme gemäß A-Inventar.
+- `/downloads` ist funktional und bereits im Footer verlinkt; seine finale optische und mobile Integration gehört in die Gesamtvereinsseiten-/Responsive-Blöcke.
 
 ## Priorität 6 – Weitere Abteilungen
 
@@ -68,7 +70,7 @@ Reihenfolge: Tischtennis, Gymnastik Damen, Behindertensport. Je Bereich später 
 
 ## Priorität 8 – Technischer Cleanup
 
-- Die veralteten Annahmen in `teamCoachAssignments.core.test.mjs` und den beiden News-UI-Strukturtests sind korrigiert. Der aktuelle vollständige Lauf umfasst einschließlich der D11-Regression und UI-Nachbesserung 910/910 bestandene Tests.
+- Die veralteten Annahmen in `teamCoachAssignments.core.test.mjs` und den beiden News-UI-Strukturtests sind korrigiert. Der aktuelle dokumentierte B15.23E-Abschlusslauf umfasst 1046/1046 bestandene Tests.
 - ESLint-Bestand, Dependency-Audit, Dateigrößen und Architektur neu inventarisieren; keine alten Zahlen ungeprüft übernehmen.
 
 ## Priorität 9 – Spätere große Module

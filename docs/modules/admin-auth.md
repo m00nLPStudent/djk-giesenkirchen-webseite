@@ -1,5 +1,7 @@
 # Modul: Admin Auth und Rollenmodell
 
+> **Aktueller Statushinweis:** Die nachfolgenden B2–B12-Abschnitte dokumentieren historische Ausbauphasen und ihre damaligen Abgrenzungen. Sie sind keine aktuelle offene To-do-Liste. Loginpflicht, zentrale Route-/Navigationsermittlung, serverseitige Action-Permissions, Rollen und Fachscopes sind inzwischen produktiv im Einsatz. B15.23C–E einschließlich Recovery, Einladung, bestätigtem E-Mail-Wechsel, Compensation und live aktivem `auth.users`-Guard sind abgeschlossen. Verbindlich ist die [`current-roadmap.md`](../planning/current-roadmap.md).
+
 ## Ziel
 
 Phase B1 bereitet das technische Fundament fuer Benutzer- und Rollenverwaltung vor, ohne bereits UI-Schutz oder Login-Flows umzubauen.

@@ -1,5 +1,11 @@
 # Modul: Profile Card Linking (B12.2a)
 
+## Aktueller Status
+
+Die nullable `admin_profile_id`-Relationen, Indizes und Superadmin-Verwaltung sind produktiv vorhanden und wurden in den späteren B15.23-Security-/Profilblöcken beibehalten. Die unten beschriebene Migration war der historische Einführungsplan und ist keine noch auszuführende Migration. E-Mail und Name bleiben ausschließlich Match-Hilfe, niemals Autorisierungsgrundlage.
+
+Als separater Follow-up-Punkt bleibt die gezielte Regression des expliziten Entfernens einer vorhandenen Zuordnung auf `NULL`; die historische Einschränkung wird nicht als bereits behoben ausgegeben.
+
 ## Ziel
 
 Vorstands- sowie Trainer-/Betreuerkacheln dauerhaft mit Admin-Profilen verknuepfen.
