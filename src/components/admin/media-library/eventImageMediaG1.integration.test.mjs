@@ -32,11 +32,13 @@ test("event actions validate, upload and synchronize centrally", () => {
   assert.match(assignment, /"event"/);
 });
 
-test("public event views batch-resolve only public central images with legacy fallback", () => {
+test("public event views batch-resolve event media while home uses virtual trainings only", () => {
   assert.match(resolver, /loadPublicMediaUrlMap/);
   assert.match(resolver, /resolveLoadedPublicMediaImage/);
   assert.match(publicList, /resolvePublicEventImages/);
-  assert.match(home, /resolvePublicEventImages/);
+  assert.doesNotMatch(home, /resolvePublicEventImages/);
+  assert.match(home, /getVirtualTrainingEvents/);
+  assert.match(home, /selectUpcomingHomeTrainings/);
   assert.match(publicDetail, /resolved_image_url \|\| event\.image_url/);
   assert.match(publicCard, /resolved_image_url \|\| event\.image_url/);
 });

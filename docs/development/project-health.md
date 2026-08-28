@@ -8,7 +8,7 @@ Stand: 28. August 2026
 - Adminbereich modularisiert; Settings/CMS, Membership, News, Events, Teams, Personen, Sponsoren und Chronik aktiv integriert.
 - B15.18 Notification-/Reminder-System einschließlich Audit-, Idempotenz- und Append-Härtung abgeschlossen; operative Cron-Aktivierung bleibt Go-live.
 - B15.19 zentrale Medienbibliothek und Fachintegrationen einschließlich Rollen-/Security-Nachläufen abgeschlossen.
-- öffentliche Kernbereiche sind vorhanden. B15.24A hat den tatsächlichen Bestand als 30 Seiten und zwei öffentliche Handler inventarisiert; visuelle, responsive und vollständige Go-live-Abnahme bleibt geplant.
+- öffentliche Kernbereiche sind vorhanden. B15.24A hat den Bestand inventarisiert; B15.24B strukturiert Gesamtverein und vier Abteilungen, beseitigt tote Navigationsziele und steht auf `IMPLEMENTED / PARTIAL MANUAL REVIEW COMPLETE / REMAINING WEBSITE REVIEW PENDING`. Der restliche visuelle Browser-/Designreview wird im nächsten Arbeitsschritt fortgesetzt; die vollständige Go-live-Abnahme bleibt geplant.
 
 ## Architekturregeln
 
@@ -18,8 +18,8 @@ Stand: 28. August 2026
 
 ## Bekannte Qualitätspunkte
 
-Die drei früher dokumentierten Testfehler wurden in einem kleinen Wartungsblock korrigiert. Der B15.23E-Abschlusslauf war mit 1046/1046 Tests grün. Die Repository-ESLint-Baseline bleibt bei 8 Fehlern und 35 Warnungen; der fokussierte öffentliche Scope aus B15.24A enthält davon einen Fehler im Football.de-Widget sowie 16 `no-img-element`-Warnungen. Dependency- und Dateigrößenbestand bleiben im technischen Cleanup gesondert zu bewerten.
+Die drei früher dokumentierten Testfehler wurden in einem kleinen Wartungsblock korrigiert. Der B15.24B-Lauf nach Browser-Nacharbeit 10 ist mit 1063/1063 Tests grün; Produktionsbuild und TypeScript bestehen. Die Repository-ESLint-Baseline bleibt unverändert bei 8 Fehlern und 35 Warnungen; der geänderte Nacharbeit-10-Scope enthält keinen Fehler. Dependency- und Dateigrößenbestand bleiben im technischen Cleanup gesondert zu bewerten.
 
 ## Planung
 
-Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). B15.24A ist der aktuelle abgeschlossene Analyseblock; nächster Fachblock ist B15.24B – Gesamtvereins-Informationsarchitektur und Navigation. Go-live bleibt davon getrennt.
+Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). B15.24B ist implementiert und befindet sich im manuellen Review; B15.24C folgt erst nach dessen Freigabe und mit geklärtem Referenzdesign. Go-live bleibt davon getrennt.

@@ -16,6 +16,13 @@ const clubAreas = [
     eyebrow: "Abteilung",
   },
   {
+    title: "Behindertensport",
+    description:
+      "Informationen zu Angeboten, Aktivitäten und Ansprechpartnern im Behindertensport.",
+    href: "/behindertensport",
+    eyebrow: "Abteilung",
+  },
+  {
     title: "Damen-Gymnastik",
     description:
       "Übersicht zur Damen-Gymnastik mit Angeboten, Trainingszeiten und Kontakten.",
@@ -26,7 +33,7 @@ const clubAreas = [
 
 export default function ClubOverviewPage() {
   return (
-    <main className="min-h-screen bg-[#101014] px-4 pt-32 pb-20 text-white sm:px-6 md:pt-56 md:pb-24">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#c4001a33,transparent_32%),#101014] px-4 pt-28 pb-20 text-white sm:px-6 xl:pt-32">
       <section className="mx-auto max-w-7xl">
         <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
           Verein
@@ -34,28 +41,35 @@ export default function ClubOverviewPage() {
         <h1 className="mt-5 max-w-4xl break-words text-4xl font-black leading-tight md:text-7xl">
           Vereinsbereiche
         </h1>
-        <p className="mt-6 max-w-3xl text-base leading-7 text-white/60 md:text-lg md:leading-8">
-          Wähle einen Bereich des Vereins und gelange direkt zur passenden
-          Übersicht.
+        <p className="mt-6 max-w-3xl text-base leading-7 text-white/65 md:text-lg md:leading-8">
+          Die DJK/VfL Giesenkirchen vereint vier Abteilungen unter einem gemeinsamen Vereinsdach.
         </p>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/verein/vorstand" className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold hover:border-red-500 hover:bg-white/10">Vorstand Gesamtverein</Link>
+          <Link href="/verein/vereinsgeschichte" className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold hover:border-red-500 hover:bg-white/10">Vereinsgeschichte</Link>
+          <Link href="/termine" className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold hover:border-red-500 hover:bg-white/10">Termine</Link>
+          <Link href="/news" className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold hover:border-red-500 hover:bg-white/10">News</Link>
+          <Link href="/downloads" className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold hover:border-red-500 hover:bg-white/10">Downloads</Link>
+        </div>
 
         <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {clubAreas.map((area) => (
             <Link
               key={area.href}
               href={area.href}
-              className="group min-w-0 rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:-translate-y-1 hover:border-red-500/60 hover:bg-white/10"
+              className="group min-w-0 rounded-3xl border border-black/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-red-500/60 hover:shadow-lg"
             >
               <p className="text-xs font-black uppercase tracking-[0.24em] text-red-400">
                 {area.eyebrow}
               </p>
-              <h2 className="mt-3 break-words text-2xl font-black leading-tight text-white">
+              <h2 className="mt-3 break-words text-2xl font-black leading-tight">
                 {area.title}
               </h2>
-              <p className="mt-3 break-words text-sm leading-7 text-white/60">
+              <p className="mt-3 break-words text-sm leading-7 text-black/60">
                 {area.description}
               </p>
-              <span className="mt-6 inline-flex rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition group-hover:border-red-500 group-hover:text-white">
+              <span className="mt-6 inline-flex rounded-full border border-black/10 px-4 py-2 text-sm font-bold text-black/65 transition group-hover:border-red-500 group-hover:text-[#9f0015]">
                 Öffnen
               </span>
             </Link>

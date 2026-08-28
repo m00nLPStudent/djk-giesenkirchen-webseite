@@ -9,27 +9,23 @@ export const footballMenuItems = [
     ],
   },
   {
-    label: "Abteilung",
-    href: "/fussball/abteilung",
-    children: [
-      { label: "Vorstand", href: "/fussball/abteilung/vorstand" },
-      { label: "Trainer", href: "/fussball/abteilung/trainer" },
-    ],
+    label: "Trainer",
+    href: "/fussball/abteilung/trainer",
   },
   {
-    label: "Sponsoren",
-    href: "/fussball/sponsoren",
+    label: "Vorstand Fußball",
+    href: "/fussball/abteilung/vorstand",
   },
   {
-    label: "Turniere / Events",
+    label: "Trainingszeiten",
+    href: "/termine/training",
+  },
+  {
+    label: "Termine",
+    href: "/termine/allgemein",
+  },
+  {
+    label: "Turniere & Events",
     href: "/fussball/turniere-events",
-    children: [
-      { label: "Turniere", href: "/fussball/turniere" },
-      { label: "Events", href: "/fussball/events" },
-    ],
-  },
-  {
-    label: "Vereinsgeschichte",
-    href: "/fussball/vereinsgeschichte",
   },
 ];

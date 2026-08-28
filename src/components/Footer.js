@@ -1,24 +1,27 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { formatGermanPhoneNumberReadable } from "@/lib/phone";
+import SocialLinks from "@/components/common/SocialLinks";
+import { PUBLIC_SITE_LOGO_URL, PUBLIC_SITE_NAME } from "@/config/publicSite";
 
 function formatAddress(settings) {
-  const street = [settings?.street, settings?.house_number]
-    .filter(Boolean)
-    .join(" ");
-  const city = [settings?.postal_code, settings?.city]
-    .filter(Boolean)
-    .join(" ");
+  const street = [settings?.street, settings?.house_number].filter(Boolean).join(" ");
+  const city = [settings?.postal_code, settings?.city].filter(Boolean).join(" ");
   return [street, city].filter(Boolean);
+}
+
+function normalizeSocialLinks(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return {
+    facebook: value.facebook || "",
+    instagram: value.instagram || "",
+    tiktok: value.tiktok || "",
+  };
 }
 
 export default async function Footer() {
   const [settingsResult, pagesResult] = await Promise.all([
-    supabase
-      .from("club_settings")
-      .select("*")
-      .eq("singleton", true)
-      .maybeSingle(),
+    supabase.from("club_settings").select("*").eq("singleton", true).maybeSingle(),
     supabase
       .from("pages")
       .select("slug, title_de, title_en, sort_order")
@@ -30,137 +33,87 @@ export default async function Footer() {
 
   const settings = settingsResult?.data || null;
   const footerPages = pagesResult?.data || [];
-  const pageBySlug = Object.fromEntries(
-    footerPages.map((page) => [page.slug, page]),
-  );
-  const additionalLegalPages = footerPages.filter(
-    (page) =>
-      !["datenschutz", "impressum", "mitglied-werden"].includes(page.slug),
-  );
+  const pageBySlug = Object.fromEntries(footerPages.map((page) => [page.slug, page]));
   const addressLines = formatAddress(settings);
   const phone = formatGermanPhoneNumberReadable(settings?.phone || "");
+  const socialLinks = normalizeSocialLinks(settings?.social_links);
   const footerColumns = [
     {
       title: "Verein",
       links: [
         { label: "News", href: "/news" },
-        { label: "News Übersicht", href: "/news/uebersicht" },
+        { label: "News-Übersicht", href: "/news/uebersicht" },
         { label: "Termine", href: "/termine" },
         { label: "Downloads", href: "/downloads" },
-        { label: "Vereinsgeschichte", href: "/fussball/vereinsgeschichte" },
+        { label: "Vereinsgeschichte", href: "/verein/vereinsgeschichte" },
+        { label: "Vorstand", href: "/verein/vorstand" },
       ],
     },
     {
-      title: "Abteilungen",
+      title: "Sportarten",
       links: [
-        { label: "Fußball", href: "/fussball" },
+        { label: "Fußball Senioren", href: "/fussball/mannschaften/senioren" },
+        { label: "Fußball Jugend", href: "/fussball/mannschaften/junioren" },
         { label: "Tischtennis", href: "/tischtennis" },
-        { label: "Damen-Gymnastik", href: "/damen-gymnastik" },
-        { label: "Mitglied werden", href: "/mitglied-werden" },
+        { label: "Behindertensport", href: "/behindertensport" },
+        { label: "Gymnastikdamen", href: "/damen-gymnastik" },
       ],
     },
     {
-      title: "Rechtliches",
+      title: "Weitere Links",
       links: [
-        ...(pageBySlug.datenschutz
-          ? [
-              {
-                label: pageBySlug.datenschutz.title_de || "Datenschutz",
-                href: "/datenschutz",
-              },
-            ]
-          : []),
-        ...(pageBySlug.impressum
-          ? [
-              {
-                label: pageBySlug.impressum.title_de || "Impressum",
-                href: "/impressum",
-              },
-            ]
-          : []),
-        ...additionalLegalPages.map((page) => ({
-          label: page.title_de || page.title_en || page.slug,
-          href: `/${page.slug}`,
-        })),
+        { label: "Mitglied werden", href: "/mitglied-werden" },
+        { label: "Sponsoren", href: "/fussball/sponsoren" },
         { label: "Kontakt", href: "/kontakt" },
-        { label: "Cookie-Einstellungen", href: "#" },
       ],
     },
   ];
 
   return (
-    <footer className="border-t border-white/10 bg-[#0b0b0f] px-6 py-16 text-white">
+    <footer className="border-t border-white/10 bg-[#09090d] px-5 py-14 text-white sm:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_2fr]">
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_2fr]">
           <div>
             <div className="flex items-center gap-4">
-              <img
-                src="https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/logos/Giesenkirchen.png"
-                alt="DJK/VfL Giesenkirchen"
-                className="h-16 w-16 object-contain"
-              />
+              <img src={PUBLIC_SITE_LOGO_URL} alt="Logo der DJK/VfL Giesenkirchen" className="h-16 w-16 object-contain" />
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.32em] text-red-400">
-                  Gemeinsam. Stark.
-                </p>
-                <h2 className="mt-1 text-2xl font-black">
-                  {settings?.short_name || "Giesenkirchen"}
-                </h2>
+                <p className="text-xs font-black uppercase tracking-[0.28em] text-red-400">Gemeinsam. Stark.</p>
+                <h2 className="mt-1 text-xl font-black">{settings?.short_name || "Giesenkirchen"}</h2>
               </div>
             </div>
-
-            <p className="mt-6 max-w-md text-sm leading-7 text-white/55">
-              {settings?.club_name || "DJK/VfL Giesenkirchen 05/09 e.V."}{" "}
-              informiert über Sportangebote, Neuigkeiten, Termine und die Arbeit
-              der Abteilungen im Verein.
+            <p className="mt-5 max-w-md text-sm leading-7 text-white/65">
+              {settings?.club_name || PUBLIC_SITE_NAME} – ein Gesamtverein mit Fußball, Tischtennis, Behindertensport und Gymnastikdamen.
             </p>
-
-            <div className="mt-6 space-y-2 text-sm text-white/60">
-              {addressLines.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-              {settings?.email && (
-                <p>
-                  <a
-                    href={`mailto:${settings.email}`}
-                    className="transition hover:text-white"
-                  >
-                    {settings.email}
-                  </a>
-                </p>
-              )}
-              {phone && <p>{phone}</p>}
+            <div className="mt-5 space-y-2 text-sm text-white/65">
+              {addressLines.map((line) => <p key={line}>{line}</p>)}
+              {settings?.email && <p><a href={`mailto:${settings.email}`} className="hover:text-white">{settings.email}</a></p>}
+              {phone && <p><a href={`tel:${String(settings?.phone || "").replace(/[^+\d]/g, "")}`} className="hover:text-white">{phone}</a></p>}
             </div>
+            <SocialLinks links={socialLinks} name={settings?.short_name || "DJK/VfL Giesenkirchen"} className="mt-6" />
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
             {footerColumns.map((column) => (
-              <div key={column.title}>
-                <h3 className="text-sm font-black uppercase tracking-[0.25em] text-red-400">
+              <section key={column.title} aria-labelledby={`footer-${column.title.toLowerCase().replace(" ", "-")}`}>
+                <h3 id={`footer-${column.title.toLowerCase().replace(" ", "-")}`} className="text-xs font-black uppercase tracking-[0.24em] text-red-400">
                   {column.title}
                 </h3>
-                <div className="mt-5 space-y-3">
+                <ul className="mt-4 space-y-2.5">
                   {column.links.map((link) => (
-                    <Link
-                      key={link.label}
-                      href={link.href}
-                      className="block text-sm text-white/55 transition hover:text-white"
-                    >
-                      {link.label}
-                    </Link>
+                    <li key={link.href}><Link href={link.href} className="text-sm text-white/65 transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-400">{link.label}</Link></li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              </section>
             ))}
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 text-sm text-white/40 md:flex-row md:items-center md:justify-between">
-          <p>
-            © {new Date().getFullYear()}{" "}
-            {settings?.club_name || "DJK/VfL Giesenkirchen 05/09 e.V."}
-          </p>
-          <p>Vereinswebseite · News, Mannschaften und Termine</p>
+        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-7 text-sm text-white/50 md:flex-row md:items-center md:justify-between">
+          <p>{settings?.copyright_text || `© ${new Date().getFullYear()} ${settings?.club_name || PUBLIC_SITE_NAME}. Alle Rechte vorbehalten.`}</p>
+          <nav aria-label="Rechtliche Hinweise" className="flex flex-wrap gap-x-5 gap-y-2">
+            {pageBySlug.impressum && <Link href="/impressum" className="hover:text-white">{pageBySlug.impressum.title_de || "Impressum"}</Link>}
+            {pageBySlug.datenschutz && <Link href="/datenschutz" className="hover:text-white">{pageBySlug.datenschutz.title_de || "Datenschutz"}</Link>}
+          </nav>
         </div>
       </div>
     </footer>

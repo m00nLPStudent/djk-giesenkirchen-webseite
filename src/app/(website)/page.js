@@ -6,12 +6,10 @@ import { resolvePublicNewsImages } from "@/components/admin/news/services/newsMe
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
 import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
 import { HomeEventsSection } from "@/components/website/events";
-import {
-  expandRecurringEvents,
-  getVirtualTrainingEvents,
-  mergeEventsWithVirtualTrainings,
-} from "@/lib/events";
-import { resolvePublicEventImages } from "@/components/admin/events/services/eventMedia.service";
+import { getVirtualTrainingEvents } from "@/lib/events";
+import { selectUpcomingHomeTrainings } from "@/lib/events/homeTrainingEvents.mjs";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const [{ data: categories }, { data: eventTypes }] = await Promise.all([
@@ -30,41 +28,23 @@ export default async function Home() {
   const featuredNews = newsCards[0];
   const secondaryNews = newsCards.slice(1, 4);
 
-  const { data: publishedEvents } = await supabase
-    .from("events")
-    .select("*")
-    .eq("is_published", true)
-    .order("starts_at", { ascending: true })
-    .limit(120);
-
   const now = new Date();
-  const from = now;
-  const to = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
-  const resolvedEvents = await resolvePublicEventImages(publishedEvents || []);
-  const expandedEvents = expandRecurringEvents(resolvedEvents, {
-    from,
-    to,
-    maxOccurrencesPerEvent: 180,
-  });
-  const upcomingEventsOnly = expandedEvents.filter(
-    (event) => new Date(event.starts_at) >= now,
-  );
-  const virtualTrainings = await getVirtualTrainingEvents({
-    from,
-    to,
+  const trainingEvents = await getVirtualTrainingEvents({
+    from: now,
+    to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
     maxOccurrencesPerTraining: 180,
   });
-  const mergedUpcomingEvents = createEventDtos(mergeEventsWithVirtualTrainings(
-    upcomingEventsOnly,
-    virtualTrainings,
-  ).slice(0, 4), eventTypes || []);
+  const upcomingTrainings = createEventDtos(
+    selectUpcomingHomeTrainings(trainingEvents, { now }),
+    eventTypes || [],
+  );
 
   return (
     <main className="min-h-screen bg-[#101014] text-white">
-      <section className="relative overflow-hidden px-4 pt-28 pb-20 sm:px-6 md:pt-56 md:pb-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,#c4001a55,transparent_35%),linear-gradient(120deg,#101014_20%,#1b1b22_60%,#c4001a_140%)]" />
+      <section className="relative overflow-hidden px-4 pt-28 pb-20 sm:px-6 xl:pt-48 xl:pb-24">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(220,38,38,0.2),transparent_31%),radial-gradient(circle_at_86%_44%,rgba(220,38,38,0.08),transparent_28%),linear-gradient(120deg,#101014_15%,#18181f_68%,#211116_135%)]" />
 
-        <div className="relative z-10 mx-auto max-w-7xl min-w-0">
+        <div className="relative z-10 mx-auto max-w-[90rem] min-w-0">
           <div className="min-w-0">
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Aktuelles aus dem Verein
@@ -74,28 +54,27 @@ export default async function Home() {
             </h1>
           </div>
 
-          {featuredNews ? (
-            <div className="mt-12 space-y-8">
-              <NewsCard item={featuredNews} featured />
-              {secondaryNews.length > 0 && (
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                  {secondaryNews.map((item) => (
-                    <NewsCard item={item} key={item.id} compactMeta />
-                  ))}
+          <div className="mt-12 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] xl:grid-cols-[minmax(0,1fr)_27rem]">
+            <div className="min-w-0 space-y-8">
+              {featuredNews ? (
+                <>
+                  <NewsCard item={featuredNews} featured />
+                  {secondaryNews.length > 0 && (
+                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                      {secondaryNews.map((item) => <NewsCard item={item} key={item.id} compactMeta />)}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8">
+                  <p className="text-base text-white/65 md:text-lg">Aktuell sind noch keine News veröffentlicht.</p>
                 </div>
               )}
             </div>
-          ) : (
-            <div className="mt-12 rounded-[2rem] border border-white/10 bg-white/5 p-6 md:p-8">
-              <p className="text-base text-white/65 md:text-lg">
-                Aktuell sind noch keine News veröffentlicht.
-              </p>
-            </div>
-          )}
+            <HomeEventsSection events={upcomingTrainings} compact />
+          </div>
         </div>
       </section>
-
-      <HomeEventsSection events={mergedUpcomingEvents} />
     </main>
   );
 }

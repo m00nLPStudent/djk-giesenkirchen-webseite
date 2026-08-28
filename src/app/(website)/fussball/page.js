@@ -58,9 +58,9 @@ export default async function FootballPage() {
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Übersicht
             </p>
-            <h2 className="mt-4 text-2xl font-black sm:text-3xl md:text-5xl">
+            <h1 className="mt-4 text-2xl font-black sm:text-3xl md:text-5xl">
               Fußballbereich im Überblick
-            </h2>
+            </h1>
             <p className="mt-4 text-base leading-7 text-white/65 md:text-lg md:leading-8">
               Wähle direkt den Bereich aus, den du suchst.
             </p>

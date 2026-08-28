@@ -45,7 +45,7 @@ B15.23E ist technisch **COMPLETE – LIVE CORE FLOWS VERIFIED**. Der Guard block
 
 ## Aktueller Fachblock
 
-B15.24A ist als reiner Analyse-/Dokumentationsblock abgeschlossen. Der tatsächliche öffentliche Codebestand umfasst 30 Seiten und zwei Handler. Die Website ist künftig als Gesamtvereinsauftritt mit Fußball, Tischtennis, Behindertensport und Gymnastikdamen zu strukturieren. Nächster Umsetzungs-/Entscheidungsblock ist B15.24B – Gesamtvereins-Informationsarchitektur und Navigation. Die externe visuelle Referenz bleibt Input für B15.24C; eine finale Farbentscheidung wurde nicht getroffen.
+B15.24A ist abgeschlossen. B15.24B steht auf **IMPLEMENTED / PARTIAL MANUAL REVIEW COMPLETE / REMAINING WEBSITE REVIEW PENDING**. Informationsarchitektur, Desktop-/Mobilnavigation, Floating-Navigation, Branding/Header, Rot-/Hover-/Active-Hierarchie, CTA „Mitglied werden“, dynamische News-/Trainingstermin-Homepage, mannschaftsübergreifende Top-5-Logik, vier lokale Sportassets, kontrollierte öffentliche Aufbau-Routen, Footer und Accessibility-Verbesserungen sind umgesetzt und automatisiert geprüft. Der bereits bearbeitete Header-/Navigations-/Startseiten-/Trainingstermin-/Sporticon-Bereich wurde iterativ im Browser nachgearbeitet. **Der restliche visuelle Browser-/Designreview der öffentlichen Website wird im nächsten Arbeitsschritt fortgesetzt.** B15.24B ist ausdrücklich nicht vollständig abgeschlossen; es gab keine DB-/SQL- oder Dashboardänderung.
 
 ## Bewusst offene Betriebs- und Folgepunkte
 

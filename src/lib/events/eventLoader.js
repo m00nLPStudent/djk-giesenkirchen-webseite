@@ -105,7 +105,7 @@ export async function getVirtualTrainingEvents({
     if (teamIds.length > 0) {
       const teamsResult = await supabaseClient
         .from("teams")
-        .select("id, name_de, slug, age_group")
+        .select("id, name_de, slug, age_group, is_active, department_id, departments(slug)")
         .in("id", teamIds);
 
       if (teamsResult.error) {
@@ -130,6 +130,7 @@ export async function getVirtualTrainingEvents({
       teams: team,
       team_name_de: slot.team_name_de || team?.name_de || null,
       team_slug: slot.team_slug || team?.slug || null,
+      department_slug: team?.departments?.slug || null,
     };
   });
 
