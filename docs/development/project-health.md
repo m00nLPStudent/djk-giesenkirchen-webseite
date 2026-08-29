@@ -8,7 +8,7 @@ Stand: 28. August 2026
 - Adminbereich modularisiert; Settings/CMS, Membership, News, Events, Teams, Personen, Sponsoren und Chronik aktiv integriert.
 - B15.18 Notification-/Reminder-System einschließlich Audit-, Idempotenz- und Append-Härtung abgeschlossen; operative Cron-Aktivierung bleibt Go-live.
 - B15.19 zentrale Medienbibliothek und Fachintegrationen einschließlich Rollen-/Security-Nachläufen abgeschlossen.
-- öffentliche Kernbereiche sind vorhanden. B15.24A hat den Bestand inventarisiert; B15.24B strukturiert Gesamtverein und vier Abteilungen, beseitigt tote Navigationsziele und steht auf `IMPLEMENTED / PARTIAL MANUAL REVIEW COMPLETE / REMAINING WEBSITE REVIEW PENDING`. Der restliche visuelle Browser-/Designreview wird im nächsten Arbeitsschritt fortgesetzt; die vollständige Go-live-Abnahme bleibt geplant.
+- Öffentliche Kernbereiche sind vorhanden. B15.24A hat den Bestand inventarisiert; B15.24B ist nach vollständigem Desktop-/Smartphone-Review abgeschlossen. B15.24C hat den bestätigten As-built-Designvertrag ohne Redesign oder neuen Referenzinput konsolidiert. Die fachliche Inhaltsbefüllung, Accessibility/Performance/SEO und vollständige Go-live-Abnahme bleiben eigene Folgeblöcke.
 
 ## Architekturregeln
 
@@ -18,8 +18,8 @@ Stand: 28. August 2026
 
 ## Bekannte Qualitätspunkte
 
-Die drei früher dokumentierten Testfehler wurden in einem kleinen Wartungsblock korrigiert. Der B15.24B-Lauf nach Browser-Nacharbeit 10 ist mit 1063/1063 Tests grün; Produktionsbuild und TypeScript bestehen. Die Repository-ESLint-Baseline bleibt unverändert bei 8 Fehlern und 35 Warnungen; der geänderte Nacharbeit-10-Scope enthält keinen Fehler. Dependency- und Dateigrößenbestand bleiben im technischen Cleanup gesondert zu bewerten.
+Die drei früher dokumentierten Testfehler wurden in einem kleinen Wartungsblock korrigiert. Der finale B15.24B-Abschlusslauf war mit 1090/1090 Tests grün; Produktionsbuild und TypeScript bestanden. Im geänderten Scope bestanden keine ESLint-Fehler; bekannte `no-img-element`-Warnungen bleiben für den späteren Performanceblock sichtbar. Dependency-, Bildoptimierungs- und Dateigrößenbestand werden im technischen Cleanup beziehungsweise B15.24L gesondert bewertet.
 
 ## Planung
 
-Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). B15.24B ist implementiert und befindet sich im manuellen Review; B15.24C folgt erst nach dessen Freigabe und mit geklärtem Referenzdesign. Go-live bleibt davon getrennt.
+Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). B15.24B und B15.24C sind abgeschlossen. B15.24D wird als Nächstes gegen den tatsächlich bereits umgesetzten Header-/Layoutstand neu bewertet. Go-live bleibt davon getrennt.

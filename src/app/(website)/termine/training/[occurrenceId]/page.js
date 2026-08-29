@@ -103,7 +103,7 @@ export default async function TrainingDetailPage({ params }) {
   });
 
   return (
-    <main className="min-h-screen bg-[#101014] text-white">
+    <main className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="px-6 pt-32 pb-20">
         <div className="mx-auto max-w-5xl">
           <p className="text-sm uppercase tracking-[0.35em] text-red-400">

@@ -34,7 +34,7 @@ export default async function FootballSponsorsPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#101014] overflow-x-hidden px-4 pt-32 pb-20 text-white sm:px-6 md:pt-56 md:pb-24">
+    <main className="min-h-screen bg-[var(--dunkel)] overflow-x-hidden px-4 pt-32 pb-20 text-white sm:px-6 md:pt-56 md:pb-24">
       <section className="mx-auto max-w-7xl">
         <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
           Fußballabteilung

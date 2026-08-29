@@ -17,7 +17,7 @@ const cards = [
 
 export default function FootballDepartmentPage() {
   return (
-    <main className="min-h-screen bg-[#101014] px-6 pt-48 pb-24 text-white md:pt-56">
+    <main className="min-h-screen bg-[var(--dunkel)] px-6 pt-48 pb-24 text-white md:pt-56">
       <section className="mx-auto max-w-7xl">
         <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">Fußballabteilung</p>
         <h1 className="mt-5 max-w-4xl text-5xl font-black leading-tight md:text-7xl">Abteilung & Ansprechpartner</h1>

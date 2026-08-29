@@ -40,7 +40,7 @@ export default async function Home() {
   );
 
   return (
-    <main className="public-home-page min-h-screen bg-[#101014] text-white">
+    <main className="public-home-page min-h-screen bg-[var(--dunkel)] text-white">
       <section className="relative overflow-hidden px-4 pt-28 pb-20 sm:px-6 xl:pt-48 xl:pb-24">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_8%,rgba(220,38,38,0.2),transparent_31%),radial-gradient(circle_at_86%_44%,rgba(220,38,38,0.08),transparent_28%),linear-gradient(120deg,#101014_15%,#18181f_68%,#211116_135%)]" />
 

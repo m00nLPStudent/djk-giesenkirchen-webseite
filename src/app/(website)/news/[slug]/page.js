@@ -21,7 +21,7 @@ export default async function NewsDetailPage({ params }) {
 
   if (!article) {
     return (
-      <main className="min-h-screen bg-[#101014] pt-28 text-white md:pt-32">
+      <main className="min-h-screen bg-[var(--dunkel)] pt-28 text-white md:pt-32">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <h1 className="text-3xl font-black sm:text-5xl">
             Artikel nicht gefunden
@@ -37,7 +37,7 @@ export default async function NewsDetailPage({ params }) {
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
   return (
-    <main className="min-h-screen bg-[#101014] text-white">
+    <main className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="px-4 pt-28 pb-16 sm:px-6 md:pt-32 md:pb-20">
         <div className="mx-auto max-w-5xl">
           {resolvedArticle.resolved_image_url && (

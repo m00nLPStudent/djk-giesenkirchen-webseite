@@ -97,7 +97,7 @@ export default async function PlayerProfilePage({ params }) {
   ];
 
   return (
-    <main className="min-h-screen bg-[#101014] text-white">
+    <main className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="px-6 pt-32 pb-24">
         <div className="mx-auto max-w-7xl">
           <Link

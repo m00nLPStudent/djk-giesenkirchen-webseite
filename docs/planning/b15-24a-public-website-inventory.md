@@ -4,7 +4,7 @@
 
 B15.24A ist ein reiner Analyse- und Dokumentationsblock. Es wurden weder öffentliche Komponenten noch Navigation, Header, Footer, Datenbank oder SQL verändert. Die verbindliche Planungsquelle bleibt [`current-roadmap.md`](current-roadmap.md).
 
-Die öffentliche Website ist fachlich als Website des **Gesamtvereins** zu behandeln. Der Gesamtverein umfasst Fußball, Tischtennis, Behindertensport und Gymnastikdamen. Das bestehende Grunddesign bleibt Ausgangspunkt; eine externe Referenzwebsite für Helligkeit, Flächenwirkung, Farbverteilung, Kontrast und Gesamtwirkung ist **OPEN INPUT**. Bis sie vorliegt, wird keine finale Farbpalette oder visuelle Detailentscheidung getroffen.
+Die öffentliche Website ist fachlich als Website des **Gesamtvereins** zu behandeln. Der Gesamtverein umfasst Fußball, Tischtennis, Behindertensport und Gymnastikdamen. Historischer A-Stand: Für Helligkeit, Flächenwirkung, Farbverteilung, Kontrast und Gesamtwirkung war zunächst eine externe Referenzwebsite als **OPEN INPUT** vorgesehen. Dieser offene Input wurde später durch die iterative Betreiberentscheidung und die bestandene B15.24B-Abnahme ersetzt; B15.24C dokumentiert den bestätigten Ist-Stand ohne externe Referenz als verbindliche Designbasis.
 
 ## Routeninventar
 
@@ -232,7 +232,7 @@ Nur eine statische Platzhalterseite unter `/damen-gymnastik`. Angebote/Gruppen, 
 
 1. **B15.24A – COMPLETE:** Dokumentationskonsolidierung und vollständige IST-Analyse.
 2. **B15.24B – COMPLETE – MANUAL DESKTOP AND RESPONSIVE REVIEW PASSED:** Gesamtvereinsstruktur, gemeinsame Public-Layout-/Hero-/Card-Basis, klick- und hoverfähige Desktop-Disclosure-Navigation, vollständige Mobile-Akkordeons, Floating-Navigation, Header/Footer, dynamische Homepage, globale Top-5-Trainingstermine und kontrollierte Aufbau-Routen sind umgesetzt. Der abschließende reale Desktop-, Smartphone- und Responsive-Review ist bestanden.
-3. **B15.24C:** Referenzdesign auswerten und zentrale öffentliche Designbasis festlegen; Tokens, Typografie, Flächen, Page-/Section-/Hero-Bausteine.
+3. **B15.24C – COMPLETE – AS-BUILT DESIGN BASIS CONSOLIDATED:** Die iterative Betreiberentscheidung und der bestandene B15.24B-Review ersetzen den ursprünglich vorgesehenen externen Referenzinput. Farben/Flächen, Typografie, Layout, Karten, Responsive und Interaktion sind als bestehender Designvertrag dokumentiert; identische öffentliche Hauptgründe verwenden das vorhandene `--dunkel`-Token. Es erfolgte kein Redesign und keine parallele Tokenarchitektur.
 4. **B15.24D:** Header und globale Layoutgeometrie auf Basis von B/C.
 5. **B15.24E:** Gesamtvereinsfooter, Kontakt-/Rechtlich-Hierarchie und nur tatsächlich vorhandene Links.
 6. **B15.24F:** Gesamtvereinsseiten einschließlich Verein, News, Termine, Kontakt, Mitglied werden und Downloads vereinheitlichen.

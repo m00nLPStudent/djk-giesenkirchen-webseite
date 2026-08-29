@@ -33,7 +33,7 @@ a {
   background:
     radial-gradient(circle at 12% 0%, rgba(196, 0, 26, 0.22), transparent 32%),
     radial-gradient(circle at 90% 22%, rgba(127, 29, 29, 0.12), transparent 28%),
-    #101014;
+    var(--dunkel);
 }
 
 .public-site-frame > main {

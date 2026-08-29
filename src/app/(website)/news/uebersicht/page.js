@@ -50,7 +50,7 @@ export default async function NewsOverviewPage({ searchParams }) {
   const totalPages = Math.max(1, Math.ceil((count || 0) / PAGE_SIZE));
 
   return (
-    <main className="min-h-screen bg-[#101014] px-4 pt-32 pb-20 text-white sm:px-6 md:pt-56 md:pb-24">
+    <main className="min-h-screen bg-[var(--dunkel)] px-4 pt-32 pb-20 text-white sm:px-6 md:pt-56 md:pb-24">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div>

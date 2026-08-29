@@ -25,6 +25,20 @@ test("public layout provides one background and navigation-safe responsive offse
   assert.match(shell, /sm:px-6/);
 });
 
+test("accepted public core colors use the existing global design tokens", () => {
+  const home = read("src/app/(website)/page.js");
+  const news = read("src/app/(website)/news/page.js");
+  const membership = read("src/app/(website)/mitglied-werden/page.js");
+
+  assert.match(globals, /--vereinsrot: #c4001a/);
+  assert.match(globals, /--dunkel: #101014/);
+  assert.match(globals, /\.public-site-frame[\s\S]*var\(--dunkel\)/);
+  for (const source of [home, news, membership]) {
+    assert.match(source, /bg-\[var\(--dunkel\)\]/);
+  }
+  assert.match(card, /bg-\[#18181f\]\/90/);
+});
+
 test("shared hero and card establish the common public design geometry", () => {
   assert.match(hero, /<header/);
   assert.match(hero, /<h1/);

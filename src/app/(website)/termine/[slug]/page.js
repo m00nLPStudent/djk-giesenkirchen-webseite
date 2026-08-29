@@ -64,7 +64,7 @@ export default async function EventDetailPage({ params }) {
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
 
   return (
-    <main className="min-h-screen bg-[#101014] text-white">
+    <main className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="px-6 pt-32 pb-20">
         <div className="mx-auto max-w-5xl">
           {(event.resolved_image_url || event.image_url) && (

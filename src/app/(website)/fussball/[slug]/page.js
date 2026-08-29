@@ -70,7 +70,7 @@ export default async function TeamPage({ params }) {
 
   if (slug === "turniere-events") {
     return (
-      <main className="min-h-screen bg-[#101014] px-6 pt-40 pb-24 text-white md:pt-52">
+      <main className="min-h-screen bg-[var(--dunkel)] px-6 pt-40 pb-24 text-white md:pt-52">
         <section className="mx-auto max-w-7xl">
           <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent p-8 shadow-[0_30px_80px_-40px_rgba(196,0,26,0.65)] md:p-12">
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
@@ -230,7 +230,7 @@ export default async function TeamPage({ params }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#101014] text-white">
+    <main className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="overflow-x-hidden px-4 pt-28 pb-20 sm:px-6 md:pt-32 md:pb-24">
         <div className="mx-auto max-w-7xl min-w-0 space-y-8">
           <TeamHero team={displayTeam} />

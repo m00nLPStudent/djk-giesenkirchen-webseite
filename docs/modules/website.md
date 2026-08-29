@@ -4,7 +4,50 @@
 
 Der funktionale Responsive Release ist abgeschlossen. B15.24A hat 30 öffentliche Seiten und zwei Handler inventarisiert. B15.24B ist **COMPLETE – MANUAL DESKTOP AND RESPONSIVE REVIEW PASSED**: Gesamtvereinsstruktur, gemeinsame Public-Layout-/Hero-/Card-Basis, alle vier Abteilungen, zugängliche Desktop-/Mobilnavigation, Floating-Navigation, Header/Footer, dynamische Startseite, globale Top-5-Trainingstermine und kontrollierte Aufbau-Routen sind implementiert. Der abschließende reale Desktop-, Smartphone- und Responsive-Review ist bestanden. Der vollständige Befund und Umsetzungsstand stehen unter [`../planning/b15-24a-public-website-inventory.md`](../planning/b15-24a-public-website-inventory.md).
 
-Die Website behandelt Fußball, Tischtennis, Behindertensport und Gymnastikdamen als Abteilungen desselben Gesamtvereins. Die bestätigte Grundrichtung bleibt dunkel, modern und sportlich mit Rot/Schwarz/Weiß; helle Karten und kleine Weißflächen lockern gezielt auf. Eine externe Referenz für spätere Detailarbeit steht weiterhin aus.
+Die Website behandelt Fußball, Tischtennis, Behindertensport und Gymnastikdamen als Abteilungen desselben Gesamtvereins. Die bestätigte Grundrichtung bleibt dunkel, modern und sportlich mit Rot/Schwarz/Weiß; helle Karten und kleine Weißflächen lockern gezielt auf. Eine externe Referenz ist für die bestehende Designbasis nicht mehr erforderlich; nur ein später ausdrücklich gewünschtes Redesign könnte neuen Referenzinput benötigen.
+
+## As-built-Designvertrag (B15.24C)
+
+Die iterative Betreiberentscheidung und die bestandene Desktop-/Smartphone-Abnahme aus B15.24B ersetzen den ursprünglich vorgesehenen externen Referenzinput. Für die bestehende öffentliche Designbasis ist keine Referenzwebsite mehr erforderlich. Änderungen an diesem Vertrag sind künftig als bewusstes Redesign zu behandeln, nicht als technische Bereinigung.
+
+### Farben und Flächen
+
+- Hauptgrund: `--dunkel: #101014`; öffentliche Hauptgründe verwenden `var(--dunkel)`.
+- Standardkarte: `PublicCard` mit `#18181f` bei 90 Prozent Deckkraft.
+- Stärkere Flächen: bestehende, bewusst komponentenspezifische Anthrazit-/Schwarzwerte in Header, Navigation, Footer und Fachkarten.
+- Vereinsrot: `--vereinsrot: #c4001a`. Tailwind-States `red-400`, `red-500`, `red-600` und `red-700` bleiben bewusst abgestufte Akzent-, Icon-, Active-, CTA- und Hoverfarben.
+- Text: Weiß als Primärkontrast; abgestufte `text-white/*`-Transparenzen für Sekundär- und Metatext.
+- Border: überwiegend `border-white/10`; stärkere oder rote Borders kennzeichnen Interaktion, Status oder bewusste Fachkarten.
+- Glass-/Hover-States verwenden transparente weiße beziehungsweise `red-600`-Flächen. Ähnliche dunkle Werte werden nicht ohne semantische Gleichheit zusammengelegt.
+
+### Typografie
+
+- Globale Schrift: Geist über `--font-geist-sans`, mit Arial/Helvetica als Fallback.
+- Eyebrows: klein, stark gewichtet, uppercase, weit gesperrt und rot.
+- Standard-H1: `PublicPageHero` mit `text-4xl`, ab `sm` `text-5xl`, ab `lg` `text-7xl`, `font-black` und enger Zeilenhöhe.
+- H2/H3 folgen derselben schweren, kontrastreichen Grundrichtung; Richtext besitzt dafür zentrale responsive Regeln, Fachmodule dürfen abgestufte Größen verwenden.
+- Body- und Einleitungstexte verwenden ruhige Zeilenhöhen und weiße Sekundärkontraste; Schriftgrößen skalieren mobile-first.
+
+### Layout und öffentliche Primitives
+
+- `PublicPageShell`: Standardcontainer `max-w-7xl`, `px-4`/`sm:px-6`, zentraler Header-/Floating-Navigation-Abstand und unterer Seitenabstand.
+- `PublicPageHero`: Eyebrow, H1, Einleitung und optionale Hero-Aktionen ohne zusätzliche äußere Kartenfläche.
+- `PublicCard`: Standard-Surface mit `rounded-3xl`, `border-white/10`, dunkler Fläche, `p-6`/`sm:p-8` und bestehendem Standardschatten.
+- Normale Übersichten verwenden diese Primitives. Detail-, Formular-, Personen-, Team-, News- und Widgetseiten dürfen eine fachlich notwendige Sonderstruktur behalten, müssen aber Farben, Kontrast und Responsive-Grundsätze der Designfamilie wahren.
+- Header, Navigation und Footer verwenden den bestätigten breiten 90-rem-Rahmen; Inhaltsseiten verwenden je nach Aufgabe `max-w-4xl` bis `max-w-7xl`.
+
+### Responsive und Interaktion
+
+- Mobile-first; reale Abnahme bei 360–430 Pixel sowie auf Desktop ist bestanden.
+- Mobile Navigation bleibt bis `xl` aktiv, Desktop-Disclosure ab `xl`; Grids erweitern erst bei ausreichendem Platz.
+- Touchziele liegen im Header bei mindestens 40 Pixel, der Hamburger bei 44 Pixel.
+- Primary CTA: deckendes `red-600`; Active States: `red-600/45`; Hover/Focus: `red-600/20`. Fokusumrisse bleiben sichtbar.
+- Social-/Serviceicons verwenden transparente Flächen, rote Glyphen und gemeinsame Touchboxen. Links bleiben unterstrichfrei, erhalten aber klare Hover-/Focus-Rückmeldung.
+- Kartenradien und Shadows werden nicht global vereinheitlicht: Abweichungen sind zulässig, wenn Bildmasken, Pills, Fachkarten oder Overlays dies funktional beziehungsweise visuell erfordern.
+
+### Technische Grenze
+
+Die bestehenden Variablen `--vereinsrot`, `--dunkel`, `--anthrazit`, `--hell` und `--weiss` bleiben die einzige globale Basisschicht. B15.24C führt keine parallele Tokenwelt ein. Identische öffentliche Hauptgründe wurden auf `var(--dunkel)` konsolidiert; ähnliche Surface-, Rot-, Radius- und Shadowwerte bleiben absichtlich komponentenspezifisch. Die ungenutzten Legacy-Komponenten `src/components/website/WebsiteLayout.js`, `NavigationItem.js` und `DropdownMenu.js` bleiben dokumentierter späterer Cleanup und wurden nicht gelöscht.
 
 ## Öffentliche Kernbereiche
 
@@ -34,7 +77,7 @@ Die Website behandelt Fußball, Tischtennis, Behindertensport und Gymnastikdamen
 ## Responsive
 
 - mobile-first über alle öffentlichen Seiten
-- historisch auf 360, 375, 390, 414, 768, 1024 und Desktop validiert; nach der B15.24-Überarbeitung ist eine neue reale Geräte-/Browserabnahme erforderlich
+- real auf kleinen Smartphone-Breiten von 360–430 Pixel sowie auf Desktop abgenommen; Tablet-/Desktop-Verträge bleiben automatisiert abgesichert
 - kein horizontales Seitenscrolling als Qualitätsziel
 
 ## Hinweis
