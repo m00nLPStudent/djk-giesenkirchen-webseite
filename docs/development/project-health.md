@@ -22,4 +22,4 @@ Die drei früher dokumentierten Testfehler wurden in einem kleinen Wartungsblock
 
 ## Planung
 
-Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). Die Public-Design-/Hauptseitenbasis einschließlich D, E, F, K und M ist nach ausdrücklicher Betreiberabnahme abgeschlossen und wird nicht erneut mikrogeprüft. B15.24G ist der nächste echte offene Fachblock; Abteilungsintegrationen, Accessibility/Performance/SEO sowie Maps, Consent und Infrastruktur-Go-live bleiben getrennt offen.
+Die verbindliche offene Reihenfolge steht in der [aktuellen Roadmap](../planning/current-roadmap.md). Die Public-Design-/Hauptseitenbasis und B15.24G sind nach ausdrücklicher Betreiberentscheidung abgeschlossen. FUSSBALL.DE-Widgets bleiben bis zur finalen registrierten Produktivdomain ein separater Go-live-Punkt; der Turniere-&-Events-Vollausbau bleibt Future/Post-Go-live. B15.24H ist der nächste aktuell bearbeitbare Fachblock; weitere Abteilungsintegration, Accessibility/Performance/SEO sowie Maps, Consent und Infrastruktur-Go-live bleiben getrennt offen.
