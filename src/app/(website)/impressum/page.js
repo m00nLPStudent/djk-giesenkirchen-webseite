@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import RichTextContent from "@/components/website/content/RichTextContent";
+import { PublicCard, PublicPageHero, PublicPageShell } from "@/components/website/layout";
 import { supabase } from "@/lib/supabase";
 
 async function getPublishedPage(slug) {
@@ -21,19 +22,12 @@ export default async function ImpressumPage() {
   const page = await getPublishedPage("impressum");
 
   return (
-    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-52 md:pb-24">
-      <section className="mx-auto max-w-5xl rounded-3xl border border-white/10 bg-white/5 p-6 md:p-12">
-        <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-          Rechtliches
-        </p>
-        <h1 className="mt-4 text-3xl font-black leading-tight md:text-6xl">
-          {page.title_de || page.title_en || "Impressum"}
-        </h1>
+    <PublicPageShell width="max-w-5xl">
+        <PublicPageHero eyebrow="Rechtliches" title={page.title_de || page.title_en || "Impressum"} />
 
-        <article className="mt-8 rounded-3xl border border-white/10 bg-black/20 p-5 md:p-9">
+        <PublicCard as="article" className="mt-10">
           <RichTextContent content={page.content_de || page.content_en || ""} />
-        </article>
-      </section>
-    </main>
+        </PublicCard>
+    </PublicPageShell>
   );
 }

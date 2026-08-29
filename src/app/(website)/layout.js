@@ -7,7 +7,7 @@ export default function WebsiteLayout({ children }) {
   return (
     <>
       <Header />
-      {children}
+      <div className="public-site-frame min-h-screen">{children}</div>
       <Footer />
     </>
   );

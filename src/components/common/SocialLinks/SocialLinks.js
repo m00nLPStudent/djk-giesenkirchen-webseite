@@ -10,12 +10,19 @@ const socialConfig = {
   x: { label: "X", Icon: SiX },
 };
 
-export default function SocialLinks({ links = {}, name = "Profil", className = "", compact = false }) {
+export default function SocialLinks({
+  links = {},
+  name = "Profil",
+  className = "",
+  compact = false,
+  contents = false,
+  iconSizes = {},
+}) {
   const entries = Object.entries(links).filter(([, href]) => Boolean(href));
   if (!entries.length) return null;
 
   return (
-    <div className={`flex flex-wrap gap-3 ${className}`}>
+    <div className={contents ? "contents" : `flex flex-wrap gap-3 ${className}`}>
       {entries.map(([key, href]) => {
         const config = socialConfig[key];
         if (!config) return null;
@@ -31,7 +38,10 @@ export default function SocialLinks({ links = {}, name = "Profil", className = "
             title={config.label}
             className={`${compact ? "h-8 w-8" : "h-10 w-10"} group flex items-center justify-center rounded-lg border border-transparent bg-transparent transition hover:-translate-y-0.5 hover:bg-white/[0.05] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500`}
           >
-            <Icon size={18} className="text-red-500 transition-colors group-hover:text-red-400" />
+            <Icon
+              size={iconSizes[key] || 18}
+              className="block shrink-0 text-red-500 transition-colors group-hover:text-red-400"
+            />
           </a>
         );
       })}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PublicPageShell } from "@/components/website/layout";
 const TERMINE_CARDS = [
   {
     eyebrow: "Training",
@@ -20,8 +21,8 @@ const TERMINE_CARDS = [
 
 export default function EventsPage() {
   return (
-    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
-      <section className="mx-auto max-w-7xl space-y-14">
+    <PublicPageShell>
+      <section className="space-y-14">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Verein
@@ -56,6 +57,6 @@ export default function EventsPage() {
           ))}
         </div>
       </section>
-    </main>
+    </PublicPageShell>
   );
 }

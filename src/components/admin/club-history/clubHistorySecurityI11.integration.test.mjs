@@ -12,7 +12,7 @@ const form = read("./forms/ClubHistoryEditorForm.js");
 const milestones = read("./components/ClubHistoryMilestonesManager.js");
 const images = read("./components/ClubHistoryImagesManager.js");
 const service = read("./services/clubHistory.service.js");
-const publicPage = read("../../../app/(website)/fussball/vereinsgeschichte/page.js");
+const publicPage = read("../../website/club-history/ClubHistoryPublicPage.js");
 
 test("proposal removes browser write policies and all non-select browser grants", () => {
   assert.match(proposal, /cmd IN\('ALL','INSERT','UPDATE','DELETE'\)/);

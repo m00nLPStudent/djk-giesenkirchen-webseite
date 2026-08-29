@@ -38,7 +38,7 @@ export default function MembershipPersonalData({
       <FormField label="Geburtsdatum" required>
         <input
           type="date"
-          className={inputClassName}
+          className={`${inputClassName} membership-birthdate-input`}
           value={form.birthdate}
           onChange={(event) => onBirthdateChange(event.target.value)}
         />

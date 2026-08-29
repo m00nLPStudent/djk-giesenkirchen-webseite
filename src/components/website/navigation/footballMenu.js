@@ -21,10 +21,6 @@ export const footballMenuItems = [
     href: "/termine/training",
   },
   {
-    label: "Termine",
-    href: "/termine/allgemein",
-  },
-  {
     label: "Turniere & Events",
     href: "/fussball/turniere-events",
   },

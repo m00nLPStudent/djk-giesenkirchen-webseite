@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PublicCard, PublicPageHero, PublicPageShell } from "@/components/website/layout";
 
 const clubAreas = [
   {
@@ -33,17 +34,9 @@ const clubAreas = [
 
 export default function ClubOverviewPage() {
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,#c4001a33,transparent_32%),#101014] px-4 pt-28 pb-20 text-white sm:px-6 xl:pt-32">
-      <section className="mx-auto max-w-7xl">
-        <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
-          Verein
-        </p>
-        <h1 className="mt-5 max-w-4xl break-words text-4xl font-black leading-tight md:text-7xl">
-          Vereinsbereiche
-        </h1>
-        <p className="mt-6 max-w-3xl text-base leading-7 text-white/65 md:text-lg md:leading-8">
-          Die DJK/VfL Giesenkirchen vereint vier Abteilungen unter einem gemeinsamen Vereinsdach.
-        </p>
+    <PublicPageShell>
+      <section>
+        <PublicPageHero eyebrow="Verein" title="Vereinsbereiche" description="Die DJK/VfL Giesenkirchen vereint vier Abteilungen unter einem gemeinsamen Vereinsdach." />
 
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/verein/vorstand" className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-bold hover:border-red-500 hover:bg-white/10">Vorstand Gesamtverein</Link>
@@ -55,10 +48,11 @@ export default function ClubOverviewPage() {
 
         <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {clubAreas.map((area) => (
-            <Link
+            <PublicCard
+              as={Link}
               key={area.href}
               href={area.href}
-              className="group min-w-0 rounded-3xl border border-black/10 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-red-500/60 hover:shadow-lg"
+              className="group min-w-0 transition hover:-translate-y-1 hover:border-red-500/60 hover:bg-white/[0.07]"
             >
               <p className="text-xs font-black uppercase tracking-[0.24em] text-red-400">
                 {area.eyebrow}
@@ -66,16 +60,16 @@ export default function ClubOverviewPage() {
               <h2 className="mt-3 break-words text-2xl font-black leading-tight">
                 {area.title}
               </h2>
-              <p className="mt-3 break-words text-sm leading-7 text-black/60">
+              <p className="mt-3 break-words text-sm leading-7 text-white/60">
                 {area.description}
               </p>
-              <span className="mt-6 inline-flex rounded-full border border-black/10 px-4 py-2 text-sm font-bold text-black/65 transition group-hover:border-red-500 group-hover:text-[#9f0015]">
+              <span className="mt-6 inline-flex rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-white/70 transition group-hover:border-red-500 group-hover:text-white">
                 Öffnen
               </span>
-            </Link>
+            </PublicCard>
           ))}
         </div>
       </section>
-    </main>
+    </PublicPageShell>
   );
 }

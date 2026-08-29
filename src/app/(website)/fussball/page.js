@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PublicPageShell } from "@/components/website/layout";
 
 const overviewCards = [
   {
@@ -40,20 +41,13 @@ const overviewCards = [
     href: "/fussball/turniere-events",
     eyebrow: "Events",
   },
-  {
-    title: "Vereinsgeschichte",
-    description:
-      "Die Geschichte der Fußballabteilung und wichtige Meilensteine.",
-    href: "/fussball/vereinsgeschichte",
-    eyebrow: "Historie",
-  },
 ];
 
 export default async function FootballPage() {
   return (
-    <main className="min-h-screen bg-[#101014] pt-28 pb-20 text-white md:pt-32 md:pb-24">
+    <PublicPageShell>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <section className="rounded-3xl border border-white/10 bg-black/20 p-6 md:p-9">
+        <section>
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
               Übersicht
@@ -88,6 +82,6 @@ export default async function FootballPage() {
           </div>
         </section>
       </div>
-    </main>
+    </PublicPageShell>
   );
 }

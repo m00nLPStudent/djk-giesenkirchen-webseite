@@ -18,3 +18,9 @@ export function resolveSocialLinks(value) {
     return href ? [[key, href]] : [];
   }));
 }
+
+export function selectMobileHeaderSocialLinks(links = {}) {
+  return Object.fromEntries(
+    ["instagram", "facebook"].flatMap((key) => links[key] ? [[key, links[key]]] : []),
+  );
+}

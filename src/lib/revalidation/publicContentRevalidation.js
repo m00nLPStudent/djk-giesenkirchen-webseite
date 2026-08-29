@@ -30,7 +30,10 @@ const PUBLIC_REVALIDATION_PATHS = {
     { path: "/termine/allgemein" },
     { path: "/termine/[slug]", type: "page" },
   ],
-  "club-history": [{ path: "/fussball/vereinsgeschichte" }],
+  "club-history": [
+    { path: "/verein/vereinsgeschichte" },
+    { path: "/fussball/vereinsgeschichte" },
+  ],
   contacts: [{ path: "/kontakt" }],
   "pages/settings": [{ path: "/impressum" }, { path: "/datenschutz" }],
   settings: [{ path: "/", type: "layout" }],

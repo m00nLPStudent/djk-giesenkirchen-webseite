@@ -17,6 +17,13 @@ test("native request-type options remain readable in the Windows Chrome popup", 
   assert.match(personal, /<option[^>]*className="bg-neutral-950 text-white"/);
 });
 
+test("native birthdate indicator keeps mobile spacing without changing date behavior", async () => {
+  const personal = await read("./components/MembershipPersonalData.js");
+  const css = await read("../../../app/globals.css");
+  assert.match(personal, /type="date"[\s\S]*membership-birthdate-input[\s\S]*onBirthdateChange/);
+  assert.match(css, /@media \(max-width: 767px\)[\s\S]*membership-birthdate-input::\-webkit-calendar-picker-indicator[\s\S]*margin-right: 0\.375rem/);
+});
+
 test("football resolution is debounced, abortable and clears stale selections", async () => {
   const form = await read("./MembershipRequestForm.js");
   assert.match(form, /setTimeout[\s\S]*350/);

@@ -3,7 +3,7 @@ import { CalendarDays, MapPin } from "lucide-react";
 import SocialLinks from "@/components/common/SocialLinks";
 import { Navigation } from "@/components/website/navigation";
 import { PUBLIC_SITE_LOGO_URL } from "@/config/publicSite";
-import { resolveSocialLinks } from "@/lib/socialLinks";
+import { resolveSocialLinks, selectMobileHeaderSocialLinks } from "@/lib/socialLinks";
 import { supabase } from "@/lib/supabase";
 
 export default async function Header() {
@@ -13,9 +13,10 @@ export default async function Header() {
     .eq("singleton", true)
     .maybeSingle();
   const socialLinks = resolveSocialLinks(settings?.social_links);
+  const mobileSocialLinks = selectMobileHeaderSocialLinks(socialLinks);
   const serviceLinks = [
     { label: "Sportanlage / Anfahrt", href: "/anfahrt", Icon: MapPin },
-    { label: "Termine", href: "/termine", Icon: CalendarDays },
+    { label: "Termine", href: "/termine/allgemein", Icon: CalendarDays },
   ];
 
   return (
@@ -32,7 +33,7 @@ export default async function Header() {
             alt="Logo der DJK/VfL Giesenkirchen"
             className="h-14 w-14 shrink-0 object-contain drop-shadow-[0_12px_22px_rgba(0,0,0,0.45)] transition group-hover:scale-[1.03] xl:h-32 xl:w-32"
           />
-          <div className="min-w-0">
+          <div className="hidden min-w-0 min-[390px]:block">
             <p className="truncate text-[0.58rem] font-black uppercase tracking-[0.24em] text-red-400 sm:text-[0.64rem] xl:text-sm xl:tracking-[0.24em]">
               Gemeinsam. Stark.
             </p>
@@ -65,7 +66,19 @@ export default async function Header() {
           })}
         </nav>
 
-        <div className="ml-auto shrink-0 xl:absolute xl:right-6 xl:bottom-0 xl:left-[9.5rem] xl:flex xl:translate-y-1/2 xl:justify-end 2xl:left-[10.5rem]">
+        <nav aria-label="Mobile Service-Links" className="ml-auto flex shrink-0 items-center gap-1 xl:hidden">
+          <SocialLinks
+            links={mobileSocialLinks}
+            name="DJK/VfL Giesenkirchen"
+            contents
+            iconSizes={{ facebook: 17 }}
+          />
+          <Link href="/anfahrt" aria-label="Sportanlage / Anfahrt" className="group flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-transparent transition hover:bg-white/[0.05] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+            <MapPin aria-hidden="true" size={18} className="block shrink-0 text-red-500 transition-colors group-hover:text-red-400" />
+          </Link>
+        </nav>
+
+        <div className="shrink-0 xl:absolute xl:right-6 xl:bottom-0 xl:left-[9.5rem] xl:flex xl:translate-y-1/2 xl:justify-end 2xl:left-[10.5rem]">
           <Navigation />
         </div>
       </div>

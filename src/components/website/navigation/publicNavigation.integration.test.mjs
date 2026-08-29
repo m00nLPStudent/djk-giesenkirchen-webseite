@@ -50,6 +50,7 @@ test("every newly introduced navigation target has a real page", () => {
     "tischtennis/spielplan-tabelle",
     "tischtennis/vorstand",
     "tischtennis/termine",
+    "tischtennis/trainingszeiten",
   ]) {
     assert.equal(existsSync(resolve(root, `src/app/(website)/${route}/page.js`)), true, route);
   }
@@ -99,7 +100,7 @@ test("desktop header service links share validated social settings and existing 
   assert.match(socialResolverSource, /normalizeExternalHttpUrl/);
   assert.match(socialResolverSource, /url\.username \|\| url\.password/);
   assert.match(headerSource, /label: "Sportanlage \/ Anfahrt", href: "\/anfahrt"/);
-  assert.match(headerSource, /label: "Termine", href: "\/termine"/);
+  assert.match(headerSource, /label: "Termine", href: "\/termine\/allgemein"/);
   assert.match(headerSource, /aria-label="Service-Links"/);
   assert.match(headerSource, /hidden items-center.*xl:flex/);
   assert.match(socialLinksSource, /target="_blank"/);
@@ -128,7 +129,8 @@ test("footer exposes real legal routes without powered-by or missing AGB links",
     assert.match(socialLinksSource, new RegExp(icon));
   }
   assert.match(socialLinksSource, /bg-transparent/);
-  assert.match(socialLinksSource, /<Icon size=\{18\} className="text-red-500 transition-colors group-hover:text-red-400"/);
+  assert.match(socialLinksSource, /size=\{iconSizes\[key\] \|\| 18\}/);
+  assert.match(socialLinksSource, /className="block shrink-0 text-red-500 transition-colors group-hover:text-red-400"/);
   assert.doesNotMatch(socialLinksSource, /bg-transparent text-white|<Icon[^>]+text-white/);
   assert.doesNotMatch(socialLinksSource, /#1877f2|radial-gradient|#ff0000|#0a66c2|#25f4ee|#fe2c55/);
   assert.match(socialLinksSource, /title=\{config\.label\}/);
@@ -166,11 +168,10 @@ test("directions and cookie routes are real, settings-backed and transparent", (
   assert.doesNotMatch(cookieSettingsSource, /type="(?:checkbox|radio)"/);
 });
 
-test("footer uses only existing internal targets and leaves news cards untouched by chrome", () => {
+test("footer uses canonical club targets and leaves news cards untouched by chrome", () => {
   for (const href of [
-    "/news",
     "/news/uebersicht",
-    "/termine",
+    "/termine/allgemein",
     "/downloads",
     "/verein/vereinsgeschichte",
     "/verein/vorstand",
@@ -182,9 +183,27 @@ test("footer uses only existing internal targets and leaves news cards untouched
   ]) {
     assert.match(footerSource, new RegExp(`href: "${href}"`));
   }
+  assert.doesNotMatch(footerSource, /label: "News-Übersicht"/);
+  assert.doesNotMatch(footerSource, /href: "\/news"/);
+  assert.doesNotMatch(footerSource, /href: "\/termine"/);
   assert.doesNotMatch(headerSource, /NewsCard/);
   assert.doesNotMatch(footerSource, /NewsCard/);
   assert.match(newsCardSource, /export default function NewsCard/);
+});
+
+test("club and department menus expose the reviewed event and news architecture", () => {
+  assert.match(configSource, /label: "Termine", href: "\/termine\/allgemein"/);
+  assert.match(configSource, /label: "News", href: "\/news\/uebersicht"/);
+  assert.doesNotMatch(configSource, /label: "News-Übersicht"/);
+
+  const footballBlock = configSource.match(/label: "Fußball"[\s\S]*?label: "Tischtennis"/)?.[0] || "";
+  assert.match(footballBlock, /label: "Trainingszeiten"/);
+  assert.match(footballBlock, /label: "Turniere & Events"/);
+  assert.doesNotMatch(footballBlock, /label: "Termine"/);
+
+  const tableTennisBlock = configSource.match(/label: "Tischtennis"[\s\S]*?label: "Gymnastikdamen"/)?.[0] || "";
+  assert.match(tableTennisBlock, /label: "Trainingszeiten", href: "\/tischtennis\/trainingszeiten"/);
+  assert.doesNotMatch(tableTennisBlock, /label: "Termine"/);
 });
 
 test("home reuses virtual training generation without loading general events", () => {

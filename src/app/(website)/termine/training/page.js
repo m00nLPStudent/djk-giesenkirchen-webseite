@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EventCard } from "@/components/website/events";
+import { PublicPageShell } from "@/components/website/layout";
 import { getVirtualTrainingEvents } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
@@ -47,8 +48,8 @@ export default async function TrainingEventsPage({ searchParams }) {
   const virtualTrainings = createEventDtos(trainingEvents, eventTypes || []);
 
   return (
-    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
-      <section className="mx-auto max-w-7xl space-y-14">
+    <PublicPageShell>
+      <section className="space-y-14">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Training
@@ -100,6 +101,6 @@ export default async function TrainingEventsPage({ searchParams }) {
           </div>
         )}
       </section>
-    </main>
+    </PublicPageShell>
   );
 }

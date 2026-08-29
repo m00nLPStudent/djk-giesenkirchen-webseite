@@ -5,7 +5,7 @@ import test from "node:test";
 const read = (path) => fs.readFileSync(new URL(path, import.meta.url), "utf8");
 const actions = read("../../../app/admin/club-history/actions.js");
 const manager = read("../club-history/components/ClubHistoryImagesManager.js");
-const publicPage = read("../../../app/(website)/fussball/vereinsgeschichte/page.js");
+const publicPage = read("../../website/club-history/ClubHistoryPublicPage.js");
 const adminPage = read("../../../app/admin/club-history/page.js");
 const assignment = read("./mediaAssignment.core.mjs");
 const proposal = read("../../../../docs/sql/b15-19i1-club-history-image-media-reference-proposal.sql");
@@ -31,7 +31,7 @@ test("each gallery row owns one usage and cross-purpose stays selectable", () =>
 test("public resolution is batched, public-only and falls back to legacy", () => {
   assert.equal((publicPage.match(/loadPublicMediaUrlMap\(/g) || []).length, 1);
   assert.match(publicPage, /mediaUrls\.data\.get\(image\.media_asset_id\) \|\| image\.image_url/);
-  assert.match(publicPage, /src=\{image\.resolved_image_url\}/);
+  assert.match(publicPage, /src=\{image\.resolvedImageUrl\}/);
   assert.match(adminPage, /loadMediaAssetsForPicker/);
 });
 

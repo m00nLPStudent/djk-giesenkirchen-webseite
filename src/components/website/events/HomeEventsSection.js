@@ -5,13 +5,13 @@ import TrainingSportIcon from "./TrainingSportIcon";
 export default function HomeEventsSection({ events = [], compact = false }) {
   if (compact) {
     return (
-      <aside className="rounded-[1.75rem] border border-white/10 bg-[#15151b]/95 p-5 text-white shadow-[0_24px_65px_rgba(0,0,0,0.32)] lg:p-6" aria-labelledby="home-events-title">
-        <div className="flex items-end justify-between gap-4">
-          <div>
+      <aside className="min-w-0 w-full rounded-[1.75rem] border border-white/10 bg-[#15151b]/95 p-5 text-white shadow-[0_24px_65px_rgba(0,0,0,0.32)] lg:p-6" aria-labelledby="home-events-title">
+        <div className="flex min-w-0 flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
             <p className="text-xs font-black uppercase tracking-[0.28em] text-red-400">Verein</p>
-            <h2 id="home-events-title" className="mt-3 text-2xl font-black">Nächste Trainingstermine</h2>
+            <h2 id="home-events-title" className="mt-3 break-words text-2xl font-black">Nächste Trainingstermine</h2>
           </div>
-          <Link href="/termine/training" className="text-right text-xs font-black uppercase tracking-[0.12em] text-red-300 hover:text-white hover:underline">Alle Trainingszeiten</Link>
+          <Link href="/termine/training" className="max-w-full text-left text-xs font-black uppercase tracking-[0.12em] text-red-300 hover:text-white hover:underline sm:text-right">Alle Trainingszeiten</Link>
         </div>
         {events.length === 0 ? (
           <p className="mt-6 rounded-2xl border border-dashed border-white/15 bg-white/[0.04] p-5 text-sm leading-6 text-white/55">Aktuell sind keine kommenden Trainingstermine hinterlegt.</p>

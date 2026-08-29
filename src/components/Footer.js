@@ -16,9 +16,8 @@ const footerColumns = [
   {
     title: "Verein",
     links: [
-      { label: "News", href: "/news" },
-      { label: "News-Übersicht", href: "/news/uebersicht" },
-      { label: "Termine", href: "/termine" },
+      { label: "News", href: "/news/uebersicht" },
+      { label: "Termine", href: "/termine/allgemein" },
       { label: "Downloads", href: "/downloads" },
       { label: "Vereinsgeschichte", href: "/verein/vereinsgeschichte" },
       { label: "Vorstand", href: "/verein/vorstand" },

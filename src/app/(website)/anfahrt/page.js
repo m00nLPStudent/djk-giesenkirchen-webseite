@@ -1,5 +1,6 @@
 import { MapPin } from "lucide-react";
 import { GoogleMapsPanel } from "@/components/website/maps";
+import { PublicPageHero, PublicPageShell } from "@/components/website/layout";
 import { PUBLIC_SITE_NAME } from "@/config/publicSite";
 import { buildGoogleMapsEmbedUrl, normalizeGoogleMapsUrl } from "@/lib/maps";
 import { supabase } from "@/lib/supabase";
@@ -20,11 +21,9 @@ export default async function DirectionsPage() {
   const embedUrl = buildGoogleMapsEmbedUrl({ apiKey: process.env.GOOGLE_MAPS_EMBED_API_KEY, query: addressQuery });
 
   return (
-    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-52 md:pb-24">
-      <section className="mx-auto max-w-6xl">
-        <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">Besuch planen</p>
-        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">Sportanlage & Anfahrt</h1>
-        <p className="mt-5 max-w-3xl text-base leading-7 text-white/60">Hier findest du die zentral gepflegte Vereinsadresse und den hinterlegten Weg zur Sportanlage.</p>
+    <PublicPageShell width="max-w-6xl">
+      <section>
+        <PublicPageHero eyebrow="Besuch planen" title="Sportanlage & Anfahrt" description="Hier findest du die zentral gepflegte Vereinsadresse und den hinterlegten Weg zur Sportanlage." />
         <div className="mt-10 grid gap-6 lg:grid-cols-[0.75fr_1.4fr]">
           <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8" aria-labelledby="directions-address">
             <MapPin aria-hidden="true" className="text-red-500" size={30} />
@@ -39,6 +38,6 @@ export default async function DirectionsPage() {
           <GoogleMapsPanel mapsUrl={mapsUrl} embedUrl={embedUrl} />
         </div>
       </section>
-    </main>
+    </PublicPageShell>
   );
 }

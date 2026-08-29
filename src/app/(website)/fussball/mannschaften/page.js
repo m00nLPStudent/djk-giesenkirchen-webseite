@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PublicPageShell } from "@/components/website/layout";
 import {
   getActiveFootballTeams,
   groupFootballTeams,
@@ -32,9 +33,9 @@ export default async function FootballTeamsOverviewPage() {
   const groups = groupFootballTeams(teams);
 
   return (
-    <main className="min-h-screen bg-[#101014] pt-28 pb-20 text-white md:pt-32 md:pb-24">
+    <PublicPageShell>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <section className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-10">
+        <section>
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Mannschaften
           </p>
@@ -68,6 +69,6 @@ export default async function FootballTeamsOverviewPage() {
           </div>
         </section>
       </div>
-    </main>
+    </PublicPageShell>
   );
 }

@@ -1,4 +1,5 @@
 import { EventCard } from "@/components/website/events";
+import { PublicPageShell } from "@/components/website/layout";
 import { getPublishedEvents } from "@/components/admin/events/services/events.service";
 import { expandRecurringEvents, splitEventsByTimeline } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
@@ -26,8 +27,8 @@ export default async function GeneralEventsPage() {
   const { upcoming, past } = splitEventsByTimeline(realEvents, now);
 
   return (
-    <main className="min-h-screen bg-[#101014] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
-      <section className="mx-auto max-w-7xl space-y-14">
+    <PublicPageShell>
+      <section className="space-y-14">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.35em] text-red-400">
             Verein
@@ -93,6 +94,6 @@ export default async function GeneralEventsPage() {
           )}
         </section>
       </section>
-    </main>
+    </PublicPageShell>
   );
 }
