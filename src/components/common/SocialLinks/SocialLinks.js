@@ -1,12 +1,16 @@
-import { SiFacebook, SiInstagram, SiTiktok } from "react-icons/si";
+import { FaLinkedinIn } from "react-icons/fa";
+import { SiFacebook, SiInstagram, SiTiktok, SiX, SiYoutube } from "react-icons/si";
 
 const socialConfig = {
   facebook: { label: "Facebook", Icon: SiFacebook },
   instagram: { label: "Instagram", Icon: SiInstagram },
+  youtube: { label: "YouTube", Icon: SiYoutube },
   tiktok: { label: "TikTok", Icon: SiTiktok },
+  linkedin: { label: "LinkedIn", Icon: FaLinkedinIn },
+  x: { label: "X", Icon: SiX },
 };
 
-export default function SocialLinks({ links = {}, name = "Profil", className = "" }) {
+export default function SocialLinks({ links = {}, name = "Profil", className = "", compact = false }) {
   const entries = Object.entries(links).filter(([, href]) => Boolean(href));
   if (!entries.length) return null;
 
@@ -22,11 +26,12 @@ export default function SocialLinks({ links = {}, name = "Profil", className = "
             key={key}
             href={href}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             aria-label={`${name} auf ${config.label}`}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/70 transition hover:-translate-y-0.5 hover:border-red-500 hover:bg-red-600 hover:text-white"
+            title={config.label}
+            className={`${compact ? "h-8 w-8" : "h-10 w-10"} group flex items-center justify-center rounded-lg border border-transparent bg-transparent transition hover:-translate-y-0.5 hover:bg-white/[0.05] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500`}
           >
-            <Icon size={18} />
+            <Icon size={18} className="text-red-500 transition-colors group-hover:text-red-400" />
           </a>
         );
       })}
