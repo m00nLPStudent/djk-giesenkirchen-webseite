@@ -233,16 +233,16 @@ Nur eine statische Platzhalterseite unter `/damen-gymnastik`. Angebote/Gruppen, 
 1. **B15.24A – COMPLETE:** Dokumentationskonsolidierung und vollständige IST-Analyse.
 2. **B15.24B – COMPLETE – MANUAL DESKTOP AND RESPONSIVE REVIEW PASSED:** Gesamtvereinsstruktur, gemeinsame Public-Layout-/Hero-/Card-Basis, klick- und hoverfähige Desktop-Disclosure-Navigation, vollständige Mobile-Akkordeons, Floating-Navigation, Header/Footer, dynamische Homepage, globale Top-5-Trainingstermine und kontrollierte Aufbau-Routen sind umgesetzt. Der abschließende reale Desktop-, Smartphone- und Responsive-Review ist bestanden.
 3. **B15.24C – COMPLETE – AS-BUILT DESIGN BASIS CONSOLIDATED:** Die iterative Betreiberentscheidung und der bestandene B15.24B-Review ersetzen den ursprünglich vorgesehenen externen Referenzinput. Farben/Flächen, Typografie, Layout, Karten, Responsive und Interaktion sind als bestehender Designvertrag dokumentiert; identische öffentliche Hauptgründe verwenden das vorhandene `--dunkel`-Token. Es erfolgte kein Redesign und keine parallele Tokenarchitektur.
-4. **B15.24D:** Header und globale Layoutgeometrie auf Basis von B/C.
-5. **B15.24E:** Gesamtvereinsfooter, Kontakt-/Rechtlich-Hierarchie und nur tatsächlich vorhandene Links.
-6. **B15.24F:** Gesamtvereinsseiten einschließlich Verein, News, Termine, Kontakt, Mitglied werden und Downloads vereinheitlichen.
+4. **B15.24D – COMPLETE – HEADER AND GLOBAL LAYOUT CONTRACT ALREADY DELIVERED BY B15.24B/C:** Der formale Soll-Ist-Abgleich bestätigt Header, Floating Desktop Navigation, Mobile Header, zentrale Root-/Seitenoffsets, gemeinsame Breiten und Public-Primitives als umgesetzt, getestet und manuell abgenommen. Es bleibt keine zusätzliche Produktarbeit.
+5. **B15.24E – COMPLETE – PUBLIC FOOTER ACCEPTED AS DELIVERED:** Gesamtvereinsfooter, Kontakt-/Rechtlich-Hierarchie und ausschließlich tatsächlich vorhandene Links wurden durch B15.24B umgesetzt und im abschließenden Desktop-/Mobile-Review vom Betreiber freigegeben. Fehlende AGB-, Register- oder externe Links werden nicht erfunden.
+6. **B15.24F – COMPLETE – PUBLIC CLUB PAGES ACCEPTED AS DELIVERED:** Die visuelle Vereinheitlichung von Verein, News, Terminen, Kontakt, Mitglied werden und Downloads wurde durch B15.24B umgesetzt und im abschließenden Desktop-/Mobile-Review vom Betreiber freigegeben. Eigenständige spätere Formular-, Inhalts- oder Integrationsarbeit wird dadurch nicht pauschal geschlossen.
 7. **B15.24G:** Fußballbereich konsolidieren; tote Turnierlinks entscheiden, Mannschaften/Widgets/Profile/Chronik vereinheitlichen.
 8. **B15.24H:** Tischtennis fachlich und technisch planen/integrieren.
 9. **B15.24I:** Behindertensport fachlich und technisch planen/integrieren.
 10. **B15.24J:** Gymnastikdamen fachlich und technisch planen/integrieren.
-11. **B15.24K:** Responsive-/Mobile-Finalisierung mit realer Geräte-/Browsermatrix.
+11. **B15.24K – COMPLETE – RESPONSIVE AND MOBILE REVIEW ACCEPTED:** Die Responsive-/Mobile-Finalisierung wurde durch B15.24B umgesetzt und im abschließenden Desktop-/Mobile-Review bei den relevanten Smartphone-Breiten vom Betreiber freigegeben.
 12. **B15.24L:** Accessibility, Performance und SEO; Metadata, Bilder, Fokus, Semantik und technische Altlasten.
-13. **B15.24M:** Öffentliche fachliche/visuelle Abnahme. Infrastruktur-Go-live mit Domain, Echtdaten, Mailserver und Secrets bleibt davon getrennt.
+13. **B15.24M – COMPLETE – PUBLIC WEBSITE REVIEW ACCEPTED:** Die öffentliche fachlich-visuelle Abnahme ist durch die ausdrückliche Betreiberfreigabe abgeschlossen. Infrastruktur-Go-live mit Domain, Echtdaten, Mailserver, Secrets sowie offene Consent-/Maps-Aufgaben bleibt davon getrennt.
 
 ## B15.24B Umsetzungsstand
 
@@ -278,4 +278,4 @@ Nur eine statische Platzhalterseite unter `/damen-gymnastik`. Angebote/Gruppen, 
 
 ## Nächster Schritt
 
-B15.24B ist **COMPLETE – MANUAL DESKTOP AND RESPONSIVE REVIEW PASSED**. Desktop-Serviceleiste, Footer, öffentliche Seiten, Startseite, Trainingstermine, Featured-NewsCard, Navigation, Vereinsgeschichte, History-Encoding, Membership-Datumsfeld und mobiler Header einschließlich Social-/Standorticons wurden real geprüft und akzeptiert. Maps-/Consent-Go-live, fachliche Inhaltsbefüllung sowie die weiteren B15.24-Unterblöcke bleiben separat offen.
+B15.24B ist **COMPLETE – MANUAL DESKTOP AND RESPONSIVE REVIEW PASSED**. Desktop-Serviceleiste, Footer, öffentliche Seiten, Startseite, Trainingstermine, Featured-NewsCard, Navigation, Vereinsgeschichte, History-Encoding, Membership-Datumsfeld und mobiler Header einschließlich Social-/Standorticons wurden real geprüft und akzeptiert. Die daraus bereits gelieferten reinen Public-Design-Blöcke D, E, F, K und M sind formal abgeschlossen. Maps-/Consent-Go-live, fachliche Abteilungs-/Integrationsarbeit sowie Accessibility, Performance und SEO bleiben separat offen.
