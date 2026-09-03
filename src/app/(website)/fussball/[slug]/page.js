@@ -213,6 +213,7 @@ export default async function TeamPage({ params }) {
       const coachDtos = await loadPublicCoachDtosByIds(
         supabase,
         (coachAssignments || []).map((assignment) => assignment.coach_id),
+        { departmentId: team.department_id },
       );
       coaches = mapCoachDtosForTeam(coachDtos, team.id);
     }
@@ -221,12 +222,15 @@ export default async function TeamPage({ params }) {
   if (teamSeason?.id) {
     const { data: playerAssignments } = await supabase
       .from("player_team_seasons")
-      .select("id, player_id, shirt_number, position_de, position_en, is_captain, is_active, sort_order, players(id, first_name, last_name, image_url, photo_url, is_active, year_group, strong_foot)")
+      .select("id, player_id, shirt_number, position_de, position_en, is_captain, is_active, sort_order, players(id, first_name, last_name, image_url, photo_url, is_active, year_group, strong_foot, department_id)")
       .eq("team_season_id", teamSeason.id)
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
 
-    players = mapTeamRosterPlayers(playerAssignments || []);
+    players = mapTeamRosterPlayers((playerAssignments || []).filter((assignment) => {
+      const player = Array.isArray(assignment.players) ? assignment.players[0] : assignment.players;
+      return player?.department_id && player.department_id === team.department_id;
+    }));
   }
 
   return (

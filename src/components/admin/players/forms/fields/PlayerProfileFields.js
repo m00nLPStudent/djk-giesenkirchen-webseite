@@ -8,6 +8,7 @@ export default function PlayerProfileFields({
   errors,
   calculatedYearGroup,
   updateField,
+  sportContext = "football",
 }) {
   return (
     <div className="space-y-4">
@@ -39,12 +40,14 @@ export default function PlayerProfileFields({
 
       <FormGrid>
         <SelectField
-          label="Starker Fuß"
-          value={form.strong_foot}
-          onChange={(event) => updateField("strong_foot", event.target.value)}
+          label={sportContext === "table_tennis" ? "Starke Hand" : "Starker Fuß"}
+          required={sportContext === "table_tennis"}
+          value={sportContext === "table_tennis" ? form.strong_hand : form.strong_foot}
+          onChange={(event) => updateField(sportContext === "table_tennis" ? "strong_hand" : "strong_foot", event.target.value)}
+          error={sportContext === "table_tennis" ? errors.strong_hand : null}
         >
-          <option value="">Starker Fuß auswählen</option>
-          {STRONG_FOOT.map((foot) => (
+          <option value="">{sportContext === "table_tennis" ? "Starke Hand auswählen" : "Starker Fuß auswählen"}</option>
+          {(sportContext === "table_tennis" ? ["Rechts", "Links"] : STRONG_FOOT).map((foot) => (
             <option key={foot} value={foot}>
               {foot}
             </option>

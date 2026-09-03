@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatEventDate, formatEventTime } from "@/lib/events";
+import { formatEventDate, formatEventTime, getTrainingLocationTypeLabel } from "@/lib/events";
 import TrainingSportIcon from "./TrainingSportIcon";
 
 export default function HomeEventsSection({ events = [], compact = false }) {
@@ -32,7 +32,7 @@ export default function HomeEventsSection({ events = [], compact = false }) {
                 </span>
                 <span className="min-w-20 text-right">
                   <span className="block text-sm font-black text-white">{formatEventTime(event.starts_at, { isAllDay: event.is_all_day })}</span>
-                  <span className="mt-1 block max-w-28 text-xs leading-4 text-white/40">{[event.location_name, event.location_city].filter(Boolean).join(" · ") || "Ort offen"}</span>
+                  <span className="mt-1 block max-w-28 text-xs leading-4 text-white/40">{[getTrainingLocationTypeLabel(event.training_location_type), event.location_name, event.location_city].filter(Boolean).join(" · ") || "Ort offen"}</span>
                 </span>
               </Link>
             ))}
@@ -96,9 +96,9 @@ export default function HomeEventsSection({ events = [], compact = false }) {
                     isAllDay: event.is_all_day,
                   })}
                 </p>
-                {(event.location_name || event.location_city) && (
+                {(event.training_location_type || event.location_name || event.location_city) && (
                   <p className="mt-2 text-sm text-white/45">
-                    {[event.location_name, event.location_city]
+                    {[getTrainingLocationTypeLabel(event.training_location_type), event.location_name, event.location_city]
                       .filter(Boolean)
                       .join(" · ")}
                   </p>

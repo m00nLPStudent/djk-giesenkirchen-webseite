@@ -21,7 +21,10 @@ function createSeasonalTeamMapFromAssignments(assignments = [], teamById = new M
       name_de: assignment.teamNameDe || assignment.teamNameEn || "Keine Mannschaft",
       name_en: assignment.teamNameEn || assignment.teamNameDe || "No team",
       slug: assignment.teamSlug || null,
-      age_group: assignment.ageGroup || null,
+          age_group: assignment.ageGroup || null,
+          department_id: assignment.departmentId || null,
+          department_slug: assignment.departmentSlug || null,
+          department_name_de: assignment.departmentNameDe || null,
       is_active: assignment.isActive !== false,
     });
   });

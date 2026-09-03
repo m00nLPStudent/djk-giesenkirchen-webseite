@@ -46,6 +46,10 @@ function buildRule(
 }
 
 const ADMIN_ROUTE_PERMISSION_RULES = [
+  buildRule("/admin/system/structure", "dashboard.view", {
+    matchType: "prefix",
+    priority: 310,
+  }),
   buildRule("/admin/system/notification-email-settings", "dashboard.view", {
     matchType: "prefix",
     priority: 310,
@@ -53,6 +57,10 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
   buildRule("/admin/notifications", "dashboard.view", {
     matchType: "exact",
     priority: 500,
+  }),
+  buildRule("/admin/notifications/settings", "dashboard.view", {
+    matchType: "exact",
+    priority: 600,
   }),
   buildRule("/admin/permissions/matrix", "permissions.edit", {
     matchType: "exact",
@@ -130,6 +138,18 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "exact",
     priority: 500,
   }),
+  ...["football", "table-tennis"].flatMap((area) => [
+    buildRule(`/admin/${area}/teams/new`, "teams.create", { matchType: "exact", priority: 600 }),
+    buildRule(`/admin/${area}/teams/edit/:id`, "teams.edit", { matchType: "exact", priority: 600 }),
+    buildRule(`/admin/${area}/coaches/new`, "coaches.create", { matchType: "exact", priority: 600 }),
+    buildRule(`/admin/${area}/coaches/edit/:id`, "coaches.edit", { matchType: "exact", priority: 600 }),
+    buildRule(`/admin/${area}/players/new`, "players.create", { matchType: "exact", priority: 600 }),
+    buildRule(`/admin/${area}/players/edit/:id`, "players.edit", { matchType: "exact", priority: 600 }),
+    buildRule(`/admin/${area}/board/new`, "board.create", { matchType: "exact", priority: 600 }),
+    buildRule(`/admin/${area}/board/edit/:id`, "board.edit", { matchType: "exact", priority: 600 }),
+  ]),
+  buildRule("/admin/club/board/new", "board.create", { matchType: "exact", priority: 600 }),
+  buildRule("/admin/club/board/edit/:id", "board.edit", { matchType: "exact", priority: 600 }),
   buildRule("/admin/settings/seasons-teams", "teams.edit", {
     matchType: "exact",
     priority: 500,
@@ -158,15 +178,15 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "exact",
     priority: 500,
   }),
-  buildRule("/admin/department/board/new", "settings.edit", {
+  buildRule("/admin/department/board/new", "board.create", {
     matchType: "exact",
     priority: 500,
   }),
-  buildRule("/admin/department/board/edit/:id", "settings.edit", {
+  buildRule("/admin/department/board/edit/:id", "board.edit", {
     matchType: "exact",
     priority: 500,
   }),
-  buildRule("/admin/department/board/:id/edit", "settings.edit", {
+  buildRule("/admin/department/board/:id/edit", "board.edit", {
     matchType: "exact",
     priority: 500,
   }),
@@ -188,6 +208,14 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "prefix",
     priority: 300,
   }),
+  ...["football", "table-tennis"].flatMap((area) => [
+    buildRule(`/admin/${area}/teams`, "teams.view", { matchType: "prefix", priority: 400 }),
+    buildRule(`/admin/${area}/coaches`, "coaches.view", { matchType: "prefix", priority: 400 }),
+    buildRule(`/admin/${area}/players`, "players.view", { matchType: "prefix", priority: 400 }),
+    buildRule(`/admin/${area}/board`, "board.view", { matchType: "prefix", priority: 400 }),
+  ]),
+  buildRule("/admin/club/board", "board.view", { matchType: "prefix", priority: 400 }),
+  buildRule("/admin/system/notifications", "dashboard.view", { matchType: "prefix", priority: 310 }),
   buildRule("/admin/contributions", "contributions.view", {
     matchType: "prefix",
     priority: 300,
@@ -212,7 +240,7 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "prefix",
     priority: 310,
   }),
-  buildRule("/admin/department", "settings.view", {
+  buildRule("/admin/department", "board.view", {
     matchType: "prefix",
     priority: 300,
   }),
@@ -343,13 +371,23 @@ export const ADMIN_PUBLIC_ROUTE_PATTERNS = [
 
 export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin": "dashboard.view",
+  "/admin/system/structure": "dashboard.view",
   "/admin/notifications": "dashboard.view",
   "/admin/system/notification-email-settings": "dashboard.view",
   "/admin/news": "news.view",
   "/admin/downloads": "downloads.view",
-  "/admin/department": "settings.view",
+  "/admin/department": "board.view",
+  "/admin/club/board": "board.view",
   "/admin/sponsors": "sponsors.view",
   "/admin/teams": "teams.view",
+  "/admin/table-tennis/teams": "teams.view",
+  "/admin/table-tennis/coaches": "coaches.view",
+  "/admin/table-tennis/players": "players.view",
+  "/admin/table-tennis/board": "board.view",
+  "/admin/football/teams": "teams.view",
+  "/admin/football/coaches": "coaches.view",
+  "/admin/football/players": "players.view",
+  "/admin/football/board": "board.view",
   "/admin/coaches": "coaches.view",
   "/admin/players": "players.view",
   "/admin/contributions": "contributions.view",

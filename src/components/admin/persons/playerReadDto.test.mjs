@@ -15,6 +15,7 @@ test("createPlayerReadDto maps seasonal assignments into the shared player dto",
       position_de: "Alt",
       is_captain: false,
       year_group: "2009",
+      strong_hand: "Rechts",
     },
     {
       assignments: [
@@ -66,6 +67,7 @@ test("createPlayerReadDto maps seasonal assignments into the shared player dto",
   assert.equal(dto.positionDe, "Mittelfeld");
   assert.equal(dto.isCaptain, false);
   assert.equal(dto.hasMultipleActiveAssignments, true);
+  assert.equal(dto.strongHand, "Rechts");
 });
 
 test("createPlayerReadDto does not synthesize current-season values from player snapshots", () => {

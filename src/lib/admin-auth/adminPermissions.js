@@ -50,6 +50,10 @@ export const ADMIN_PERMISSION_KEYS = [
   "membership_requests.view",
   "membership_requests.edit",
   "membership_requests.forward",
+  "board.view",
+  "board.create",
+  "board.edit",
+  "board.delete",
   "users.view",
   "users.create",
   "users.edit",
@@ -118,4 +122,5 @@ export const ADMIN_PERMISSION_GROUPS = {
     "contributions.cancel",
     "contributions.export",
   ],
+  board: ["board.view", "board.create", "board.edit", "board.delete"],
 };

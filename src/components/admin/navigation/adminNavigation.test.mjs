@@ -36,9 +36,9 @@ test("active navigation follows the agreed club, football and system structure",
     .find((section) => section.key === sectionKey).items
     .filter((item) => item.implementationStatus === "active")
     .map((item) => item.key);
-  assert.deepEqual(keys("club"), ["news", "sponsors", "events", "club-history", "downloads", "membership-requests", "media", "settings"]);
+  assert.deepEqual(keys("club"), ["news", "sponsors", "events", "club-history", "club-board", "downloads", "membership-requests", "media", "settings"]);
   assert.deepEqual(keys("football"), ["teams", "players", "coaches", "contributions", "department"]);
-  assert.deepEqual(keys("system"), ["users", "roles", "permissions", "notification-email-settings", "notification-monitoring"]);
+  assert.deepEqual(keys("system"), ["structure-assignment", "users", "roles", "permissions", "notification-email-settings", "notification-monitoring"]);
 });
 
 test("active items are valid admin routes with permission metadata", () => {
@@ -75,12 +75,23 @@ test("global notification e-mail settings navigation is visible only to superadm
   assert.ok(itemKeys(dto(allPermissions, globalScope, "/admin/system/notification-email-settings", ["superadmin"])).includes("notification-email-settings"));
 });
 
-test("system administration remains permission-gated in the system section", () => {
-  const result = dto(["users.view", "roles.view", "permissions.view"]);
+test("system administration is superadmin-only even when historical permissions exist", () => {
+  const denied = dto(["users.view", "roles.view", "permissions.view"], globalScope, "/admin/users", ["webmaster"]);
+  assert.ok(!denied.sections.find((section) => section.key === "system"));
+  const result = dto(["users.view", "roles.view", "permissions.view"], globalScope, "/admin/users", ["superadmin"]);
   const system = result.sections.find((section) => section.key === "system");
-  assert.deepEqual(system.items.map((item) => item.key), ["users", "roles", "permissions"]);
+  assert.deepEqual(system.items.map((item) => item.key), ["structure-assignment", "users", "roles", "permissions", "notification-email-settings", "notification-monitoring"]);
   assert.ok(!result.sections.find((section) => section.key === "club")?.items.some((item) => ["users", "roles", "permissions"].includes(item.key)));
   assert.ok(!itemKeys(dto([])).some((key) => ["users", "roles", "permissions"].includes(key)));
+});
+
+test("vorstand sees both business departments but no system section", () => {
+  const result = dto(["dashboard.view", "teams.view", "players.view", "coaches.view", "board.view", "users.view"], {
+    roleScopeTypes: ["own_board_card", "read_only"], assignedTeamIds: [], isGlobal: false,
+  }, "/admin", ["vorstand"]);
+  assert.ok(result.sections.some((section) => section.key === "football"));
+  assert.ok(result.sections.some((section) => section.key === "table_tennis"));
+  assert.ok(!result.sections.some((section) => section.key === "system"));
 });
 
 test("cashier permissions expose contributions but no team or player links", () => {
@@ -125,10 +136,10 @@ test("caretaker and guest contexts expose only explicitly permitted items", () =
 });
 
 test("department navigation follows the route guard permission and board scope", () => {
-  const allowed = dto(["settings.view"], { roleScopeTypes: ["own_board_card"] });
+  const allowed = dto(["board.view"], { roleScopeTypes: ["own_board_card"] });
   assert.ok(itemKeys(allowed).includes("department"));
   const section = allowed.sections.find(({ key }) => key === "football");
-  assert.equal(section.items.find(({ key }) => key === "department").label, "Fußballvorstände");
+  assert.equal(section.items.find(({ key }) => key === "department").label, "Vorstand Fußball");
   assert.ok(!itemKeys(dto(["system.view"], { isGlobal: true })).includes("department"));
 });
 
@@ -159,13 +170,16 @@ test("planned modules are absent by default and non-clickable behind the develop
 
 test("route matching covers details and avoids similar prefixes", () => {
   const cases = new Map([
-    ["/admin", "dashboard"], ["/admin/players", "players"],
-    ["/admin/players/new", "players"], ["/admin/players/test-id", "players"],
-    ["/admin/teams", "teams"], ["/admin/teams/test-id", "teams"], ["/admin/coaches", "coaches"],
+    ["/admin", "dashboard"], ["/admin/players", null],
+    ["/admin/players/new", null], ["/admin/players/test-id", null],
+    ["/admin/teams", null], ["/admin/teams/test-id", null], ["/admin/coaches", null],
     ["/admin/contributions", "contributions"], ["/admin/contributions/test-id", "contributions"],
     ["/admin/news", "news"], ["/admin/events", "events"], ["/admin/settings", "settings"],
-    ["/admin/department", "department"], ["/admin/users", "users"], ["/admin/roles", "roles"],
+    ["/admin/department", null], ["/admin/users", "users"], ["/admin/roles", "roles"],
     ["/admin/permissions", "permissions"], ["/admin/system/notifications", "notification-monitoring"],
+    ["/admin/football/players", "players"], ["/admin/football/teams/test-id", "teams"],
+    ["/admin/football/coaches/new", "coaches"], ["/admin/football/board", "department"],
+    ["/admin/table-tennis/players/test-id", "table-tennis-players"],
     ["/admin/system/notification-email-settings", "notification-email-settings"],
     ["/admin/playerstats", null], ["/admin/unknown", null], ["/unknown", null],
   ]);
@@ -180,7 +194,7 @@ test("longest route prefix wins and only one item is active", () => {
     { key: "long", href: "/admin/a/b", matchPrefixes: ["/admin/a/b"] },
   ] }];
   assert.equal(findActiveNavigationEntry(sections, "/admin/a/b/1").itemKey, "long");
-  const result = dto(allPermissions, globalScope, "/admin/players/new");
+  const result = dto(allPermissions, globalScope, "/admin/football/players/new");
   assert.equal(result.sections.flatMap((s) => s.items).filter((item) => item.isActive).length, 1);
 });
 

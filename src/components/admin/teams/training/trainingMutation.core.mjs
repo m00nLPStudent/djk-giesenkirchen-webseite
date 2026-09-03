@@ -1,4 +1,4 @@
-export const TRAINING_TIME_FIELDS = ["team_season_id", "weekday", "start_time", "end_time", "training_type", "location_name", "location_address", "location_city", "is_active", "effective_from", "effective_until"];
+export const TRAINING_TIME_FIELDS = ["team_season_id", "weekday", "start_time", "end_time", "training_type", "training_location_type", "location_name", "location_address", "location_city", "is_active", "effective_from", "effective_until"];
 export const TRAINING_EXCEPTION_FIELDS = ["team_training_time_id", "exception_date", "exception_type", "override_start_time", "override_end_time", "override_location_name", "override_location_address", "override_location_city", "is_active"];
 
 const changes = (previous, next, fields) => fields.filter((field) => (previous?.[field] ?? null) !== (next?.[field] ?? null));
@@ -10,6 +10,7 @@ export function normalizeTrainingTimePayload(payload = {}) {
     start_time: payload.start_time || null,
     end_time: payload.end_time || null,
     training_type: payload.training_type || "training",
+    training_location_type: payload.training_location_type || null,
     location_name: payload.location_name || null,
     location_address: payload.location_address || null,
     location_city: payload.location_city || null,

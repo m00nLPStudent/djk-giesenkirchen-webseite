@@ -1,7 +1,6 @@
-import { validateRequiredFields } from "@/components/admin/utils/validation";
 import { CURRENT_SEASON_STATUSES } from "@/components/admin/persons/seasonalReadModelCore.mjs";
 import { PLAYER_PLACEHOLDER_IMAGE } from "../services/players.service";
-import { REQUIRED_PLAYER_FIELDS } from "./playerForm.config";
+import { validatePlayerRequiredFields } from "./playerFormValidation.core.mjs";
 import {
   createInitialPlayerFormData,
   createPlayerPayloadData,
@@ -22,8 +21,8 @@ export function createInitialPlayerForm(
 }
 export { getYearGroupFromBirthdate };
 
-export function validatePlayerForm(form) {
-  return validateRequiredFields(form, REQUIRED_PLAYER_FIELDS);
+export function validatePlayerForm(form, sportContext = "football") {
+  return validatePlayerRequiredFields(form, sportContext);
 }
 
 export function createPlayerPayload(form, yearGroup) {

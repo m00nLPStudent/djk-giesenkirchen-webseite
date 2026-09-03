@@ -8,6 +8,7 @@ import useTeamScope from "../useTeamScope";
 export default function TeamCreateButton({
   className = "",
   label = "Neue Mannschaft",
+  href = "/admin/teams/new",
 }) {
   const { isReady } = useAdminUiContext();
   const { canReachTeamCreate } = useTeamScope();
@@ -17,7 +18,7 @@ export default function TeamCreateButton({
 
   return (
     <Can permission="teams.create" uiOnly>
-      <Link href="/admin/teams/new" className={className}>
+      <Link href={href} className={className}>
         {label}
       </Link>
     </Can>

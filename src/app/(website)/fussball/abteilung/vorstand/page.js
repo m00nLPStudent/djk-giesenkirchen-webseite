@@ -10,11 +10,24 @@ import { resolveLoadedPublicMediaImage } from "@/lib/people/publicMediaImage.mjs
 import { COACH_PLACEHOLDER_IMAGE as BOARD_PLACEHOLDER_IMAGE } from "@/constants/images";
 
 export default async function DepartmentBoardPage() {
-  const { data: boardMembers } = await supabase
-    .from("board_members")
-    .select("*, board_roles(name_de, name_en)")
+  const { data: footballDepartment } = await supabase
+    .from("departments")
+    .select("id")
+    .eq("slug", "fussball")
     .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+    .maybeSingle();
+
+  let boardMembers = [];
+  if (footballDepartment?.id) {
+    const result = await supabase
+      .from("board_members")
+      .select("*, board_roles(name_de, name_en)")
+      .eq("organization_scope", "department")
+      .eq("department_id", footballDepartment.id)
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true });
+    boardMembers = result.data || [];
+  }
 
   const mediaResult = await loadPublicMediaUrlMap((boardMembers || []).map((member) => member.image_media_asset_id));
   return (

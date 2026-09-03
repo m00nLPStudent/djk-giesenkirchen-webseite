@@ -11,7 +11,8 @@ test("team create and edit load active departments into the existing form", asyn
   ]);
   for (const page of [createPage, editPage]) {
     assert.match(page, /loadActiveTeamDepartments/);
-    assert.match(page, /departments=\{departments \|\| \[\]\}/);
+    assert.match(page, /departments=\{scopedDepartments\}/);
+    assert.match(page, /scopeContext\.managedDepartmentId/);
   }
   assert.match(repository, /\.eq\("is_active", true\)/);
   assert.match(repository, /import "server-only"/);

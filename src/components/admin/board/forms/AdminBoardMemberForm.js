@@ -20,11 +20,13 @@ import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker"
 import { BOARD_PLACEHOLDER_IMAGE } from "../services/board.service";
 import { loadBoardMediaPickerAction, uploadBoardMediaAction } from "@/app/admin/department/board/actions";
 
-export default function AdminBoardMemberForm({ member, roles = [], initialMedia = null }) {
+export default function AdminBoardMemberForm({ member, roles = [], departments = [], canManageOrganizationScope = false, canManageStructuralFields = true, canManageUnassigned = false, initialMedia = null, returnPath = "/admin/department", departmentSlug = null, organizationScope = null, departmentLabel = null }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(initialMedia);
   const [form, setForm] = useState({
+    organization_scope: member?.organization_scope || (member?.department_id ? "department" : "unassigned"),
+    department_id: member?.department_id || null,
     role_id: member?.role_id || "",
     first_name: member?.first_name || "",
     last_name: member?.last_name || "",
@@ -52,6 +54,14 @@ export default function AdminBoardMemberForm({ member, roles = [], initialMedia 
     }));
   }
 
+  function updateOrganizationScope(scope) {
+    setForm((current) => ({
+      ...current,
+      organization_scope: scope,
+      department_id: scope === "department" ? current.department_id : null,
+    }));
+  }
+
   function handleMediaChange(media) {
     setSelectedMedia(media);
     setForm((current) => ({ ...current, image_media_asset_id: media?.id || null }));
@@ -69,6 +79,7 @@ export default function AdminBoardMemberForm({ member, roles = [], initialMedia 
     const { error } = await saveBoardMemberWithScopeAction(
       form,
       member?.id || null,
+      { departmentSlug, organizationScope },
     );
     setLoading(false);
 
@@ -95,13 +106,29 @@ export default function AdminBoardMemberForm({ member, roles = [], initialMedia 
 
     await revalidatePublicContentAction("board");
 
-    router.push("/admin/department");
+    router.push(returnPath);
     router.refresh();
   }
 
   return (
     <form id="board-member-editor" onSubmit={handleSubmit} className="space-y-6">
       <FormSection eyebrow="Vorstand" title="Personendaten">
+        {departmentSlug || organizationScope === "club" ? <p className="mb-4 text-sm text-white/65">Bereich: <span className="font-bold text-white">{departmentLabel || departmentSlug}</span></p> : null}
+        {canManageOrganizationScope ? (
+          <FormGrid>
+            <SelectField label="Organisationsbereich" required value={form.organization_scope} onChange={(event) => updateOrganizationScope(event.target.value)}>
+              {canManageUnassigned ? <option value="unassigned">Nicht zugeordnet</option> : null}
+              <option value="club">Gesamtverein</option>
+              <option value="department">Abteilung</option>
+            </SelectField>
+            {form.organization_scope === "department" ? (
+              <SelectField label="Abteilung" required value={form.department_id || ""} onChange={(event) => updateField("department_id", event.target.value || null)}>
+                <option value="">Abteilung auswählen</option>
+                {departments.map((department) => <option key={department.id} value={department.id}>{department.name_de}</option>)}
+              </SelectField>
+            ) : null}
+          </FormGrid>
+        ) : null}
         <FormGrid>
           <InputField
             label="Vorname"
@@ -115,24 +142,7 @@ export default function AdminBoardMemberForm({ member, roles = [], initialMedia 
             value={form.last_name}
             onChange={(event) => updateField("last_name", event.target.value)}
           />
-          <SelectField
-            label="Funktion"
-            required
-            value={form.role_id}
-            onChange={(event) => updateRole(event.target.value)}
-          >
-            <option value="">Funktion auswählen</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name_de}
-              </option>
-            ))}
-          </SelectField>
-          <InputField
-            label="Funktion Englisch"
-            value={form.role_en}
-            onChange={(event) => updateField("role_en", event.target.value)}
-          />
+          {canManageStructuralFields ? <SelectField label="Funktion" required value={form.role_id} onChange={(event) => updateRole(event.target.value)}><option value="">Funktion auswählen</option>{roles.map((role) => <option key={role.id} value={role.id}>{role.name_de}</option>)}</SelectField> : null}
         </FormGrid>
       </FormSection>
       <FormSection eyebrow="Kontakt" title="Kontaktdaten">
@@ -150,7 +160,7 @@ export default function AdminBoardMemberForm({ member, roles = [], initialMedia 
       <FormSection eyebrow="Bild" title="Profilbild">
         <AdminMediaPicker value={selectedMedia} legacyUrl={selectedMedia ? null : form.image_url} placeholderUrl={BOARD_PLACEHOLDER_IMAGE} onChange={handleMediaChange} loadAction={(filters) => loadBoardMediaPickerAction(filters, member?.id || null)} uploadAction={(data) => uploadBoardMediaAction(data, member?.id || null)} usageContext="board_member" entityLabel="Vorstandsbild" />
       </FormSection>
-      <FormSection eyebrow="Einstellungen" title="Status und Sortierung">
+      {canManageStructuralFields ? <FormSection eyebrow="Einstellungen" title="Status und Sortierung">
         <FormGrid>
           <SortOrderField
             value={form.sort_order}
@@ -162,11 +172,11 @@ export default function AdminBoardMemberForm({ member, roles = [], initialMedia 
             entityLabel="Vorstandsmitglied"
           />
         </FormGrid>
-      </FormSection>
+      </FormSection> : null}
       <AdminSaveBar
         loading={loading}
         submitLabel="Vorstandsmitglied speichern"
-        cancelHref="/admin/department"
+        cancelHref={returnPath}
       />
     </form>
   );

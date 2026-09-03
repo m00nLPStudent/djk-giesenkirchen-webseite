@@ -71,8 +71,10 @@ export function buildPlayerMasterPayload(
     joined_at: player?.joined_at || null,
     year_group: toNullableString(player?.year_group),
     strong_foot: toNullableString(player?.strong_foot),
+    strong_hand: toNullableString(player?.strong_hand),
     nationality: toNullableString(player?.nationality),
     gender: toNullableString(player?.gender),
+    department_id: player?.department_id || null,
   };
 }
 
@@ -105,14 +107,6 @@ export function determinePlayerAssignmentOperation(
   existingAssignments = [],
   targetAssignment = {},
 ) {
-  if (!targetAssignment?.teamSeasonId) {
-    return {
-      ok: false,
-      code: "INVALID_TEAM_SEASON_ID",
-      message: "Die ausgewaehlte Mannschaft ist ungueltig.",
-    };
-  }
-
   const sortedAssignments = [...(existingAssignments || [])].sort(compareAssignments);
   const activeAssignments = sortedAssignments.filter(
     (assignment) => assignment?.isActive !== false,
@@ -128,6 +122,20 @@ export function determinePlayerAssignmentOperation(
   }
 
   const currentAssignment = activeAssignments[0] || null;
+  if (!targetAssignment?.teamSeasonId) {
+    return currentAssignment
+      ? {
+          ok: true,
+          operation: PLAYER_ASSIGNMENT_OPERATIONS.DEACTIVATE,
+          currentAssignmentId: currentAssignment.playerTeamSeasonId,
+        }
+      : {
+          ok: true,
+          operation: PLAYER_ASSIGNMENT_OPERATIONS.UNCHANGED,
+          currentAssignmentId: null,
+        };
+  }
+
   const existingByTeamSeasonId = new Map(
     sortedAssignments.map((assignment) => [assignment.teamSeasonId, assignment]),
   );

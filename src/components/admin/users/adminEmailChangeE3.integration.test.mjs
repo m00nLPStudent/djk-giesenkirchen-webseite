@@ -12,7 +12,7 @@ const form = read("../../auth/EmailChangeConfirmationForm.js");
 const profile = read("../profile/forms/ProfileForm.js");
 
 test("request action rechecks session, users.edit and active superadmin before stable UUID service call", () => {
-  assert.match(actions, /assertAdminActionPermission\(\{[\s\S]*requiredPermission: "users\.edit"/);
+  assert.match(actions, /assertSuperadminActionPermission\(\{[\s\S]*requiredPermission: "users\.edit"/);
   assert.match(actions, /role\?\.key === "superadmin" && role\?\.is_active !== false/);
   assert.match(actions, /requestAdminEmailChange\(\{[\s\S]*actorUserId: actorContext\.userId[\s\S]*targetUserId: userId/);
   assert.doesNotMatch(actions, /changeAdminUserEmail\(/);

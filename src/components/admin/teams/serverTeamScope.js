@@ -8,7 +8,7 @@ import {
   filterTeamsByScope,
 } from "./teamScope";
 
-const GLOBAL_TEAM_MODULE_ROLE_KEYS = ["vorstand", "fussball-vorstand"];
+const GLOBAL_TEAM_MODULE_ROLE_KEYS = ["vorstand"];
 
 function canAccessAllTeamsModule(scopeContext) {
   return Boolean(

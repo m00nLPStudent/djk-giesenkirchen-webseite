@@ -4,10 +4,10 @@ import {
   StatusSwitch,
   TextareaField,
 } from "@/components/admin/forms";
-import { TRAINING_TYPE_OPTIONS, WEEKDAY_OPTIONS } from "./trainingOptions";
+import { getTrainingLocationTypeOptions, getTrainingTypeOptions, WEEKDAY_OPTIONS } from "./trainingOptions";
 import { toDateValue, toTimeValue } from "./trainingFormatters";
 
-export default function TrainingTimeFields({ item, onFieldChange, onPersist }) {
+export default function TrainingTimeFields({ item, onFieldChange, onPersist, departmentSlug = null }) {
   return (
     <>
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
@@ -36,11 +36,15 @@ export default function TrainingTimeFields({ item, onFieldChange, onPersist }) {
             void onPersist({ ...item, training_type: nextValue });
           }}
         >
-          {TRAINING_TYPE_OPTIONS.map((option) => (
+          {getTrainingTypeOptions(departmentSlug).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
+        </SelectField>
+        <SelectField label="Platzart" required value={item.training_location_type || ""} onChange={(event) => { const value=event.target.value; onFieldChange("training_location_type", value); void onPersist({ ...item, training_location_type: value }); }}>
+          <option value="">Platzart auswählen</option>
+          {getTrainingLocationTypeOptions(departmentSlug).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         </SelectField>
 
         <InputField

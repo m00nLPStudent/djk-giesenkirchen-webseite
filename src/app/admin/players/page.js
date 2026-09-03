@@ -21,6 +21,7 @@ import PlayerNationalityList from "@/components/admin/players/stats/PlayerNation
 import { getPlayerStats } from "@/components/admin/players/stats/playerStats.helpers";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { hasManagedDepartmentRouteMismatch } from "@/lib/admin-auth/scopes/departmentManagerScope.core.mjs";
 import {
   canDeletePlayerOnServer,
   canEditPlayerOnServer,
@@ -46,6 +47,9 @@ function buildPlayerScopeMaps(readModels = new Map()) {
           name_de: assignment.teamNameDe || assignment.teamNameEn || "Keine Mannschaft",
           slug: assignment.teamSlug || null,
           age_group: assignment.ageGroup || null,
+          department_id: assignment.departmentId || null,
+          department_slug: assignment.departmentSlug || null,
+          department_name_de: assignment.departmentNameDe || null,
           is_active: assignment.isActive !== false,
         });
       }
@@ -61,7 +65,7 @@ function buildPlayerScopeMaps(readModels = new Map()) {
   return { teamIdsByPlayerId, teamById };
 }
 
-export default async function AdminPlayersPage({ searchParams }) {
+export default async function AdminPlayersPage({ searchParams, requiredDepartmentSlug = null }) {
   const params = await searchParams;
 
   const permissionResult = await assertAdminActionPermission({
@@ -75,14 +79,21 @@ export default async function AdminPlayersPage({ searchParams }) {
   const scopeContext = await loadServerPersonScopeContext(permissionResult);
   const supabaseServer = permissionResult.supabaseServer;
 
-  const { data: players } = await supabaseServer
+  const { data: requiredDepartment } = requiredDepartmentSlug
+    ? await supabaseServer.from("departments").select("id, slug").eq("slug", requiredDepartmentSlug).eq("is_active", true).maybeSingle()
+    : { data: null };
+  if (requiredDepartmentSlug && !requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-department-scope");
+  if (hasManagedDepartmentRouteMismatch(scopeContext, requiredDepartment?.id)) redirect("/admin/unauthorized?reason=missing-department-scope");
+  let playersQuery = supabaseServer
     .from("players")
     .select(
-      "id, first_name, last_name, photo_url, image_url, is_active, year_group, strong_foot, description_de, description_en, nationality, gender, birthdate, joined_at, created_at",
+      "id, first_name, last_name, photo_url, image_url, is_active, year_group, strong_foot, description_de, description_en, nationality, gender, birthdate, joined_at, created_at, department_id, departments(name_de, slug)",
     )
     .order("last_name", { ascending: true })
     .order("first_name", { ascending: true })
     .order("id", { ascending: true });
+  if (requiredDepartment?.id) playersQuery = playersQuery.eq("department_id", requiredDepartment.id);
+  const { data: players } = await playersQuery;
 
   const playerListRaw = players || [];
   const playerIds = playerListRaw.map((player) => player.id).filter(Boolean);
@@ -96,7 +107,7 @@ export default async function AdminPlayersPage({ searchParams }) {
     playerListRaw
       .filter((player) => {
         const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
-        return canViewPlayerOnServer(scopeContext, playerTeamIds, teamById);
+        return canViewPlayerOnServer(scopeContext, playerTeamIds, teamById, player);
       })
       .map((player) => {
         const playerTeamIds = teamIdsByPlayerId.get(player.id) || [];
@@ -124,15 +135,19 @@ export default async function AdminPlayersPage({ searchParams }) {
           created_at: dto.createdAt,
           nationality: dto.nationality,
           gender: dto.gender,
+          department_id: player.department_id || null,
+          department_name_de: player.departments?.name_de || null,
           _canEditInScope: canEditPlayerOnServer(
             scopeContext,
             playerTeamIds,
             teamById,
+            player,
           ),
           _canDeleteInScope: canDeletePlayerOnServer(
             scopeContext,
             playerTeamIds,
             teamById,
+            player,
           ),
         };
       }),
@@ -202,6 +217,8 @@ export default async function AdminPlayersPage({ searchParams }) {
       showHeader={false}
     >
       <AdminPlayersOverview
+        basePath={requiredDepartmentSlug ? `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/players` : "/admin/players"}
+        createHref={requiredDepartmentSlug ? `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/players/new` : "/admin/players/new"}
         players={visiblePlayers}
         initialFilters={initialFilters}
         showContributionStatus={canShowContributionStatus && !contributionSeasonWarning}

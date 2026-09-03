@@ -71,7 +71,7 @@ export async function fetchBoardMemberById(id, client = supabase) {
   return await client
     .from("board_members")
     .select(
-      "id, first_name, last_name, role_de, email, admin_profile_id, is_active",
+      "id, first_name, last_name, role_de, email, admin_profile_id, is_active, organization_scope, department_id",
     )
     .eq("id", id)
     .maybeSingle();
@@ -96,7 +96,7 @@ export async function getBoardMemberLinkForProfile(
   const result = await client
     .from("board_members")
     .select(
-      "id, first_name, last_name, role_de, email, admin_profile_id, is_active",
+      "id, first_name, last_name, role_de, email, admin_profile_id, is_active, organization_scope, department_id",
     )
     .eq("admin_profile_id", adminProfileId)
     .maybeSingle();
@@ -144,7 +144,7 @@ export async function linkBoardMemberToProfile(
     .update({ admin_profile_id: adminProfileId || null })
     .eq("id", boardMemberId)
     .select(
-      "id, first_name, last_name, role_de, email, admin_profile_id, is_active",
+      "id, first_name, last_name, role_de, email, admin_profile_id, is_active, organization_scope, department_id",
     )
     .maybeSingle();
 }
@@ -214,7 +214,7 @@ export async function listUnlinkedBoardMembers(client = getReadClient()) {
   const { data, error } = await client
     .from("board_members")
     .select(
-      "id, first_name, last_name, role_de, email, admin_profile_id, is_active",
+      "id, first_name, last_name, role_de, email, admin_profile_id, is_active, organization_scope, department_id",
     )
     .is("admin_profile_id", null)
     .order("sort_order", { ascending: true })
@@ -250,7 +250,7 @@ export async function listBoardMembersForLinking(client = getReadClient()) {
   const { data, error } = await client
     .from("board_members")
     .select(
-      "id, first_name, last_name, role_de, email, admin_profile_id, is_active",
+      "id, first_name, last_name, role_de, email, admin_profile_id, is_active, organization_scope, department_id",
     )
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });

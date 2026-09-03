@@ -6,11 +6,12 @@ const read = (path) => fs.readFileSync(new URL(path, import.meta.url), "utf8");
 const actions = read("../../../app/admin/department/board/actions.js");
 const editPage = read("../../../app/admin/department/board/edit/[id]/page.js");
 
-test("all board mutations require settings.edit before scope and persistence", () => {
-  assert.equal(actions.match(/requiredPermission: "settings\.edit"/g)?.length, 3);
+test("all board mutations require dedicated board permissions before scope and persistence", () => {
+  for (const permission of ["board.create", "board.edit", "board.delete"]) assert.match(actions, new RegExp(permission.replace(".", "\\.")));
   assert.doesNotMatch(actions, /requiredPermission:[^\n]*settings\.view/);
-  assert.match(actions, /saveBoardMemberWithScopeAction[\s\S]*requiredPermission: "settings\.edit"[\s\S]*loadServerPersonScopeContext[\s\S]*canEditBoardMemberOnServer[\s\S]*saveBoardMember/);
-  assert.match(actions, /authorizeBoardMedia[\s\S]*requiredPermission: "settings\.edit"[\s\S]*loadServerPersonScopeContext[\s\S]*canEditBoardMemberOnServer/);
+  assert.match(actions, /saveBoardMemberWithScopeAction[\s\S]*requiredPermission: boardMemberId \? "board\.edit" : "board\.create"[\s\S]*loadServerPersonScopeContext[\s\S]*canEditBoardMemberOnServer[\s\S]*saveBoardMember/);
+  assert.match(actions, /resolveBoardOrganizationTarget[\s\S]*createSupabaseAdminClient\(\)[\s\S]*saveBoardMember/);
+  assert.match(actions, /authorizeBoardMedia[\s\S]*requiredPermission: boardMemberId \? "board\.edit" : "board\.create"[\s\S]*loadServerPersonScopeContext[\s\S]*canEditBoardMemberOnServer/);
 });
 
 test("picker, upload and media removal share the hardened mutation authorization", () => {
@@ -19,13 +20,13 @@ test("picker, upload and media removal share the hardened mutation authorization
   assert.match(actions, /saveBoardMemberWithScopeAction[\s\S]*synchronizeMediaAssignment\("board_member"/);
 });
 
-test("read-only board detail retains settings.view while mutation controls retain edit", () => {
-  assert.match(editPage, /requiredPermission: "settings\.view"/);
-  assert.match(editPage, /Can permission="settings\.edit"/);
+test("read-only board detail and mutation controls use board permissions", () => {
+  assert.match(editPage, /requiredPermission: "board\.view"/);
+  assert.match(editPage, /Can permission="board\.delete"/);
 });
 
 test("delete remains edit-and-scope protected before the admin client", () => {
-  assert.match(actions, /removeBoardMemberWithScopeAction[\s\S]*requiredPermission: "settings\.edit"[\s\S]*loadServerPersonScopeContext[\s\S]*canDeleteBoardMemberOnServer[\s\S]*createSupabaseAdminClient/);
+  assert.match(actions, /removeBoardMemberWithScopeAction[\s\S]*requiredPermission: "board\.delete"[\s\S]*loadServerPersonScopeContext[\s\S]*canDeleteBoardMemberOnServer[\s\S]*createSupabaseAdminClient/);
   assert.doesNotMatch(actions, /remove_entity|\.rpc\(/);
 });
 

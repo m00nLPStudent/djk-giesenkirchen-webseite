@@ -12,8 +12,9 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import { redirect } from "next/navigation";
 import { canManageMedia, loadMediaAssetForPicker, loadMediaAssetsForPicker } from "@/components/admin/media-library/media.service";
 import { loadActiveTeamDepartments } from "@/components/admin/teams/services/teamDepartments.repository";
+import { loadTeamTypes } from "@/components/admin/settings/team-types/teamTypes.repository";
 
-export default async function EditTeamPage({ params }) {
+export default async function EditTeamPage({ params, requiredDepartmentSlug = null }) {
   const { id } = await params;
 
   const permissionResult = await assertAdminActionPermission({
@@ -36,6 +37,11 @@ export default async function EditTeamPage({ params }) {
   if (!team || !canAccessTeamOnServer(scopeContext, team)) {
     redirect("/admin/unauthorized?reason=missing-team-scope");
   }
+  const { data: requiredDepartment } = requiredDepartmentSlug
+    ? await supabaseServer.from("departments").select("id").eq("slug", requiredDepartmentSlug).eq("is_active", true).maybeSingle()
+    : { data: null };
+  if (requiredDepartmentSlug && team.department_id !== requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-team-scope");
+  const basePath = requiredDepartmentSlug ? `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/teams` : "/admin/teams";
 
   const { data: seasons } = await supabaseServer
     .from("seasons")
@@ -43,8 +49,12 @@ export default async function EditTeamPage({ params }) {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
   const { data: departments } = await loadActiveTeamDepartments(supabaseServer);
+  const { data: teamTemplates } = await loadTeamTypes(supabaseServer, { activeOnly: true, departmentId: team.department_id });
+  const scopedDepartments = scopeContext.managedDepartmentId
+    ? (departments || []).filter((department) => department.id === scopeContext.managedDepartmentId)
+    : (departments || []);
 
-  const coachEditData = await loadTeamEditCoachData(supabaseServer, id);
+  const coachEditData = await loadTeamEditCoachData(supabaseServer, id, team.department_id);
   const teamSeasons = coachEditData.teamSeasons;
 
   const ids = (teamSeasons || []).map((item) => item.id);
@@ -56,7 +66,7 @@ export default async function EditTeamPage({ params }) {
         .in("team_season_id", ids)
     : { data: [] };
 
-  const players = await loadTeamEditPlayerOptions(supabaseServer, id);
+  const players = await loadTeamEditPlayerOptions(supabaseServer, id, team.department_id);
   const teamMedia = await loadMediaAssetForPicker(team.team_image_media_asset_id);
   const teamContactMedia = await loadMediaAssetForPicker(team.contact_image_media_asset_id);
   const seasonMedia = await loadMediaAssetsForPicker((teamSeasons || []).flatMap((item) => [item.team_image_media_asset_id, item.contact_image_media_asset_id]));
@@ -71,13 +81,14 @@ export default async function EditTeamPage({ params }) {
   return (
     <AdminLayout title="Mannschaft bearbeiten" subtitle="Mannschaften" showHeader={false}>
       <AdminModulePage>
-      <AdminBackLink href={`/admin/teams/${id}`}>Zurück zu Mannschaftsdetails</AdminBackLink>
+      <AdminBackLink href={`${basePath}/${id}`}>Zurück zu Mannschaftsdetails</AdminBackLink>
       <AdminModuleHeader eyebrow="Mannschaften" title="Mannschaft bearbeiten" description="Mannschaft und Saisonzuordnungen bearbeiten." />
       <TeamScopeGate team={team}>
         <AdminTeamsForm
           team={team}
           seasons={seasons || []}
-          departments={departments || []}
+          departments={scopedDepartments}
+          teamTemplates={teamTemplates || []}
           teamSeasons={teamSeasons || []}
           players={players || []}
           coaches={coachEditData.coaches || []}
@@ -92,6 +103,7 @@ export default async function EditTeamPage({ params }) {
           initialTeamContactMedia={initialTeamContactMedia}
           initialSeasonMediaByTeamSeasonId={initialSeasonMediaByTeamSeasonId}
           initialSeasonContactMediaByTeamSeasonId={initialSeasonContactMediaByTeamSeasonId}
+          returnPath={basePath}
         />
       </TeamScopeGate>
       </AdminModulePage>

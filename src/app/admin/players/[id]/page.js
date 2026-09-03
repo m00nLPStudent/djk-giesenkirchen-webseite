@@ -25,7 +25,7 @@ import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentS
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminPlayerDetailPage({ params }) {
+export default async function AdminPlayerDetailPage({ params, requiredDepartmentSlug = null }) {
   const { id } = await params;
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: "players.view",
@@ -41,7 +41,7 @@ export default async function AdminPlayerDetailPage({ params }) {
   const { data: player } = await supabaseServer
     .from("players")
     .select(
-      "id, first_name, last_name, image_url, photo_url, is_active, description_de, description_en, birthdate, joined_at, year_group, strong_foot, nationality, gender, created_at",
+      "id, first_name, last_name, image_url, photo_url, is_active, description_de, description_en, birthdate, joined_at, year_group, strong_foot, strong_hand, nationality, gender, created_at, department_id",
     )
     .eq("id", id)
     .maybeSingle();
@@ -52,8 +52,13 @@ export default async function AdminPlayerDetailPage({ params }) {
 
   const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(supabaseServer, [id]);
   const playerTeamIds = teamIdsByPlayerId.get(id) || [];
+  const { data: requiredDepartment } = requiredDepartmentSlug
+    ? await supabaseServer.from("departments").select("id").eq("slug", requiredDepartmentSlug).eq("is_active", true).maybeSingle()
+    : { data: null };
+  if (requiredDepartmentSlug && player.department_id !== requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-player-scope");
+  const basePath = requiredDepartmentSlug ? `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/players` : "/admin/players";
 
-  if (!canViewPlayerOnServer(scopeContext, playerTeamIds, teamById)) {
+  if (!canViewPlayerOnServer(scopeContext, playerTeamIds, teamById, player)) {
     redirect("/admin/unauthorized?reason=missing-player-scope");
   }
 
@@ -88,7 +93,7 @@ export default async function AdminPlayerDetailPage({ params }) {
         )
       : null;
   const canEdit = permissionResult.permissions.includes("players.edit")
-    ? canEditPlayerOnServer(scopeContext, playerTeamIds, teamById)
+    ? canEditPlayerOnServer(scopeContext, playerTeamIds, teamById, player)
     : false;
   const canArchive = permissionResult.permissions.includes("players.delete")
     ? canDeletePlayerOnServer(scopeContext, playerTeamIds, teamById)
@@ -110,6 +115,8 @@ export default async function AdminPlayerDetailPage({ params }) {
           contributionStatus={contributionStatus}
           contributionVisibility={contributionVisibility}
           contributionSeasonWarning={contributionSeasonWarning}
+          basePath={basePath}
+          sportContext={requiredDepartmentSlug === "tischtennis" ? "table_tennis" : requiredDepartmentSlug === "fussball" ? "football" : "global"}
         />
       </div>
     </AdminLayout>

@@ -13,8 +13,12 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import { loadTeamTypes } from "@/components/admin/settings/team-types/teamTypes.repository";
 import { loadActiveTeamDepartments } from "@/components/admin/teams/services/teamDepartments.repository";
 import { redirect } from "next/navigation";
+import { hasManagedDepartmentRouteMismatch } from "@/lib/admin-auth/scopes/departmentManagerScope.core.mjs";
 
-export default async function NewTeamPage() {
+export default async function NewTeamPage({ searchParams, departmentSlug = "fussball" } = {}) {
+  const params = await searchParams;
+  const requiredDepartmentSlug = departmentSlug || (params?.department === "tischtennis" ? "tischtennis" : null);
+  const returnPath = requiredDepartmentSlug ? `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/teams` : "/admin/teams";
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: "teams.create",
   });
@@ -31,7 +35,7 @@ export default async function NewTeamPage() {
 
   const { data: scopedTeamsRaw } = await supabaseServer
     .from("teams")
-    .select("id, age_group, name_de");
+    .select("id, age_group, name_de, department_id");
   const scopedTeams = filterScopedTeamsOnServer(
     scopeContext,
     scopedTeamsRaw || [],
@@ -44,8 +48,17 @@ export default async function NewTeamPage() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
 
-  const { data: teamTemplates } = await loadTeamTypes(supabaseServer, { activeOnly: true });
   const { data: departments } = await loadActiveTeamDepartments(supabaseServer);
+  const requiredDepartment = requiredDepartmentSlug
+    ? (departments || []).find((department) => department.slug === requiredDepartmentSlug)
+    : null;
+  if (requiredDepartmentSlug && !requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-department-scope");
+  if (hasManagedDepartmentRouteMismatch(scopeContext, requiredDepartment?.id)) redirect("/admin/unauthorized?reason=missing-department-scope");
+  const effectiveDepartmentId = requiredDepartment?.id || scopeContext.managedDepartmentId;
+  const { data: teamTemplates } = await loadTeamTypes(supabaseServer, { activeOnly: true, departmentId: effectiveDepartmentId || null });
+  const scopedDepartments = effectiveDepartmentId
+    ? (departments || []).filter((department) => department.id === effectiveDepartmentId)
+    : (departments || []);
 
   const filteredTeamTemplates = canReachTeamCreateOnServer(scopeContext)
     ? (teamTemplates || []).filter((template) => {
@@ -53,7 +66,7 @@ export default async function NewTeamPage() {
           return isYouthTeam(template);
         }
 
-        return true;
+        return !effectiveDepartmentId || template.department_id === effectiveDepartmentId;
       })
     : [];
 
@@ -70,22 +83,24 @@ export default async function NewTeamPage() {
   coachesQuery = coachesQuery.or(coachScopeFilter);
 
   const [players, { data: coaches }] = await Promise.all([
-    loadTeamEditPlayerOptions(supabaseServer),
+    loadTeamEditPlayerOptions(supabaseServer, null, effectiveDepartmentId || null),
     coachesQuery,
   ]);
 
   return (
     <AdminLayout title="Neue Mannschaft" subtitle="Mannschaften" showHeader={false}>
       <AdminModulePage>
-      <AdminBackLink href="/admin/teams">Zurück zu Mannschaften</AdminBackLink>
+      <AdminBackLink href={returnPath}>Zurück zu Mannschaften</AdminBackLink>
       <AdminModuleHeader eyebrow="Mannschaften" title="Neue Mannschaft" description="Mannschaft und Saisonzuordnung anlegen." />
       <TeamScopeGate requireCreateScope>
         <AdminTeamsForm
+          team={effectiveDepartmentId ? { department_id: effectiveDepartmentId } : undefined}
           seasons={seasons || []}
-          departments={departments || []}
+          departments={scopedDepartments}
           teamTemplates={filteredTeamTemplates}
           players={players || []}
           coaches={coaches || []}
+          returnPath={returnPath}
         />
       </TeamScopeGate>
       </AdminModulePage>

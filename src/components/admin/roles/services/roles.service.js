@@ -1,6 +1,7 @@
 import {
   loadAdminPermissions,
   loadAdminRoles,
+  loadUserRoles,
 } from "@/lib/admin-auth/adminAuth.service";
 import {
   buildRlsHint,
@@ -101,6 +102,11 @@ export async function getAdminRolesPageData() {
         totalPermissions: 0,
       },
     };
+  }
+
+  const currentRoles = await loadUserRoles(authState.user?.id);
+  if (!currentRoles.some((role) => role?.key === "superadmin" && role?.is_active !== false)) {
+    throw new Error("Dieser Systembereich ist ausschließlich für Superadmins verfügbar.");
   }
 
   const [

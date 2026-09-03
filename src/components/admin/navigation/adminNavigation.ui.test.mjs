@@ -20,6 +20,7 @@ const permissions = [...new Set(activeItems.flatMap((item) => [
 const baseDto = resolveAdminNavigation({
   sections: ADMIN_NAVIGATION_SECTIONS,
   permissionKeys: permissions,
+  roleKeys: ["superadmin"],
   scopeContext: { isGlobal: true, roleScopeTypes: ["global"] },
 });
 
@@ -51,7 +52,7 @@ test("all configured icon keys resolve and unknown keys use a fallback", () => {
 
 test("active route is derived from B15.2 matching without mutating the DTO", () => {
   const before = JSON.stringify(baseDto);
-  const playerDto = applyActivePathToNavigationDto(baseDto, "/admin/players/new");
+  const playerDto = applyActivePathToNavigationDto(baseDto, "/admin/football/players/new");
   assert.equal(playerDto.activeSectionKey, "football");
   assert.equal(playerDto.activeItemKey, "players");
   assert.equal(JSON.stringify(baseDto), before);
@@ -66,7 +67,7 @@ test("active mobile section starts expanded and focus navigation wraps", () => {
 });
 
 test("moved routes activate their new sections on desktop and mobile", () => {
-  const department = applyActivePathToNavigationDto(baseDto, "/admin/department/board/edit/test-id");
+  const department = applyActivePathToNavigationDto(baseDto, "/admin/football/board/edit/test-id");
   assert.equal(department.activeSectionKey, "football");
   assert.equal(department.activeItemKey, "department");
   const users = applyActivePathToNavigationDto(baseDto, "/admin/users");
@@ -77,6 +78,9 @@ test("moved routes activate their new sections on desktop and mobile", () => {
   const emailSettings = applyActivePathToNavigationDto(superadminDto, "/admin/system/notification-email-settings");
   assert.equal(emailSettings.activeSectionKey, "system");
   assert.equal(emailSettings.activeItemKey, "notification-email-settings");
+  const structure = applyActivePathToNavigationDto(superadminDto, "/admin/system/structure");
+  assert.equal(structure.activeSectionKey, "system");
+  assert.equal(structure.activeItemKey, "structure-assignment");
 });
 
 test("runtime DTO has no planned links and no auth or service data", () => {

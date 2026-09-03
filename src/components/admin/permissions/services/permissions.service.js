@@ -11,6 +11,14 @@ import {
   toAdminError,
 } from "@/lib/admin-auth/adminDiagnostics";
 import { fetchAllRolePermissionLinks } from "@/lib/admin-auth/adminPermissions.repository";
+import { loadUserRoles } from "@/lib/admin-auth/adminAuth.service";
+
+async function assertBrowserSuperadmin(userId) {
+  const roles = await loadUserRoles(userId);
+  if (!roles.some((role) => role?.key === "superadmin" && role?.is_active !== false)) {
+    throw new Error("Dieser Systembereich ist ausschließlich für Superadmins verfügbar.");
+  }
+}
 
 function buildLookup(items = []) {
   return new Map((items || []).map((item) => [item.id, item]));
@@ -70,6 +78,8 @@ export async function getAdminPermissionsPageData() {
       },
     };
   }
+
+  await assertBrowserSuperadmin(authState.user?.id);
 
   const [permissions, roles, { data: links, error: linksError }] =
     await Promise.all([
@@ -181,6 +191,8 @@ export async function getPermissionMatrixPageData() {
       },
     };
   }
+
+  await assertBrowserSuperadmin(authState.user?.id);
 
   const [permissions, roles, { data: links, error: linksError }] =
     await Promise.all([

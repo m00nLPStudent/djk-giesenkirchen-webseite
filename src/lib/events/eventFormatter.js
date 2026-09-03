@@ -11,13 +11,17 @@ export function getTrainingTypeLabel(type = "training") {
     training: "Training",
     spiel: "Spiel",
     torwart: "Torwarttraining",
-    foerdertraining: "Foerdertraining",
+    foerdertraining: "Fördertraining",
     athletik: "Athletik",
     hallentraining: "Hallentraining",
     sonstiges: "Termin",
   };
 
   return map[type] || "Training";
+}
+
+export function getTrainingLocationTypeLabel(type) {
+  return ({ kleinfeld: "Kleinfeld", rasenplatz: "Rasenplatz", kunstrasen: "Kunstrasen", halle: "Halle" })[type] || null;
 }
 
 export function formatEventDate(value, locale = "de-DE") {

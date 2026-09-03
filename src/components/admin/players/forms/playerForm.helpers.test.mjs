@@ -105,24 +105,24 @@ test("createInitialPlayerForm still keeps master-only player fields", () => {
   assert.equal(form.birthdate, "2012-04-15");
 });
 
-test("getPlayerFormBlockingMessage blocks missing current season", () => {
+test("getPlayerFormBlockingMessage permits master edits without a current season", () => {
   const message = getPlayerFormBlockingMessageData(
     { activeSeasonStatus: CURRENT_SEASON_STATUSES.MISSING, teamOptions: [] },
     null,
     CURRENT_SEASON_STATUSES,
   );
 
-  assert.match(message, /keine aktuelle Saison/i);
+  assert.equal(message, null);
 });
 
-test("getPlayerFormBlockingMessage blocks ambiguous current season", () => {
+test("getPlayerFormBlockingMessage permits master edits with an ambiguous season", () => {
   const message = getPlayerFormBlockingMessageData(
     { activeSeasonStatus: CURRENT_SEASON_STATUSES.AMBIGUOUS, teamOptions: [] },
     null,
     CURRENT_SEASON_STATUSES,
   );
 
-  assert.match(message, /mehrere aktuelle Saisons/i);
+  assert.equal(message, null);
 });
 
 test("getPlayerFormBlockingMessage blocks multiple active assignments", () => {
@@ -148,5 +148,6 @@ test("getPlayerFormWarningMessage explains an empty current-season assignment st
   );
 
   assert.match(message, /keine aktive Mannschaftszuordnung/i);
+  assert.match(message, /optional/i);
   assert.doesNotMatch(message, /players\\.team_id/i);
 });

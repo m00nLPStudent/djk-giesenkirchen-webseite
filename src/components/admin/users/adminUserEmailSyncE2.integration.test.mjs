@@ -12,7 +12,7 @@ const deliveryRepository = read(
 );
 
 test("email request action is server-authorized and superadmin-only", () => {
-  assert.match(actions, /assertAdminActionPermission\([\s\S]*users\.edit/);
+  assert.match(actions, /assertSuperadminActionPermission\([\s\S]*users\.edit/);
   assert.match(actions, /role\?\.key === "superadmin"/);
   assert.match(actions, /requestAdminEmailChange\(\{[\s\S]*targetUserId: userId/);
   assert.match(actions, /Du bist für diese Änderung nicht berechtigt/);

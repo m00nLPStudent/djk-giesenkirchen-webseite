@@ -2,7 +2,7 @@ import { FormSection, TextareaField } from "@/components/admin/forms";
 import TrainingExceptionsManager from "../../components/TrainingExceptionsManager";
 import TrainingTimesManager from "../../components/TrainingTimesManager";
 
-export default function TeamTrainingTab({ form, onFieldChange }) {
+export default function TeamTrainingTab({ form, onFieldChange, departmentSlug = null }) {
   return (
     <FormSection eyebrow="Training" title="Trainingszeiten & Ausnahmen">
       <div className="space-y-8">
@@ -15,17 +15,9 @@ export default function TeamTrainingTab({ form, onFieldChange }) {
               onFieldChange("training_times_de", event.target.value)
             }
           />
-          <TextareaField
-            label="Trainingszeiten Englisch"
-            rows={5}
-            value={form.training_times_en}
-            onChange={(event) =>
-              onFieldChange("training_times_en", event.target.value)
-            }
-          />
         </div>
 
-        <TrainingTimesManager teamSeasonId={form.team_season_id} />
+        <TrainingTimesManager teamSeasonId={form.team_season_id} departmentSlug={departmentSlug} />
         <TrainingExceptionsManager teamSeasonId={form.team_season_id} />
       </div>
     </FormSection>

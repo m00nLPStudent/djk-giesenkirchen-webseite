@@ -27,6 +27,7 @@ export function createInitialPlayerFormData(
     birthdate: player?.birthdate || "",
     joined_at: player?.joined_at || "",
     strong_foot: player?.strong_foot || "",
+    strong_hand: player?.strong_hand || "",
     nationality: player?.nationality || "",
     gender: player?.gender || "",
     assignment_sort_order: primaryAssignment?.sortOrder ?? 0,
@@ -54,27 +55,8 @@ export function getPlayerFormBlockingMessageData(
   playerSeasonalReadModel,
   currentSeasonStatuses,
 ) {
-  if (
-    teamOptionsResult?.activeSeasonStatus === currentSeasonStatuses.MISSING
-  ) {
-    return "Es ist keine aktuelle Saison markiert. Das Spielerformular kann derzeit keine gueltige Mannschaftszuordnung speichern.";
-  }
-
-  if (
-    teamOptionsResult?.activeSeasonStatus === currentSeasonStatuses.AMBIGUOUS
-  ) {
-    return "Es sind mehrere aktuelle Saisons markiert. Bitte bereinige die Saisonkonfiguration, bevor Spieler gespeichert werden.";
-  }
-
   if (playerSeasonalReadModel?.hasMultipleActiveAssignments) {
     return "Dieser Spieler hat mehrere aktive Zuordnungen in der aktuellen Saison. Das Speichern wird blockiert, bis der Konflikt bereinigt ist.";
-  }
-
-  if (
-    teamOptionsResult?.activeSeasonStatus === currentSeasonStatuses.RESOLVED &&
-    (teamOptionsResult?.teamOptions || []).length === 0
-  ) {
-    return "Es stehen in der aktuellen Saison keine aktiven Mannschaften innerhalb deines Scopes zur Verfuegung.";
   }
 
   return null;
@@ -90,7 +72,7 @@ export function getPlayerFormWarningMessageData(
     playerSeasonalReadModel.activeSeasonStatus ===
       currentSeasonStatuses.RESOLVED
   ) {
-    return "Dieser Spieler hat aktuell keine aktive Mannschaftszuordnung in der laufenden Saison. Bitte waehle die gewuenschte Mannschaft bewusst aus.";
+    return "Dieser Spieler hat aktuell keine aktive Mannschaftszuordnung in der laufenden Saison. Die Zuordnung ist optional und kann spaeter erfolgen.";
   }
 
   return null;

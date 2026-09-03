@@ -7,7 +7,7 @@ import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminD
 import CoachAvatar from "./CoachAvatar";
 import CoachStatusBadge from "./CoachStatusBadge";
 
-export default function CoachDetailOverview({ coach, notes = "", canArchive = false }) {
+export default function CoachDetailOverview({ coach, notes = "", canArchive = false, returnPath = "/admin/coaches" }) {
   const name = coach.displayName || "Trainer";
   const assignments = coach.assignments || [];
   const formatDate = (value) => value ? new Intl.DateTimeFormat("de-DE").format(new Date(value)) : "–";
@@ -16,7 +16,7 @@ export default function CoachDetailOverview({ coach, notes = "", canArchive = fa
 
   return (
     <AdminDetailLayout
-      header={<AdminDetailHeader backHref="/admin/coaches" backLabel="Zurück zu Trainern" backVariant="pill" eyebrow="Trainer" title={name} status={<CoachStatusBadge active={coach.isActive} />} statusPlacement="below" meta={assignmentMeta} leading={<CoachAvatar coach={coach} sizeClassName="h-16 w-16" />} variant="hero" actions={<AdminActionBar><AdminButton href="#coach-edit-form" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />}
+      header={<AdminDetailHeader backHref={returnPath} backLabel="Zurück zu Trainern" backVariant="pill" eyebrow="Trainer" title={name} status={<CoachStatusBadge active={coach.isActive} />} statusPlacement="below" meta={assignmentMeta} leading={<CoachAvatar coach={coach} sizeClassName="h-16 w-16" />} variant="hero" actions={<AdminActionBar><AdminButton href="#coach-edit-form" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />}
       dangerZone={dangerZone}
     >
       <AdminInformationSection title="Persönliche Daten"><AdminInformationRow label="Vorname">{coach.firstName}</AdminInformationRow><AdminInformationRow label="Nachname">{coach.lastName}</AdminInformationRow><AdminInformationRow label="Anzeigename">{name}</AdminInformationRow><AdminInformationRow label="Nationalität">{coach.nationality}</AdminInformationRow><AdminInformationRow label="Geburtsdatum">{formatDate(coach.birthDate)}</AdminInformationRow><AdminInformationRow label="Eintrittsdatum">{formatDate(coach.joinedAt)}</AdminInformationRow><AdminInformationRow label="Status">{coach.isActive ? "Aktiv" : "Inaktiv"}</AdminInformationRow></AdminInformationSection>

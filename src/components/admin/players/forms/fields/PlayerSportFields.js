@@ -25,12 +25,6 @@ export default function PlayerSportFields({
         ))}
       </SelectField>
 
-      <InputField
-        label="Position Englisch"
-        placeholder="z. B. Attack"
-        value={form.position_en}
-        onChange={(event) => updateField("position_en", event.target.value)}
-      />
     </FormGrid>
   );
 }

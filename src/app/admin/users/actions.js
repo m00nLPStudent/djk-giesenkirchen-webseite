@@ -19,14 +19,14 @@ import {
   withRlsHint,
 } from "@/components/admin/users/services/usersActionWriteHelpers";
 import { createAdminUserWithInvite } from "@/lib/admin-auth/adminUserCreate.service";
-import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { assertSuperadminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { previewProfileCardEmailMatches } from "@/lib/admin-auth/profileCardLinkMatching.service";
 import { applyCardLinkChanges } from "./actions.cardLinks";
 import { requestAdminEmailChange } from "@/lib/admin-auth/adminEmailChange.service";
 
 export async function requestAdminUserEmailChangeAction({ userId, email }) {
   const supabaseServer = await createServerActionSupabaseClient();
-  const actorContext = await assertAdminActionPermission({
+  const actorContext = await assertSuperadminActionPermission({
     requiredPermission: "users.edit",
     supabaseServer,
   });
@@ -72,7 +72,7 @@ export async function requestAdminUserEmailChangeAction({ userId, email }) {
 export async function saveAdminUserAction({ userId, values, currentUserId }) {
   const supabaseServer = await createServerActionSupabaseClient();
   const requiredPermission = userId ? "users.edit" : "users.create";
-  const actorContext = await assertAdminActionPermission({
+  const actorContext = await assertSuperadminActionPermission({
     requiredPermission,
     supabaseServer,
   });
@@ -262,7 +262,7 @@ export async function saveAdminUserAction({ userId, values, currentUserId }) {
 
 export async function previewProfileCardEmailMatchesAction({ adminProfileId }) {
   const supabaseServer = await createServerActionSupabaseClient();
-  const actorContext = await assertAdminActionPermission({
+  const actorContext = await assertSuperadminActionPermission({
     requiredPermission: "users.edit",
     supabaseServer,
   });
@@ -307,7 +307,7 @@ export async function previewProfileCardEmailMatchesAction({ adminProfileId }) {
 export async function updateAdminUserStatusAction({ userId, isActive }) {
   try {
     const supabaseServer = await createServerActionSupabaseClient();
-    const actorContext = await assertAdminActionPermission({
+    const actorContext = await assertSuperadminActionPermission({
       requiredPermission: "users.edit",
       supabaseServer,
     });

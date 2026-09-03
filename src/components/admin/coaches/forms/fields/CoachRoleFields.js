@@ -5,7 +5,7 @@ import {
   InputField,
   SelectField,
 } from "@/components/admin/forms";
-import { coachLicenses, coachRoles } from "../../constants/CoachOptions";
+import { coachLicenses, coachRoles, tableTennisCoachLicenses } from "../../constants/CoachOptions";
 import { createCoachAssignment } from "../coachForm.helpers";
 
 function updateAssignment(assignments, index, field, value) {
@@ -18,6 +18,13 @@ function removeAssignment(assignments, index) {
   return assignments.filter((_, assignmentIndex) => assignmentIndex !== index);
 }
 
+function rolesForAssignment(assignment, teamOptions) {
+  const option = teamOptions.find((item) => item.teamSeasonId === assignment.team_season_id);
+  const relation = option?.team?.departments;
+  const slug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
+  return slug === "tischtennis" ? coachRoles.filter((role) => role !== "Torwarttrainer") : coachRoles;
+}
+
 export default function CoachRoleFields({
   form,
   errors,
@@ -25,6 +32,7 @@ export default function CoachRoleFields({
   blockingMessage,
   setForm,
   updateField,
+  sportContext = "football",
 }) {
   const assignments = form.assignments || [];
 
@@ -39,7 +47,7 @@ export default function CoachRoleFields({
           error={errors.role}
         >
           <option value="">Funktion auswaehlen</option>
-          {coachRoles.map((role) => (
+          {(sportContext === "table_tennis" ? coachRoles.filter((role) => role !== "Torwarttrainer") : coachRoles).map((role) => (
             <option key={role} value={role}>
               {role}
             </option>
@@ -51,7 +59,7 @@ export default function CoachRoleFields({
           value={form.license}
           onChange={(event) => updateField("license", event.target.value)}
         >
-          {coachLicenses.map((license) => (
+          {(sportContext === "table_tennis" ? tableTennisCoachLicenses : coachLicenses).map((license) => (
             <option key={license} value={license}>
               {license}
             </option>
@@ -171,7 +179,7 @@ export default function CoachRoleFields({
                     }
                   >
                     <option value="">Rolle auswaehlen</option>
-                    {coachRoles.map((role) => (
+                    {rolesForAssignment(assignment, teamOptions).map((role) => (
                       <option key={role} value={role}>
                         {role}
                       </option>

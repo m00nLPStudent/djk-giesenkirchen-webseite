@@ -6,6 +6,7 @@ export default function PlayerBasicFields({
   errors,
   teamOptions,
   updateField,
+  sportContext = "football",
 }) {
   return (
     <div className="space-y-4">
@@ -31,8 +32,7 @@ export default function PlayerBasicFields({
 
       <FormGrid>
         <SelectField
-          label="Mannschaft"
-          required
+          label="Mannschaft (optional)"
           value={form.team_season_id}
           onChange={(event) =>
             updateField("team_season_id", event.target.value)
@@ -41,7 +41,7 @@ export default function PlayerBasicFields({
         >
           <option value="">
             {teamOptions.length > 0
-              ? "Mannschaft auswählen"
+              ? "Keine Mannschaft"
               : "Keine Mannschaft verfügbar"}
           </option>
           {teamOptions.map((teamOption) => (
@@ -54,13 +54,15 @@ export default function PlayerBasicFields({
           ))}
         </SelectField>
 
-        <InputField
-          label="Rückennummer"
-          type="number"
-          placeholder="z. B. 10"
-          value={form.shirt_number}
-          onChange={(event) => updateField("shirt_number", event.target.value)}
-        />
+        {sportContext !== "table_tennis" ? (
+          <InputField
+            label="Rückennummer"
+            type="number"
+            placeholder="z. B. 10"
+            value={form.shirt_number}
+            onChange={(event) => updateField("shirt_number", event.target.value)}
+          />
+        ) : null}
       </FormGrid>
     </div>
   );

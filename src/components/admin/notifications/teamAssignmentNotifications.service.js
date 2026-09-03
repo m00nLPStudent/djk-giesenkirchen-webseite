@@ -84,7 +84,7 @@ export async function notifyPlayerAssignmentChange({ player, change, actorUserId
   const target = change.targetAssignment;
   if (previous && previous.teamSeasonId !== target?.teamSeasonId) events.push(buildPlayerRemovedNotification({ player, assignment: previous, assignmentId: previous.playerTeamSeasonId }));
   if (target && (!previous || previous.teamSeasonId !== target.teamSeasonId)) events.push(buildPlayerAssignedNotification({ player, assignment: target, assignmentId: change.assignmentId }));
-  else events.push(buildPlayerUpdatedNotification({ player, assignment: target, assignmentId: change.assignmentId }));
+  else if (target) events.push(buildPlayerUpdatedNotification({ player, assignment: target, assignmentId: change.assignmentId }));
   const db = createSupabaseAdminClient();
   if (!db) return { delivered: 0, skipped: events.length, error: new Error("Notification-Service-Client ist nicht konfiguriert.") };
   const recipients = await recipientMapForEvents(db, events, actorUserId);

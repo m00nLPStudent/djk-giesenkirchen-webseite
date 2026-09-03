@@ -20,3 +20,4 @@ export const coachLicenses = [
   "Torwarttrainer A-Lizenz",
   "Fußball-Lehrer",
 ];
+export const tableTennisCoachLicenses = ["Keine Lizenz", "STARTTER", "Trainer C – Breitensport", "Trainer B – Leistungssport", "Trainer A – Leistungssport"];

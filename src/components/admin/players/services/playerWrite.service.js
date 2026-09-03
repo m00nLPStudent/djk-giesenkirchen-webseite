@@ -64,6 +64,7 @@ async function applyAssignmentRollbackPlan(db, rollbackPlan = []) {
 }
 
 function buildTargetAssignment(player, targetTeamSeasonOption) {
+  if (!targetTeamSeasonOption) return null;
   return {
     teamSeasonId: targetTeamSeasonOption.teamSeasonId,
     shirtNumber: player?.shirt_number,
@@ -115,6 +116,16 @@ async function applyEditAssignment(db, playerId, decision, assignmentPayload) {
         reactivatedIds: [],
         insertedIds: [],
         deactivatedIds: [],
+      };
+    }
+
+    if (decision.operation === PLAYER_ASSIGNMENT_OPERATIONS.DEACTIVATE) {
+      return {
+        error: null,
+        updatedIds: [],
+        reactivatedIds: [],
+        insertedIds: [],
+        deactivatedIds: [assignmentId],
       };
     }
 
@@ -173,11 +184,11 @@ async function applyEditAssignment(db, playerId, decision, assignmentPayload) {
 export async function savePlayer(
   player,
   id = null,
-  { client = null, targetTeamSeasonOption = null } = {},
+  { client = null, targetTeamSeasonOption = null, activeSeasonId = null } = {},
 ) {
   const db = resolveClient(client);
 
-  if (!targetTeamSeasonOption?.teamSeasonId || !targetTeamSeasonOption?.seasonId) {
+  if (targetTeamSeasonOption && (!targetTeamSeasonOption.teamSeasonId || !targetTeamSeasonOption.seasonId)) {
     return {
       data: null,
       error: createServiceError(
@@ -190,14 +201,17 @@ export async function savePlayer(
   const masterPayload = buildPlayerMasterPayload(player, {
     placeholderImage: PLAYER_PLACEHOLDER_IMAGE,
   });
-  const assignmentPayload = buildPlayerAssignmentPayload(
-    player,
-    targetTeamSeasonOption,
-  );
+  const assignmentPayload = targetTeamSeasonOption
+    ? buildPlayerAssignmentPayload(player, targetTeamSeasonOption)
+    : null;
 
   if (!id) {
     const playerResult = await insertPlayerMaster(db, masterPayload);
     if (playerResult.error) return playerResult;
+
+    if (!targetTeamSeasonOption) {
+      return { ...playerResult, assignmentChange: null };
+    }
 
     const assignmentResult = await insertPlayerAssignment(
       db,
@@ -229,11 +243,11 @@ export async function savePlayer(
     };
   }
 
-  const existingAssignmentsResult = await loadPlayerCurrentSeasonAssignmentRows(
-    db,
-    id,
-    targetTeamSeasonOption.seasonId,
-  );
+  const assignmentSeasonId = targetTeamSeasonOption?.seasonId || activeSeasonId;
+  if (!assignmentSeasonId) {
+    return { ...(await updatePlayerMaster(db, id, masterPayload)), assignmentChange: null };
+  }
+  const existingAssignmentsResult = await loadPlayerCurrentSeasonAssignmentRows(db, id, assignmentSeasonId);
   if (existingAssignmentsResult.error) {
     return { data: null, error: existingAssignmentsResult.error };
   }

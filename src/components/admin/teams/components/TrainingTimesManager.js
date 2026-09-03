@@ -15,7 +15,7 @@ import {
   toTimeValue,
 } from "../training/trainingFormatters";
 
-export default function TrainingTimesManager({ teamSeasonId }) {
+export default function TrainingTimesManager({ teamSeasonId, departmentSlug = null }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -216,6 +216,7 @@ export default function TrainingTimesManager({ teamSeasonId }) {
       </div>
 
       <TrainingTimesCreatePanel
+        departmentSlug={departmentSlug}
         draft={draft}
         selectedWeekdays={selectedWeekdays}
         isOpen={isCreateOpen}
@@ -256,6 +257,7 @@ export default function TrainingTimesManager({ teamSeasonId }) {
 
           return (
             <TrainingTimeCard
+              departmentSlug={departmentSlug}
               key={item.id}
               item={item}
               isHighlighted={isHighlighted}

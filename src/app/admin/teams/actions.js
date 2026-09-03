@@ -61,6 +61,14 @@ async function loadAuthorizedTeamMutationContext(requiredPermission) {
   };
 }
 
+async function hasPersonsWithoutDepartmentAssignment(db, table, personColumn, personIds, departmentId) {
+  if (!personIds?.length) return false;
+  const result = await db.from(table).select(`${personColumn}, team_seasons!inner(teams!inner(department_id))`).in(personColumn, personIds).eq("is_active", true);
+  if (result.error) throw result.error;
+  const matching = new Set((result.data || []).filter((row) => row.team_seasons?.teams?.department_id === departmentId).map((row) => row[personColumn]));
+  return personIds.some((id) => !matching.has(id));
+}
+
 export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   const requiredPermission = teamId ? "teams.edit" : "teams.create";
   const authContext =
@@ -71,6 +79,12 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   }
 
   const { supabaseServer, scopeContext } = authContext;
+  if (scopeContext.managedDepartmentId) {
+    if (teamPayload?.department_id && teamPayload.department_id !== scopeContext.managedDepartmentId) {
+      return buildError("Die Abteilung darf nicht geändert werden.");
+    }
+    teamPayload = { ...teamPayload, department_id: scopeContext.managedDepartmentId };
+  }
 
   let existingTeam = null;
   if (teamId) {
@@ -98,6 +112,18 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   const validatedDepartment = validateActiveTeamDepartment(normalizedDepartment.data, departmentResult.data);
   if (validatedDepartment.error) return buildError(validatedDepartment.error.message);
   teamPayload = { ...teamPayload, department_id: validatedDepartment.data };
+  if (teamPayload.team_template_id) {
+    const templateResult = await supabaseServer.from("team_templates").select("id, department_id, is_active").eq("id", teamPayload.team_template_id).maybeSingle();
+    if (templateResult.error || !templateResult.data?.is_active || templateResult.data.department_id !== validatedDepartment.data) {
+      return buildError("Die Mannschaftsvorlage gehört nicht zur gewählten Abteilung.");
+    }
+  }
+  try {
+    if (await hasPersonsWithoutDepartmentAssignment(supabaseServer, "player_team_seasons", "player_id", teamPayload.selected_player_ids || [], validatedDepartment.data)) return buildError("Der Kader enthält Spieler ohne aktive Zuordnung zu dieser Abteilung.");
+    if (await hasPersonsWithoutDepartmentAssignment(supabaseServer, "coach_team_seasons", "coach_id", teamPayload.selected_coach_ids || [], validatedDepartment.data)) return buildError("Die Trainerliste enthält Trainer ohne aktive Zuordnung zu dieser Abteilung.");
+  } catch {
+    return buildError("Die Abteilungszuordnungen des Kaders konnten nicht geprüft werden.");
+  }
 
   const allowedVisibilities = canManageMedia(authContext.roles) ? ["public", "admin"] : ["public"];
   const mediaResult = await resolveEntityImageMedia(teamPayload?.team_image_media_asset_id || null, { allowArchived: Boolean(existingTeam?.team_image_media_asset_id === teamPayload?.team_image_media_asset_id), allowedVisibilities });

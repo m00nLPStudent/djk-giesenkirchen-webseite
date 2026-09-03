@@ -54,7 +54,7 @@ export async function loadTeamPlayerAssignmentsBySeason(
 
   const { data: teamSeasons, error: teamSeasonsError } = await db
     .from("team_seasons")
-    .select("id, team_id")
+    .select("id, team_id, teams(department_id)")
     .eq("season_id", seasonId)
     .in("team_id", normalizedTeamIds)
     .eq("is_active", true);
@@ -75,7 +75,7 @@ export async function loadTeamPlayerAssignmentsBySeason(
   const { data: assignments, error: assignmentsError } = await db
     .from("player_team_seasons")
     .select(
-      "id, player_id, team_season_id, shirt_number, position_de, position_en, is_captain, sort_order, created_at",
+      "id, player_id, team_season_id, shirt_number, position_de, position_en, is_captain, sort_order, created_at, players(department_id)",
     )
     .in("team_season_id", teamSeasonIds)
     .eq("is_active", true);
@@ -86,7 +86,11 @@ export async function loadTeamPlayerAssignmentsBySeason(
     );
   }
 
-  return (assignments || []).map((assignment) => ({
+  const teamDepartmentBySeasonId = new Map((teamSeasons || []).map((row) => [row.id, (Array.isArray(row.teams) ? row.teams[0] : row.teams)?.department_id || null]));
+  return (assignments || []).filter((assignment) => {
+    const playerDepartmentId = (Array.isArray(assignment.players) ? assignment.players[0] : assignment.players)?.department_id || null;
+    return Boolean(playerDepartmentId) && playerDepartmentId === teamDepartmentBySeasonId.get(assignment.team_season_id);
+  }).map((assignment) => ({
     ...assignment,
     team_id: teamIdByTeamSeasonId.get(assignment.team_season_id) || null,
   }));

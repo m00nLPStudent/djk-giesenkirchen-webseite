@@ -24,8 +24,8 @@ test("non-runtime statuses do not contribute to dropdown sizing", () => {
   assert.deepEqual(result.visibleItems.map(({ key }) => key), ["active"]);
 });
 
-function resolvedLayout(permissionKeys, scopeContext, sectionKey) {
-  const dto = resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys, scopeContext });
+function resolvedLayout(permissionKeys, scopeContext, sectionKey, roleKeys = []) {
+  const dto = resolveAdminNavigation({ sections: ADMIN_NAVIGATION_SECTIONS, permissionKeys, scopeContext, roleKeys });
   const section = dto.sections.find(({ key }) => key === sectionKey);
   return section ? getNavigationDropdownLayout(section.items) : getNavigationDropdownLayout([]);
 }
@@ -39,11 +39,11 @@ test("cashier football navigation is compact through permission-filtered items",
 test("reorganized administration domains use layouts based on their visible items", () => {
   const permissions = ["news.view", "events.view", "sponsors.view", "club_history.view", "settings.view", "users.view", "roles.view", "permissions.view"];
   const club = resolvedLayout(permissions, { isGlobal: true }, "club");
-  const system = resolvedLayout(permissions, { isGlobal: true }, "system");
+  const system = resolvedLayout(permissions, { isGlobal: true }, "system", ["superadmin"]);
   assert.equal(club.itemCount, 6);
   assert.equal(club.key, "mega-grid");
-  assert.equal(system.itemCount, 3);
-  assert.equal(system.key, "medium-layout");
+  assert.equal(system.itemCount, 6);
+  assert.equal(system.key, "mega-grid");
 });
 
 test("membership policy and permissions determine the visible item count", () => {

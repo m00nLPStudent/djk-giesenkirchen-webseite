@@ -8,7 +8,9 @@ import {
   getCoachTeamIdsMap,
   loadScopedActiveTeamsForPeople,
   loadServerPersonScopeContext,
+  isDepartmentManagerScope,
 } from "@/components/admin/persons/serverPersonScope";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { saveCoach } from "@/components/admin/coaches/services/coachWrite.service";
 import { loadCoachCurrentSeasonAssignmentRows } from "@/components/admin/coaches/services/coachWrite.repository";
 import { logNotificationFailure, notifyCoachAssignmentChange } from "@/components/admin/notifications/teamAssignmentNotifications.service";
@@ -21,6 +23,7 @@ import { archiveCoach } from "@/components/admin/archiving/archive.service";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, resolvePublicCoachMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
+import { tableTennisCoachLicenses } from "@/components/admin/coaches/constants/CoachOptions";
 
 function buildError(message) {
   return { error: { message } };
@@ -75,7 +78,7 @@ export async function loadCoachFormTeamsAction(requiredPermission) {
   }
 }
 
-export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
+export async function saveCoachWithScopeAction(coachPayload, coachId = null, mutationContext = {}) {
   try {
     const requiredPermission = coachId ? "coaches.edit" : "coaches.create";
     const permissionResult = await assertAdminActionPermission({
@@ -123,7 +126,12 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
     const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
     const mediaResult = await resolveEntityImageMedia(coachPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingCoach?.image_media_asset_id && existingCoach.image_media_asset_id === coachPayload?.image_media_asset_id), allowedVisibilities });
     if (mediaResult.error) return buildError(mediaResult.error.message);
-    const safeCoachPayload = { ...coachPayload, image_media_asset_id: mediaResult.data?.id || null,
+    const expectedDepartmentSlug = ["fussball", "tischtennis"].includes(mutationContext?.departmentSlug) ? mutationContext.departmentSlug : null;
+    const { data: routeDepartment } = expectedDepartmentSlug
+      ? await supabaseServer.from("departments").select("id, slug").eq("slug", expectedDepartmentSlug).eq("is_active", true).maybeSingle()
+      : { data: null };
+    if (expectedDepartmentSlug && !routeDepartment?.id) return buildError("Die Abteilung des aktuellen Bereichs konnte nicht aufgelöst werden.");
+    const safeCoachPayload = { ...coachPayload, department_id: routeDepartment?.id || existingCoach?.department_id || null, image_media_asset_id: mediaResult.data?.id || null,
       image_url: mediaResult.data?.previewUrl || coachPayload?.image_url || null };
 
     const targetResolution = await resolveCoachTeamSeasonTargets(
@@ -137,6 +145,20 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
           "Die Zielmannschaften konnten nicht aufgeloest werden.",
       );
     }
+    const targetDepartmentSlugs = (targetResolution.teamSeasonOptions || []).map((option) => {
+      const relation = option.team?.departments;
+      return Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
+    });
+    if (expectedDepartmentSlug && targetDepartmentSlugs.some((slug) => slug !== expectedDepartmentSlug)) return buildError("Mindestens eine Mannschaft gehört nicht zum aktuellen Bereich.");
+    const targetDepartmentIds = (targetResolution.teamSeasonOptions || []).map((option) => option.team?.department_id).filter(Boolean);
+    if (!routeDepartment && targetDepartmentIds.length) safeCoachPayload.department_id = targetDepartmentIds[0];
+    if (targetDepartmentIds.some((departmentId) => departmentId !== safeCoachPayload.department_id)) return buildError("Mindestens eine Mannschaft gehört nicht zur organisatorischen Abteilung des Trainers.");
+    const hasTableTennisTarget = targetDepartmentSlugs.includes("tischtennis");
+    if ((safeCoachPayload.assignments || []).some((assignment) => assignment.role_de === "Torwarttrainer" && hasTableTennisTarget)) {
+      return buildError("Die Rolle Torwarttrainer ist im Tischtennisbereich nicht zulässig.");
+    }
+    if (hasTableTennisTarget && !tableTennisCoachLicenses.includes(safeCoachPayload.license || "Keine Lizenz")) return buildError("Diese Trainerlizenz ist im Tischtennis nicht zulässig.");
+    if (hasTableTennisTarget && safeCoachPayload.role === "Torwarttrainer") return buildError("Die Rolle Torwarttrainer ist im Tischtennis nicht zulässig.");
 
     const allowedTeams = await loadScopedActiveTeamsForPeople(
       scopeContext,
@@ -153,8 +175,17 @@ export async function saveCoachWithScopeAction(coachPayload, coachId = null) {
       );
     }
 
+    const writeClient = createSupabaseAdminClient();
+    if (!writeClient) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
+    if (coachId && isDepartmentManagerScope(scopeContext)) {
+      const { teamIdsByCoachId, teamById } = await getCoachTeamIdsMap(writeClient, [coachId]);
+      if (!canEditCoachOnServer(scopeContext, existingCoach, teamIdsByCoachId.get(coachId) || [], teamById)) {
+        return buildError("Trainer mit abteilungsfremden Zuordnungen dürfen nicht bearbeitet werden.");
+      }
+    }
+
     const saveResult = await saveCoach(safeCoachPayload, coachId, {
-      client: supabaseServer,
+      client: writeClient,
       teamSeasonOptions: targetResolution.teamSeasonOptions,
     });
 

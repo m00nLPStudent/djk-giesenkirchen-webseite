@@ -4,10 +4,11 @@ import {
   StatusSwitch,
   TextareaField,
 } from "@/components/admin/forms";
-import { TRAINING_TYPE_OPTIONS, WEEKDAY_OPTIONS } from "./trainingOptions";
+import { getTrainingLocationTypeOptions, getTrainingTypeOptions, WEEKDAY_OPTIONS } from "./trainingOptions";
 import { toDateValue, toTimeValue } from "./trainingFormatters";
 
 export default function TrainingTimesCreatePanel({
+  departmentSlug,
   draft,
   selectedWeekdays,
   isOpen,
@@ -100,11 +101,15 @@ export default function TrainingTimesCreatePanel({
                 onUpdateDraft("training_type", event.target.value)
               }
             >
-              {TRAINING_TYPE_OPTIONS.map((option) => (
+              {getTrainingTypeOptions(departmentSlug).map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
               ))}
+            </SelectField>
+            <SelectField label="Platzart" required value={draft.training_location_type || ""} onChange={(event) => onUpdateDraft("training_location_type", event.target.value)}>
+              <option value="">Platzart auswählen</option>
+              {getTrainingLocationTypeOptions(departmentSlug).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </SelectField>
 
             <InputField

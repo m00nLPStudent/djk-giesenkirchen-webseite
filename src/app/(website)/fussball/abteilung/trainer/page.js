@@ -8,7 +8,8 @@ import { loadActivePublicCoachDtos } from "@/components/website/coach/coachPubli
 import { supabase } from "@/lib/supabase";
 
 export default async function DepartmentCoachesPage() {
-  const coaches = await loadActivePublicCoachDtos(supabase);
+  const { data: footballDepartment } = await supabase.from("departments").select("id").eq("slug", "fussball").eq("is_active", true).maybeSingle();
+  const coaches = footballDepartment?.id ? await loadActivePublicCoachDtos(supabase, { departmentId: footballDepartment.id }) : [];
 
   return (
     <DepartmentPageLayout

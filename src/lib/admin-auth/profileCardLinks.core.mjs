@@ -27,7 +27,7 @@ export function buildCoachCardLabel(row = {}, coachDto = null) {
 }
 
 export function createCardRow(row = {}, type, { coachDto = null } = {}) {
-  return {
+  const normalized = {
     id: row.id || null,
     type,
     email: row.email || null,
@@ -38,6 +38,13 @@ export function createCardRow(row = {}, type, { coachDto = null } = {}) {
         ? buildBoardCardLabel(row)
         : buildCoachCardLabel(row, coachDto),
   };
+
+  if (type === "board") {
+    normalized.organizationScope = row.organization_scope || null;
+    normalized.departmentId = row.department_id || null;
+  }
+
+  return normalized;
 }
 
 export function normalizeEmailForCardMatching(value = "") {

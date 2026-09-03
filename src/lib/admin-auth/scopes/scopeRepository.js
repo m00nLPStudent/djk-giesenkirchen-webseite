@@ -8,19 +8,20 @@ import {
   mergeScopeValues,
   uniqueScopeValues,
 } from "./scopeContext";
+import { resolveManagedDepartmentRole } from "./departmentManagerScope.core.mjs";
 
 const ROLE_SCOPE_HINTS = {
   superadmin: ["global", "own_profile"],
   vorstand: ["own_board_card", "own_profile", "read_only"],
-  "fussball-vorstand": ["own_board_card", "own_profile", "read_only"],
-  "tischtennis-vorstand": ["own_board_card", "own_profile", "read_only"],
+  "fussball-vorstand": ["department_manager", "own_board_card", "own_profile"],
+  "tischtennis-vorstand": ["department_manager", "own_board_card", "own_profile"],
   "damen-gymnastik-vorstand": ["own_board_card", "own_profile", "read_only"],
   "behindertensport-vorstand": ["own_board_card", "own_profile", "read_only"],
   jugendleiter: ["youth_all", "own_board_card", "own_profile"],
   trainer: ["own_staff_card", "own_profile", "own_content"],
   betreuer: ["own_staff_card", "own_profile", "own_content"],
   redakteur: ["own_profile", "own_content", "read_only"],
-  kassierer: ["own_board_card", "own_profile", "read_only"],
+  kassierer: ["own_profile", "read_only"],
   webmaster: ["own_profile", "read_only"],
   gast: ["read_only"],
 };
@@ -177,6 +178,8 @@ export function buildScopeContext({
   teamAssignmentRows = [],
   coachId = null,
   boardMemberId = null,
+  managedDepartmentId = null,
+  managedDepartmentSlug = null,
 } = {}) {
   const normalizedRoleKeys = uniqueScopeValues(roleKeys);
   const normalizedPermissionKeys = uniqueScopeValues(permissionKeys);
@@ -215,6 +218,8 @@ export function buildScopeContext({
     assignedTeamIds,
     coachId,
     boardMemberId,
+    managedDepartmentId,
+    managedDepartmentSlug,
     isGlobal,
     canAccessYouthAll,
   });
@@ -228,6 +233,13 @@ export async function loadAdminProfileScopeContext({
   supabase: client = null,
 } = {}) {
   const supabaseClient = getReadClient(client);
+  const managedDepartmentRole = resolveManagedDepartmentRole(roleKeys);
+  const departmentResult = managedDepartmentRole.departmentSlug
+    ? await supabaseClient.from("departments").select("id, slug").eq("slug", managedDepartmentRole.departmentSlug).eq("is_active", true).maybeSingle()
+    : { data: null, error: null };
+  const departmentTeamsResult = departmentResult.data?.id
+    ? await supabaseClient.from("teams").select("id").eq("department_id", departmentResult.data.id)
+    : { data: [], error: null };
 
   const [boardLinkResult, coachLinkResult] = await Promise.all([
     getBoardMemberLinkForProfile(adminProfileId, supabaseClient),
@@ -254,9 +266,10 @@ export async function loadAdminProfileScopeContext({
   );
 
   const regularAssignedTeamIds = regularTeamIdsResult.data || [];
-  const manualAssignedTeamIds = uniqueScopeValues(
-    (manualAssignmentResult.data || []).map((row) => row.teamId),
-  );
+  const manualAssignedTeamIds = uniqueScopeValues([
+    ...(manualAssignmentResult.data || []).map((row) => row.teamId),
+    ...(departmentTeamsResult.data || []).map((row) => row.id),
+  ]);
 
   return {
     context: buildScopeContext({
@@ -273,6 +286,8 @@ export async function loadAdminProfileScopeContext({
       manualAssignedTeamIds,
       coachId,
       boardMemberId,
+      managedDepartmentId: departmentResult.data?.id || null,
+      managedDepartmentSlug: departmentResult.data?.slug || null,
     }),
     sources: {
       boardLinkError: boardLinkResult?.error || null,
@@ -280,6 +295,9 @@ export async function loadAdminProfileScopeContext({
       regularAssignmentError: regularAssignmentResult.error || null,
       regularTeamIdsError: regularTeamIdsResult.error || null,
       manualAssignmentError: manualAssignmentResult.error || null,
+      managedDepartmentError: managedDepartmentRole.conflict
+        ? new Error("Mehrere verwaltete Abteilungen sind nicht zulässig.")
+        : departmentResult.error || departmentTeamsResult.error || null,
     },
   };
 }

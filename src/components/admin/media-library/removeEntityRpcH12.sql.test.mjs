@@ -21,7 +21,7 @@ test("proposal removes inherited and direct browser EXECUTE while preserving ser
 test("no application call site still invokes the legacy RPC", () => {
   for (const source of [removeActions,newsActions,newsButton,boardActions]) assert.doesNotMatch(source, /remove_entity|\.rpc\(/);
   assert.match(newsActions, /requiredPermission: "news\.delete"[\s\S]*createSupabaseAdminClient/);
-  assert.match(boardActions, /requiredPermission: "settings\.edit"[\s\S]*createSupabaseAdminClient/);
+  assert.match(boardActions, /requiredPermission: "board\.delete"[\s\S]*createSupabaseAdminClient/);
 });
 
 test("postcheck inventories function security ACLs dependencies and H1.1 invariants read-only", () => {

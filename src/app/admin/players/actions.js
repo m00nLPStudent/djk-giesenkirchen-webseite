@@ -8,6 +8,7 @@ import {
   loadScopedActiveTeamsForPeople,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import {
   loadScopedPlayerTeamSeasonOptions,
   resolvePlayerTeamSeasonTarget,
@@ -24,6 +25,7 @@ import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalid
 import { revalidatePath } from "next/cache";
 import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
+import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 const SAFE_MEDIA_ERRORS = new Set(["Keine Datei ausgewählt.", "Nur JPEG-, PNG-, WebP-Bilder und PDF-Dokumente sind erlaubt.", "Dateiinhalt und MIME-Typ stimmen nicht überein.", "Ungültige WebP-Datei.", "Die Datei ist leer oder größer als 10 MB."]);
 
 function buildError(message) {
@@ -33,7 +35,7 @@ function buildError(message) {
 async function loadPlayerById(client, playerId) {
   const { data } = await client
     .from("players")
-    .select("id, first_name, last_name, is_active, image_media_asset_id")
+    .select("id, first_name, last_name, is_active, department_id, image_media_asset_id, shirt_number, position_de, position_en, strong_foot, strong_hand")
     .eq("id", playerId)
     .maybeSingle();
 
@@ -80,6 +82,7 @@ export async function loadPlayerFormTeamsAction(requiredPermission) {
 export async function savePlayerWithScopeAction(
   playerPayload,
   playerId = null,
+  mutationContext = {},
 ) {
   try {
     const requiredPermission = playerId ? "players.edit" : "players.create";
@@ -98,11 +101,15 @@ export async function savePlayerWithScopeAction(
     const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
     const mediaResult = await resolveEntityImageMedia(playerPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingPlayer?.image_media_asset_id && existingPlayer.image_media_asset_id === playerPayload?.image_media_asset_id), allowedVisibilities });
     if (mediaResult.error) return buildError(mediaResult.error.message);
-    const safePlayerPayload = { ...playerPayload, image_media_asset_id: mediaResult.data?.id || null, image_url: mediaResult.data?.previewUrl || playerPayload?.image_url || null };
-    const targetResolution = await resolvePlayerTeamSeasonTarget(
-      supabaseServer,
-      safePlayerPayload.team_season_id,
-    );
+    const expectedDepartmentSlug = ["fussball", "tischtennis"].includes(mutationContext?.departmentSlug) ? mutationContext.departmentSlug : null;
+    const { data: routeDepartment } = expectedDepartmentSlug
+      ? await supabaseServer.from("departments").select("id, slug").eq("slug", expectedDepartmentSlug).eq("is_active", true).maybeSingle()
+      : { data: null };
+    if (expectedDepartmentSlug && !routeDepartment?.id) return buildError("Die Abteilung des aktuellen Bereichs konnte nicht aufgelöst werden.");
+    const safePlayerPayload = { ...playerPayload, department_id: routeDepartment?.id || existingPlayer?.department_id || null, image_media_asset_id: mediaResult.data?.id || null, image_url: mediaResult.data?.previewUrl || playerPayload?.image_url || null };
+    const targetResolution = safePlayerPayload.team_season_id
+      ? await resolvePlayerTeamSeasonTarget(supabaseServer, safePlayerPayload.team_season_id)
+      : { ok: true, teamSeasonOption: null };
 
     if (!targetResolution.ok) {
       return buildError(
@@ -111,13 +118,28 @@ export async function savePlayerWithScopeAction(
       );
     }
 
-    const targetTeamIds = [targetResolution.teamSeasonOption.teamId];
-    const targetTeamMap = new Map([
-      [
-        targetResolution.teamSeasonOption.team.id,
-        targetResolution.teamSeasonOption.team,
-      ],
-    ]);
+    const targetTeamIds = targetResolution.teamSeasonOption ? [targetResolution.teamSeasonOption.teamId] : [];
+    const targetTeamMap = targetResolution.teamSeasonOption ? new Map([[targetResolution.teamSeasonOption.team.id, targetResolution.teamSeasonOption.team]]) : new Map();
+    const relation = targetResolution.teamSeasonOption?.team?.departments;
+    const targetDepartmentSlug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
+    if (!routeDepartment && targetResolution.teamSeasonOption?.team?.department_id) safePlayerPayload.department_id = targetResolution.teamSeasonOption.team.department_id;
+    if (expectedDepartmentSlug && targetResolution.teamSeasonOption && targetDepartmentSlug !== expectedDepartmentSlug) return buildError("Die gewählte Mannschaft gehört nicht zum aktuellen Bereich.");
+    const isTableTennis = expectedDepartmentSlug === "tischtennis" || targetDepartmentSlug === "tischtennis";
+    if (isTableTennis && !["Rechts", "Links"].includes(safePlayerPayload.strong_hand)) return buildError("Bitte eine gültige starke Hand auswählen.");
+    const unchanged = (field) => playerId && (safePlayerPayload[field] ?? null) === (existingPlayer?.[field] ?? null);
+    const hasValue = (field) => safePlayerPayload[field] != null && String(safePlayerPayload[field]).trim() !== "";
+    if (isTableTennis && ["shirt_number", "position_de", "position_en", "strong_foot"].some((field) => hasValue(field) && !unchanged(field))) return buildError("Fußballspezifische Spielerfelder sind im Tischtennis nicht zulässig.");
+    if (!isTableTennis && safePlayerPayload.strong_hand && !unchanged("strong_hand")) return buildError("Die starke Hand ist ausschließlich für Tischtennis vorgesehen.");
+    if (!canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap)) {
+      return buildError(playerId
+        ? "Du darfst den Spieler keiner fremden Mannschaft zuordnen."
+        : "Du darfst keinen Spieler fuer diese Mannschaft anlegen.");
+    }
+    const writeClient = createSupabaseAdminClient();
+    if (!writeClient) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
+    const activeSeasonId = targetResolution.teamSeasonOption?.seasonId || (playerId
+      ? (await loadCurrentSeasonResolution(writeClient)).activeSeasonId
+      : null);
 
     if (playerId) {
       if (!existingPlayer) {
@@ -125,34 +147,21 @@ export async function savePlayerWithScopeAction(
       }
 
       const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(
-        supabaseServer,
+        writeClient,
         [playerId],
       );
       const existingTeamIds = teamIdsByPlayerId.get(playerId) || [];
 
-      if (!canEditPlayerOnServer(scopeContext, existingTeamIds, teamById)) {
+      if (!canEditPlayerOnServer(scopeContext, existingTeamIds, teamById, existingPlayer)) {
         return buildError("Du darfst diesen Spieler nicht bearbeiten.");
       }
 
-      if (
-        targetTeamIds.length > 0 &&
-        !canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap)
-      ) {
-        return buildError(
-          "Du darfst den Spieler keiner fremden Mannschaft zuordnen.",
-        );
-      }
-    } else if (
-      !canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap)
-    ) {
-      return buildError(
-        "Du darfst keinen Spieler fuer diese Mannschaft anlegen.",
-      );
     }
 
     const saveResult = await savePlayer(safePlayerPayload, playerId, {
-      client: supabaseServer,
+      client: writeClient,
       targetTeamSeasonOption: targetResolution.teamSeasonOption,
+      activeSeasonId,
     });
 
     if (saveResult.error) {
@@ -165,8 +174,8 @@ export async function savePlayerWithScopeAction(
     if (saveResult.assignmentChange?.previousAssignment) {
       saveResult.assignmentChange.previousAssignment = {
         ...saveResult.assignmentChange.previousAssignment,
-        seasonId: targetResolution.teamSeasonOption.seasonId,
-        seasonName: targetResolution.teamSeasonOption.seasonName,
+        seasonId: activeSeasonId,
+        seasonName: targetResolution.teamSeasonOption?.seasonName || null,
       };
     }
     const notificationResult = await notifyPlayerAssignmentChange({
@@ -179,7 +188,7 @@ export async function savePlayerWithScopeAction(
       const memberNotification = await notifyMemberStatusWorkflow({
         type: playerPayload.is_active ? "member_activated" : "member_deactivated",
         player: saveResult.data || existingPlayer,
-        teamSeasonId: targetResolution.teamSeasonOption.teamSeasonId || playerPayload?.team_season_id,
+        teamSeasonId: targetResolution.teamSeasonOption?.teamSeasonId || playerPayload?.team_season_id,
         actorUserId: permissionResult.profile?.id || permissionResult.userId,
       });
       logWorkflowNotificationFailure("player-status", memberNotification.error);
@@ -202,7 +211,7 @@ async function authorizePlayerMedia(playerId = null) {
     const player = await loadPlayerById(permissionResult.supabaseServer, playerId);
     if (!player) return { ok: false, message: "Spieler nicht gefunden." };
     const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(permissionResult.supabaseServer, [playerId]);
-    if (!canEditPlayerOnServer(scopeContext, teamIdsByPlayerId.get(playerId) || [], teamById)) return { ok: false, message: "Du darfst diesen Spieler nicht bearbeiten." };
+    if (!canEditPlayerOnServer(scopeContext, teamIdsByPlayerId.get(playerId) || [], teamById, player)) return { ok: false, message: "Du darfst diesen Spieler nicht bearbeiten." };
   }
   return { ok: true, permissionResult };
 }
@@ -255,7 +264,7 @@ export async function removePlayerWithScopeAction(playerId) {
   );
   const existingTeamIds = teamIdsByPlayerId.get(playerId) || [];
 
-  if (!canDeletePlayerOnServer(scopeContext, existingTeamIds, teamById)) {
+  if (!canDeletePlayerOnServer(scopeContext, existingTeamIds, teamById, existingPlayer)) {
     return buildError("Du darfst diesen Spieler nicht archivieren.");
   }
 
@@ -287,8 +296,10 @@ export async function loadPlayerArchivePreviewAction(playerId) {
   });
   if (!permissionResult.ok) return buildError(permissionResult.message || "Berechtigung fehlt.");
   const scopeContext = await loadServerPersonScopeContext(permissionResult);
+  const player = await loadPlayerById(permissionResult.supabaseServer, playerId);
+  if (!player) return buildError("Spieler nicht gefunden.");
   const { teamIdsByPlayerId, teamById } = await getPlayerTeamIdsMap(permissionResult.supabaseServer, [playerId]);
-  if (!canDeletePlayerOnServer(scopeContext, teamIdsByPlayerId.get(playerId) || [], teamById)) {
+  if (!canDeletePlayerOnServer(scopeContext, teamIdsByPlayerId.get(playerId) || [], teamById, player)) {
     return buildError("Du darfst diesen Spieler nicht archivieren.");
   }
   try {

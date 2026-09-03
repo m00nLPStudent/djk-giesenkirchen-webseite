@@ -18,7 +18,7 @@ function hasScope(scopeType, context = {}) {
   const global = Boolean(context.isGlobal || types.has("global"));
   if (scopeType === "permission_only") return true;
   if (scopeType === "team_access") {
-    return global || context.canAccessYouthAll || types.has("youth_all") || hasTeams || types.has("own_board_card");
+    return global || types.has("department_manager") || context.canAccessYouthAll || types.has("youth_all") || hasTeams || types.has("own_board_card");
   }
   if (scopeType === "staff_access") {
     return hasScope("team_access", context) || types.has("own_staff_card");
@@ -56,6 +56,9 @@ export function resolveAdminNavigation({
       .sort((a, b) => a.order - b.order)
       .filter((item) => isRuntimeCandidate(item, includePlanned))
       .filter((item) => item.implementationStatus !== "active" || ["membership_requests", "superadmin_only", "media_roles"].includes(item.accessPolicy) || hasPermission(item, permissionSet))
+      .filter((item) => item.accessPolicy !== "table_tennis" || scopeContext.isGlobal || ["vorstand", "tischtennis-vorstand", "superadmin"].some((role) => unique(roleKeys).has(role)))
+      .filter((item) => item.accessPolicy !== "club_board" || scopeContext.isGlobal || ["superadmin", "vorstand"].some((role) => unique(roleKeys).has(role)))
+      .filter((item) => item.accessPolicy !== "football_modules" || !unique(roleKeys).has("tischtennis-vorstand") || unique(roleKeys).has("superadmin"))
       .filter((item) => item.accessPolicy !== "membership_requests" || canAccessMembershipRequests({ roleKeys, permissionKeys, scopeContext }))
       .filter((item) => item.accessPolicy !== "superadmin_only" || unique(roleKeys).has("superadmin"))
       .filter((item) => item.accessPolicy !== "media_roles" || ["superadmin", "webmaster"].some((role) => unique(roleKeys).has(role)))

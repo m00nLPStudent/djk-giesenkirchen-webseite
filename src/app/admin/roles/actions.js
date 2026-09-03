@@ -12,7 +12,7 @@ import {
   normalizeRoleKey,
   validateRolePayload,
 } from "@/components/admin/roles/helpers/roles.payload";
-import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { assertSuperadminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 
 function isSameRole(existingRole, roleId) {
   if (!existingRole || !roleId) return false;
@@ -20,7 +20,7 @@ function isSameRole(existingRole, roleId) {
 }
 
 export async function saveAdminRoleAction({ roleId, values }) {
-  const access = await assertAdminActionPermission({
+  const access = await assertSuperadminActionPermission({
     requiredPermission: "roles.edit",
   });
   if (!access.ok) {
@@ -70,7 +70,7 @@ export async function updateAdminRoleStatusAction({
   roleKey,
   isActive,
 }) {
-  const access = await assertAdminActionPermission({
+  const access = await assertSuperadminActionPermission({
     requiredPermission: "roles.edit",
   });
   if (!access.ok) {

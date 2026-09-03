@@ -12,14 +12,6 @@ export default function TeamDescriptionTab({ form, onFieldChange }) {
             onFieldChange("description_de", event.target.value)
           }
         />
-        <TextareaField
-          label="Beschreibung Englisch"
-          rows={8}
-          value={form.description_en}
-          onChange={(event) =>
-            onFieldChange("description_en", event.target.value)
-          }
-        />
       </div>
     </FormSection>
   );

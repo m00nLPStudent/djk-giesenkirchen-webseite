@@ -18,6 +18,7 @@ export {
   formatEventTime,
   getEventStatusKey,
   getTrainingTypeLabel,
+  getTrainingLocationTypeLabel,
   splitEventsByTimeline,
 } from "./eventFormatter";
 

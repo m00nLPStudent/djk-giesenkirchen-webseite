@@ -27,6 +27,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { redirect } from "next/navigation";
 import { canManageMedia, loadMediaUrlMap } from "@/components/admin/media-library/media.service";
 import { resolveTeamImage } from "@/lib/football/publicTeamImage.core.mjs";
+import { hasManagedDepartmentRouteMismatch } from "@/lib/admin-auth/scopes/departmentManagerScope.core.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -71,7 +72,7 @@ function mergeTeamSeason(team, teamSeason, season) {
   };
 }
 
-export default async function AdminTeamsPage({ searchParams }) {
+export default async function AdminTeamsPage({ searchParams, requiredDepartmentSlug = null }) {
   const params = await searchParams;
   const teamSearch = String(params?.q || "");
   const teamStatus = ["active", "inactive", "all"].includes(params?.status)
@@ -88,6 +89,12 @@ export default async function AdminTeamsPage({ searchParams }) {
   const scopeContext = await loadServerTeamScopeContext(permissionResult);
   const scopeType = resolveTeamScopeType(scopeContext);
   const supabaseServer = permissionResult.supabaseServer;
+  const departmentRoute = requiredDepartmentSlug ? (requiredDepartmentSlug === "fussball" ? "football" : "table-tennis") : null;
+  const { data: requiredDepartment } = requiredDepartmentSlug
+    ? await supabaseServer.from("departments").select("id, slug").eq("slug", requiredDepartmentSlug).eq("is_active", true).maybeSingle()
+    : { data: null };
+  if (requiredDepartmentSlug && !requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-department-scope");
+  if (hasManagedDepartmentRouteMismatch(scopeContext, requiredDepartment?.id)) redirect("/admin/unauthorized?reason=missing-department-scope");
 
   if (scopeType === "none") {
     return (
@@ -114,6 +121,8 @@ export default async function AdminTeamsPage({ searchParams }) {
     .select("*")
     .order("sort_order", { ascending: true });
 
+  if (requiredDepartment?.id) teamsQuery = teamsQuery.eq("department_id", requiredDepartment.id);
+
   if (scopeType === "assigned_teams") {
     const assignedTeamIds = scopeContext?.assignedTeamIds || [];
     if (!assignedTeamIds.length) {
@@ -135,6 +144,11 @@ export default async function AdminTeamsPage({ searchParams }) {
     (seasons || []).find((season) => season.is_current) || seasons?.[0] || null;
 
   const scopedTeams = filterScopedTeamsOnServer(scopeContext, teams || []);
+  const departmentIds = Array.from(new Set(scopedTeams.map((team) => team.department_id).filter(Boolean)));
+  const { data: teamDepartments } = departmentIds.length
+    ? await supabaseServer.from("departments").select("id, name_de").in("id", departmentIds)
+    : { data: [] };
+  const departmentNameById = new Map((teamDepartments || []).map((department) => [department.id, department.name_de]));
   const teamIds = scopedTeams.map((team) => team.id);
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
 
@@ -155,14 +169,14 @@ export default async function AdminTeamsPage({ searchParams }) {
   const { data: playerAssignments } = teamSeasonIds.length
     ? await supabaseServer
         .from("player_team_seasons")
-        .select("id, team_season_id, is_active")
+        .select("id, player_id, team_season_id, is_active, players(department_id)")
         .in("team_season_id", teamSeasonIds)
     : { data: [] };
 
   const { data: coachAssignments } = teamSeasonIds.length
     ? await supabaseServer
         .from("coach_team_seasons")
-        .select("id, team_season_id, is_active")
+        .select("id, coach_id, team_season_id, is_active, coaches(department_id)")
         .in("team_season_id", teamSeasonIds)
     : { data: [] };
 
@@ -170,6 +184,7 @@ export default async function AdminTeamsPage({ searchParams }) {
   const teamSeasonList = teamSeasons || [];
   const playerList = playerAssignments || [];
   const coachList = coachAssignments || [];
+  const relatedDepartmentId = (relation) => (Array.isArray(relation) ? relation[0] : relation)?.department_id || null;
 
   const teamsWithCounts = teamList.map((team) => {
     const teamSeason = teamSeasonList.find((item) => item.team_id === team.id);
@@ -177,6 +192,7 @@ export default async function AdminTeamsPage({ searchParams }) {
 
     return {
       ...displayTeam,
+      department_name_de: departmentNameById.get(team.department_id) || "Nicht zugeordnet",
       resolved_team_image_url: resolveTeamImage({
         seasonMediaAssetId: teamSeason?.team_image_media_asset_id,
         seasonLegacyUrl: teamSeason?.team_image_url,
@@ -185,10 +201,10 @@ export default async function AdminTeamsPage({ searchParams }) {
       }, teamMediaUrls.data),
       players_count: playerList.filter(
         (player) =>
-          player.team_season_id === teamSeason?.id && player.is_active,
+          player.team_season_id === teamSeason?.id && player.is_active && relatedDepartmentId(player.players) === team.department_id,
       ).length,
       coaches_count: coachList.filter(
-        (coach) => coach.team_season_id === teamSeason?.id && coach.is_active,
+        (coach) => coach.team_season_id === teamSeason?.id && coach.is_active && relatedDepartmentId(coach.coaches) === team.department_id,
       ).length,
     };
   });
@@ -273,7 +289,7 @@ export default async function AdminTeamsPage({ searchParams }) {
         eyebrow="Mannschaften"
         title="Mannschaften verwalten"
         description="Mannschaften, Saisonzuordnungen, Trainer und Spieler verwalten."
-        actions={<TeamCreateButton className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold transition hover:bg-red-700" label="Neue Mannschaft" />}
+        actions={<TeamCreateButton className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold transition hover:bg-red-700" label="Neue Mannschaft" href={departmentRoute ? `/admin/${departmentRoute}/teams/new` : "/admin/teams/new"} />}
       >
         <TeamsHeaderSearchControls searchValue={teamSearch} statusValue={teamStatus} />
       </AdminModuleHeader>
@@ -286,6 +302,7 @@ export default async function AdminTeamsPage({ searchParams }) {
 
       <AdminTeamsList
         teams={visibleTeams}
+        basePath={departmentRoute ? `/admin/${departmentRoute}/teams` : "/admin/teams"}
         showContributionSummary={
           canShowContributionSummary && !contributionSeasonWarning
         }

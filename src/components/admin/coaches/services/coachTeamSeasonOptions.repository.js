@@ -45,6 +45,7 @@ function mapTeamSeasonOption(teamSeason, team, seasonResolution) {
 export async function loadScopedCoachTeamSeasonOptions(
   scopeContext,
   supabaseServer,
+  { requiredDepartmentId = null } = {},
 ) {
   const seasonResolution = await loadCurrentSeasonResolution(supabaseServer);
 
@@ -60,7 +61,8 @@ export async function loadScopedCoachTeamSeasonOptions(
     scopeContext,
     supabaseServer,
   );
-  const allowedTeamIds = new Set((allowedTeams || []).map((team) => team.id));
+  const filteredTeams = requiredDepartmentId ? (allowedTeams || []).filter((team) => team.department_id === requiredDepartmentId) : (allowedTeams || []);
+  const allowedTeamIds = new Set(filteredTeams.map((team) => team.id));
 
   const { data: teamSeasons, error } = await supabaseServer
     .from("team_seasons")
@@ -79,7 +81,7 @@ export async function loadScopedCoachTeamSeasonOptions(
   const teamSeasonsInScope = (teamSeasons || []).filter((teamSeason) =>
     allowedTeamIds.has(teamSeason.team_id),
   );
-  const teamById = new Map((allowedTeams || []).map((team) => [team.id, team]));
+  const teamById = new Map(filteredTeams.map((team) => [team.id, team]));
 
   return createStatusResult(
     seasonResolution,
@@ -169,7 +171,7 @@ export async function resolveCoachTeamSeasonTargets(
   );
   const { data: teams, error: teamsError } = await supabaseServer
     .from("teams")
-    .select("id, name_de, name_en, slug, age_group, is_active, sort_order")
+    .select("id, name_de, name_en, slug, age_group, department_id, departments(slug), is_active, sort_order")
     .in("id", teamIds)
     .eq("is_active", true);
 

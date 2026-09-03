@@ -29,8 +29,8 @@ test("missing and invalid image URLs safely fall back to the normal panel", () =
   assert.doesNotMatch(background, /fetch\(/);
 });
 
-test("the existing team query, edit action and archive action stay unchanged", () => {
+test("the existing team query and archive action stay unchanged while edit keeps its route context", () => {
   assert.match(page, /\.from\("teams"\)[\s\S]*?\.select\("\*"\)/);
-  assert.match(detail, /admin\/teams\/edit\/\$\{team\.id\}/);
+  assert.match(detail, /\$\{basePath\}\/edit\/\$\{team\.id\}/);
   assert.match(detail, /removeTeamWithScopeAction\.bind/);
 });

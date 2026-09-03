@@ -16,7 +16,7 @@ import { loadMediaAssetForPicker } from "@/components/admin/media-library/media.
 
 export const dynamic = "force-dynamic";
 
-export default async function EditCoachPage({ params }) {
+export default async function EditCoachPage({ params, requiredDepartmentSlug = null }) {
   const { id } = await params;
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: "coaches.edit",
@@ -44,6 +44,11 @@ export default async function EditCoachPage({ params }) {
     [id],
   );
   const coachTeamIds = teamIdsByCoachId.get(id) || [];
+  const { data: requiredDepartment } = requiredDepartmentSlug
+    ? await supabaseServer.from("departments").select("id").eq("slug", requiredDepartmentSlug).eq("is_active", true).maybeSingle()
+    : { data: null };
+  if (requiredDepartmentSlug && coach.department_id !== requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-coach-scope");
+  const returnPath = requiredDepartmentSlug ? `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/coaches` : "/admin/coaches";
 
   if (!canEditCoachOnServer(scopeContext, coach, coachTeamIds, teamById)) {
     redirect("/admin/unauthorized?reason=missing-coach-scope");
@@ -56,6 +61,7 @@ export default async function EditCoachPage({ params }) {
   const teamOptionsResult = await loadScopedCoachTeamSeasonOptions(
     scopeContext,
     supabaseServer,
+    { requiredDepartmentId: requiredDepartment?.id || null },
   );
   const canArchive = canDeleteCoachOnServer(
     scopeContext,
@@ -72,12 +78,15 @@ export default async function EditCoachPage({ params }) {
         coach={coachDetail}
         notes={coach.notes || coach.bio_de || coach.bio_en || ""}
         canArchive={canArchive}
+        returnPath={returnPath}
       />
       <AdminCoachesForm
         coach={coach}
         teamOptionsResult={teamOptionsResult}
         coachSeasonalReadModel={coachSeasonalReadModel}
         initialMediaAsset={mediaResult.data || null}
+        sportContext={requiredDepartmentSlug === "tischtennis" ? "table_tennis" : requiredDepartmentSlug === "fussball" ? "football" : "global"}
+        returnPath={returnPath}
       />
     </AdminLayout>
   );

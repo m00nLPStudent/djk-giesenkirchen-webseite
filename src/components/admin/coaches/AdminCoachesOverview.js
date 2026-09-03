@@ -10,7 +10,7 @@ import AdminCoachesList from "./AdminCoachesList";
 import CoachFilters from "./components/CoachFilters";
 import CoachStats from "./components/CoachStats";
 
-export default function AdminCoachesOverview({ coaches = [], canCreate = false }) {
+export default function AdminCoachesOverview({ coaches = [], canCreate = false, createHref = "/admin/coaches/new", basePath = "/admin/coaches" }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("alle");
   const filteredCoaches = useMemo(() => coaches.filter((coach) =>
@@ -30,7 +30,7 @@ export default function AdminCoachesOverview({ coaches = [], canCreate = false }
         description="Trainer- und Betreuerprofile kompakt verwalten."
         actions={canCreate ? (
           <Can permission="coaches.create" uiOnly>
-            <Link href="/admin/coaches/new" className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white transition hover:bg-red-700">
+            <Link href={createHref} className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white transition hover:bg-red-700">
               <Plus size={17} aria-hidden="true" /> Neuer Trainer
             </Link>
           </Can>
@@ -44,7 +44,7 @@ export default function AdminCoachesOverview({ coaches = [], canCreate = false }
       </AdminPageHeader>
       <CoachStats coaches={coaches} />
       <CoachFilters status={status} setStatus={setStatus} />
-      <AdminCoachesList coaches={filteredCoaches} />
+      <AdminCoachesList coaches={filteredCoaches} basePath={basePath} />
     </div>
   );
 }

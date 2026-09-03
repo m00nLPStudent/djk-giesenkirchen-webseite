@@ -1,7 +1,10 @@
 import { createSlug } from "@/lib/slug";
 
 export function createTeamFormPayload(form = {}) {
-  const { coach_team_state, ...payload } = form;
+  const payload = { ...form };
+  delete payload.coach_team_state;
+  delete payload.description_en;
+  delete payload.training_times_en;
 
   return {
     ...payload,

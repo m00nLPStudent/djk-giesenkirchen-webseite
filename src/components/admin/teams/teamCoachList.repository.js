@@ -1,6 +1,6 @@
 import "server-only";
 
-export async function loadActiveTeamSeasonCoaches(db, teamSeasonId) {
+export async function loadActiveTeamSeasonCoaches(db, teamSeasonId, departmentId = null) {
   if (!teamSeasonId) return [];
 
   const { data: assignments, error: assignmentError } = await db
@@ -18,7 +18,7 @@ export async function loadActiveTeamSeasonCoaches(db, teamSeasonId) {
 
   const { data: coaches, error: coachError } = await db
     .from("coaches")
-    .select("id, slug, first_name, last_name, name, image_url, photo_url, license, is_active, sort_order")
+    .select("id, slug, first_name, last_name, name, image_url, photo_url, license, is_active, sort_order, department_id")
     .in("id", coachIds)
     .eq("is_active", true);
 
@@ -27,5 +27,5 @@ export async function loadActiveTeamSeasonCoaches(db, teamSeasonId) {
   }
 
   const assignmentByCoachId = new Map((assignments || []).map((row) => [row.coach_id, row]));
-  return (coaches || []).map((coach) => ({ coach, assignment: assignmentByCoachId.get(coach.id) }));
+  return (coaches || []).filter((coach) => !departmentId || coach.department_id === departmentId).map((coach) => ({ coach, assignment: assignmentByCoachId.get(coach.id) }));
 }

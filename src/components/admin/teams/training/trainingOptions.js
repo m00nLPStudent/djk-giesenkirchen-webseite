@@ -16,3 +16,11 @@ export const TRAINING_TYPE_OPTIONS = [
   { value: "hallentraining", label: "Hallentraining" },
   { value: "sonstiges", label: "Sonstiges" },
 ];
+
+export const TABLE_TENNIS_TRAINING_TYPE_OPTIONS = TRAINING_TYPE_OPTIONS.filter(({ value }) => ["training", "foerdertraining", "sonstiges"].includes(value));
+export const TRAINING_LOCATION_TYPE_OPTIONS = [
+  { value: "kleinfeld", label: "Kleinfeld" }, { value: "rasenplatz", label: "Rasenplatz" },
+  { value: "kunstrasen", label: "Kunstrasen" }, { value: "halle", label: "Halle" },
+];
+export function getTrainingTypeOptions(departmentSlug) { return departmentSlug === "tischtennis" ? TABLE_TENNIS_TRAINING_TYPE_OPTIONS : TRAINING_TYPE_OPTIONS; }
+export function getTrainingLocationTypeOptions(departmentSlug) { return departmentSlug === "tischtennis" ? TRAINING_LOCATION_TYPE_OPTIONS.filter(({ value }) => value === "halle") : TRAINING_LOCATION_TYPE_OPTIONS; }

@@ -8,10 +8,12 @@ import {
 } from "@/components/admin/persons/serverPersonScope";
 import { CURRENT_SEASON_STATUSES } from "@/components/admin/persons/seasonalReadModelCore.mjs";
 import { loadScopedPlayerTeamSeasonOptions } from "@/components/admin/players/services/playerTeamSeasonOptions.repository";
+import { hasManagedDepartmentRouteMismatch } from "@/lib/admin-auth/scopes/departmentManagerScope.core.mjs";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewPlayerPage() {
+export default async function NewPlayerPage({ searchParams, departmentSlug = "fussball" }) {
+  const params = await searchParams;
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: "players.create",
   });
@@ -21,9 +23,14 @@ export default async function NewPlayerPage() {
   }
 
   const scopeContext = await loadServerPersonScopeContext(permissionResult);
+  const requestedDepartmentSlug = departmentSlug || (params?.department === "tischtennis" ? "tischtennis" : null);
+  const { data: requiredDepartment } = requestedDepartmentSlug ? await permissionResult.supabaseServer.from("departments").select("id").eq("slug", requestedDepartmentSlug).eq("is_active", true).maybeSingle() : { data: null };
+  if (requestedDepartmentSlug && !requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-department-scope");
+  if (hasManagedDepartmentRouteMismatch(scopeContext, requiredDepartment?.id)) redirect("/admin/unauthorized?reason=missing-department-scope");
   const teamOptionsResult = await loadScopedPlayerTeamSeasonOptions(
     scopeContext,
     permissionResult.supabaseServer,
+    { requiredDepartmentId: requiredDepartment?.id || null },
   );
 
   if (
@@ -37,9 +44,9 @@ export default async function NewPlayerPage() {
   return (
     <AdminLayout title="Neuer Spieler" subtitle="Spieler" showHeader={false}>
       <AdminModulePage>
-        <AdminBackLink href="/admin/players">Zurück zu Spielern</AdminBackLink>
+        <AdminBackLink href={requestedDepartmentSlug ? `/admin/${requestedDepartmentSlug === "fussball" ? "football" : "table-tennis"}/players` : "/admin/players"}>Zurück zu Spielern</AdminBackLink>
         <AdminModuleHeader eyebrow="Spieler" title="Neuer Spieler" description="Spielerprofil und Mannschaftszuordnung anlegen." />
-        <AdminPlayersForm teamOptionsResult={teamOptionsResult} />
+        <AdminPlayersForm teamOptionsResult={teamOptionsResult} sportContext={requestedDepartmentSlug === "tischtennis" ? "table_tennis" : "football"} returnPath={requestedDepartmentSlug ? `/admin/${requestedDepartmentSlug === "fussball" ? "football" : "table-tennis"}/players` : "/admin/players"} />
       </AdminModulePage>
     </AdminLayout>
   );

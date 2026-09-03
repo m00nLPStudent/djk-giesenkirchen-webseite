@@ -2,7 +2,7 @@ import TrainingTimeFields from "./TrainingTimeFields";
 import { TRAINING_TYPE_OPTIONS } from "./trainingOptions";
 import { getWeekdayLabel, toTimeValue } from "./trainingFormatters";
 
-export default function TrainingTimeCard({
+export default function TrainingTimeCard({ departmentSlug,
   item,
   isHighlighted,
   isOpen,
@@ -64,6 +64,7 @@ export default function TrainingTimeCard({
           </div>
 
           <TrainingTimeFields
+            departmentSlug={departmentSlug}
             item={item}
             onFieldChange={onFieldChange}
             onPersist={onPersist}

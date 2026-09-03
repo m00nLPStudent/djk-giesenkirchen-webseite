@@ -15,6 +15,8 @@ export async function saveBoardMember(
 ) {
   const db = resolveClient(client);
   const payload = {
+    organization_scope: member.organization_scope,
+    department_id: member.department_id || null,
     role_id: member.role_id || null,
     first_name: member.first_name || null,
     last_name: member.last_name || null,

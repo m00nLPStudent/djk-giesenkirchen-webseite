@@ -55,7 +55,7 @@ async function loadPlayerAssignmentsByPlayerId(
   const teamIds = toUniqueIds((teamSeasons || []).map((row) => row?.team_id));
   const { data: teams, error: teamError } = await supabaseServer
     .from("teams")
-    .select("id, name_de, name_en, slug, age_group, is_active")
+    .select("id, name_de, name_en, slug, age_group, department_id, departments(slug, name_de), is_active")
     .in("id", teamIds)
     .eq("is_active", true);
 

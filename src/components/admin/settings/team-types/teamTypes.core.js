@@ -1,11 +1,11 @@
 const text = (value) => String(value || "").trim();
 
 export function createTeamTypeForm(item = null) {
-  return { name_de: item?.name_de || "", slug: item?.slug || "", age_group: item?.age_group || "", sort_order: item?.sort_order ?? 0, is_active: item?.is_active ?? true };
+  return { name_de: item?.name_de || "", slug: item?.slug || "", age_group: item?.age_group || "", department_id: item?.department_id || "", sort_order: item?.sort_order ?? 0, is_active: item?.is_active ?? true };
 }
 
 export function normalizeTeamTypePayload(form = {}) {
-  return { name_de: text(form.name_de), slug: text(form.slug).toLowerCase(), age_group: text(form.age_group), sort_order: Number(form.sort_order || 0), is_active: Boolean(form.is_active) };
+  return { name_de: text(form.name_de), slug: text(form.slug).toLowerCase(), age_group: text(form.age_group), department_id: text(form.department_id), sort_order: Number(form.sort_order || 0), is_active: Boolean(form.is_active) };
 }
 
 export function sortTeamTypes(items = []) {

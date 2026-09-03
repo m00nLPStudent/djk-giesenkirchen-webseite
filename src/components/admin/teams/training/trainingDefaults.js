@@ -5,6 +5,7 @@ export function createNewTrainingTime(teamSeasonId) {
     start_time: "17:00",
     end_time: "18:45",
     training_type: "training",
+    training_location_type: null,
     location_name: "Bezirkssportanlage Giesenkirchen",
     location_address: "Am Puffkohlen 80",
     location_city: "41238 Mönchengladbach",

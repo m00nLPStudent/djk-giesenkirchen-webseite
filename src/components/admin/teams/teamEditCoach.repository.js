@@ -2,7 +2,7 @@ import "server-only";
 
 import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
 
-export async function loadTeamEditCoachData(supabaseServer, teamId) {
+export async function loadTeamEditCoachData(supabaseServer, teamId, departmentId = null) {
   const currentSeasonResolution = await loadCurrentSeasonResolution(
     supabaseServer,
   );
@@ -85,8 +85,15 @@ export async function loadTeamEditCoachData(supabaseServer, teamId) {
     );
   }
 
+  const currentTeamIds = Array.from(new Set((currentSeasonTeamSeasons || []).map((item) => item.team_id).filter(Boolean)));
+  const { data: currentTeams } = currentTeamIds.length ? await supabaseServer.from("teams").select("id, department_id").in("id", currentTeamIds) : { data: [] };
+  const departmentByTeamId = new Map((currentTeams || []).map((item) => [item.id, item.department_id]));
+  const teamIdBySeasonId = new Map((currentSeasonTeamSeasons || []).map((item) => [item.id, item.team_id]));
+  const inDepartmentCoachIds = new Set(departmentId ? (currentSeasonCoachAssignments || []).filter((assignment) => departmentByTeamId.get(teamIdBySeasonId.get(assignment.team_season_id)) === departmentId).map((assignment) => assignment.coach_id) : []);
+  const scopedCoaches = departmentId ? (coaches || []).filter((coach) => inDepartmentCoachIds.has(coach.id)) : (coaches || []);
+
   return {
-    coaches: coaches || [],
+    coaches: scopedCoaches,
     coachAssignments: coachAssignments || [],
     currentSeasonCoachAssignments: currentSeasonCoachAssignments || [],
     currentSeasonResolution,

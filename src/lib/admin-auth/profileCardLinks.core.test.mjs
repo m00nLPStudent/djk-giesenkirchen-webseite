@@ -55,6 +55,12 @@ test("buildBoardCardLabel keeps board labels unchanged", () => {
   );
 });
 
+test("board linking DTO preserves the explicit organization contract", () => {
+  const row = createCardRow({ id: "board-1", organization_scope: "club", department_id: null }, "board");
+  assert.equal(row.organizationScope, "club");
+  assert.equal(row.departmentId, null);
+});
+
 test("normalizeEmailForCardMatching lowercases and strips spaces", () => {
   assert.equal(
     normalizeEmailForCardMatching(" Mira.Muster @Example.TEST "),

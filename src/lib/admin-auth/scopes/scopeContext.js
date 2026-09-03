@@ -35,6 +35,8 @@ export function createEmptyScopeContext(overrides = {}) {
     assignedTeamIds: [],
     coachId: null,
     boardMemberId: null,
+    managedDepartmentId: null,
+    managedDepartmentSlug: null,
     isGlobal: false,
     canAccessYouthAll: false,
     ...overrides,

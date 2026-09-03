@@ -11,7 +11,7 @@ import TabNavigation from "@/components/admin/ui/TabNavigation";
 import { REQUIRED_FIELDS_MESSAGE } from "@/components/admin/utils/validation";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { PLAYER_PLACEHOLDER_IMAGE } from "../services/players.service";
-import { getPositionOptions, POSITION_EN } from "./playerForm.config";
+import { getPositionOptions } from "./playerForm.config";
 import {
   createInitialPlayerForm,
   createPlayerPayload,
@@ -39,6 +39,8 @@ export default function AdminPlayersForm({
   player,
   teamOptionsResult,
   playerSeasonalReadModel,
+  sportContext = "football",
+  returnPath = "/admin/players",
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
@@ -59,7 +61,15 @@ export default function AdminPlayersForm({
     hasErrors,
   } = useEntityForm({
     initialForm: createInitialPlayerForm(player, playerSeasonalReadModel),
-    validate: validatePlayerForm,
+    validate: (nextForm) => {
+      const option = teamOptions.find((item) => item.teamSeasonId === nextForm.team_season_id);
+      const relation = option?.team?.departments;
+      const slug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
+      const validationContext = sportContext === "global"
+        ? (slug === "tischtennis" ? "table_tennis" : "football")
+        : sportContext;
+      return validatePlayerForm(nextForm, validationContext);
+    },
   });
 
   const blockingMessage = getPlayerFormBlockingMessage(
@@ -75,6 +85,13 @@ export default function AdminPlayersForm({
       ),
     [form.team_season_id, teamOptions],
   );
+  const selectedTeamRelation = selectedTeam?.team?.departments;
+  const selectedDepartmentSlug = Array.isArray(selectedTeamRelation)
+    ? selectedTeamRelation[0]?.slug
+    : selectedTeamRelation?.slug;
+  const effectiveSportContext = sportContext === "global"
+    ? (selectedDepartmentSlug === "tischtennis" ? "table_tennis" : "football")
+    : sportContext;
 
   const positionOptions = useMemo(
     () => getPositionOptions(selectedTeam?.teamNameDe),
@@ -87,7 +104,6 @@ export default function AdminPlayersForm({
     setForm((current) => ({
       ...current,
       position_de: value,
-      position_en: POSITION_EN[value] || value,
     }));
 
     if (errors.position_de) {
@@ -129,6 +145,7 @@ export default function AdminPlayersForm({
     const { error } = await savePlayerWithScopeAction(
       payload,
       player?.id ?? null,
+      { departmentSlug: sportContext === "global" ? null : sportContext === "table_tennis" ? "tischtennis" : "fussball" },
     );
 
     setLoading(false);
@@ -154,14 +171,14 @@ export default function AdminPlayersForm({
       navigationTriggered: true,
     });
 
-    router.push("/admin/players");
+    router.push(returnPath);
     router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit} className="mt-10 space-y-6" noValidate>
       <TabNavigation
-        tabs={PLAYER_FORM_TABS}
+        tabs={effectiveSportContext === "table_tennis" ? PLAYER_FORM_TABS.filter((tab) => tab.id !== "sport") : PLAYER_FORM_TABS}
         activeTab={activeTab}
         onChange={setActiveTab}
       />
@@ -176,18 +193,21 @@ export default function AdminPlayersForm({
         <FormSection
           eyebrow="Spieler"
           title="Persönliche Daten"
-          description="Grunddaten, Mannschaftszuordnung und Rückennummer des Spielers."
+          description={effectiveSportContext === "table_tennis"
+            ? "Grunddaten und Mannschaftszuordnung des Spielers."
+            : "Grunddaten, Mannschaftszuordnung und Rückennummer des Spielers."}
         >
           <PlayerBasicFields
             form={form}
             errors={errors}
             teamOptions={teamOptions}
             updateField={updateField}
+            sportContext={effectiveSportContext}
           />
         </FormSection>
       )}
 
-      {activeTab === "sport" && (
+      {activeTab === "sport" && effectiveSportContext !== "table_tennis" && (
         <FormSection
           eyebrow="Sport"
           title="Sportliche Angaben"
@@ -198,6 +218,7 @@ export default function AdminPlayersForm({
             errors={errors}
             positionOptions={positionOptions}
             updateField={updateField}
+            sportContext={effectiveSportContext}
             updatePosition={updatePosition}
           />
         </FormSection>
@@ -214,6 +235,7 @@ export default function AdminPlayersForm({
             errors={errors}
             calculatedYearGroup={calculatedYearGroup}
             updateField={updateField}
+            sportContext={effectiveSportContext}
           />
         </FormSection>
       )}
@@ -247,7 +269,7 @@ export default function AdminPlayersForm({
       <AdminSaveBar
         loading={loading}
         submitLabel="Spieler speichern"
-        cancelHref="/admin/players"
+        cancelHref={returnPath}
       />
     </form>
   );

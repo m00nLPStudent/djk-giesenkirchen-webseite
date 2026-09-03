@@ -35,7 +35,7 @@ export default function AdminCreateMenu() {
       href: "/admin/department/board/new",
       label: "Neues Vorstandsmitglied",
       icon: Building2,
-      requiredPermission: "settings.edit",
+      requiredPermission: "board.create",
     },
     {
       href: "/admin/teams/new",

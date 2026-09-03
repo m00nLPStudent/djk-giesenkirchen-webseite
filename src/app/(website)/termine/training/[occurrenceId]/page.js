@@ -5,6 +5,7 @@ import {
   formatEventDate,
   formatEventTime,
   getVirtualTrainingEvents,
+  getTrainingLocationTypeLabel,
 } from "@/lib/events";
 
 function getTrainingTypeLabel(type = "training") {
@@ -93,7 +94,7 @@ export default async function TrainingDetailPage({ params }) {
   const teamName = getTeamName(event);
   const trainingTypeLabel = getTrainingTypeLabel(event.training_type);
   const teamHref = event.team_slug ? `/fussball/${event.team_slug}` : null;
-  const location = [event.location_name, event.location_city]
+  const location = [getTrainingLocationTypeLabel(event.training_location_type), event.location_name, event.location_city]
     .filter(Boolean)
     .join(" · ");
   const mapsUrl = buildGoogleMapsSearchUrl({

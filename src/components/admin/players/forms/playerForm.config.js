@@ -21,16 +21,6 @@ export const POSITION_EN = {
   Mittelstürmer: "Centre forward",
 };
 
-export const REQUIRED_PLAYER_FIELDS = {
-  team_season_id: "Mannschaft",
-  first_name: "Vorname",
-  last_name: "Nachname",
-  birthdate: "Geburtsdatum",
-  position_de: "Position",
-  nationality: "Nationalität",
-  gender: "Geschlecht",
-};
-
 const germany = COUNTRIES.find((country) => country.iso === "DE");
 
 export const COUNTRY_OPTIONS = germany

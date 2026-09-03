@@ -75,7 +75,7 @@ export default function TeamBaseTab({
           </div>
         </>
       ) : (
-        <FormGrid>
+        <><FormGrid>
           <SelectField
             label="Abteilung"
             required
@@ -105,7 +105,7 @@ export default function TeamBaseTab({
           <InputField label="Slug" value={form.slug} disabled />
           <InputField label="Altersgruppe" value={form.age_group} disabled />
           <InputField label="Bearbeitete Saison" value={form.season} disabled />
-        </FormGrid>
+        </FormGrid>{form.department_id && teamTemplates.length === 0 ? <div className="mt-4"><FormHintBox eyebrow="Keine Mannschaftsvorlagen">Für diese Abteilung sind noch keine aktiven Mannschaftsvorlagen eingerichtet.</FormHintBox></div> : null}</>
       )}
     </FormSection>
   );

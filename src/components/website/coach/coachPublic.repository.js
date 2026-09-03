@@ -10,7 +10,7 @@ import {
 } from "@/components/admin/persons/coachSeasonalReadModelRepository";
 
 const PUBLIC_COACH_SELECT =
-  "id, first_name, last_name, name, slug, role, role_de, role_en, email, phone, whatsapp, license, nationality, image_url, photo_url, is_active, sort_order";
+  "id, first_name, last_name, name, slug, role, role_de, role_en, email, phone, whatsapp, license, nationality, image_url, photo_url, is_active, sort_order, department_id";
 
 function sortByName(a, b) {
   return String(a.displayName || "").localeCompare(String(b.displayName || ""));
@@ -32,13 +32,14 @@ function mapCoachDtos(coaches = [], readModels = new Map()) {
 
 export async function loadActivePublicCoachDtos(
   supabaseServer,
-  { getReadModelsMap = getCoachSeasonalReadModelsMap } = {},
+  { getReadModelsMap = getCoachSeasonalReadModelsMap, departmentId = null } = {},
 ) {
-  const { data: coaches, error } = await supabaseServer
+  let query = supabaseServer
     .from("coaches")
     .select(PUBLIC_COACH_SELECT)
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+    .eq("is_active", true);
+  if (departmentId) query = query.eq("department_id", departmentId);
+  const { data: coaches, error } = await query.order("sort_order", { ascending: true });
 
   if (error) {
     throw new Error(
@@ -82,18 +83,20 @@ export async function loadPublicCoachBySlug(
 export async function loadPublicCoachDtosByIds(
   supabaseServer,
   coachIds = [],
-  { getReadModelsMap = getCoachSeasonalReadModelsMap } = {},
+  { getReadModelsMap = getCoachSeasonalReadModelsMap, departmentId = null } = {},
 ) {
   const uniqueCoachIds = Array.from(new Set((coachIds || []).filter(Boolean)));
   if (uniqueCoachIds.length === 0) {
     return [];
   }
 
-  const { data: coaches, error } = await supabaseServer
+  let query = supabaseServer
     .from("coaches")
     .select(PUBLIC_COACH_SELECT)
     .in("id", uniqueCoachIds)
     .eq("is_active", true);
+  if (departmentId) query = query.eq("department_id", departmentId);
+  const { data: coaches, error } = await query;
 
   if (error) {
     throw new Error(

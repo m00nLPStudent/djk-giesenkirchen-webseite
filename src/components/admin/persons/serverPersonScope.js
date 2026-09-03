@@ -11,8 +11,12 @@ import {
   getCoachTeamIdsMap as getCoachTeamIdsMapFromRepository,
   getPlayerTeamIdsMap as getPlayerTeamIdsMapFromRepository,
 } from "./personTeamRepository";
+import {
+  canAccessBoardMember,
+  isBoardGlobalBusinessManager,
+} from "@/components/admin/board/boardRoleContract.core.mjs";
 
-const GLOBAL_PERSON_MODULE_ROLE_KEYS = ["vorstand", "fussball-vorstand"];
+const GLOBAL_PERSON_MODULE_ROLE_KEYS = ["vorstand"];
 
 function normalizePermissionKeys(permissions = []) {
   return (permissions || [])
@@ -48,6 +52,10 @@ function canReadPeopleGlobally(scopeContext) {
   );
 }
 
+export function isDepartmentManagerScope(scopeContext) {
+  return Boolean(scopeContext?.managedDepartmentId && hasScopeType(scopeContext, "department_manager"));
+}
+
 function isOwnCoachCard(scopeContext, coach = {}) {
   if (!scopeContext || !coach) return false;
 
@@ -76,6 +84,10 @@ function canMutateAllTargetTeams(
 ) {
   if (canAccessAllPersonModules(scopeContext)) return true;
   if (!teamIds.length) return false;
+
+  if (isDepartmentManagerScope(scopeContext)) {
+    return teamIds.every((teamId) => canAccessAssignedTeam(scopeContext, teamId));
+  }
 
   if (canAccessYouth(scopeContext)) {
     return teamIds.every((teamId) => isYouthTeamId(teamId, teamById));
@@ -116,7 +128,7 @@ export async function getPlayerAssignedTeamIds(supabaseServer, playerId) {
 export async function getCoachTeamIdsMap(
   supabaseServer,
   coachIds = [],
-  { activeSeasonId = null, includeLegacyFallback = true } = {},
+  { activeSeasonId = null, includeLegacyFallback = false } = {},
 ) {
   return await getCoachTeamIdsMapFromRepository(supabaseServer, coachIds, {
     activeSeasonId,
@@ -135,8 +147,10 @@ export function canViewPlayerOnServer(
   scopeContext,
   playerTeamIds = [],
   teamById = new Map(),
+  player = {},
 ) {
   if (canReadPeopleGlobally(scopeContext)) return true;
+  if (isDepartmentManagerScope(scopeContext)) return player.department_id === scopeContext.managedDepartmentId;
 
   if (canAccessYouth(scopeContext)) {
     return playerTeamIds.some((teamId) => isYouthTeamId(teamId, teamById));
@@ -149,7 +163,9 @@ export function canEditPlayerOnServer(
   scopeContext,
   playerTeamIds = [],
   teamById = new Map(),
+  player = {},
 ) {
+  if (isDepartmentManagerScope(scopeContext)) return player.department_id === scopeContext.managedDepartmentId;
   return canMutateAllTargetTeams(scopeContext, playerTeamIds, teamById);
 }
 
@@ -165,7 +181,9 @@ export function canDeletePlayerOnServer(
   scopeContext,
   playerTeamIds = [],
   teamById = new Map(),
+  player = {},
 ) {
+  if (isDepartmentManagerScope(scopeContext)) return player.department_id === scopeContext.managedDepartmentId;
   return canMutateAllTargetTeams(scopeContext, playerTeamIds, teamById);
 }
 
@@ -177,6 +195,7 @@ export function canViewCoachOnServer(
 ) {
   if (canReadPeopleGlobally(scopeContext)) return true;
   if (isOwnCoachCard(scopeContext, coach)) return true;
+  if (isDepartmentManagerScope(scopeContext)) return coach.department_id === scopeContext.managedDepartmentId;
 
   if (canAccessYouth(scopeContext)) {
     return coachTeamIds.some((teamId) => isYouthTeamId(teamId, teamById));
@@ -192,6 +211,9 @@ export function canEditCoachOnServer(
   teamById = new Map(),
 ) {
   if (canAccessAllPersonModules(scopeContext)) return true;
+  if (isDepartmentManagerScope(scopeContext)) {
+    return coach.department_id === scopeContext.managedDepartmentId;
+  }
   if (isOwnCoachCard(scopeContext, coach)) return true;
 
   if (canAccessYouth(scopeContext)) {
@@ -206,7 +228,7 @@ export function canEditCoachOnServer(
 
 export function canCreateCoachOnServer(scopeContext) {
   return (
-    canAccessAllPersonModules(scopeContext) || canAccessYouth(scopeContext)
+    canAccessAllPersonModules(scopeContext) || isDepartmentManagerScope(scopeContext) || canAccessYouth(scopeContext)
   );
 }
 
@@ -218,6 +240,10 @@ export function canDeleteCoachOnServer(
 ) {
   if (canAccessAllPersonModules(scopeContext)) return true;
 
+  if (isDepartmentManagerScope(scopeContext)) {
+    return coach.department_id === scopeContext.managedDepartmentId;
+  }
+
   if (canAccessYouth(scopeContext)) {
     return (
       coachTeamIds.length > 0 &&
@@ -228,28 +254,32 @@ export function canDeleteCoachOnServer(
   return false;
 }
 
-export function canViewBoardMemberOnServer(scopeContext) {
-  if (canReadPeopleGlobally(scopeContext)) return true;
-  return hasScopeType(scopeContext, "own_board_card");
+export function canViewBoardMemberOnServer(scopeContext, boardMember = {}) {
+  return canAccessBoardMember(scopeContext, boardMember);
 }
 
-export function canEditBoardMemberOnServer(scopeContext, boardMember = {}) {
+export function canAccessBoardDepartmentOnServer(scopeContext, boardMember = {}) {
   if (canAccessAll(scopeContext)) return true;
-
   return Boolean(
-    scopeContext?.adminProfileId &&
-    boardMember?.admin_profile_id &&
-    scopeContext.adminProfileId === boardMember.admin_profile_id,
+    scopeContext?.managedDepartmentId
+    && boardMember?.organization_scope === "department"
+    && boardMember?.department_id === scopeContext.managedDepartmentId,
   );
 }
 
+export function canEditBoardMemberOnServer(scopeContext, boardMember = {}) {
+  return canAccessBoardMember(scopeContext, boardMember);
+}
+
 export function canCreateBoardMemberOnServer(scopeContext) {
-  return canAccessAll(scopeContext);
+  return isBoardGlobalBusinessManager(scopeContext);
 }
 
 export function canDeleteBoardMemberOnServer(scopeContext) {
-  return canAccessAll(scopeContext);
+  return isBoardGlobalBusinessManager(scopeContext);
 }
+
+export { isBoardGlobalBusinessManager as canManageAllBoardMembersOnServer };
 
 export async function loadScopedActiveTeamsForPeople(
   scopeContext,

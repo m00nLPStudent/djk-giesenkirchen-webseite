@@ -81,6 +81,7 @@ export function buildCoachMasterPayload(
     nationality: toNullableString(coach?.nationality),
     sort_order: primaryAssignment?.sortOrder ?? toRequiredNumber(coach?.sort_order, 0),
     is_active: coach?.is_active ?? true,
+    department_id: coach?.department_id || null,
   };
 }
 
@@ -106,6 +107,7 @@ export function buildCoachMasterRollbackPayload(
     nationality: toNullableString(coach?.nationality),
     sort_order: toRequiredNumber(coach?.sort_order, 0),
     is_active: coach?.is_active ?? true,
+    department_id: coach?.department_id || null,
   };
 }
 

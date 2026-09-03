@@ -39,6 +39,8 @@ export default function AdminCoachesForm({
   teamOptionsResult,
   coachSeasonalReadModel,
   initialMediaAsset = null,
+  sportContext = "football",
+  returnPath = "/admin/coaches",
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
@@ -65,6 +67,15 @@ export default function AdminCoachesForm({
     ),
     validate: validateCoachForm,
   });
+  const assignedDepartmentSlugs = useMemo(() => new Set((form.assignments || []).flatMap((assignment) => {
+    const option = teamOptions.find((item) => item.teamSeasonId === assignment.team_season_id);
+    const relation = option?.team?.departments;
+    const slug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
+    return slug ? [slug] : [];
+  })), [form.assignments, teamOptions]);
+  const effectiveSportContext = sportContext === "global" && assignedDepartmentSlugs.size === 1 && assignedDepartmentSlugs.has("tischtennis")
+    ? "table_tennis"
+    : sportContext === "global" ? "football" : sportContext;
 
   const blockingMessage = getCoachFormBlockingMessage(
     teamOptionsResult,
@@ -108,6 +119,7 @@ export default function AdminCoachesForm({
     const { error } = await saveCoachWithScopeAction(
       createCoachPayload(form),
       coach?.id ?? null,
+      { departmentSlug: sportContext === "global" ? null : sportContext === "table_tennis" ? "tischtennis" : "fussball" },
     );
     setLoading(false);
 
@@ -133,7 +145,7 @@ export default function AdminCoachesForm({
     });
 
     await revalidatePublicContentAction("coaches");
-    router.push("/admin/coaches");
+    router.push(returnPath);
     router.refresh();
   }
 
@@ -171,6 +183,7 @@ export default function AdminCoachesForm({
             form={form}
             errors={errors}
             updateField={updateField}
+            sportContext={effectiveSportContext}
           />
         </FormSection>
       )}
@@ -191,6 +204,7 @@ export default function AdminCoachesForm({
               setForm(updater);
             }}
             updateField={updateField}
+            sportContext={effectiveSportContext}
           />
         </FormSection>
       )}
@@ -242,7 +256,7 @@ export default function AdminCoachesForm({
       <AdminSaveBar
         loading={loading}
         submitLabel="Trainer speichern"
-        cancelHref="/admin/coaches"
+        cancelHref={returnPath}
       />
     </form>
   );

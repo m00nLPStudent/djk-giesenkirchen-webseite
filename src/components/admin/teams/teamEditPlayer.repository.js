@@ -134,7 +134,7 @@ async function loadPlayerIdsAssignedToTeam(supabaseServer, teamId) {
   return new Set((assignments || []).map((assignment) => assignment?.player_id).filter(Boolean));
 }
 
-export async function loadTeamEditPlayerOptions(supabaseServer, teamId = null) {
+export async function loadTeamEditPlayerOptions(supabaseServer, teamId = null, departmentId = null) {
   const [players, seasonResolution] = await Promise.all([
     loadActivePlayers(supabaseServer),
     loadCurrentSeasonResolution(supabaseServer),
@@ -158,14 +158,17 @@ export async function loadTeamEditPlayerOptions(supabaseServer, teamId = null) {
     ),
     loadPlayerIdsAssignedToTeam(supabaseServer, teamId),
   ]);
+  const currentTeamIds = uniqueIds([...currentTeamIdsByPlayerId.values()].flat());
+  const { data: currentTeams } = currentTeamIds.length ? await supabaseServer.from("teams").select("id, department_id").in("id", currentTeamIds) : { data: [] };
+  const departmentByTeamId = new Map((currentTeams || []).map((item) => [item.id, item.department_id]));
 
   return sortPlayersByIdentity(
     mappedPlayers.filter((player) => {
       const currentTeamIds = currentTeamIdsByPlayerId.get(player.id) || [];
 
-      if (currentTeamIds.length === 0) {
-        return true;
-      }
+      if (departmentId && !currentTeamIds.some((currentTeamId) => departmentByTeamId.get(currentTeamId) === departmentId)) return false;
+
+      if (currentTeamIds.length === 0) return !departmentId;
 
       if (!teamId) {
         return false;

@@ -43,7 +43,7 @@ test("direct fach uploads remain public and assignments reuse the central servic
 
 test("board mutations and publish transitions require their dedicated permissions", () => {
   assert.doesNotMatch(domainActions.board, /boardMemberId \? "settings\.view" : "settings\.edit"/);
-  assert.equal(domainActions.board.match(/requiredPermission: "settings\.edit"/g)?.length, 3);
+  for (const permission of ["board.create", "board.edit", "board.delete"]) assert.match(domainActions.board, new RegExp(permission.replace(".", "\\.")));
   assert.match(domainActions.news, /requiredPermission: "news\.publish"/);
   assert.match(domainActions.events, /requiredPermission: "events\.publish"/);
   assert.match(domainActions.history, /requiredPermission: "club_history\.publish"/);

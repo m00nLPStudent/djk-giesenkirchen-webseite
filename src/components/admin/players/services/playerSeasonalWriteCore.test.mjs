@@ -19,6 +19,7 @@ test("buildPlayerMasterPayload keeps seasonal assignment snapshots out of the ma
       shirt_number: "10",
       position_de: "Mittelfeld",
       position_en: "Midfield",
+      strong_hand: "Rechts",
       image_url: "https://example.test/max.png",
       assignment_sort_order: "4",
       is_captain: true,
@@ -29,6 +30,7 @@ test("buildPlayerMasterPayload keeps seasonal assignment snapshots out of the ma
   );
 
   assert.equal(payload.image_url, "https://example.test/max.png");
+  assert.equal(payload.strong_hand, "Rechts");
   assert.equal(Object.hasOwn(payload, "photo_url"), false);
   assert.equal("team_id" in payload, false);
   assert.equal("shirt_number" in payload, false);
@@ -259,12 +261,18 @@ test("determinePlayerAssignmentOperation blocks multiple active assignments", ()
   assert.equal(result.code, "MULTIPLE_ACTIVE_CURRENT_ASSIGNMENTS");
 });
 
-test("determinePlayerAssignmentOperation blocks missing team season targets", () => {
-  const result = determinePlayerAssignmentOperation(
-    [],
-    { teamSeasonId: "" },
-  );
+test("determinePlayerAssignmentOperation keeps a teamless player unchanged", () => {
+  const result = determinePlayerAssignmentOperation([], null);
+  assert.equal(result.ok, true);
+  assert.equal(result.operation, PLAYER_ASSIGNMENT_OPERATIONS.UNCHANGED);
+  assert.equal(result.currentAssignmentId, null);
+});
 
-  assert.equal(result.ok, false);
-  assert.equal(result.code, "INVALID_TEAM_SEASON_ID");
+test("determinePlayerAssignmentOperation deactivates the current assignment when team is removed", () => {
+  const result = determinePlayerAssignmentOperation([
+    { playerTeamSeasonId: "pts-1", teamSeasonId: "ts-1", isActive: true },
+  ], null);
+  assert.equal(result.ok, true);
+  assert.equal(result.operation, PLAYER_ASSIGNMENT_OPERATIONS.DEACTIVATE);
+  assert.equal(result.currentAssignmentId, "pts-1");
 });

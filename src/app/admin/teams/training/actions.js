@@ -8,6 +8,16 @@ import { logTrainingNotificationFailure, notifyTrainingMutation } from "@/compon
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 
 const errorResult = (message) => ({ data: null, error: { message } });
+const TYPES = { tischtennis: new Set(["training", "foerdertraining", "sonstiges"]), default: new Set(["training", "spiel", "torwart", "foerdertraining", "athletik", "hallentraining", "sonstiges"]) };
+const LOCATIONS = { tischtennis: new Set(["halle"]), default: new Set(["kleinfeld", "rasenplatz", "kunstrasen", "halle"]) };
+function validateTrainingContract(item, context) {
+  const relation = context.team?.departments;
+  const slug = (Array.isArray(relation) ? relation[0]?.slug : relation?.slug) || context.team?.department_slug;
+  const key = slug === "tischtennis" ? "tischtennis" : "default";
+  if (!TYPES[key].has(item.training_type)) return "Diese Trainingsart ist für die Abteilung nicht zulässig.";
+  if (!item.training_location_type || !LOCATIONS[key].has(item.training_location_type)) return "Bitte eine zulässige Platzart auswählen.";
+  return null;
+}
 
 async function loadBaseAuth() {
   const auth = await assertAdminActionPermission({ requiredPermission: "teams.edit" });
@@ -20,7 +30,7 @@ async function loadTeamContext(db, teamSeasonId) {
   const seasonRow = await db.from("team_seasons").select("id, team_id, season_id, name_de, is_active").eq("id", teamSeasonId).maybeSingle();
   if (seasonRow.error || !seasonRow.data) return { error: seasonRow.error || { message: "Team-Saison nicht gefunden." } };
   const [team, season] = await Promise.all([
-    db.from("teams").select("*").eq("id", seasonRow.data.team_id).maybeSingle(),
+    db.from("teams").select("*, departments(slug)").eq("id", seasonRow.data.team_id).maybeSingle(),
     db.from("seasons").select("id, name, slug").eq("id", seasonRow.data.season_id).maybeSingle(),
   ]);
   if (team.error || !team.data || season.error) return { error: team.error || season.error || { message: "Mannschaft nicht gefunden." } };
@@ -54,6 +64,8 @@ export async function createTrainingTimeAction(payload) {
   if (state.error) return state.error;
   const context = await authorizeContext(state, teamSeasonIds[0]);
   if (context.error) return errorResult(context.error.message);
+  const contractError = items.map((item) => validateTrainingContract(item, context)).find(Boolean);
+  if (contractError) return errorResult(contractError);
   const write = await state.auth.supabaseServer.from("team_training_times").insert(items).select("*");
   if (write.error) return write;
   const ids = (write.data || []).map((item) => item.id);
@@ -74,6 +86,8 @@ export async function updateTrainingTimeAction(id, payload) {
   if (oldContext.error) return errorResult(oldContext.error.message);
   const newContext = nextPayload.team_season_id === before.data.team_season_id ? oldContext : await authorizeContext(state, nextPayload.team_season_id);
   if (newContext.error) return errorResult(newContext.error.message);
+  const contractError = validateTrainingContract(nextPayload, newContext);
+  if (contractError) return errorResult(contractError);
   const write = await state.auth.supabaseServer.from("team_training_times").update(nextPayload).eq("id", id).select("*").single();
   if (write.error) return write;
   const plan = getTrainingTimePlan(before.data, write.data);

@@ -38,7 +38,7 @@ function comparePlayerRows(a = {}, b = {}) {
   );
 }
 
-export default async function AdminTeamDetailPage({ params }) {
+export default async function AdminTeamDetailPage({ params, requiredDepartmentSlug = null }) {
   const { id } = await params;
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: "teams.view",
@@ -60,6 +60,13 @@ export default async function AdminTeamDetailPage({ params }) {
   if (!team || !canAccessTeamOnServer(scopeContext, team)) {
     redirect("/admin/unauthorized?reason=missing-team-scope");
   }
+  const { data: requiredDepartment } = requiredDepartmentSlug
+    ? await supabaseServer.from("departments").select("id").eq("slug", requiredDepartmentSlug).eq("is_active", true).maybeSingle()
+    : { data: null };
+  if (requiredDepartmentSlug && team.department_id !== requiredDepartment?.id) redirect("/admin/unauthorized?reason=missing-team-scope");
+  const basePath = requiredDepartmentSlug
+    ? `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/teams`
+    : "/admin/teams";
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
   const teamSeasonResolution = await loadCurrentSeasonResolution(supabaseServer);
 
@@ -165,18 +172,23 @@ export default async function AdminTeamDetailPage({ params }) {
     teamMediaAssetId: team.team_image_media_asset_id,
     teamLegacyUrl: team.team_image_url,
   }, teamMediaUrls.data);
-  const coachResults = await loadActiveTeamSeasonCoaches(supabaseServer, currentTeamSeason?.id);
+  const coachResults = await loadActiveTeamSeasonCoaches(supabaseServer, currentTeamSeason?.id, team.department_id);
   const coachIds = coachResults.map(({ coach }) => coach.id);
   const mayOpenCoachDetails = permissionResult.permissions.includes("coaches.edit");
   const coachScopeContext = mayOpenCoachDetails ? await loadServerPersonScopeContext(permissionResult) : null;
   const coachScopeData = mayOpenCoachDetails && coachIds.length
     ? await getCoachTeamIdsMap(supabaseServer, coachIds)
     : { teamIdsByCoachId: new Map(), teamById: new Map() };
-  const coachRows = coachResults.map(({ coach, assignment }) => createTeamCoachListDto(coach, assignment, {
+  const coachRows = coachResults.map(({ coach, assignment }) => {
+    const dto = createTeamCoachListDto(coach, assignment, {
     teamName: team.name_de,
     seasonLabel: contributionSeasonResolution?.activeSeasonName || "Keine Saison",
     canOpen: mayOpenCoachDetails && canEditCoachOnServer(coachScopeContext, coach, coachScopeData.teamIdsByCoachId.get(coach.id) || [], coachScopeData.teamById),
-  }));
+    });
+    return requiredDepartmentSlug && dto.detailHref
+      ? { ...dto, detailHref: `/admin/${requiredDepartmentSlug === "fussball" ? "football" : "table-tennis"}/coaches/edit/${coach.id}` }
+      : dto;
+  });
 
   return (
     <AdminLayout title="Mannschaftsdetails" subtitle="Mannschaften" showHeader={false}>
@@ -196,6 +208,7 @@ export default async function AdminTeamDetailPage({ params }) {
           contributionSeasonWarning={contributionSeasonWarning}
           teamSummary={teamSummary}
           players={playerRows}
+          basePath={basePath}
         />
       </div>
     </AdminLayout>

@@ -29,6 +29,7 @@ function getSeasonStatusMessage(status) {
 export async function loadScopedPlayerTeamSeasonOptions(
   scopeContext,
   supabaseServer,
+  { requiredDepartmentId = null } = {},
 ) {
   const seasonResolution = await loadCurrentSeasonResolution(supabaseServer);
 
@@ -60,7 +61,7 @@ export async function loadScopedPlayerTeamSeasonOptions(
 
   const { data: teams, error: teamsError } = await supabaseServer
     .from("teams")
-    .select("id, name_de, name_en, slug, age_group, is_active, sort_order")
+    .select("id, name_de, name_en, slug, age_group, department_id, departments(slug), is_active, sort_order")
     .in("id", teamIds)
     .eq("is_active", true);
 
@@ -73,6 +74,7 @@ export async function loadScopedPlayerTeamSeasonOptions(
   const teamById = new Map((teams || []).map((team) => [team.id, team]));
   const teamOptions = (teamSeasons || [])
     .filter((teamSeason) => teamById.has(teamSeason.team_id))
+    .filter((teamSeason) => !requiredDepartmentId || teamById.get(teamSeason.team_id)?.department_id === requiredDepartmentId)
     .filter((teamSeason) =>
       canCreatePlayerOnServer(
         scopeContext,
@@ -140,7 +142,7 @@ export async function resolvePlayerTeamSeasonTarget(supabaseServer, teamSeasonId
 
   const { data: team, error: teamError } = await supabaseServer
     .from("teams")
-    .select("id, name_de, name_en, slug, age_group, is_active, sort_order")
+    .select("id, name_de, name_en, slug, age_group, department_id, departments(slug), is_active, sort_order")
     .eq("id", teamSeason.team_id)
     .eq("is_active", true)
     .maybeSingle();

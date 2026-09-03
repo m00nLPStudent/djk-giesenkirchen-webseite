@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { formatEventDate, formatEventTime } from "@/lib/events";
+import { formatEventDate, formatEventTime, getTrainingLocationTypeLabel } from "@/lib/events";
 
 export default function EventCard({ event }) {
-  const locationLabel = [event.location_name, event.location_city]
+  const locationLabel = [getTrainingLocationTypeLabel(event.training_location_type), event.location_name, event.location_city]
     .filter(Boolean)
     .join(" · ");
   const isVirtualTraining =

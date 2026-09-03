@@ -67,6 +67,7 @@ export default function AdminTeamsForm({
   initialSeasonMediaByTeamSeasonId = {},
   initialTeamContactMedia = null,
   initialSeasonContactMediaByTeamSeasonId = {},
+  returnPath = "/admin/teams",
 }) {
   const router = useRouter();
   const initialSeason = useMemo(() => getCurrentSeason(seasons), [seasons]);
@@ -93,6 +94,7 @@ export default function AdminTeamsForm({
     () => getCoachStatusMessage(currentSeasonResolution, currentTeamSeasons),
     [currentSeasonResolution, currentTeamSeasons],
   );
+  const selectedDepartment = departments.find((department) => department.id === form.department_id);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -162,13 +164,13 @@ export default function AdminTeamsForm({
 
     if (isEditMode && !canAccessTeamInScope(team || {})) {
       alert("Du hast keinen Zugriff auf diese Mannschaft.");
-      router.push("/admin/teams");
+      router.push(returnPath);
       return;
     }
 
     if (!isEditMode && !canCreateTeamInScope(form)) {
       alert("Du darfst diese Mannschaft nicht erstellen.");
-      router.push("/admin/teams");
+      router.push(returnPath);
       return;
     }
 
@@ -233,7 +235,7 @@ export default function AdminTeamsForm({
     });
 
     await revalidatePublicContentAction("teams");
-    router.push("/admin/teams");
+    router.push(returnPath);
     router.refresh();
   }
 
@@ -268,7 +270,7 @@ export default function AdminTeamsForm({
         <TeamDescriptionTab form={form} onFieldChange={updateField} />
       )}
       {activeTab === "training" && (
-        <TeamTrainingTab form={form} onFieldChange={updateField} />
+        <TeamTrainingTab form={form} onFieldChange={updateField} departmentSlug={selectedDepartment?.slug || null} />
       )}
       {activeTab === "players" && (
         <TeamPlayersTab
@@ -287,7 +289,7 @@ export default function AdminTeamsForm({
         />
       )}
       {activeTab === "competition" && (
-        <TeamCompetitionTab form={form} onFieldChange={updateField} />
+        <TeamCompetitionTab form={form} onFieldChange={updateField} departmentSlug={selectedDepartment?.slug || null} />
       )}
       {activeTab === "contact" && (
         <TeamContactTab

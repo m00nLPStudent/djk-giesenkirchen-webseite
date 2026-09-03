@@ -7,6 +7,7 @@ const service = await read("../notifications.service.js");
 const loader = await read("./notificationMonitoring.loader.js");
 const moduleSource = await read("./NotificationMonitoringModule.js");
 const page = await read("../../../../app/admin/system/notifications/page.js");
+const permissionBoundary = await read("../../../../lib/admin-auth/adminActionPermissions.js");
 
 test("central notification writes await persistent structured audit events", () => {
   assert.match(service, /recordNotificationMonitoringEvent/);
@@ -32,8 +33,8 @@ test("persistent history includes the 90 day range and has no runtime buffer wor
 
 test("route is force dynamic and guarded exclusively by superadmin role", () => {
   assert.match(page, /dynamic = "force-dynamic"/);
-  assert.match(page, /role\?\.key === "superadmin"/);
-  assert.match(page, /superadmin-required/);
+  assert.match(page, /assertSuperadminActionPermission/);
+  assert.match(permissionBoundary, /superadmin-required/);
 });
 
 test("dashboard uses shared responsive design-system primitives", () => {

@@ -237,3 +237,21 @@ export async function assertAdminActionPermission({
     permissions: permissionContext.context.permissions || [],
   };
 }
+
+export async function assertSuperadminActionPermission(options = {}) {
+  const result = await assertAdminActionPermission(options);
+  if (!result.ok) return result;
+
+  const isSuperadmin = (result.roles || []).some(
+    (role) => role?.key === "superadmin" && role?.is_active !== false,
+  );
+  if (!isSuperadmin) {
+    return {
+      ok: false,
+      reason: "superadmin-required",
+      message: "Dieser Systembereich ist ausschließlich für Superadmins verfügbar.",
+    };
+  }
+
+  return result;
+}

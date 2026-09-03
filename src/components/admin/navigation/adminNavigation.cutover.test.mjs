@@ -35,8 +35,8 @@ test("the controlled drawer retains dialog, focus, escape and body-lock semantic
   assert.match(drawer, /opener\?\.focus\(\)/);
 });
 
-test("department route guard and navigation share settings.view", () => {
-  assert.match(permissionConfig, /buildRule\("\/admin\/department", "settings\.view"/);
-  assert.match(permissionConfig, /"\/admin\/department": "settings\.view"/);
+test("department route guard and navigation share board.view", () => {
+  assert.match(permissionConfig, /buildRule\("\/admin\/department", "board\.view"/);
+  assert.match(permissionConfig, /"\/admin\/department": "board\.view"/);
   assert.doesNotMatch(permissionConfig, /\/admin\/department[^\n]+system\.view/);
 });

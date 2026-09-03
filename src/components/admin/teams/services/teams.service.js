@@ -57,9 +57,13 @@ function createTeamPayload(team) {
     age_group: team.age_group || null,
     season: team.season || null,
     description_de: team.description_de || null,
-    description_en: team.description_en || null,
+    ...(Object.hasOwn(team, "description_en")
+      ? { description_en: team.description_en || null }
+      : {}),
     training_times_de: team.training_times_de || null,
-    training_times_en: team.training_times_en || null,
+    ...(Object.hasOwn(team, "training_times_en")
+      ? { training_times_en: team.training_times_en || null }
+      : {}),
     team_image_url: team.remove_legacy_team_image ? null : team.team_image_url || null,
     contact_name: team.contact_name || null,
     contact_email: team.contact_email || null,
@@ -81,9 +85,13 @@ function createTeamSeasonPayload(team, teamId, seasonId) {
     slug: team.slug || null,
     age_group: team.age_group || null,
     description_de: team.description_de || null,
-    description_en: team.description_en || null,
+    ...(Object.hasOwn(team, "description_en")
+      ? { description_en: team.description_en || null }
+      : {}),
     training_times_de: team.training_times_de || null,
-    training_times_en: team.training_times_en || null,
+    ...(Object.hasOwn(team, "training_times_en")
+      ? { training_times_en: team.training_times_en || null }
+      : {}),
     team_image_url: team.remove_legacy_season_team_image ? null : team.season_team_image_url || null,
     contact_name: team.contact_name || null,
     contact_email: team.contact_email || null,

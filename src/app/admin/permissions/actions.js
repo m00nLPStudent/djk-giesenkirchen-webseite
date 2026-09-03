@@ -13,7 +13,7 @@ import {
   normalizePermissionKey,
   validatePermissionPayload,
 } from "@/components/admin/permissions/helpers/permissions.payload";
-import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { assertSuperadminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 
 function isSamePermission(existing, permissionId) {
   if (!existing || !permissionId) return false;
@@ -21,7 +21,7 @@ function isSamePermission(existing, permissionId) {
 }
 
 export async function saveAdminPermissionAction({ permissionId, values }) {
-  const access = await assertAdminActionPermission({
+  const access = await assertSuperadminActionPermission({
     requiredPermission: "permissions.edit",
   });
   if (!access.ok) {
@@ -75,7 +75,7 @@ export async function toggleRolePermissionAction({
   permissionId,
   checked,
 }) {
-  const access = await assertAdminActionPermission({
+  const access = await assertSuperadminActionPermission({
     requiredPermission: "permissions.edit",
   });
   if (!access.ok) {

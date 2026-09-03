@@ -1,6 +1,7 @@
 import {
   loadAdminPermissions,
   loadAdminRoles,
+  loadUserRoles,
 } from "@/lib/admin-auth/adminAuth.service";
 import {
   listBoardMembersForLinking,
@@ -202,6 +203,10 @@ export async function getAdminUsersPageData() {
   }
 
   currentUserId = authState.user?.id || null;
+  const currentRoles = await loadUserRoles(currentUserId);
+  if (!currentRoles.some((role) => role?.key === "superadmin" && role?.is_active !== false)) {
+    throw new Error("Dieser Systembereich ist ausschließlich für Superadmins verfügbar.");
+  }
 
   const [
     { data: profiles, error: profilesError },

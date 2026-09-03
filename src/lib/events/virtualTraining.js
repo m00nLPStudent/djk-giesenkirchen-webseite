@@ -76,6 +76,7 @@ function toOccurrenceLikeEvent(slot, startDate, endDate, occurrenceIndex) {
     age_group: slot.teams?.age_group || null,
     department_slug: slot.department_slug || slot.teams?.departments?.slug || null,
     training_type: trainingType,
+    training_location_type: slot.training_location_type || null,
 
     title_de: `${getTrainingTypeLabel(trainingType)} ${teamName}`,
     teaser_de: `${teamName} · ${getTrainingTypeLabel(trainingType)}`,
