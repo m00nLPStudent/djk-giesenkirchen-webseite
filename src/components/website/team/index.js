@@ -13,3 +13,4 @@ export { default as TeamPlayerSection } from "./TeamPlayerSection";
 export { default as TeamPlayerCard } from "./TeamPlayerCard";
 export { default as TeamSeasonSelector } from "./TeamSeasonSelector";
 export { default as TeamDetailTabs } from "./TeamDetailTabs";
+export { default as TeamSectionTabs } from "./TeamSectionTabs";

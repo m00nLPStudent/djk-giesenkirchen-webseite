@@ -1,5 +1,9 @@
-import PublicSectionPlaceholder from "@/components/website/content/PublicSectionPlaceholder";
+import { PublicPageHero, PublicPageShell } from "@/components/website/layout";
+import { loadPublicTableTennisBoard, TableTennisPersonCard } from "@/components/website/table-tennis";
 
-export default function TableTennisBoardPage() {
-  return <PublicSectionPlaceholder eyebrow="Tischtennis" title="Vorstand" description="Die Ansprechpartner und Funktionen der Tischtennisabteilung werden hier veröffentlicht, sobald eine fachlich geprüfte Datenquelle vorliegt." items={["Abteilungsleitung", "Funktionen", "Kontaktmöglichkeiten"]} backHref="/tischtennis" backLabel="Zur Tischtennisübersicht" />;
+export const metadata = { title: "Tischtennis-Vorstand | DJK/VfL Giesenkirchen", description: "Vorstand und öffentliche Ansprechpartner der Tischtennisabteilung." };
+
+export default async function TableTennisBoardPage() {
+  const result = await loadPublicTableTennisBoard();
+  return <PublicPageShell><PublicPageHero eyebrow="Tischtennis" title="Vorstand" description="Ansprechpartner und Funktionen der Tischtennisabteilung." />{result.error ? <p className="mt-8 text-white/55">Der Vorstand konnte derzeit nicht geladen werden.</p> : result.data.length ? <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{result.data.map((member) => <TableTennisPersonCard key={member.id} person={member} kind="Vorstand" />)}</div> : <p className="mt-8 text-white/55">Aktuell sind keine öffentlichen Vorstandsangaben hinterlegt.</p>}</PublicPageShell>;
 }

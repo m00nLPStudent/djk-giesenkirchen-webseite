@@ -1,12 +1,12 @@
 import { resolveSeasonDisplayName } from "@/lib/football/seasonDisplay";
 
-export default function TeamIntroCard({ team }) {
+export default function TeamIntroCard({ team, departmentLabel = "Fußballabteilung", emptyDescription = "Mannschaftsbeschreibung folgt." }) {
   const seasonName = resolveSeasonDisplayName(team, "Keine Saison");
 
   return (
     <section className="min-w-0 rounded-[2rem] border border-white/10 bg-white/5 p-5 sm:p-6 md:p-8">
       <p className="text-xs font-bold uppercase tracking-[0.35em] text-red-400">
-        Fußballabteilung
+        {departmentLabel}
       </p>
 
       <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
@@ -15,7 +15,7 @@ export default function TeamIntroCard({ team }) {
             {team?.name_de}
           </h1>
           <p className="mt-5 max-w-4xl break-words text-base leading-7 text-white/70 md:text-lg md:leading-8">
-            {team?.description_de || "Mannschaftsbeschreibung folgt."}
+            {team?.description_de || emptyDescription}
           </p>
         </div>
 
