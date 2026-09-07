@@ -1,4 +1,4 @@
-import { isDateWithinRange, parseDateOnlyLocal } from "./dateHelpers";
+import { isDateWithinRange, parseDateOnlyLocal } from "./dateHelpers.js";
 
 export function applyClubClosurePeriods(occurrences = [], closurePeriods = []) {
   if (!closurePeriods.length) return occurrences;

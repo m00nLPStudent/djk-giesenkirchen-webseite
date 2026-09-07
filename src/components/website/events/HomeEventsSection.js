@@ -20,7 +20,7 @@ export default function HomeEventsSection({ events = [], compact = false }) {
             {events.map((event) => (
               <Link
                 key={event.occurrence_id || `${event.id}-${event.starts_at}`}
-                href={`/termine/training/${event.occurrence_id}`}
+                href={event.source_type === "department_training" && event.department_href ? event.department_href : `/termine/training/${event.occurrence_id}`}
                 className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#1d1d24] p-3.5 transition hover:border-red-400/35 hover:bg-red-600/10 focus-visible:outline-2 focus-visible:outline-red-500"
               >
                 <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/12 bg-[#111117]/85 text-white/90 shadow-[0_5px_14px_rgba(0,0,0,0.24)]" aria-hidden="true">

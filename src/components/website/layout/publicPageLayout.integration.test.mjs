@@ -81,7 +81,7 @@ test("reviewed overview pages use the shared shell or shared placeholder", () =>
   for (const route of routes) {
     const path = `src/app/(website)/${route}`;
     assert.equal(existsSync(resolve(root, path)), true, route);
-    assert.match(read(path), /PublicPageShell|PublicSectionPlaceholder|ClubHistoryPublicPage/, route);
+    assert.match(read(path), /PublicPageShell|PublicSectionPlaceholder|PublicDepartmentSectionPage|ClubHistoryPublicPage/, route);
   }
   assert.match(read("src/components/website/downloads/DownloadsPublicPage.js"), /PublicPageShell/);
 });
@@ -92,7 +92,7 @@ test("club overview cards are dark and smaller departments share one structure",
   const gymnastics = read("src/app/(website)/damen-gymnastik/page.js");
   assert.match(club, /<PublicCard/);
   assert.doesNotMatch(club, /bg-white p-6/);
-  assert.match(disability, /Beschreibung der Abteilung/);
+  assert.match(disability, /PublicDepartmentSectionPage/);
   assert.match(gymnastics, /Beschreibung der Abteilung/);
   assert.match(gymnastics, /Angebote und Aktivitäten/);
   assert.match(gymnastics, /Geschichte und Über uns/);

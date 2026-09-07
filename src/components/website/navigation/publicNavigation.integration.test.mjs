@@ -208,6 +208,8 @@ test("club and department menus expose the reviewed event and news architecture"
 
 test("home reuses virtual training generation without loading general events", () => {
   assert.match(homeSource, /getVirtualTrainingEvents/);
+  assert.match(homeSource, /getPublicDepartmentTrainingEvents/);
+  assert.match(homeSource, /mergeTrainingOccurrenceStreams/);
   assert.match(homeSource, /selectUpcomingHomeTrainings/);
   assert.match(homeSource, /export const dynamic = "force-dynamic"/);
   assert.match(homeSource, /365 \* 24 \* 60 \* 60 \* 1000/);

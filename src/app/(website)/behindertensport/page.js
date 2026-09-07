@@ -1,5 +1,14 @@
-import PublicSectionPlaceholder from "@/components/website/content/PublicSectionPlaceholder";
+import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { PublicDepartmentSectionPage, loadPublicDepartmentSection } from "@/components/website/department-sections";
 
-export default function DisabilitySportsPage() {
-  return <PublicSectionPlaceholder eyebrow="Abteilung" title="Behindertensport" description="Der öffentliche Bereich des Behindertensports wird vorbereitet. Er wird künftig Angebote, Aktivitäten und persönliche Kontaktmöglichkeiten übersichtlich bündeln." items={["Beschreibung der Abteilung", "Angebote und Aktivitäten", "Geschichte und Über uns", "Kontakt und Ansprechpartner"]} backHref="/verein" backLabel="Zur Vereinsübersicht" />;
+const DEPARTMENT_SLUG = "behindertensport";
+
+export const metadata = { title: "Behindertensport | DJK/VfL Giesenkirchen", description: "Behindertensport beim DJK/VfL Giesenkirchen: Informationen, Kontakt und aktuelle Trainingszeiten." };
+
+export default async function DisabilitySportsPage() {
+  await connection();
+  const result = await loadPublicDepartmentSection(DEPARTMENT_SLUG);
+  if (result.error || !result.data) notFound();
+  return <PublicDepartmentSectionPage data={result.data}/>;
 }

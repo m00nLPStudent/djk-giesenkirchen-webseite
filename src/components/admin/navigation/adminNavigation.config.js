@@ -86,9 +86,9 @@ export const ADMIN_NAVIGATION_SECTIONS = [
   },
   {
     key: "disabled_sports", label: "Behindertensport", iconKey: "heart-handshake", href: null,
-    description: "Geplanter kompakter Inhaltsbereich.", order: 50,
-    visibility: { strategy: "visible_items" }, implementationStatus: "planned",
-    items: ["Übersicht", "Inhalte", "Trainingszeiten", "Ansprechpartner", "Bilder"].map((label, index) => planned(`disabled-sports-${index}`, label, "heart-handshake", "department_unavailable", (index + 1) * 10, "Department-Content-Scope fehlt.")),
+    description: "Inhalte und Trainingszeiten des Behindertensports.", order: 50,
+    visibility: { strategy: "visible_items" }, implementationStatus: "active",
+    items: [active("disabled-sports-editor", "Bereich verwalten", "/admin/behindertensport", "heart-handshake", "department_sections.view", "permission_only", 10, "Inhalte, Kontakt, Gruppenbild und Trainingszeiten pflegen.")],
   },
   {
     key: "gymnastics", label: "Gymnastikdamen", iconKey: "activity", href: null,

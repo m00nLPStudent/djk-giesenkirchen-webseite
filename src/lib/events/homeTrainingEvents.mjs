@@ -11,7 +11,7 @@ export function selectUpcomingHomeTrainings(
     .filter(
       (event) =>
         event?.is_virtual === true &&
-        event?.source_type === "team_training" &&
+        ["team_training", "department_training"].includes(event?.source_type) &&
         Number.isFinite(new Date(event.starts_at).getTime()) &&
         new Date(event.starts_at).getTime() >= nowTime,
     )

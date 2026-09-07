@@ -8,8 +8,8 @@ import {
   minDate,
   parseDateOnlyLocal,
   parseTimeParts,
-} from "./dateHelpers";
-import { getTrainingTypeLabel } from "./eventFormatter";
+} from "./dateHelpers.js";
+import { getTrainingTypeLabel } from "./eventFormatter.js";
 
 function getTeamNameFromTraining(slot = {}) {
   return (
@@ -49,13 +49,15 @@ function getTeamSeasonSlugFromTraining(slot = {}) {
 }
 
 function toOccurrenceLikeEvent(slot, startDate, endDate, occurrenceIndex) {
+  const isDepartmentTraining = slot.source_type === "department_training";
   const trainingType = slot.training_type || "training";
-  const teamName = getTeamNameFromTraining(slot);
-  const teamId = getTeamIdFromTraining(slot);
-  const teamSlug = getTeamSlugFromTraining(slot);
-  const teamSeasonSlug = getTeamSeasonSlugFromTraining(slot);
+  const teamName = isDepartmentTraining ? null : getTeamNameFromTraining(slot);
+  const teamId = isDepartmentTraining ? null : getTeamIdFromTraining(slot);
+  const teamSlug = isDepartmentTraining ? null : getTeamSlugFromTraining(slot);
+  const teamSeasonSlug = isDepartmentTraining ? null : getTeamSeasonSlugFromTraining(slot);
+  const displayName = isDepartmentTraining ? slot.display_name_de : teamName;
   const dateKey = dateToKeyLocal(startDate);
-  const baseId = `team-training-${slot.id}`;
+  const baseId = `${isDepartmentTraining ? "department" : "team"}-training-${slot.id}`;
 
   return {
     id: baseId,
@@ -65,22 +67,25 @@ function toOccurrenceLikeEvent(slot, startDate, endDate, occurrenceIndex) {
     is_recurring_instance: true,
 
     is_virtual: true,
-    source_type: "team_training",
+    source_type: isDepartmentTraining ? "department_training" : "team_training",
 
     team_id: teamId,
-    team_season_id: slot.team_season_id || null,
+    team_season_id: isDepartmentTraining ? null : slot.team_season_id || null,
     team_slug: teamSlug,
     team_season_slug: teamSeasonSlug,
     team_name_de: teamName,
     team_season_name: slot.team_seasons?.name_de || null,
     age_group: slot.teams?.age_group || null,
     department_slug: slot.department_slug || slot.teams?.departments?.slug || null,
+    department_name_de: slot.department_name_de || null,
+    department_href: slot.department_href || null,
+    sport_key: slot.sport_key || null,
     training_type: trainingType,
     training_location_type: slot.training_location_type || null,
 
-    title_de: `${getTrainingTypeLabel(trainingType)} ${teamName}`,
-    teaser_de: `${teamName} · ${getTrainingTypeLabel(trainingType)}`,
-    description_de: slot.note || null,
+    title_de: isDepartmentTraining ? displayName : `${getTrainingTypeLabel(trainingType)} ${teamName}`,
+    teaser_de: isDepartmentTraining ? displayName : `${teamName} · ${getTrainingTypeLabel(trainingType)}`,
+    description_de: slot.location_note || slot.note || null,
 
     starts_at: startDate.toISOString(),
     ends_at: endDate.toISOString(),

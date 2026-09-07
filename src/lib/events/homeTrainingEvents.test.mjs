@@ -5,11 +5,11 @@ import {
   selectUpcomingHomeTrainings,
 } from "./homeTrainingEvents.mjs";
 
-const training = (id, startsAt) => ({
+const training = (id, startsAt, sourceType = "team_training") => ({
   id,
   starts_at: startsAt,
   is_virtual: true,
-  source_type: "team_training",
+  source_type: sourceType,
 });
 
 test("home trainings keep only future virtual team trainings in chronological order", () => {
@@ -53,6 +53,22 @@ test("home trainings merge teams globally before applying the limit", () => {
     "team-a-08",
     "team-b-09",
   ]);
+});
+
+test("department occurrences participate in the same global top-five limit", () => {
+  const result = selectUpcomingHomeTrainings(
+    [
+      training("team-monday", "2026-09-07T18:00:00.000Z"),
+      training("team-wednesday", "2026-09-09T18:00:00.000Z"),
+      training("team-friday", "2026-09-11T18:00:00.000Z"),
+      training("department-tuesday", "2026-09-08T18:00:00.000Z", "department_training"),
+      training("department-thursday", "2026-09-10T18:00:00.000Z", "department_training"),
+      training("later", "2026-09-12T18:00:00.000Z"),
+    ],
+    { now: new Date("2026-09-07T00:00:00.000Z") },
+  );
+
+  assert.deepEqual(result.map(({ id }) => id), ["team-monday", "department-tuesday", "team-wednesday", "department-thursday", "team-friday"]);
 });
 
 test("a nearer Bambini occurrence is never displaced by later E1 recurrences", () => {

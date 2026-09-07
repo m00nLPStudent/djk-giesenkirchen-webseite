@@ -54,6 +54,10 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
     matchType: "prefix",
     priority: 310,
   }),
+  buildRule("/admin/behindertensport", "department_sections.view", {
+    matchType: "prefix",
+    priority: 400,
+  }),
   buildRule("/admin/notifications", "dashboard.view", {
     matchType: "exact",
     priority: 500,
@@ -374,6 +378,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin/system/structure": "dashboard.view",
   "/admin/notifications": "dashboard.view",
   "/admin/system/notification-email-settings": "dashboard.view",
+  "/admin/behindertensport": "department_sections.view",
   "/admin/news": "news.view",
   "/admin/downloads": "downloads.view",
   "/admin/department": "board.view",

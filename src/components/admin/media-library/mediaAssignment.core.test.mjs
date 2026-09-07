@@ -57,3 +57,8 @@ test("dashboard avatars use the dedicated admin profile field", () => {
   });
   assert.equal(buildMediaAssignmentPayload("admin_profile", "profile-1", "asset-1", "image").ok, false);
 });
+
+test("department sections use the central image assignment contract", () => {
+  assert.equal(buildMediaAssignmentPayload("department_section", "section-1", "asset-1", "image").ok, true);
+  assert.equal(buildMediaAssignmentPayload("department_section", "section-1", "asset-1", "file").ok, false);
+});

@@ -7,6 +7,8 @@ import { loadEventTypes } from "@/components/admin/events/services/eventTypes.re
 import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
 import { HomeEventsSection } from "@/components/website/events";
 import { getVirtualTrainingEvents } from "@/lib/events";
+import { getPublicDepartmentTrainingEvents } from "@/lib/events/departmentTrainingLoader";
+import { mergeTrainingOccurrenceStreams } from "@/lib/events/departmentTrainingEvents.mjs";
 import { selectUpcomingHomeTrainings } from "@/lib/events/homeTrainingEvents.mjs";
 
 export const dynamic = "force-dynamic";
@@ -29,11 +31,16 @@ export default async function Home() {
   const secondaryNews = newsCards.slice(1, 4);
 
   const now = new Date();
-  const trainingEvents = await getVirtualTrainingEvents({
+  const trainingWindow = {
     from: now,
     to: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
     maxOccurrencesPerTraining: 180,
-  });
+  };
+  const [teamTrainingEvents, departmentTrainingEvents] = await Promise.all([
+    getVirtualTrainingEvents(trainingWindow),
+    getPublicDepartmentTrainingEvents(trainingWindow),
+  ]);
+  const trainingEvents = mergeTrainingOccurrenceStreams(teamTrainingEvents, departmentTrainingEvents);
   const upcomingTrainings = createEventDtos(
     selectUpcomingHomeTrainings(trainingEvents, { now }),
     eventTypes || [],
