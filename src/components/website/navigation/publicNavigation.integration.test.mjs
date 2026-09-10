@@ -32,7 +32,7 @@ test("public navigation exposes the agreed club and department structure", () =>
     "Kontakt",
     "Mitglied werden",
     "Sponsoren",
-    "Vorstand Gesamtverein",
+    "Vorstand",
     "Spielplan & Tabelle",
     "Turniere & Events",
   ]) {

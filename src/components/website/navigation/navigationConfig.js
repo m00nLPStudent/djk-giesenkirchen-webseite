@@ -4,7 +4,7 @@ export const publicNavigationItems = [
     label: "Verein",
     href: "/verein",
     children: [
-      { label: "Vorstand Gesamtverein", href: "/verein/vorstand" },
+      { label: "Vorstand", href: "/verein/vorstand" },
       { label: "Vereinsgeschichte", href: "/verein/vereinsgeschichte" },
       { label: "Termine", href: "/termine/allgemein" },
       { label: "News", href: "/news/uebersicht" },
