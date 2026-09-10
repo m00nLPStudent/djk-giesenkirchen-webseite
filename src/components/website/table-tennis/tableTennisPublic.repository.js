@@ -2,8 +2,10 @@ import "server-only";
 
 import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
 import { supabase } from "@/lib/supabase";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { loadCompetitionConfigs } from "@/lib/table-tennis/competition.repository";
+import { loadCompetitionFromConfig } from "@/lib/table-tennis/competition.service";
 import {
-  TABLE_TENNIS_COMPETITION_STATUS,
   TABLE_TENNIS_DEPARTMENT_SLUG,
   applyPublicMediaUrl,
   mergePublicTableTennisSummaries,
@@ -18,6 +20,7 @@ import {
   selectPublicTableTennisCoaches,
   selectPublicTableTennisRoster,
   selectPublicTableTennisTeams,
+  selectConfiguredCompetitionOptions,
 } from "./tableTennisPublic.core.mjs";
 
 const closed = (error, list = false) => ({ data: list ? [] : null, error: error || new Error("Tischtennisdaten sind nicht verfügbar.") });
@@ -72,6 +75,34 @@ export async function loadPublicTableTennisTeamSummaries(options = {}) {
   return { data: mergePublicTableTennisSummaries(teamsResult.data, details), error: null };
 }
 
+export async function loadPublicTableTennisCompetitionOptions({ db = supabase } = {}) {
+  const scope = await loadTeamScope(db);
+  if (scope.error) return closed(scope.error, true);
+  const { department, season } = scope.data;
+  const [teamsResult, teamSeasonsResult] = await Promise.all([
+    db.from("teams").select("id, slug, name_de, sort_order, department_id, is_active").eq("department_id", department.id).eq("is_active", true).order("sort_order", { ascending: true }),
+    db.from("team_seasons").select("id, team_id, name_de, season_id, is_active").eq("season_id", season.id).eq("is_active", true),
+  ]);
+  if (teamsResult.error || teamSeasonsResult.error) return closed(teamsResult.error || teamSeasonsResult.error, true);
+  const rows = selectPublicTableTennisTeams({ teams: teamsResult.data || [], teamSeasons: teamSeasonsResult.data || [], departmentId: department.id, season });
+  const adminDb = createSupabaseAdminClient();
+  if (!adminDb) return closed(new Error("Serverseitiger Datenbankzugriff ist nicht konfiguriert."), true);
+  const configs = await loadCompetitionConfigs(adminDb, rows.map((row) => row.teamSeason.id));
+  if (configs.error) return closed(configs.error, true);
+  return { data: selectConfiguredCompetitionOptions(rows, configs.data || []), error: null };
+}
+
+export async function loadPublicTableTennisCompetitionBySlug(slug, options = {}) {
+  const normalizedSlug = normalizePublicTableTennisTeamSlug(slug);
+  if (!normalizedSlug) return { data: null, error: new Error("Ungültige Mannschaftsauswahl.") };
+  const { preloadedOptions, ...loaderOptions } = options;
+  const optionsResult = Array.isArray(preloadedOptions) ? { data: preloadedOptions, error: null } : await loadPublicTableTennisCompetitionOptions(loaderOptions);
+  if (optionsResult.error) return { data: null, error: optionsResult.error };
+  const selected = optionsResult.data.find((item) => item.slug === normalizedSlug);
+  if (!selected) return { data: null, error: null };
+  return { data: { team: { slug: selected.slug, name: selected.name }, competition: await loadCompetitionFromConfig(selected.config) }, error: null };
+}
+
 export async function loadPublicTableTennisBoard({ db = supabase, mediaLoader = loadPublicMediaUrlMap } = {}) {
   const department = await resolveActiveTableTennisDepartment(db);
   if (department.error) return closed(department.error, true);
@@ -95,11 +126,19 @@ export async function loadPublicTableTennisTeamBySlug(slug, { db = supabase, med
   const teamSeasonResult = await db.from("team_seasons").select("*").eq("team_id", team.id).eq("season_id", season.id).eq("is_active", true).maybeSingle();
   if (teamSeasonResult.error || !teamSeasonResult.data?.id) return closed(teamSeasonResult.error);
   const teamSeason = teamSeasonResult.data;
+  const adminDb = createSupabaseAdminClient();
+  const configResult = adminDb ? await loadCompetitionConfigs(adminDb, [teamSeason.id]) : { data: [], error: new Error("Serverseitiger Datenbankzugriff ist nicht konfiguriert.") };
+  const activeCompetitionConfig = (configResult.data || []).find((item) => item.is_active) || null;
 
-  const [trainingResult, rosterResult, coachesResult] = await Promise.all([
+  const [trainingResult, rosterResult, coachesResult, competition] = await Promise.all([
     db.from("team_training_times").select("*").eq("team_season_id", teamSeason.id).eq("is_active", true).order("weekday", { ascending: true }).order("start_time", { ascending: true }),
     db.from("player_team_seasons").select("id, is_active, sort_order, players(id, first_name, last_name, description_de, year_group, strong_hand, image_url, photo_url, image_media_asset_id, is_active, department_id)").eq("team_season_id", teamSeason.id).eq("is_active", true).order("sort_order", { ascending: true }),
     db.from("coach_team_seasons").select("id, role_de, is_active, sort_order, coaches(id, first_name, last_name, name, role, role_de, license, email, phone, whatsapp, image_url, photo_url, image_media_asset_id, is_active, department_id)").eq("team_season_id", teamSeason.id).eq("is_active", true).order("sort_order", { ascending: true }),
+    configResult.error
+      ? Promise.resolve({ status: "unavailable", table: null, schedule: null, attribution: null, error: { code: "CONFIG_LOAD_FAILED" } })
+      : activeCompetitionConfig
+        ? loadCompetitionFromConfig(activeCompetitionConfig)
+        : Promise.resolve({ status: "not_configured", table: null, schedule: null, attribution: null }),
   ]);
   const queryError = trainingResult.error || rosterResult.error || coachesResult.error;
   if (queryError) return closed(queryError);
@@ -121,7 +160,7 @@ export async function loadPublicTableTennisTeamBySlug(slug, { db = supabase, med
       roster: roster.map((item) => applyPublicMediaUrl(item, mediaUrls)),
       coaches: coaches.map((item) => applyPublicMediaUrl(item, mediaUrls)),
       contact: applyPublicMediaUrl(contact, mediaUrls),
-      competition: { status: TABLE_TENNIS_COMPETITION_STATUS },
+      competition,
     },
     error: null,
   };

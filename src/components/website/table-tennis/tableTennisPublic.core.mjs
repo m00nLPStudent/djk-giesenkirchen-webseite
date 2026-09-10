@@ -1,5 +1,4 @@
 export const TABLE_TENNIS_DEPARTMENT_SLUG = "tischtennis";
-export const TABLE_TENNIS_COMPETITION_STATUS = "external_integration_deferred";
 
 const text = (value) => String(value || "").trim();
 
@@ -56,6 +55,14 @@ export function selectPublicTableTennisTeams({ teams = [], teamSeasons = [], dep
       (left.team.sort_order ?? Number.MAX_SAFE_INTEGER) - (right.team.sort_order ?? Number.MAX_SAFE_INTEGER)
       || text(left.team.name_de).localeCompare(text(right.team.name_de), "de"),
     );
+}
+
+export function selectConfiguredCompetitionOptions(rows = [], configs = []) {
+  const configBySeason = new Map(configs.filter((item) => item?.is_active === true).map((item) => [item.team_season_id, item]));
+  return rows.flatMap(({ team, teamSeason }) => {
+    const config = configBySeason.get(teamSeason?.id);
+    return config ? [{ slug: team.slug, name: teamSeason.name_de || team.name_de, sortOrder: team.sort_order ?? null, config }] : [];
+  });
 }
 
 export function normalizePublicTableTennisTraining(item, today = new Date().toISOString().slice(0, 10)) {

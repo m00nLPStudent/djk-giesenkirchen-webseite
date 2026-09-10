@@ -13,6 +13,8 @@ import { redirect } from "next/navigation";
 import { canManageMedia, loadMediaAssetForPicker, loadMediaAssetsForPicker } from "@/components/admin/media-library/media.service";
 import { loadActiveTeamDepartments } from "@/components/admin/teams/services/teamDepartments.repository";
 import { loadTeamTypes } from "@/components/admin/settings/team-types/teamTypes.repository";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { loadCompetitionConfigs } from "@/lib/table-tennis/competition.repository";
 
 export default async function EditTeamPage({ params, requiredDepartmentSlug = null }) {
   const { id } = await params;
@@ -58,6 +60,10 @@ export default async function EditTeamPage({ params, requiredDepartmentSlug = nu
   const teamSeasons = coachEditData.teamSeasons;
 
   const ids = (teamSeasons || []).map((item) => item.id);
+  const competitionDb = createSupabaseAdminClient();
+  const isTableTennisTeam = (departments || []).some((department) => department.id === team.department_id && department.slug === "tischtennis");
+  const competitionConfigs = isTableTennisTeam && competitionDb ? await loadCompetitionConfigs(competitionDb, ids) : { data: [] };
+  const initialCompetitionConfigsByTeamSeasonId = Object.fromEntries((competitionConfigs.data || []).map((item) => [item.team_season_id, item]));
 
   const { data: playerAssignments } = ids.length
     ? await supabaseServer
@@ -103,6 +109,7 @@ export default async function EditTeamPage({ params, requiredDepartmentSlug = nu
           initialTeamContactMedia={initialTeamContactMedia}
           initialSeasonMediaByTeamSeasonId={initialSeasonMediaByTeamSeasonId}
           initialSeasonContactMediaByTeamSeasonId={initialSeasonContactMediaByTeamSeasonId}
+          initialCompetitionConfigsByTeamSeasonId={initialCompetitionConfigsByTeamSeasonId}
           returnPath={basePath}
         />
       </TeamScopeGate>

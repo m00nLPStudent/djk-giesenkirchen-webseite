@@ -70,12 +70,13 @@ test("all table-tennis people use the established central person placeholder", (
   assert.doesNotMatch(ui, /person\.name\?\.charAt/);
 });
 
-test("detail page is table-tennis specific and omits football roster and competition fields", () => {
+test("detail and competition pages stay table-tennis specific and omit football fields", () => {
   assert.match(detail, /TableTennisTeamHero/);
   assert.match(detail, /Tischtennis/);
   assert.doesNotMatch(detail, /shirt_number|position_de|strong_foot|FootballDe|FuPa|fupa/);
   assert.doesNotMatch(ui, /shirt_number|position_de|strong_foot/);
-  assert.match(competition, /offizielle Spielplan- und Tabellenintegration/i);
+  assert.match(competition, /loadPublicTableTennisCompetitionOptions/);
+  assert.match(competition, /TableTennisCompetitionView/);
   assert.doesNotMatch(competition, /football\.de|fupa/i);
 });
 

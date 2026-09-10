@@ -21,6 +21,8 @@ import { normalizeBirthYears } from "@/components/admin/teams/services/teamSeaso
 import { replaceTeamSeasonYearGroups } from "@/components/admin/teams/services/teamSeasonYearGroups.repository";
 import { validateActiveTeamDepartment, validateTeamDepartmentId } from "@/components/admin/teams/services/teamDepartments.core.mjs";
 import { findTeamDepartmentById } from "@/components/admin/teams/services/teamDepartments.repository";
+import { normalizeClickTtConfig } from "@/lib/table-tennis/clickTt.core.mjs";
+import { upsertCompetitionConfig } from "@/lib/table-tennis/competition.repository";
 
 function buildError(message) {
   return { error: { message } };
@@ -206,6 +208,26 @@ export async function saveTeamSeasonYearGroupsAction(teamId, teamSeasonId, value
   revalidatePath(`/admin/teams/edit/${teamId}`);
   revalidatePath("/admin/settings/seasons-teams");
   return { data: normalized.data, error: null };
+}
+
+export async function saveTeamCompetitionConfigAction(teamId, teamSeasonId, input) {
+  const auth = await loadAuthorizedTeamMutationContext("teams.edit");
+  if (!auth.ok) return auth.result;
+  const team = await loadTeamById(auth.supabaseServer, teamId);
+  if (!team || !canAccessTeamOnServer(auth.scopeContext, team)) return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
+  const { data: department } = await auth.supabaseServer.from("departments").select("id, slug, is_active").eq("id", team.department_id).maybeSingle();
+  if (!department?.is_active || department.slug !== "tischtennis") return buildError("click-TT kann nur für Tischtennis-Mannschaften konfiguriert werden.");
+  const { data: teamSeason, error: teamSeasonError } = await auth.supabaseServer.from("team_seasons").select("id, team_id").eq("id", teamSeasonId).eq("team_id", team.id).maybeSingle();
+  if (teamSeasonError || !teamSeason) return buildError("Die Mannschaftssaison ist ungültig.");
+  const normalized = normalizeClickTtConfig(input);
+  if (normalized.error) return buildError(normalized.error.message);
+  const adminDb = createSupabaseAdminClient();
+  if (!adminDb) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
+  const result = await upsertCompetitionConfig(adminDb, teamSeason.id, normalized.data);
+  if (result.error) { console.error("[team-competition-config]", { code: result.error.code || "COMPETITION_CONFIG_SAVE_FAILED" }); return buildError("Die click-TT-Konfiguration konnte nicht gespeichert werden."); }
+  revalidatePath(`/admin/teams/edit/${team.id}`);
+  revalidatePath(`/admin/table-tennis/teams/edit/${team.id}`);
+  return { data: result.data, error: null };
 }
 
 async function authorizeTeamMedia(teamId = null) {

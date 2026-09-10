@@ -67,6 +67,7 @@ export default function AdminTeamsForm({
   initialSeasonMediaByTeamSeasonId = {},
   initialTeamContactMedia = null,
   initialSeasonContactMediaByTeamSeasonId = {},
+  initialCompetitionConfigsByTeamSeasonId = {},
   returnPath = "/admin/teams",
 }) {
   const router = useRouter();
@@ -289,7 +290,7 @@ export default function AdminTeamsForm({
         />
       )}
       {activeTab === "competition" && (
-        <TeamCompetitionTab form={form} onFieldChange={updateField} departmentSlug={selectedDepartment?.slug || null} />
+        <TeamCompetitionTab key={form.team_season_id || "no-team-season"} form={form} onFieldChange={updateField} departmentSlug={selectedDepartment?.slug || null} teamId={team?.id || null} initialCompetitionConfigsByTeamSeasonId={initialCompetitionConfigsByTeamSeasonId} />
       )}
       {activeTab === "contact" && (
         <TeamContactTab

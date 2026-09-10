@@ -14,11 +14,11 @@ export default async function TableTennisTeamPage({ params }) {
   const { slug } = await params;
   const result = await loadPublicTableTennisTeamBySlug(slug);
   if (!result.data) notFound();
-  const { team, training, roster, coaches, contact } = result.data;
+  const { team, training, roster, coaches, contact, competition } = result.data;
   const introTeam = { name_de: team.name, description_de: team.description, public_season_name: team.season?.name };
   return <PublicPageShell className="space-y-8">
     <TableTennisTeamHero team={team} />
     <TeamIntroCard team={introTeam} departmentLabel="Tischtennisabteilung" emptyDescription="Für diese Mannschaft ist aktuell keine Beschreibung hinterlegt." />
-    <TableTennisTeamDetailTabs training={training} roster={roster} coaches={coaches} contact={contact} />
+    <TableTennisTeamDetailTabs training={training} roster={roster} coaches={coaches} contact={contact} competition={competition} />
   </PublicPageShell>;
 }

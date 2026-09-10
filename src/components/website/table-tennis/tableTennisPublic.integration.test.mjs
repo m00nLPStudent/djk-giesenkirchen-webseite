@@ -23,7 +23,8 @@ test("detail relations are batch-loaded without a board contact dependency", () 
   assert.doesNotMatch(detailLoader, /from\("board_members"\)/);
   assert.match(repository, /Promise\.all\(\[/);
   assert.doesNotMatch(repository, /football\.de|fussball_de|FuPa|fupa/i);
-  assert.match(repository, /TABLE_TENNIS_COMPETITION_STATUS/);
+  assert.match(repository, /loadCompetitionFromConfig/);
+  assert.match(repository, /status: "not_configured"/);
 });
 
 test("standalone board and detail relations stay scoped while optional media stays presentation-only", () => {

@@ -2,7 +2,6 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
-  TABLE_TENNIS_COMPETITION_STATUS,
   applyPublicMediaUrl,
   buildPublicTableTennisTeamHref,
   mergePublicTableTennisSummaries,
@@ -131,8 +130,4 @@ test("list and detail share the same seasonal team image priority", () => {
   const detailImage = resolvePublicTableTennisTeamImage({ team, teamSeason, mediaUrls });
   assert.equal(listImage, "season-public");
   assert.equal(detailImage, listImage);
-});
-
-test("competition contract is neutral and explicitly deferred", () => {
-  assert.equal(TABLE_TENNIS_COMPETITION_STATUS, "external_integration_deferred");
 });
