@@ -4,6 +4,7 @@ import test from "node:test";
 
 const read = (path) => readFileSync(new URL(`../../../../${path}`, import.meta.url), "utf8");
 const page = read("src/app/(website)/behindertensport/page.js");
+const gymnasticsPage = read("src/app/(website)/damen-gymnastik/page.js");
 const repository = read("src/components/website/department-sections/departmentSectionPublic.repository.js");
 const layout = read("src/components/website/department-sections/PublicDepartmentSectionPage.js");
 
@@ -13,6 +14,16 @@ test("Behindertensport route uses the fixed server-side public section contract"
   assert.match(page, /await connection\(\)/);
   assert.match(page, /notFound\(\)/);
   assert.doesNotMatch(page, /PublicSectionPlaceholder/);
+});
+
+test("Gymnastikdamen route reuses the fixed server-side public section contract", () => {
+  assert.match(gymnasticsPage, /DEPARTMENT_SLUG = "damen-gymnastik"/);
+  assert.match(gymnasticsPage, /loadPublicDepartmentSection\(DEPARTMENT_SLUG\)/);
+  assert.match(gymnasticsPage, /await connection\(\)/);
+  assert.match(gymnasticsPage, /notFound\(\)/);
+  assert.match(gymnasticsPage, /PublicDepartmentSectionPage/);
+  assert.match(gymnasticsPage, /\/images\/sports-icons\/gymnastics\.png/);
+  assert.doesNotMatch(gymnasticsPage, /PublicSectionPlaceholder|contact_email|contact_phone|contact_name/);
 });
 
 test("repository uses sanitized RPC, RLS training read and public media resolver", () => {

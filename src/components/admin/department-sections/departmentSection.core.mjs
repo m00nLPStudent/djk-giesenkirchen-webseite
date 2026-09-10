@@ -5,6 +5,12 @@ export const DEPARTMENT_SECTION_CONFIGS = Object.freeze({
     defaultTitle: "Behindertensport",
     adminPath: "/admin/behindertensport",
   }),
+  gymnastikdamen: Object.freeze({
+    slug: "damen-gymnastik",
+    label: "Gymnastikdamen",
+    defaultTitle: "Gymnastikdamen",
+    adminPath: "/admin/gymnastikdamen",
+  }),
 });
 
 const clean = (value, max) => String(value ?? "").trim().slice(0, max);

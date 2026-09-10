@@ -1,9 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  DEPARTMENT_SECTION_CONFIGS,
   normalizeDepartmentSectionPayload,
   normalizeDepartmentTrainingPayload,
 } from "./departmentSection.core.mjs";
+
+test("section configs keep both departments fixed and separate", () => {
+  assert.equal(DEPARTMENT_SECTION_CONFIGS.behindertensport.slug, "behindertensport");
+  assert.equal(DEPARTMENT_SECTION_CONFIGS.gymnastikdamen.slug, "damen-gymnastik");
+  assert.notEqual(DEPARTMENT_SECTION_CONFIGS.behindertensport.adminPath, DEPARTMENT_SECTION_CONFIGS.gymnastikdamen.adminPath);
+});
 
 test("section validation keeps German content and requires meaningful public contact", () => {
   const valid = normalizeDepartmentSectionPayload({

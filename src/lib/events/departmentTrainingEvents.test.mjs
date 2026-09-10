@@ -34,6 +34,17 @@ test("department name is the safe display fallback and internal slug is never th
   assert.equal(slot.department_href, "/behindertensport");
 });
 
+test("published Gymnastikdamen training uses the same neutral occurrence contract", () => {
+  const gymnasticsDepartment = { id: "gymnastics", slug: "damen-gymnastik", name_de: "Gymnastikdamen", is_active: true };
+  const gymnasticsSection = { department_id: "gymnastics", title_de: "Gymnastikdamen", is_active: true, is_published: true };
+  const gymnasticsTraining = { ...training, id: "gymnastics-training", department_id: "gymnastics", location_name: null };
+  const [slot] = selectPublishedDepartmentTrainingSlots([gymnasticsTraining], [gymnasticsDepartment], [gymnasticsSection]);
+  assert.equal(slot.source_type, "department_training");
+  assert.equal(slot.department_slug, "damen-gymnastik");
+  assert.equal(slot.department_href, "/damen-gymnastik");
+  assert.equal(slot.display_name_de, "Gymnastikdamen");
+});
+
 test("inactive, unpublished, foreign and malformed source records fail closed", () => {
   assert.deepEqual(selectPublishedDepartmentTrainingSlots([{ ...training, is_active: false }], [department], [section]), []);
   assert.deepEqual(selectPublishedDepartmentTrainingSlots([training], [{ ...department, is_active: false }], [section]), []);

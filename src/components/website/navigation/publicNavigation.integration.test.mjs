@@ -46,6 +46,7 @@ test("every newly introduced navigation target has a real page", () => {
     "verein/vereinsgeschichte",
     "fussball/turniere-events",
     "behindertensport",
+    "damen-gymnastik",
     "tischtennis/mannschaften",
     "tischtennis/spielplan-tabelle",
     "tischtennis/vorstand",

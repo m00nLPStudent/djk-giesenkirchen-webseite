@@ -92,8 +92,8 @@ export const ADMIN_NAVIGATION_SECTIONS = [
   },
   {
     key: "gymnastics", label: "Gymnastikdamen", iconKey: "activity", href: null,
-    description: "Geplanter kompakter Inhaltsbereich.", order: 60,
-    visibility: { strategy: "visible_items" }, implementationStatus: "planned",
-    items: ["Übersicht", "Inhalte", "Trainingszeiten", "Ansprechpartner", "Bilder"].map((label, index) => planned(`gymnastics-${index}`, label, "activity", "department_unavailable", (index + 1) * 10, "Department-Content-Scope fehlt.")),
+    description: "Inhalte und Trainingszeiten der Gymnastikdamen.", order: 60,
+    visibility: { strategy: "visible_items" }, implementationStatus: "active",
+    items: [active("gymnastics-editor", "Bereich verwalten", "/admin/gymnastikdamen", "activity", "department_sections.view", "permission_only", 10, "Inhalte, Kontakt, Gruppenbild und Trainingszeiten pflegen.")],
   },
 ];

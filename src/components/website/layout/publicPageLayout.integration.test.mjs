@@ -93,10 +93,10 @@ test("club overview cards are dark and smaller departments share one structure",
   assert.match(club, /<PublicCard/);
   assert.doesNotMatch(club, /bg-white p-6/);
   assert.match(disability, /PublicDepartmentSectionPage/);
-  assert.match(gymnastics, /Beschreibung der Abteilung/);
-  assert.match(gymnastics, /Angebote und Aktivitäten/);
-  assert.match(gymnastics, /Geschichte und Über uns/);
-  assert.match(gymnastics, /Kontakt und Ansprechpartner/);
+  assert.match(gymnastics, /PublicDepartmentSectionPage/);
+  assert.match(gymnastics, /DEPARTMENT_SLUG = "damen-gymnastik"/);
+  assert.match(gymnastics, /loadPublicDepartmentSection/);
+  assert.match(gymnastics, /gymnastics\.png/);
 });
 
 test("published club history uses the confirmed global CMS source and preserves the legacy football route", () => {

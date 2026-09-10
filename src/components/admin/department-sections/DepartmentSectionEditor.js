@@ -1,14 +1,6 @@
 "use client";
 import { useState } from "react";
 import AdminMediaPicker from "@/components/admin/media-library/AdminMediaPicker";
-import {
-  createDepartmentTrainingAction,
-  deleteDepartmentTrainingAction,
-  loadDepartmentSectionMediaPickerAction,
-  saveDepartmentSectionAction,
-  updateDepartmentTrainingAction,
-  uploadDepartmentSectionMediaAction,
-} from "@/app/admin/behindertensport/actions";
 
 const WEEKDAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
 const emptyTraining = { weekday: 1, start_time: "18:00", end_time: "19:00", location_name: "", location_address: "", location_city: "", location_note: "", effective_from: "", effective_until: "", is_active: true, sort_order: 0 };
@@ -43,7 +35,15 @@ function TrainingFields({ value, onChange }) {
   </div>;
 }
 
-export default function DepartmentSectionEditor({ config, initialSection, initialTrainingTimes = [] }) {
+export default function DepartmentSectionEditor({ config, initialSection, initialTrainingTimes = [], actions }) {
+  const {
+    createDepartmentTrainingAction,
+    deleteDepartmentTrainingAction,
+    loadDepartmentSectionMediaPickerAction,
+    saveDepartmentSectionAction,
+    updateDepartmentTrainingAction,
+    uploadDepartmentSectionMediaAction,
+  } = actions;
   const [section, setSection] = useState({
     title_de: initialSection?.title_de || config.defaultTitle,
     description_de: initialSection?.description_de || "",
@@ -69,7 +69,7 @@ export default function DepartmentSectionEditor({ config, initialSection, initia
     const response = await saveDepartmentSectionAction({ ...section, image_media_asset_id: selectedMedia?.id || null });
     setPending(false);
     if (response.ok) setSectionExists(true);
-    setFeedback({ ok: response.ok, message: response.ok ? "Behindertensport wurde gespeichert." : response.error || "Speichern fehlgeschlagen." });
+    setFeedback({ ok: response.ok, message: response.ok ? `${config.label} wurde gespeichert.` : response.error || "Speichern fehlgeschlagen." });
   }
 
   function beginCreate() { setEditingId(null); setTrainingDraft({ ...emptyTraining }); setFeedback(null); }
