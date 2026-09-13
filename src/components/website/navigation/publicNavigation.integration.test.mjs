@@ -9,6 +9,8 @@ const navigationSource = read("src/components/website/navigation/Navigation.js")
 const configSource = read("src/components/website/navigation/navigationConfig.js");
 const headerSource = read("src/components/Header.js");
 const footerSource = read("src/components/Footer.js");
+const publicSiteSource = read("src/config/publicSite.js");
+const adminBrandSource = read("src/components/admin/layout/AdminBrand.js");
 const homeSource = read("src/app/(website)/page.js");
 const homeEventsSource = read("src/components/website/events/HomeEventsSection.js");
 const trainingSportIconSource = read("src/components/website/events/TrainingSportIcon.js");
@@ -81,6 +83,11 @@ test("header has no global h1 and shares the centralized logo source", () => {
   assert.doesNotMatch(headerSource, /<h1\b/);
   assert.match(headerSource, /PUBLIC_SITE_LOGO_URL/);
   assert.match(footerSource, /PUBLIC_SITE_LOGO_URL/);
+  assert.match(publicSiteSource, /PUBLIC_SITE_LOGO_URL\s*=\s*"\/images\/club-logo\.png"/);
+  assert.doesNotMatch(publicSiteSource, /supabase\.co\/storage/);
+  assert.equal(existsSync(resolve(root, "public/images/club-logo.png")), true);
+  assert.match(adminBrandSource, /PUBLIC_SITE_LOGO_URL/);
+  assert.doesNotMatch(adminBrandSource, /supabase\.co\/storage/);
   assert.match(headerSource, /max-w-\[90rem\]/);
   assert.match(headerSource, /xl:h-36/);
   assert.match(headerSource, /xl:bottom-0/);

@@ -1,12 +1,11 @@
-const logoUrl =
-  "https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/logos/Giesenkirchen.png";
+import { PUBLIC_SITE_LOGO_URL } from "@/config/publicSite";
 
 export default function AdminBrand() {
   return (
     <div className="flex min-w-0 items-center gap-3">
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] p-1">
         <img
-          src={logoUrl}
+          src={PUBLIC_SITE_LOGO_URL}
           alt="DJK/VfL Giesenkirchen"
           className="h-9 w-9 object-contain"
         />
