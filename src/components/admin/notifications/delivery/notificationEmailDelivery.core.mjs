@@ -1,4 +1,4 @@
-import { escapeMailHtml } from "../../../../lib/mail/mail.core.mjs";
+import { renderClubMailLayout } from "../../../../lib/mail/templates/clubMailLayout.mjs";
 
 export const NOTIFICATION_EMAIL_CHANNEL = "email";
 export const NOTIFICATION_EMAIL_SUBJECT = "Neue Benachrichtigung im Vereinsdashboard";
@@ -50,7 +50,7 @@ export function buildTrustedDashboardUrl(value) {
   }
 }
 
-export function renderNotificationEmail(type, { dashboardUrl = null } = {}) {
+export function renderNotificationEmail(type, { dashboardUrl = null, siteUrl = null } = {}) {
   const policy = getNotificationEmailPolicy(type);
   if (!policy.enabled) return { data: null, error: { code: "notification_email_type_denied" } };
   const eventText = EMAIL_COPY[policy.templateKey];
@@ -58,10 +58,12 @@ export function renderNotificationEmail(type, { dashboardUrl = null } = {}) {
     ? `Bitte melde dich im Vereinsdashboard an, um die Details einzusehen:\n${dashboardUrl}`
     : "Bitte melde dich im Vereinsdashboard an, um die Details einzusehen.";
   const text = ["Hallo,", "", eventText, "", callToAction, "", "Sportliche Grüße", "DJK/VfL Giesenkirchen"].join("\n");
-  const link = dashboardUrl
-    ? `<p><a href="${escapeMailHtml(dashboardUrl)}">Vereinsdashboard öffnen</a></p>`
-    : "";
-  const html = `<p>Hallo,</p><p>${escapeMailHtml(eventText)}</p><p>Bitte melde dich im Vereinsdashboard an, um die Details einzusehen.</p>${link}<p>Sportliche Grüße<br>DJK/VfL Giesenkirchen</p>`;
+  const html = renderClubMailLayout({
+    title: NOTIFICATION_EMAIL_SUBJECT,
+    paragraphs: ["Hallo,", eventText, "Bitte melde dich im Vereinsdashboard an, um die Details einzusehen."],
+    action: dashboardUrl ? { label: "Vereinsdashboard öffnen", url: dashboardUrl } : null,
+    siteUrl,
+  });
   return { data: { subject: NOTIFICATION_EMAIL_SUBJECT, text, html }, error: null };
 }
 
@@ -127,7 +129,7 @@ export async function executeNotificationEmailDelivery(notification, {
     return skipped.error || !skipped.data ? deliveryResult("failed", { code: "notification_delivery_skip_failed" }) : deliveryResult("skipped", { code: "notification_email_recipient_unavailable" });
   }
 
-  const rendered = renderNotificationEmail(notification.type, { dashboardUrl: buildTrustedDashboardUrl(siteUrl) });
+  const rendered = renderNotificationEmail(notification.type, { dashboardUrl: buildTrustedDashboardUrl(siteUrl), siteUrl });
   if (rendered.error) return deliveryResult("skipped", { code: rendered.error.code });
   const claimed = await store.claimNotificationDelivery(db, delivery, createdAt.toISOString());
   if (claimed.error || !claimed.data) return deliveryResult(claimed.error ? "failed" : "not_claimed", { code: claimed.error ? "notification_delivery_claim_failed" : undefined });

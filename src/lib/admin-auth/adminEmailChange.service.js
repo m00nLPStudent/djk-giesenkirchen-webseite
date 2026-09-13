@@ -47,6 +47,7 @@ function safeFailure(reason = "unexpected-failure") {
 }
 
 function buildDependencies(client, mailer = sendMail) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || null;
   const send = async ({ to, content, eventType, requestId, context }) => {
     const result = await mailer({
       to,
@@ -204,10 +205,10 @@ function buildDependencies(client, mailer = sendMail) {
       }
       return result;
     },
-    sendOldAddressWarning: ({ requestId, oldEmail }) => send({ to: oldEmail, content: buildAdminEmailChangeOldWarningMail(), eventType: "admin-email-change-requested-old", requestId, context: "admin_email_change_requested_old" }),
-    sendNewAddressConfirmation: ({ requestId, newEmail, confirmationUrl }) => send({ to: newEmail, content: buildAdminEmailChangeConfirmationMail({ confirmationUrl }), eventType: "admin-email-change-confirmation", requestId, context: "admin_email_change_confirmation" }),
-    sendOldAddressCompletion: ({ requestId, oldEmail }) => send({ to: oldEmail, content: buildAdminEmailChangeOldCompletionMail(), eventType: "admin-email-change-completed-old", requestId, context: "admin_email_change_completed_old" }),
-    sendNewAddressCompletion: ({ requestId, newEmail }) => send({ to: newEmail, content: buildAdminEmailChangeNewCompletionMail(), eventType: "admin-email-change-completed-new", requestId, context: "admin_email_change_completed_new" }),
+    sendOldAddressWarning: ({ requestId, oldEmail }) => send({ to: oldEmail, content: buildAdminEmailChangeOldWarningMail({ siteUrl }), eventType: "admin-email-change-requested-old", requestId, context: "admin_email_change_requested_old" }),
+    sendNewAddressConfirmation: ({ requestId, newEmail, confirmationUrl }) => send({ to: newEmail, content: buildAdminEmailChangeConfirmationMail({ confirmationUrl, siteUrl }), eventType: "admin-email-change-confirmation", requestId, context: "admin_email_change_confirmation" }),
+    sendOldAddressCompletion: ({ requestId, oldEmail }) => send({ to: oldEmail, content: buildAdminEmailChangeOldCompletionMail({ siteUrl }), eventType: "admin-email-change-completed-old", requestId, context: "admin_email_change_completed_old" }),
+    sendNewAddressCompletion: ({ requestId, newEmail }) => send({ to: newEmail, content: buildAdminEmailChangeNewCompletionMail({ siteUrl }), eventType: "admin-email-change-completed-new", requestId, context: "admin_email_change_completed_new" }),
   };
 }
 

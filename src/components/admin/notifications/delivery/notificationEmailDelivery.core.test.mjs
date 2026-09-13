@@ -53,11 +53,15 @@ test("registry contains all 16 globally recommended renderers and remains defaul
 });
 
 test("renderer is generic and excludes dashboard content, metadata and ids", () => {
-  const rendered = renderNotificationEmail(notification.type, { dashboardUrl: "https://verein.example/admin" });
+  const rendered = renderNotificationEmail(notification.type, { dashboardUrl: "https://verein.example/admin", siteUrl: "https://verein.example" });
   const combined = `${rendered.data.subject}\n${rendered.data.text}\n${rendered.data.html}`;
   for (const forbidden of [notification.title, notification.message, notification.id, "requestId", "secret"]) assert.doesNotMatch(combined, new RegExp(forbidden));
   assert.match(combined, /Vereinsdashboard/);
-  assert.match(rendered.data.html, /&lt;|<p>/);
+  assert.match(rendered.data.html, /<p style=/);
+  assert.match(rendered.data.html, /max-width:640px/);
+  assert.match(rendered.data.html, /images\/club-logo\.png/);
+  assert.match(rendered.data.html, /\/impressum/);
+  assert.match(rendered.data.html, /\/datenschutz/);
 });
 
 test("all 16 configured active types have datensparse renderers", () => {

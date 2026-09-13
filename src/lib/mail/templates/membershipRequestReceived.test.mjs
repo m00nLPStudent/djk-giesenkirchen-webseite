@@ -17,3 +17,11 @@ test("membership confirmation excludes sensitive and internal request data", () 
   assert.match(mail.text, /Trainer werden/);
   assert.doesNotMatch(JSON.stringify(mail), /2010-01-01|12345|privat|intern|request-secret/);
 });
+
+test("membership confirmation uses the shared logo and legal footer when the site URL is safe", () => {
+  const mail = buildMembershipRequestReceivedMail({ first_name: "Mia", request_type: "trainer-werden" }, { siteUrl: "https://verein.example" });
+  assert.match(mail.html, /images\/club-logo\.png/);
+  assert.match(mail.html, /\/impressum/);
+  assert.match(mail.html, /\/datenschutz/);
+  assert.match(mail.text, /Sportliche Grüße/);
+});
