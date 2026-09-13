@@ -1,34 +1,25 @@
-.football-de-card,
-.football-de-widget-shell {
-  --football-de-red: #ef111d;
-  --football-de-card: #1b1b21;
-  --football-de-border: rgba(255, 255, 255, 0.1);
-}
-
 .football-de-card {
   min-height: 100%;
 }
 
 .football-de-widget-frame {
-  background: #ffffff;
+  background: rgba(0, 0, 0, 0.2);
   min-height: 300px;
+  max-width: 100%;
 }
 
 .football-de-widget-shell .fussballde_widget {
   display: block;
   min-height: 260px;
+  max-width: 100%;
   width: 100%;
 }
 
 .football-de-widget-shell .fussballde_widget iframe {
-  display: block !important;
-  min-height: 420px !important;
-  width: 100% !important;
-  border: 0 !important;
-}
-
-.football-de-widget-shell .fussballde_widget a {
-  color: var(--football-de-red);
-  font-weight: 900;
-  text-decoration: none;
+  background: transparent;
+  border: 0;
+  display: block;
+  max-width: 100%;
+  min-height: 420px;
+  width: 100%;
 }
