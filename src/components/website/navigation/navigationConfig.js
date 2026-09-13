@@ -19,7 +19,7 @@ export const publicNavigationItems = [
       { label: "Spielplan & Tabelle", href: "/fussball/spielplan-tabelle" },
       { label: "Trainer", href: "/fussball/abteilung/trainer" },
       { label: "Vorstand Fußball", href: "/fussball/abteilung/vorstand" },
-      { label: "Trainingszeiten", href: "/termine/training" },
+      { label: "Trainingszeiten", href: "/fussball/trainingszeiten" },
       { label: "Turniere & Events", href: "/fussball/turniere-events" },
     ],
   },

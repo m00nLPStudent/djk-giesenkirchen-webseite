@@ -3,10 +3,19 @@ import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.se
 import { resolvePublicTeamImage } from "./publicTeamImage.core.mjs";
 
 const LEGACY_TEAM_FIELDS =
-  "id, slug, name_de, name_en, age_group, training_times_de, team_image_url, is_active, sort_order";
+  "id, slug, name_de, name_en, age_group, training_times_de, team_image_url, is_active, sort_order, department_id";
 const TEAM_FIELDS = `${LEGACY_TEAM_FIELDS}, team_image_media_asset_id`;
 const LEGACY_TEAM_SEASON_FIELDS = "id, team_id, season_id, team_image_url";
 const TEAM_SEASON_FIELDS = `${LEGACY_TEAM_SEASON_FIELDS}, team_image_media_asset_id`;
+
+async function resolveFootballDepartment() {
+  return supabase
+    .from("departments")
+    .select("id")
+    .eq("slug", "fussball")
+    .eq("is_active", true)
+    .maybeSingle();
+}
 
 export function getFootballTeamGroup(team = {}) {
   const value =
@@ -29,19 +38,24 @@ export function getFootballTeamGroup(team = {}) {
   return "junioren";
 }
 
-async function loadActiveFootballTeams(fields) {
+async function loadActiveFootballTeams(fields, departmentId) {
   return supabase
     .from("teams")
     .select(fields)
+    .eq("department_id", departmentId)
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("name_de", { ascending: true });
 }
 
 export async function getActiveFootballTeams() {
-  let result = await loadActiveFootballTeams(TEAM_FIELDS);
+  const departmentResult = await resolveFootballDepartment();
+  if (departmentResult.error || !departmentResult.data?.id) {
+    return { data: [], error: departmentResult.error || new Error("Die Fußballabteilung ist nicht verfügbar.") };
+  }
+  let result = await loadActiveFootballTeams(TEAM_FIELDS, departmentResult.data.id);
   if (result.error?.code === "42703" && result.error.message?.includes("team_image_media_asset_id")) {
-    result = await loadActiveFootballTeams(LEGACY_TEAM_FIELDS);
+    result = await loadActiveFootballTeams(LEGACY_TEAM_FIELDS, departmentResult.data.id);
   }
   if (result.error) return result;
   const teams = result.data || [];

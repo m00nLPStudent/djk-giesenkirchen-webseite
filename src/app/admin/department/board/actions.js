@@ -10,6 +10,7 @@ import {
 } from "@/components/admin/persons/serverPersonScope";
 import { saveBoardMember } from "@/components/admin/board/services/board.service";
 import { revalidatePath } from "next/cache";
+import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
 import { canManageMedia, loadMediaLibrary, resolveEntityImageMedia, synchronizeMediaAssignment, uploadMediaAsset } from "@/components/admin/media-library/media.service";
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
@@ -54,6 +55,7 @@ function revalidateBoardPaths() {
   revalidatePath("/admin/club/board");
   revalidatePath("/admin/football/board");
   revalidatePath("/admin/table-tennis/board");
+  revalidatePublicContent("board");
 }
 
 async function authorizeBoardMedia(boardMemberId = null) {

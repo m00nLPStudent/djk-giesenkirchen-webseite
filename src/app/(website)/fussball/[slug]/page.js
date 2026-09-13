@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabase";
 import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
 import { resolvePublicTeamImage } from "@/lib/football/publicTeamImage.core.mjs";
 import { resolveTeamContactImage } from "@/lib/football/publicTeamContactImage.core.mjs";
+import { notFound } from "next/navigation";
 
 const tournamentItems = [
   "Spielpläne",
@@ -160,11 +161,22 @@ export default async function TeamPage({ params }) {
   const selectedSeason =
     seasonList.find((season) => season.is_current) || seasonList[0] || null;
 
+  const { data: footballDepartment } = await supabase
+    .from("departments")
+    .select("id")
+    .eq("slug", "fussball")
+    .eq("is_active", true)
+    .maybeSingle();
+  if (!footballDepartment?.id) notFound();
+
   const { data: team } = await supabase
     .from("teams")
     .select("*")
     .eq("slug", slug)
-    .single();
+    .eq("department_id", footballDepartment.id)
+    .eq("is_active", true)
+    .maybeSingle();
+  if (!team?.id) notFound();
 
   const { data: teamSeason } =
     selectedSeason?.id && team?.id

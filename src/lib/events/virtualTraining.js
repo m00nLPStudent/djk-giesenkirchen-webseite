@@ -76,6 +76,7 @@ function toOccurrenceLikeEvent(slot, startDate, endDate, occurrenceIndex) {
     team_name_de: teamName,
     team_season_name: slot.team_seasons?.name_de || null,
     age_group: slot.teams?.age_group || null,
+    department_id: slot.department_id || slot.teams?.department_id || null,
     department_slug: slot.department_slug || slot.teams?.departments?.slug || null,
     department_name_de: slot.department_name_de || null,
     department_href: slot.department_href || null,

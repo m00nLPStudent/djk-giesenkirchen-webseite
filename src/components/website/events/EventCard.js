@@ -7,7 +7,9 @@ export default function EventCard({ event }) {
     .join(" · ");
   const isVirtualTraining =
     event.is_virtual === true && event.source_type === "team_training";
-  const href = isVirtualTraining
+  const isDepartmentTraining =
+    event.is_virtual === true && event.source_type === "department_training";
+  const href = isVirtualTraining || isDepartmentTraining
     ? `/termine/training/${event.occurrence_id}`
     : event.slug
       ? `/termine/${event.slug}`
@@ -63,7 +65,7 @@ export default function EventCard({ event }) {
         </p>
 
         <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-red-400">
-          {isVirtualTraining ? "Zum Training" : "Zum Termin"}
+          {isVirtualTraining || isDepartmentTraining ? "Zum Training" : "Zum Termin"}
         </p>
       </div>
     </Link>

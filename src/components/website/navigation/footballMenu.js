@@ -22,7 +22,7 @@ export const footballMenuItems = [
   },
   {
     label: "Trainingszeiten",
-    href: "/termine/training",
+    href: "/fussball/trainingszeiten",
   },
   {
     label: "Turniere & Events",

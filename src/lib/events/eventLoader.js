@@ -130,6 +130,7 @@ export async function getVirtualTrainingEvents({
       teams: team,
       team_name_de: slot.team_name_de || team?.name_de || null,
       team_slug: slot.team_slug || team?.slug || null,
+      department_id: team?.department_id || null,
       department_slug: team?.departments?.slug || null,
     };
   });

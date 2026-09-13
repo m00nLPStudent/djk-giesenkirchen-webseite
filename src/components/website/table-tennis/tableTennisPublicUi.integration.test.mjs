@@ -20,7 +20,9 @@ test("landing and team overview use only the public table-tennis contract", () =
   assert.match(landing, /loadPublicTableTennisTeamSummaries/);
   assert.match(landing, /loadPublicTableTennisBoard/);
   assert.match(teams, /loadPublicTableTennisTeamSummaries/);
-  for (const source of [landing, teams, detail, training, board]) assert.doesNotMatch(source, /supabase|\.from\(/);
+  for (const source of [landing, teams, detail, board]) assert.doesNotMatch(source, /supabase|\.from\(/);
+  assert.match(training, /getVirtualTrainingEvents/);
+  assert.match(training, /selectTeamTrainingForDepartment\(loaded, "tischtennis"\)/);
   assert.doesNotMatch(teams, /Junioren|Senioren|Damen|Jugend/);
 });
 
@@ -81,7 +83,8 @@ test("detail and competition pages stay table-tennis specific and omit football 
 });
 
 test("training, coaches, standalone board and explicit team contact retain scoped DTO boundaries", () => {
-  assert.match(training, /loadPublicTableTennisTeamSummaries/);
+  assert.match(training, /TrainingEventsOverview/);
+  assert.match(training, /basePath="\/tischtennis\/trainingszeiten"/);
   assert.match(board, /loadPublicTableTennisBoard/);
   assert.match(detailTabs, /TableTennisContactCard/);
   assert.match(ui, /Für diese Mannschaft ist derzeit kein Ansprechpartner hinterlegt\./);

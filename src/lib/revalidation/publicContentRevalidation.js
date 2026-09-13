@@ -12,6 +12,7 @@ const PUBLIC_REVALIDATION_PATHS = {
     { path: "/fussball/[slug]", type: "page" },
     { path: "/mitglied-werden" },
     { path: "/termine/training" },
+    { path: "/fussball/trainingszeiten" },
     { path: "/termine/training/[occurrenceId]", type: "page" },
   ],
   coaches: [

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { EventCard } from "@/components/website/events";
 import { PublicPageShell } from "@/components/website/layout";
 import { getVirtualTrainingEvents } from "@/lib/events";
+import { getPublicDepartmentTrainingEvents } from "@/lib/events/departmentTrainingLoader";
+import { mergeTrainingOccurrenceStreams } from "@/lib/events/departmentTrainingEvents.mjs";
 import { supabase } from "@/lib/supabase";
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
 import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
@@ -30,6 +32,8 @@ function getEndOfDay(date) {
   );
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function TrainingEventsPage({ searchParams }) {
   const resolvedSearchParams = await Promise.resolve(searchParams);
   const trainingRange =
@@ -41,10 +45,12 @@ export default async function TrainingEventsPage({ searchParams }) {
       ? getEndOfDay(new Date(now.getTime() + 6 * 24 * 60 * 60 * 1000))
       : getEndOfDay(new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000));
 
-  const [trainingEvents, { data: eventTypes }] = await Promise.all([
+  const [teamTrainingEvents, departmentTrainingEvents, { data: eventTypes }] = await Promise.all([
     getVirtualTrainingEvents({ from: trainingFrom, to: trainingTo, maxOccurrencesPerTraining: trainingRange === "week" ? 8 : 3 }),
+    getPublicDepartmentTrainingEvents({ from: trainingFrom, to: trainingTo, maxOccurrencesPerTraining: trainingRange === "week" ? 8 : 3 }),
     loadEventTypes(supabase, { activeOnly: false }),
   ]);
+  const trainingEvents = mergeTrainingOccurrenceStreams(teamTrainingEvents, departmentTrainingEvents);
   const virtualTrainings = createEventDtos(trainingEvents, eventTypes || []);
 
   return (

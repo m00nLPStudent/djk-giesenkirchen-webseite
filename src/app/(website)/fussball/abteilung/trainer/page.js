@@ -7,8 +7,11 @@ import {
 import { loadActivePublicCoachDtos } from "@/components/website/coach/coachPublic.repository";
 import { supabase } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 export default async function DepartmentCoachesPage() {
-  const { data: footballDepartment } = await supabase.from("departments").select("id").eq("slug", "fussball").eq("is_active", true).maybeSingle();
+  const { data: footballDepartment, error: departmentError } = await supabase.from("departments").select("id").eq("slug", "fussball").eq("is_active", true).maybeSingle();
+  if (departmentError) throw new Error(`Football department query failed: ${departmentError.message}`);
   const coaches = footballDepartment?.id ? await loadActivePublicCoachDtos(supabase, { departmentId: footballDepartment.id }) : [];
 
   return (

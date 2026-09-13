@@ -7,6 +7,9 @@ import {
   getVirtualTrainingEvents,
   getTrainingLocationTypeLabel,
 } from "@/lib/events";
+import { getPublicDepartmentTrainingEvents } from "@/lib/events/departmentTrainingLoader";
+import { mergeTrainingOccurrenceStreams } from "@/lib/events/departmentTrainingEvents.mjs";
+import { resolveTrainingOwnerLink } from "@/lib/events/publicTrainingScope.core.mjs";
 
 function getTrainingTypeLabel(type = "training") {
   const map = {
@@ -78,7 +81,11 @@ export default async function TrainingDetailPage({ params }) {
   }
 
   const searchWindow = getOccurrenceWindow(occurrenceId);
-  const virtualEvents = await getVirtualTrainingEvents(searchWindow);
+  const [teamEvents, departmentEvents] = await Promise.all([
+    getVirtualTrainingEvents(searchWindow),
+    getPublicDepartmentTrainingEvents(searchWindow),
+  ]);
+  const virtualEvents = mergeTrainingOccurrenceStreams(teamEvents, departmentEvents);
   const event = virtualEvents.find(
     (item) => item.occurrence_id === occurrenceId,
   );
@@ -86,14 +93,15 @@ export default async function TrainingDetailPage({ params }) {
   if (
     !event ||
     event.is_virtual !== true ||
-    event.source_type !== "team_training"
+    !["team_training", "department_training"].includes(event.source_type)
   ) {
     notFound();
   }
 
   const teamName = getTeamName(event);
+  const isDepartmentTraining = event.source_type === "department_training";
   const trainingTypeLabel = getTrainingTypeLabel(event.training_type);
-  const teamHref = event.team_slug ? `/fussball/${event.team_slug}` : null;
+  const ownerLink = resolveTrainingOwnerLink(event);
   const location = [getTrainingLocationTypeLabel(event.training_location_type), event.location_name, event.location_city]
     .filter(Boolean)
     .join(" · ");
@@ -121,8 +129,8 @@ export default async function TrainingDetailPage({ params }) {
               {trainingTypeLabel}
             </p>
             <p>
-              <span className="font-bold text-white">Mannschaft:</span>{" "}
-              {teamName}
+              <span className="font-bold text-white">{isDepartmentTraining ? "Bereich:" : "Mannschaft:"}</span>{" "}
+              {isDepartmentTraining ? event.department_name_de || event.title_de : teamName}
             </p>
             <p>
               <span className="font-bold text-white">Datum:</span>{" "}
@@ -174,8 +182,7 @@ export default async function TrainingDetailPage({ params }) {
           )}
 
           <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/75">
-            Dieser Termin wurde automatisch aus den Trainingszeiten der
-            Mannschaft erzeugt.
+            Dieser Termin wurde automatisch aus den hinterlegten Trainingszeiten erzeugt.
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
@@ -186,12 +193,12 @@ export default async function TrainingDetailPage({ params }) {
               Zurück zur Terminübersicht
             </Link>
 
-            {teamHref && (
+            {ownerLink && (
               <Link
-                href={teamHref}
+                href={ownerLink.href}
                 className="inline-flex rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-white/70 transition hover:border-red-500 hover:bg-red-600/10 hover:text-white"
               >
-                Zur Mannschaft
+                {ownerLink.label}
               </Link>
             )}
           </div>

@@ -9,23 +9,27 @@ import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.se
 import { resolveLoadedPublicMediaImage } from "@/lib/people/publicMediaImage.mjs";
 import { COACH_PLACEHOLDER_IMAGE as BOARD_PLACEHOLDER_IMAGE } from "@/constants/images";
 
+export const dynamic = "force-dynamic";
+
 export default async function DepartmentBoardPage() {
-  const { data: footballDepartment } = await supabase
+  const { data: footballDepartment, error: departmentError } = await supabase
     .from("departments")
     .select("id")
     .eq("slug", "fussball")
     .eq("is_active", true)
     .maybeSingle();
+  if (departmentError) throw new Error(`Football department query failed: ${departmentError.message}`);
 
   let boardMembers = [];
   if (footballDepartment?.id) {
     const result = await supabase
       .from("board_members")
-      .select("*, board_roles(name_de, name_en)")
+      .select("id, first_name, last_name, role_de, role_en, phone, email, image_url, image_media_asset_id, is_active, sort_order, organization_scope, department_id, board_roles(name_de, name_en)")
       .eq("organization_scope", "department")
       .eq("department_id", footballDepartment.id)
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
+    if (result.error) throw new Error(`Football board query failed: ${result.error.message}`);
     boardMembers = result.data || [];
   }
 
