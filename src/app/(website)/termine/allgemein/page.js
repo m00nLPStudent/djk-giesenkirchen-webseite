@@ -6,12 +6,14 @@ import { supabase } from "@/lib/supabase";
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
 import { createEventDtos } from "@/components/admin/events/helpers/eventTypes.core";
 import { resolvePublicEventImages } from "@/components/admin/events/services/eventMedia.service";
+import { connection } from "next/server";
 
 function filterRealEvents(events = []) {
   return events.filter((event) => !event?.is_virtual);
 }
 
 export default async function GeneralEventsPage() {
+  await connection();
   const [{ data: events }, { data: eventTypes }] = await Promise.all([
     getPublishedEvents(),
     loadEventTypes(supabase, { activeOnly: false }),

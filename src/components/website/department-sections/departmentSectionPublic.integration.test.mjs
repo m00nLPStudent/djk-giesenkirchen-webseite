@@ -12,7 +12,9 @@ test("Behindertensport route uses the fixed server-side public section contract"
   assert.match(page, /DEPARTMENT_SLUG = "behindertensport"/);
   assert.match(page, /loadPublicDepartmentSection\(DEPARTMENT_SLUG\)/);
   assert.match(page, /await connection\(\)/);
-  assert.match(page, /notFound\(\)/);
+  assert.match(page, /status === "not_found"[^]*notFound\(\)/);
+  assert.match(page, /status === "empty"[^]*PublicDepartmentSectionEmptyPage/);
+  assert.match(page, /result\.error[^]*throw result\.error/);
   assert.doesNotMatch(page, /PublicSectionPlaceholder/);
 });
 
@@ -20,7 +22,8 @@ test("Gymnastikdamen route reuses the fixed server-side public section contract"
   assert.match(gymnasticsPage, /DEPARTMENT_SLUG = "damen-gymnastik"/);
   assert.match(gymnasticsPage, /loadPublicDepartmentSection\(DEPARTMENT_SLUG\)/);
   assert.match(gymnasticsPage, /await connection\(\)/);
-  assert.match(gymnasticsPage, /notFound\(\)/);
+  assert.match(gymnasticsPage, /status === "not_found"[^]*notFound\(\)/);
+  assert.match(gymnasticsPage, /status === "empty"[^]*PublicDepartmentSectionEmptyPage/);
   assert.match(gymnasticsPage, /PublicDepartmentSectionPage/);
   assert.match(gymnasticsPage, /\/images\/sports-icons\/gymnastics\.png/);
   assert.doesNotMatch(gymnasticsPage, /PublicSectionPlaceholder|contact_email|contact_phone|contact_name/);
@@ -31,6 +34,10 @@ test("repository uses sanitized RPC, RLS training read and public media resolver
   assert.match(repository, /\.rpc\("get_public_department_section"/);
   assert.match(repository, /\.from\("department_training_times"\)/);
   assert.match(repository, /loadPublicMediaUrlMap/);
+  assert.match(repository, /status: "not_found"/);
+  assert.match(repository, /status: "empty"/);
+  assert.match(repository, /status: "ready"/);
+  assert.ok(repository.indexOf('.from("departments")') < repository.indexOf('.rpc("get_public_department_section"'));
   assert.doesNotMatch(repository, /createSupabaseAdminClient|contact_name.*select|from\("department_sections"\)/s);
 });
 
@@ -43,6 +50,7 @@ test("public layout provides image fallback, contact privacy empty state and tra
   assert.match(layout, /items-stretch/);
   assert.equal((layout.match(/className="h-full min-w-0"/g) || []).length, 2);
   assert.match(layout, /break-all/);
+  assert.match(layout, /Für diesen Bereich sind aktuell noch keine Inhalte hinterlegt/);
 });
 
 test("neutral public layout follows title, information, image and description DOM order", () => {

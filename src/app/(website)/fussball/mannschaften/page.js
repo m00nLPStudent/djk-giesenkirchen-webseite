@@ -4,6 +4,7 @@ import {
   getActiveFootballTeams,
   groupFootballTeams,
 } from "@/lib/football/teams";
+import { connection } from "next/server";
 
 const GROUP_CARDS = [
   {
@@ -29,6 +30,7 @@ const GROUP_CARDS = [
 ];
 
 export default async function FootballTeamsOverviewPage() {
+  await connection();
   const { data: teams = [] } = await getActiveFootballTeams();
   const groups = groupFootballTeams(teams);
 

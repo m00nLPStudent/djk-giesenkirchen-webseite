@@ -18,12 +18,20 @@ const intro = read("../team/TeamIntroCard.js");
 
 test("landing and team overview use only the public table-tennis contract", () => {
   assert.match(landing, /loadPublicTableTennisTeamSummaries/);
+  assert.match(landing, /await connection\(\);[\s\S]*loadPublicTableTennisTeamSummaries\(\)/);
   assert.match(landing, /loadPublicTableTennisBoard/);
   assert.match(teams, /loadPublicTableTennisTeamSummaries/);
   for (const source of [landing, teams, detail, board]) assert.doesNotMatch(source, /supabase|\.from\(/);
   assert.match(training, /getVirtualTrainingEvents/);
   assert.match(training, /selectTeamTrainingForDepartment\(loaded, "tischtennis"\)/);
   assert.doesNotMatch(teams, /Junioren|Senioren|Damen|Jugend/);
+});
+
+test("table tennis landing keeps a real empty state without fallback teams", () => {
+  assert.match(landing, /teamsResult\.data \|\| \[\]/);
+  assert.match(landing, /teams\.length \?/);
+  assert.match(landing, /Aktuell sind keine aktiven Mannschaften veröffentlicht/);
+  assert.doesNotMatch(landing, /1 Herrenmannschaft|1\. Damenmannschaft|fallbackTeams|defaultTeams/);
 });
 
 test("team overview resolves live data at request time in dev and production start", () => {

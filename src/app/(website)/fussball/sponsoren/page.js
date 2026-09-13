@@ -1,8 +1,10 @@
 import { SponsorSection, SponsorTabs } from "@/components/website/sponsors";
 import { supabase } from "@/lib/supabase";
 import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
+import { connection } from "next/server";
 
 export default async function FootballSponsorsPage() {
+  await connection();
   const { data: categories } = await supabase
     .from("sponsor_categories")
     .select("*")
@@ -48,26 +50,32 @@ export default async function FootballSponsorsPage() {
 
         <SponsorTabs categories={categories || []} />
 
-        <div className="mt-14 space-y-14 md:mt-16 md:space-y-20">
-          {(categories || []).map((category) => (
-            <SponsorSection
-              key={category.id}
-              category={category}
-              sponsors={sponsorsByCategory[category.id] || []}
-            />
-          ))}
+        {resolvedSponsors.length === 0 ? (
+          <div className="mt-14 rounded-3xl border border-white/10 bg-white/5 p-8 text-white/55">
+            Aktuell sind keine Sponsoren veröffentlicht.
+          </div>
+        ) : (
+          <div className="mt-14 space-y-14 md:mt-16 md:space-y-20">
+            {(categories || []).map((category) => (
+              <SponsorSection
+                key={category.id}
+                category={category}
+                sponsors={sponsorsByCategory[category.id] || []}
+              />
+            ))}
 
-          {uncategorizedSponsors.length > 0 && (
-            <SponsorSection
-              category={{
-                id: "uncategorized",
-                slug: "weitere-sponsoren",
-                name_de: "Weitere Sponsoren",
-              }}
-              sponsors={uncategorizedSponsors}
-            />
-          )}
-        </div>
+            {uncategorizedSponsors.length > 0 && (
+              <SponsorSection
+                category={{
+                  id: "uncategorized",
+                  slug: "weitere-sponsoren",
+                  name_de: "Weitere Sponsoren",
+                }}
+                sponsors={uncategorizedSponsors}
+              />
+            )}
+          </div>
+        )}
       </section>
     </main>
   );

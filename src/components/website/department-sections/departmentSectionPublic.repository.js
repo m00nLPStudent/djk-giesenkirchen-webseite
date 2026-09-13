@@ -4,16 +4,20 @@ import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.se
 import { supabase } from "@/lib/supabase";
 import { createPublicDepartmentSectionDto } from "./departmentSectionPublic.core.mjs";
 
-const unavailable = (error) => ({ data: null, error: error || new Error("Der Bereich ist nicht verfügbar.") });
+const unavailable = (error) => ({ data: null, error: error || new Error("Der Bereich ist nicht verfügbar."), status: "error" });
 
 export async function loadPublicDepartmentSection(departmentSlug, { db = supabase, mediaLoader = loadPublicMediaUrlMap, today } = {}) {
   if (typeof departmentSlug !== "string" || !/^[a-z0-9-]{1,120}$/.test(departmentSlug)) return unavailable();
 
-  const sectionResult = await db.rpc("get_public_department_section", { p_department_slug: departmentSlug }).maybeSingle();
-  if (sectionResult.error || !sectionResult.data) return unavailable(sectionResult.error);
+  const departmentResult = await db.from("departments").select("id, slug, name_de").eq("slug", departmentSlug).eq("is_active", true).maybeSingle();
+  if (departmentResult.error) return unavailable(departmentResult.error);
+  if (!departmentResult.data?.id) return { data: null, error: null, status: "not_found" };
 
-  const departmentResult = await db.from("departments").select("id").eq("slug", departmentSlug).eq("is_active", true).maybeSingle();
-  if (departmentResult.error || !departmentResult.data?.id) return unavailable(departmentResult.error);
+  const sectionResult = await db.rpc("get_public_department_section", { p_department_slug: departmentSlug }).maybeSingle();
+  if (sectionResult.error) return unavailable(sectionResult.error);
+  if (!sectionResult.data) {
+    return { data: null, department: departmentResult.data, error: null, status: "empty" };
+  }
 
   const trainingResult = await db.from("department_training_times")
     .select("department_id, weekday, start_time, end_time, location_name, location_address, location_city, location_note, effective_from, effective_until, is_active, sort_order")
@@ -28,5 +32,5 @@ export async function loadPublicDepartmentSection(departmentSlug, { db = supabas
   if (mediaResult.error) return unavailable(mediaResult.error);
   const imageUrl = mediaResult.data.get(sectionResult.data.image_media_asset_id) || null;
   const dto = createPublicDepartmentSectionDto(sectionResult.data, trainingResult.data || [], imageUrl, { departmentId: departmentResult.data.id, today });
-  return dto ? { data: dto, error: null } : unavailable();
+  return dto ? { data: dto, department: departmentResult.data, error: null, status: "ready" } : unavailable();
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { PublicCard, PublicPageHero, PublicPageShell } from "@/components/website/layout";
 import { formatTableTennisWeekday, loadPublicTableTennisBoard, loadPublicTableTennisTeamSummaries, TableTennisTeamCard } from "@/components/website/table-tennis";
 
@@ -7,6 +8,7 @@ export const metadata = { title: "Tischtennis", description: "Mannschaften, Trai
 const areas = [["Mannschaften", "/tischtennis/mannschaften"], ["Trainingszeiten", "/tischtennis/trainingszeiten"], ["Vorstand", "/tischtennis/vorstand"], ["Spielplan & Tabelle", "/tischtennis/spielplan-tabelle"]];
 
 export default async function TableTennisPage() {
+  await connection();
   const [teamsResult, boardResult] = await Promise.all([loadPublicTableTennisTeamSummaries(), loadPublicTableTennisBoard()]);
   const teams = teamsResult.data || [];
   const firstTraining = teams.flatMap((team) => team.training.map((training) => ({ ...training, team }))).at(0);

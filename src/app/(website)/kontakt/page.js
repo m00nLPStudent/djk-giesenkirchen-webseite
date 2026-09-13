@@ -6,6 +6,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
 import { resolveLoadedPublicMediaImage } from "@/lib/people/publicMediaImage.mjs";
+import { connection } from "next/server";
 
 function mapClubContactForDisplay(contact = {}, mediaUrls = new Map()) {
   return {
@@ -16,6 +17,7 @@ function mapClubContactForDisplay(contact = {}, mediaUrls = new Map()) {
 }
 
 export default async function ContactPage() {
+  await connection();
   const { data: contacts } = await supabase
     .from("club_contacts")
     .select("*")

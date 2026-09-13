@@ -65,3 +65,16 @@ export default function PublicDepartmentSectionPage({ data, eyebrow = "Abteilung
     </PublicPageShell>
   );
 }
+
+export function PublicDepartmentSectionEmptyPage({ title, eyebrow = "Abteilung" }) {
+  return (
+    <PublicPageShell>
+      <PublicPageHero eyebrow={eyebrow} title={title} />
+      <PublicCard className="mt-10 min-w-0">
+        <p className="leading-7 text-white/60">
+          Für diesen Bereich sind aktuell noch keine Inhalte hinterlegt.
+        </p>
+      </PublicCard>
+    </PublicPageShell>
+  );
+}

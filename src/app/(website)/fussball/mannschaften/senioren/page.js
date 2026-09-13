@@ -5,8 +5,10 @@ import {
   getActiveFootballTeams,
   groupFootballTeams,
 } from "@/lib/football/teams";
+import { connection } from "next/server";
 
 export default async function FootballSeniorTeamsPage() {
+  await connection();
   const { data: teams = [] } = await getActiveFootballTeams();
   const grouped = groupFootballTeams(teams);
   const seniorTeams = grouped.senioren;
