@@ -34,7 +34,7 @@ export default function TeamCompetitionTab({ form, onFieldChange, departmentSlug
       title="fussball.de Integration"
       description="Widget-Code aus fussball.de einfügen. Gespeichert werden automatisch nur die Widget-IDs."
     >
-      <TeamFootballDeFields form={form} updateField={onFieldChange} />
+      <TeamFootballDeFields form={form} updateField={onFieldChange} teamId={teamId} teamSeasonId={form.team_season_id} />
     </FormSection>
   );
 }

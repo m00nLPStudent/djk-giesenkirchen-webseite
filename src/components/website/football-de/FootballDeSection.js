@@ -1,7 +1,9 @@
 import FootballDeAccordion from "./FootballDeAccordion";
 import FootballDeWidget from "./FootballDeWidget";
 
-export default function FootballDeSection({ team, showTable }) {
+export default function FootballDeSection({ team }) {
+  const hasTable = Boolean(team?.fussball_de_table_widget_id);
+  const hasMatches = Boolean(team?.fussball_de_matches_widget_id);
   return (
     <section className="mt-8 space-y-6">
       <div>
@@ -14,33 +16,40 @@ export default function FootballDeSection({ team, showTable }) {
         </p>
       </div>
 
-      <div className={`grid items-start gap-6 ${showTable ? "lg:grid-cols-2" : ""}`}>
-        <FootballDeAccordion
-          title="Spielplan"
-          description="Letzte und kommende Spiele dieser Mannschaft anzeigen."
-        >
-          <FootballDeWidget
-            title="Spielplan"
-            description="Letzte und kommende Spiele dieser Mannschaft."
-            widgetId={team?.fussball_de_matches_widget_id}
-            widgetType="team-matches"
-          />
-        </FootballDeAccordion>
-
-        {showTable && (
-          <FootballDeAccordion
-            title="Tabelle"
-            description="Aktuelle Tabelle der jeweiligen Staffel anzeigen."
-          >
-            <FootballDeWidget
+      {!hasTable && !hasMatches ? (
+        <p className="rounded-3xl border border-white/10 bg-white/5 p-6 text-white/60">
+          Für diese Mannschaft sind derzeit keine Spielbetriebsdaten hinterlegt.
+        </p>
+      ) : (
+        <div className={`grid min-w-0 items-start gap-6 ${hasTable && hasMatches ? "lg:grid-cols-2" : ""}`}>
+          {hasTable && (
+            <FootballDeAccordion
               title="Tabelle"
-              description="Aktuelle Tabelle der jeweiligen Staffel."
-              widgetId={team?.fussball_de_table_widget_id}
-              widgetType="table"
-            />
-          </FootballDeAccordion>
-        )}
-      </div>
+              description="Aktuelle Tabelle der jeweiligen Staffel anzeigen."
+            >
+              <FootballDeWidget
+                title="Tabelle"
+                description="Aktuelle Tabelle der jeweiligen Staffel."
+                widgetId={team?.fussball_de_table_widget_id}
+                widgetType="table"
+              />
+            </FootballDeAccordion>
+          )}
+          {hasMatches && (
+            <FootballDeAccordion
+              title="Spielplan"
+              description="Letzte und kommende Spiele dieser Mannschaft anzeigen."
+            >
+              <FootballDeWidget
+                title="Spielplan"
+                description="Letzte und kommende Spiele dieser Mannschaft."
+                widgetId={team.fussball_de_matches_widget_id}
+                widgetType="team-matches"
+              />
+            </FootballDeAccordion>
+          )}
+        </div>
+      )}
     </section>
   );
 }

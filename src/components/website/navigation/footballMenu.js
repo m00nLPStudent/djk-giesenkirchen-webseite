@@ -13,6 +13,10 @@ export const footballMenuItems = [
     href: "/fussball/abteilung/trainer",
   },
   {
+    label: "Spielplan & Tabelle",
+    href: "/fussball/spielplan-tabelle",
+  },
+  {
     label: "Vorstand Fußball",
     href: "/fussball/abteilung/vorstand",
   },

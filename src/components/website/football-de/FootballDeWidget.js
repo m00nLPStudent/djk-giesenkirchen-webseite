@@ -1,49 +1,58 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FootballDeCard from "./FootballDeCard";
 import FootballDeError from "./FootballDeError";
 
 const FOOTBALL_DE_SCRIPT_SRC = "https://www.fussball.de/widgets.js";
 
-function loadFootballDeScript() {
-  document
-    .querySelectorAll('script[src^="https://www.fussball.de/widgets.js"]')
-    .forEach((script) => script.remove());
+const widgetNodes = new Set();
+let reloadTimer = null;
+let activeScript = null;
 
-  const script = document.createElement("script");
-  script.type = "text/javascript";
-  script.src = `${FOOTBALL_DE_SCRIPT_SRC}?t=${Date.now()}`;
-  script.async = false;
-  document.head.appendChild(script);
+function scheduleFootballDeReload() {
+  window.clearTimeout(reloadTimer);
+  reloadTimer = window.setTimeout(() => {
+    widgetNodes.forEach((node) => node.replaceChildren());
+    document
+      .querySelectorAll('script[src^="https://www.fussball.de/widgets.js"]')
+      .forEach((script) => script.remove());
+    const script = document.createElement("script");
+    script.id = "football-de-widget-script";
+    script.src = FOOTBALL_DE_SCRIPT_SRC;
+    script.async = true;
+    document.head.appendChild(script);
+    activeScript = script;
+  }, 50);
 }
 
 export default function FootballDeWidget({ widgetId, widgetType, title, description }) {
-  const reactId = useId();
   const widgetRef = useRef(null);
   const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
     if (!widgetId) return;
 
-    setIsEmpty(false);
-
-    const loadTimeout = window.setTimeout(() => {
-      loadFootballDeScript();
-    }, 250);
+    const widget = widgetRef.current;
+    if (!widget) return;
+    widgetNodes.add(widget);
+    scheduleFootballDeReload();
 
     const checkTimeout = window.setTimeout(() => {
-      const widget = widgetRef.current;
-      if (!widget) return;
-
       setIsEmpty(widget.children.length === 0 && widget.innerHTML.trim() === "");
-    }, 3000);
+    }, 4000);
 
     return () => {
-      window.clearTimeout(loadTimeout);
       window.clearTimeout(checkTimeout);
+      widgetNodes.delete(widget);
+      widget.replaceChildren();
+      if (widgetNodes.size === 0) {
+        window.clearTimeout(reloadTimer);
+        activeScript?.remove();
+        activeScript = null;
+      }
     };
-  }, [widgetId, widgetType, reactId]);
+  }, [widgetId, widgetType]);
 
   if (!widgetId) {
     return (
@@ -58,7 +67,7 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
       <div className="football-de-widget-frame rounded-3xl border border-white/10 bg-white p-4 text-black">
         <div
           ref={widgetRef}
-          key={`${widgetId}-${widgetType}-${reactId}`}
+          key={`${widgetId}-${widgetType}`}
           className="fussballde_widget"
           data-id={widgetId}
           data-type={widgetType}

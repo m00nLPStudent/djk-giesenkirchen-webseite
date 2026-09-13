@@ -23,6 +23,7 @@ import { validateActiveTeamDepartment, validateTeamDepartmentId } from "@/compon
 import { findTeamDepartmentById } from "@/components/admin/teams/services/teamDepartments.repository";
 import { normalizeClickTtConfig } from "@/lib/table-tennis/clickTt.core.mjs";
 import { upsertCompetitionConfig } from "@/lib/table-tennis/competition.repository";
+import { validateFootballDeWidgetCode } from "@/lib/football-de";
 
 function buildError(message) {
   return { error: { message } };
@@ -228,6 +229,39 @@ export async function saveTeamCompetitionConfigAction(teamId, teamSeasonId, inpu
   revalidatePath(`/admin/teams/edit/${team.id}`);
   revalidatePath(`/admin/table-tennis/teams/edit/${team.id}`);
   return { data: result.data, error: null };
+}
+
+async function mutateFootballDeWidget(teamId, teamSeasonId, kind, widgetCode, remove = false) {
+  const auth = await loadAuthorizedTeamMutationContext("teams.edit");
+  if (!auth.ok) return auth.result;
+  const team = await loadTeamById(auth.supabaseServer, teamId);
+  if (!team || !canAccessTeamOnServer(auth.scopeContext, team)) return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
+  const { data: department } = await auth.supabaseServer.from("departments").select("id, slug, is_active").eq("id", team.department_id).maybeSingle();
+  if (!department?.is_active || department.slug !== "fussball") return buildError("fussball.de-Widgets können nur für Fußballmannschaften gepflegt werden.");
+  const { data: teamSeason, error: teamSeasonError } = await auth.supabaseServer.from("team_seasons").select("id, team_id").eq("id", teamSeasonId).eq("team_id", team.id).maybeSingle();
+  if (teamSeasonError || !teamSeason) return buildError("Die Mannschaftssaison ist ungültig.");
+  if (!["matches", "table"].includes(kind)) return buildError("Der Widgettyp ist ungültig.");
+  const validation = remove ? { data: { widgetId: null }, error: null } : validateFootballDeWidgetCode(widgetCode, kind);
+  if (validation.error) return buildError(validation.error.message);
+  const column = kind === "matches" ? "fussball_de_matches_widget_id" : "fussball_de_table_widget_id";
+  const result = await auth.supabaseServer.from("team_seasons").update({ [column]: validation.data.widgetId }).eq("id", teamSeason.id).eq("team_id", team.id).select(`id, ${column}`).single();
+  if (result.error) {
+    console.error("[football-de-widget-save]", { code: result.error.code || "FOOTBALL_DE_WIDGET_SAVE_FAILED", kind });
+    return buildError("Das fussball.de-Widget konnte nicht gespeichert werden.");
+  }
+  revalidatePath(`/admin/football/teams/edit/${team.id}`);
+  revalidatePath(`/admin/teams/edit/${team.id}`);
+  revalidatePath(`/fussball/${team.slug}`);
+  revalidatePath("/fussball/spielplan-tabelle");
+  return { data: { widgetId: validation.data.widgetId }, error: null };
+}
+
+export async function saveFootballDeWidgetAction(teamId, teamSeasonId, kind, widgetCode) {
+  return mutateFootballDeWidget(teamId, teamSeasonId, kind, widgetCode, false);
+}
+
+export async function removeFootballDeWidgetAction(teamId, teamSeasonId, kind) {
+  return mutateFootballDeWidget(teamId, teamSeasonId, kind, "", true);
 }
 
 async function authorizeTeamMedia(teamId = null) {

@@ -29,3 +29,20 @@ export function parseFootballDeWidgetCode(widgetCode = "") {
     widgetType: extractFootballDeWidgetType(widgetCode),
   };
 }
+
+const WIDGET_TYPES = {
+  matches: "team-matches",
+  table: "table",
+};
+
+export function validateFootballDeWidgetCode(widgetCode = "", kind = "") {
+  const parsed = parseFootballDeWidgetCode(widgetCode);
+  const expectedType = WIDGET_TYPES[kind];
+  if (!expectedType || !/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(parsed.widgetId)) {
+    return { data: null, error: { code: "INVALID_FOOTBALL_DE_WIDGET", message: "Der Widget-Code ist ungültig oder unvollständig." } };
+  }
+  if (parsed.widgetType !== expectedType) {
+    return { data: null, error: { code: "INVALID_FOOTBALL_DE_WIDGET_TYPE", message: kind === "matches" ? "Bitte verwende einen Spielplan-Widget-Code vom Typ team-matches." : "Bitte verwende einen Tabellen-Widget-Code vom Typ table." } };
+  }
+  return { data: { widgetId: parsed.widgetId, widgetType: parsed.widgetType }, error: null };
+}

@@ -16,6 +16,7 @@ export const publicNavigationItems = [
     href: "/fussball",
     children: [
       { label: "Mannschaften", href: "/fussball/mannschaften" },
+      { label: "Spielplan & Tabelle", href: "/fussball/spielplan-tabelle" },
       { label: "Trainer", href: "/fussball/abteilung/trainer" },
       { label: "Vorstand Fußball", href: "/fussball/abteilung/vorstand" },
       { label: "Trainingszeiten", href: "/termine/training" },
