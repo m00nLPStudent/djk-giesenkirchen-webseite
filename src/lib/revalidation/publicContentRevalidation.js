@@ -36,7 +36,12 @@ const PUBLIC_REVALIDATION_PATHS = {
     { path: "/fussball/vereinsgeschichte" },
   ],
   contacts: [{ path: "/kontakt" }],
-  "pages/settings": [{ path: "/impressum" }, { path: "/datenschutz" }],
+  "pages/settings": [
+    { path: "/", type: "layout" },
+    { path: "/[slug]", type: "page" },
+    { path: "/impressum" },
+    { path: "/datenschutz" },
+  ],
   settings: [{ path: "/", type: "layout" }],
 };
 

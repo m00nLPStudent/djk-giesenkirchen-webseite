@@ -29,6 +29,10 @@ a {
   text-decoration: none;
 }
 
+.public-footer-link:hover {
+  color: var(--color-red-400);
+}
+
 .public-skip-link {
   position: fixed;
   top: 0.75rem;

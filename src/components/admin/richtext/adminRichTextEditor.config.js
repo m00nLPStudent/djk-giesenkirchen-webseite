@@ -109,6 +109,7 @@ export function createTinyMceInit({ id, minHeight, placeholder, toolbarMode, req
     image_class_list: onOpenMediaPicker ? NEWS_INLINE_IMAGE_CLASSES : undefined,
     image_toolbar: onOpenMediaPicker ? `${NEWS_INLINE_IMAGE_ACTIONS.map(({ name }) => name).join(" ")} | imageoptions` : undefined,
     forced_root_block: "p",
+    entity_encoding: "raw",
     block_formats: "Absatz=p;Überschrift 1=h1;Überschrift 2=h2;Überschrift 3=h3;Überschrift 4=h4;Vorformatiert=pre",
     paste_data_images: false,
     automatic_uploads: false,

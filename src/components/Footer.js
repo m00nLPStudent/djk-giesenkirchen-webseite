@@ -2,10 +2,14 @@ import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import SocialLinks from "@/components/common/SocialLinks";
 import ConsentSettingsButton from "@/components/website/consent/ConsentSettingsButton";
+import { getPublicPageHref } from "@/components/website/pages/publicPages.helpers";
+import { loadPublicFooterPages } from "@/components/website/pages/publicPages.repository";
 import { PUBLIC_SITE_LOGO_URL, PUBLIC_SITE_NAME } from "@/config/publicSite";
 import { formatGermanPhoneNumberReadable } from "@/lib/phone";
 import { resolveSocialLinks } from "@/lib/socialLinks";
 import { supabase } from "@/lib/supabase";
+
+const FOOTER_TEXT_LINK_CLASS = "public-footer-link transition-colors hover:text-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-400";
 
 function formatAddress(settings) {
   const street = [settings?.street, settings?.house_number].filter(Boolean).join(" ");
@@ -54,7 +58,7 @@ function FooterLinkColumn({ title, links }) {
       <ul className="mt-5 space-y-3">
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="text-sm text-white/60 transition hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500">
+            <Link href={link.href} className={`${FOOTER_TEXT_LINK_CLASS} text-sm text-white/60`}>
               {link.label}
             </Link>
           </li>
@@ -65,17 +69,12 @@ function FooterLinkColumn({ title, links }) {
 }
 
 export default async function Footer() {
-  const [settingsResult, pagesResult] = await Promise.all([
+  const [settingsResult, footerPages] = await Promise.all([
     supabase.from("club_settings").select("*").eq("singleton", true).maybeSingle(),
-    supabase
-      .from("pages")
-      .select("slug, title_de, title_en")
-      .in("slug", ["impressum", "datenschutz"])
-      .eq("is_published", true),
+    loadPublicFooterPages(),
   ]);
 
   const settings = settingsResult?.data || null;
-  const pageBySlug = Object.fromEntries((pagesResult?.data || []).map((page) => [page.slug, page]));
   const addressLines = formatAddress(settings);
   const phone = formatGermanPhoneNumberReadable(settings?.phone || "");
   const phoneHref = String(settings?.phone || "").replace(/[^+\d]/g, "");
@@ -113,13 +112,13 @@ export default async function Footer() {
                 </div>
               )}
               {phone && (
-                <a href={`tel:${phoneHref}`} className="flex items-start gap-2.5 break-words transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500">
+                <a href={`tel:${phoneHref}`} className={`${FOOTER_TEXT_LINK_CLASS} flex items-start gap-2.5 break-words`}>
                   <Phone aria-hidden="true" size={16} className="mt-1 shrink-0 text-red-500" />
                   <span>{phone}</span>
                 </a>
               )}
               {settings?.email && (
-                <a href={`mailto:${settings.email}`} className="flex items-start gap-2.5 break-all transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500">
+                <a href={`mailto:${settings.email}`} className={`${FOOTER_TEXT_LINK_CLASS} flex items-start gap-2.5 break-all`}>
                   <Mail aria-hidden="true" size={16} className="mt-1 shrink-0 text-red-500" />
                   <span>{settings.email}</span>
                 </a>
@@ -132,9 +131,12 @@ export default async function Footer() {
           <div className="flex flex-col gap-5 text-sm text-white/45 md:flex-row md:items-end md:justify-between">
             <p>© {new Date().getFullYear()} {clubName}. Alle Rechte vorbehalten.</p>
             <nav aria-label="Rechtliche Hinweise" className="flex flex-wrap gap-x-5 gap-y-2">
-              {pageBySlug.impressum && <Link href="/impressum" className="transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500">{pageBySlug.impressum.title_de || pageBySlug.impressum.title_en || "Impressum"}</Link>}
-              {pageBySlug.datenschutz && <Link href="/datenschutz" className="transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500">{pageBySlug.datenschutz.title_de || pageBySlug.datenschutz.title_en || "Datenschutz"}</Link>}
-              <ConsentSettingsButton className="cursor-pointer transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500" />
+              {footerPages.map((page) => (
+                <Link key={page.slug} href={getPublicPageHref(page)} className={FOOTER_TEXT_LINK_CLASS}>
+                  {page.title_de || page.title_en || page.slug}
+                </Link>
+              ))}
+              <ConsentSettingsButton className={`${FOOTER_TEXT_LINK_CLASS} cursor-pointer`} />
             </nav>
           </div>
         </div>

@@ -9,6 +9,7 @@ const navigationSource = read("src/components/website/navigation/Navigation.js")
 const configSource = read("src/components/website/navigation/navigationConfig.js");
 const headerSource = read("src/components/Header.js");
 const footerSource = read("src/components/Footer.js");
+const globalStylesSource = read("src/app/globals.css");
 const publicSiteSource = read("src/config/publicSite.js");
 const adminBrandSource = read("src/components/admin/layout/AdminBrand.js");
 const homeSource = read("src/app/(website)/page.js");
@@ -19,6 +20,9 @@ const socialResolverSource = read("src/lib/socialLinks.js");
 const directionsSource = read("src/app/(website)/anfahrt/page.js");
 const mapsPanelSource = read("src/components/website/maps/GoogleMapsPanel.js");
 const cookieSettingsSource = read("src/app/(website)/cookie-einstellungen/page.js");
+const publicCmsPageSource = read("src/app/(website)/[slug]/page.js");
+const publicPagesRepositorySource = read("src/components/website/pages/publicPages.repository.js");
+const revalidationSource = read("src/lib/revalidation/publicContentRevalidation.js");
 const roadmapSource = read("docs/planning/current-roadmap.md");
 const projectStatusSource = read("docs/planning/project-status.md");
 const newsCardSource = read("src/components/website/news/NewsCard.js");
@@ -115,14 +119,20 @@ test("desktop header service links share validated social settings and existing 
   assert.match(socialLinksSource, /rel="noopener noreferrer"/);
 });
 
-test("footer exposes real legal routes without powered-by or missing AGB links", () => {
+test("footer exposes published CMS legal routes generically without powered-by links", () => {
   assert.doesNotMatch(footerSource, /href="#"/);
-  assert.doesNotMatch(footerSource, /href="\/agb"/);
   assert.match(footerSource, /ConsentSettingsButton/);
   assert.doesNotMatch(footerSource, /Powered by/);
   assert.match(footerSource, /Behindertensport/);
   assert.match(footerSource, /social_links/);
-  assert.match(footerSource, /\.in\("slug", \["impressum", "datenschutz"\]\)/);
+  assert.match(footerSource, /loadPublicFooterPages/);
+  assert.match(footerSource, /footerPages\.map/);
+  assert.doesNotMatch(footerSource, /\.in\("slug"|\["impressum", "datenschutz"/);
+  assert.match(publicPagesRepositorySource, /\.eq\("is_published", true\)/);
+  assert.match(publicPagesRepositorySource, /\.eq\("show_in_footer", true\)/);
+  assert.match(publicPagesRepositorySource, /\.order\("sort_order"/);
+  assert.match(publicCmsPageSource, /loadPublishedPublicPage/);
+  assert.match(publicCmsPageSource, /<RichTextContent/);
   assert.match(footerSource, /settings\?\.club_name \|\| PUBLIC_SITE_NAME/);
   assert.match(footerSource, /settings\?\.street/);
   assert.match(footerSource, /settings\?\.house_number/);
@@ -142,6 +152,23 @@ test("footer exposes real legal routes without powered-by or missing AGB links",
   assert.doesNotMatch(socialLinksSource, /bg-transparent text-white|<Icon[^>]+text-white/);
   assert.doesNotMatch(socialLinksSource, /#1877f2|radial-gradient|#ff0000|#0a66c2|#25f4ee|#fe2c55/);
   assert.match(socialLinksSource, /title=\{config\.label\}/);
+});
+
+test("all footer text actions share red hover and visible keyboard focus", () => {
+  assert.match(footerSource, /FOOTER_TEXT_LINK_CLASS/);
+  assert.match(footerSource, /public-footer-link/);
+  assert.match(footerSource, /hover:text-red-400/);
+  assert.match(footerSource, /focus-visible:outline-red-400/);
+  assert.doesNotMatch(footerSource, /hover:text-white/);
+  assert.match(footerSource, /ConsentSettingsButton className=\{`\$\{FOOTER_TEXT_LINK_CLASS\} cursor-pointer`\}/);
+  assert.match(globalStylesSource, /\.public-footer-link:hover\s*\{\s*color: var\(--color-red-400\)/);
+  assert.doesNotMatch(globalStylesSource, /footer[^}]*#[0-9a-f]{3,8}/i);
+});
+
+test("CMS page saves revalidate the shared website layout and generic page route", () => {
+  assert.match(revalidationSource, /"pages\/settings": \[/);
+  assert.match(revalidationSource, /path: "\/", type: "layout"/);
+  assert.match(revalidationSource, /path: "\/\[slug\]", type: "page"/);
 });
 
 test("roadmap keeps maps and legal content go-live gates explicit", () => {

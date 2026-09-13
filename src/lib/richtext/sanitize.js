@@ -46,6 +46,55 @@ const ALLOWED_NEWS_IMAGE_CLASSES = new Set([
   "news-inline-image--flow-right",
 ]);
 
+const EDITOR_TEXT_ENTITIES = Object.freeze({
+  amp: "&",
+  apos: "'",
+  auml: "ä",
+  Auml: "Ä",
+  bdquo: "„",
+  euro: "€",
+  gt: ">",
+  ldquo: "“",
+  lsquo: "‘",
+  lt: "<",
+  mdash: "—",
+  nbsp: " ",
+  ndash: "–",
+  ouml: "ö",
+  Ouml: "Ö",
+  quot: '"',
+  sbquo: "‚",
+  sect: "§",
+  szlig: "ß",
+  uuml: "ü",
+  Uuml: "Ü",
+});
+
+export function decodeRichTextEntities(value) {
+  return String(value || "").replace(
+    /&(?:#(\d+)|#x([0-9a-f]+)|([a-z][a-z0-9]+));/gi,
+    (match, decimal, hexadecimal, name) => {
+      if (name) {
+        return Object.prototype.hasOwnProperty.call(EDITOR_TEXT_ENTITIES, name)
+          ? EDITOR_TEXT_ENTITIES[name]
+          : match;
+      }
+
+      const codePoint = Number.parseInt(decimal || hexadecimal, decimal ? 10 : 16);
+      if (
+        !Number.isInteger(codePoint) ||
+        codePoint <= 0 ||
+        codePoint > 0x10ffff ||
+        (codePoint >= 0xd800 && codePoint <= 0xdfff)
+      ) {
+        return match;
+      }
+
+      return String.fromCodePoint(codePoint);
+    },
+  );
+}
+
 function escapeText(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -190,7 +239,7 @@ export function sanitizeRichTextHtml(input) {
     const isClosing = fullTag.startsWith("</");
 
     result += escapeText(
-      normalizeTextChunk(html.slice(lastIndex, match.index)),
+      decodeRichTextEntities(normalizeTextChunk(html.slice(lastIndex, match.index))),
     );
     lastIndex = tagRegex.lastIndex;
 
@@ -262,7 +311,9 @@ export function sanitizeRichTextHtml(input) {
     result += `<${tagName}>`;
   }
 
-  result += escapeText(normalizeTextChunk(html.slice(lastIndex)));
+  result += escapeText(
+    decodeRichTextEntities(normalizeTextChunk(html.slice(lastIndex))),
+  );
 
   return result;
 }

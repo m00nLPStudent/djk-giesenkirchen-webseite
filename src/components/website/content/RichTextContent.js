@@ -1,5 +1,6 @@
 import {
   containsHtmlTags,
+  decodeRichTextEntities,
   plainTextToParagraphHtml,
   sanitizeRichTextHtml,
 } from "@/lib/richtext/sanitize";
@@ -46,7 +47,7 @@ export default function RichTextContent({
   }
 
   if (!containsHtmlTags(source)) {
-    return <TextParagraphs text={source} className={className} />;
+    return <TextParagraphs text={decodeRichTextEntities(source)} className={className} />;
   }
 
   const sanitizedHtml = sanitizeRichTextHtml(source);
