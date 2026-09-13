@@ -1,3 +1,5 @@
+import { formatPublicPlayerName } from "../../../lib/people/publicPlayerName.mjs";
+
 export const TABLE_TENNIS_DEPARTMENT_SLUG = "tischtennis";
 
 const text = (value) => String(value || "").trim();
@@ -92,7 +94,7 @@ export function selectPublicTableTennisRoster(assignments = [], departmentId) {
     seen.add(player.id);
     return [{
       id: player.id,
-      name: text(`${player.first_name || ""} ${player.last_name || ""}`),
+      name: formatPublicPlayerName(player.first_name, player.last_name),
       description: player.description_de || null,
       yearGroup: player.year_group || null,
       strongHand: player.strong_hand || null,

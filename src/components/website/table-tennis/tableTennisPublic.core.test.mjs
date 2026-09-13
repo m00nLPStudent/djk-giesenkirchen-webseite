@@ -79,6 +79,7 @@ test("roster excludes football, null-department, inactive and duplicate players 
   const assignment = (id, department_id, overrides = {}) => ({ id, is_active: true, sort_order: 1, players: { id, first_name: id, last_name: "Spieler", department_id, is_active: true, shirt_number: 8, position_de: "Sturm", strong_foot: "Rechts", strong_hand: "Links", ...overrides } });
   const roster = selectPublicTableTennisRoster([assignment("tt", "tt"), assignment("football", "football"), assignment("null", null), assignment("inactive", "tt", { is_active: false }), assignment("tt", "tt")], "tt");
   assert.deepEqual(roster.map((item) => item.id), ["tt"]);
+  assert.equal(roster[0].name, "tt S.");
   assert.equal(roster[0].strongHand, "Links");
   assert.equal("shirt_number" in roster[0], false);
   assert.equal("position_de" in roster[0], false);

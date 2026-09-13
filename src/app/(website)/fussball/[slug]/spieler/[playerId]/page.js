@@ -7,7 +7,7 @@ import {
   calculateAge,
   formatDate,
   getCountry,
-  getFullName,
+  getPublicPlayerName,
   getTeam,
   PlayerProfileDescription,
   PlayerProfileHeader,
@@ -51,7 +51,7 @@ export default async function PlayerProfilePage({ params }) {
     notFound();
   }
 
-  const fullName = getFullName(playerView);
+  const fullName = getPublicPlayerName(playerView) || "Unbekannter Spieler";
   const country = getCountry(playerDto.nationality);
   const age = calculateAge(playerDto.birthdate);
   const teamSlug = team?.slug || slug;

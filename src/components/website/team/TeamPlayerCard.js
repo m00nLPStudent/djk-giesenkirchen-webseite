@@ -1,10 +1,12 @@
 import { PLAYER_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { resolvePlayerImageUrl } from "@/lib/people/imageUrl";
+import { formatPublicPlayerName } from "@/lib/people/publicPlayerName.mjs";
 
 export default function TeamPlayerCard({ player }) {
-  const fullName =
-    `${player.first_name ?? ""} ${player.last_name ?? ""}`.trim() ||
-    "Unbekannter Spieler";
+  const fullName = formatPublicPlayerName(
+    player.first_name,
+    player.last_name,
+  ) || "Unbekannter Spieler";
 
   const imageUrl = resolvePlayerImageUrl(player, PLAYER_PLACEHOLDER_IMAGE);
 

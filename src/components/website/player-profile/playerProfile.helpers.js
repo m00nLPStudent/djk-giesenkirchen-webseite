@@ -1,4 +1,5 @@
 import { COUNTRIES } from "@/constants";
+import { formatPublicPlayerName } from "@/lib/people/publicPlayerName.mjs";
 
 export function getCountry(value) {
   if (!value) return null;
@@ -56,6 +57,9 @@ export function formatDate(date) {
   }).format(new Date(date));
 }
 
-export function getFullName(player) {
-  return `${player.first_name ?? player.firstName ?? ""} ${player.last_name ?? player.lastName ?? ""}`.trim();
+export function getPublicPlayerName(player) {
+  return formatPublicPlayerName(
+    player.first_name ?? player.firstName,
+    player.last_name ?? player.lastName,
+  );
 }
