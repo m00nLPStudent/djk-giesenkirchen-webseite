@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { ExternalLink, MapPinned } from "lucide-react";
+import ExternalContentPlaceholder from "@/components/website/consent/ExternalContentPlaceholder";
+import { useConsent } from "@/components/website/consent/ConsentProvider";
 
 export default function GoogleMapsPanel({ mapsUrl, embedUrl = null }) {
   const [showMap, setShowMap] = useState(false);
+  const { externalMediaAllowed } = useConsent();
 
   if (!mapsUrl && !embedUrl) {
     return (
@@ -14,12 +17,16 @@ export default function GoogleMapsPanel({ mapsUrl, embedUrl = null }) {
     );
   }
 
-  if (embedUrl && showMap) {
+  if (embedUrl && showMap && externalMediaAllowed) {
     return (
       <div className="aspect-video min-h-72 overflow-hidden rounded-3xl border border-white/10 bg-black/20">
         <iframe src={embedUrl} title="Google Maps – Sportanlage DJK/VfL Giesenkirchen" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" className="h-full w-full border-0" allowFullScreen />
       </div>
     );
+  }
+
+  if (embedUrl && !externalMediaAllowed) {
+    return <ExternalContentPlaceholder provider="Google Maps" description="Für die interaktive Karte wird eine Verbindung zu Google Maps hergestellt. Der normale Kartenlink bleibt auch ohne Zustimmung verfügbar." externalLink={mapsUrl} />;
   }
 
   return (

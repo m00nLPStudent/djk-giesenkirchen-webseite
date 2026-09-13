@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import SocialLinks from "@/components/common/SocialLinks";
+import ConsentSettingsButton from "@/components/website/consent/ConsentSettingsButton";
 import { PUBLIC_SITE_LOGO_URL, PUBLIC_SITE_NAME } from "@/config/publicSite";
 import { formatGermanPhoneNumberReadable } from "@/lib/phone";
 import { resolveSocialLinks } from "@/lib/socialLinks";
@@ -133,7 +134,7 @@ export default async function Footer() {
             <nav aria-label="Rechtliche Hinweise" className="flex flex-wrap gap-x-5 gap-y-2">
               {pageBySlug.impressum && <Link href="/impressum" className="transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500">{pageBySlug.impressum.title_de || pageBySlug.impressum.title_en || "Impressum"}</Link>}
               {pageBySlug.datenschutz && <Link href="/datenschutz" className="transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500">{pageBySlug.datenschutz.title_de || pageBySlug.datenschutz.title_en || "Datenschutz"}</Link>}
-              <Link href="/cookie-einstellungen" className="transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500">Cookie-Einstellungen</Link>
+              <ConsentSettingsButton className="cursor-pointer transition hover:text-white focus-visible:outline-2 focus-visible:outline-red-500" />
             </nav>
           </div>
         </div>

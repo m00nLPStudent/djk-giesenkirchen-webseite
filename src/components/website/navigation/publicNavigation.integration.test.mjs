@@ -111,7 +111,7 @@ test("desktop header service links share validated social settings and existing 
 test("footer exposes real legal routes without powered-by or missing AGB links", () => {
   assert.doesNotMatch(footerSource, /href="#"/);
   assert.doesNotMatch(footerSource, /href="\/agb"/);
-  assert.match(footerSource, /href="\/cookie-einstellungen"/);
+  assert.match(footerSource, /ConsentSettingsButton/);
   assert.doesNotMatch(footerSource, /Powered by/);
   assert.match(footerSource, /Behindertensport/);
   assert.match(footerSource, /social_links/);
@@ -137,19 +137,19 @@ test("footer exposes real legal routes without powered-by or missing AGB links",
   assert.match(socialLinksSource, /title=\{config\.label\}/);
 });
 
-test("roadmap keeps maps embed and real consent management explicitly open", () => {
+test("roadmap keeps maps and legal content go-live gates explicit", () => {
   for (const source of [roadmapSource, projectStatusSource]) {
     assert.match(source, /GOOGLE_MAPS_EMBED_API_KEY/);
     assert.match(source, /Maps Embed API/);
     assert.match(source, /Consent/);
     assert.match(source, /offen/i);
   }
-  assert.match(roadmapSource, /notwendige\/funktionale\/externe Dienste/);
-  assert.match(roadmapSource, /Zustimmung speichern, ändern und widerrufen/);
-  assert.match(roadmapSource, /\/cookie-einstellungen.*keine fertige Consent/i);
+  assert.match(roadmapSource, /B15\.24M.*COMPLETE.*MANUAL CONSENT REVIEW PASSED/);
+  assert.match(roadmapSource, /LEGAL CONTENT GATE/);
+  assert.match(roadmapSource, /Footer und `\/cookie-einstellungen` öffnen dieselben/);
 });
 
-test("directions and cookie routes are real, settings-backed and transparent", () => {
+test("directions and cookie routes are real, settings-backed and consent-aware", () => {
   assert.equal(existsSync(resolve(root, "src/app/(website)/anfahrt/page.js")), true);
   assert.equal(existsSync(resolve(root, "src/app/(website)/cookie-einstellungen/page.js")), true);
   assert.match(directionsSource, /google_maps_url/);
@@ -157,16 +157,15 @@ test("directions and cookie routes are real, settings-backed and transparent", (
   assert.match(directionsSource, /normalizeGoogleMapsUrl/);
   assert.match(directionsSource, /GOOGLE_MAPS_EMBED_API_KEY/);
   assert.match(directionsSource, /buildGoogleMapsEmbedUrl/);
-  assert.match(mapsPanelSource, /embedUrl && showMap/);
+  assert.match(mapsPanelSource, /embedUrl && showMap && externalMediaAllowed/);
   assert.match(mapsPanelSource, /src=\{embedUrl\}/);
   assert.doesNotMatch(mapsPanelSource, /src=\{mapsUrl\}/);
   assert.match(mapsPanelSource, /Google Maps anzeigen/);
   assert.match(mapsPanelSource, /In Google Maps öffnen/);
   assert.match(mapsPanelSource, /loading="lazy"/);
   assert.match(mapsPanelSource, /strict-origin-when-cross-origin/);
-  assert.match(cookieSettingsSource, /wird derzeit vorbereitet/);
-  assert.match(cookieSettingsSource, /keine Einstellungen vorgetäuscht/);
-  assert.doesNotMatch(cookieSettingsSource, /type="(?:checkbox|radio)"/);
+  assert.match(cookieSettingsSource, /ConsentSettingsButton/);
+  assert.match(cookieSettingsSource, /ändern oder widerrufen/);
 });
 
 test("footer uses canonical club targets and leaves news cards untouched by chrome", () => {

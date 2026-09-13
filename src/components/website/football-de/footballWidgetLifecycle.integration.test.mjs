@@ -13,6 +13,8 @@ test("football.de loader is singleton, cachebuster-free and cleans widget DOM", 
   assert.match(source, /script\.src = FOOTBALL_DE_SCRIPT_SRC/);
   assert.match(source, /widgetNodes\.forEach\(\(node\) => node\.replaceChildren\(\)\)/);
   assert.match(source, /widgetNodes\.delete\(widget\)/);
+  assert.match(source, /!widgetId \|\| !externalMediaAllowed/);
+  assert.match(source, /ExternalContentPlaceholder/);
   assert.doesNotMatch(source, /Date\.now|\?t=/);
 });
 

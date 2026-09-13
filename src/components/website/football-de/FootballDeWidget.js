@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import FootballDeCard from "./FootballDeCard";
 import FootballDeError from "./FootballDeError";
+import ExternalContentPlaceholder from "@/components/website/consent/ExternalContentPlaceholder";
+import { useConsent } from "@/components/website/consent/ConsentProvider";
 
 const FOOTBALL_DE_SCRIPT_SRC = "https://www.fussball.de/widgets.js";
 
@@ -27,11 +29,12 @@ function scheduleFootballDeReload() {
 }
 
 export default function FootballDeWidget({ widgetId, widgetType, title, description }) {
+  const { externalMediaAllowed } = useConsent();
   const widgetRef = useRef(null);
   const [isEmpty, setIsEmpty] = useState(false);
 
   useEffect(() => {
-    if (!widgetId) return;
+    if (!widgetId || !externalMediaAllowed) return;
 
     const widget = widgetRef.current;
     if (!widget) return;
@@ -52,12 +55,20 @@ export default function FootballDeWidget({ widgetId, widgetType, title, descript
         activeScript = null;
       }
     };
-  }, [widgetId, widgetType]);
+  }, [externalMediaAllowed, widgetId, widgetType]);
 
   if (!widgetId) {
     return (
       <FootballDeCard title={title} description={description}>
         <FootballDeError title={title} />
+      </FootballDeCard>
+    );
+  }
+
+  if (!externalMediaAllowed) {
+    return (
+      <FootballDeCard title={title} description={description}>
+        <ExternalContentPlaceholder provider="FUSSBALL.DE" description="Für die Anzeige von Spielplan und Tabelle wird eine Verbindung zu FUSSBALL.DE hergestellt." />
       </FootballDeCard>
     );
   }
