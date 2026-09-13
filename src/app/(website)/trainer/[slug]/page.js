@@ -56,7 +56,7 @@ export default async function CoachProfilePage({ params }) {
   ];
 
   return (
-    <main className="min-h-screen bg-[var(--dunkel)] text-white">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="px-6 pt-32 pb-24">
         <div className="mx-auto max-w-7xl">
           <Link

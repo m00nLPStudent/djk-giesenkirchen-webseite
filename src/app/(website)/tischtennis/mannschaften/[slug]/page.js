@@ -6,7 +6,7 @@ import { loadPublicTableTennisTeamBySlug, TableTennisTeamDetailTabs, TableTennis
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const result = await loadPublicTableTennisTeamBySlug(slug);
-  if (!result.data) return { title: "Mannschaft nicht gefunden | DJK/VfL Giesenkirchen", robots: { index: false, follow: false } };
+  if (!result.data) return { title: "Mannschaft nicht gefunden", robots: { index: false, follow: false } };
   return { title: `${result.data.team.name} | Tischtennis`, description: result.data.team.description || `${result.data.team.name} der Tischtennisabteilung.` };
 }
 

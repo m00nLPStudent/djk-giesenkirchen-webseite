@@ -20,7 +20,7 @@ export default async function NewsPage() {
   const secondaryNews = newsCards.slice(1);
 
   return (
-    <main className="min-h-screen bg-[var(--dunkel)] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-[var(--dunkel)] px-4 pt-28 pb-20 text-white sm:px-6 md:pt-32 md:pb-24">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>

@@ -5,7 +5,7 @@ import { PublicDepartmentSectionPage, loadPublicDepartmentSection } from "@/comp
 const DEPARTMENT_SLUG = "damen-gymnastik";
 const PLACEHOLDER = "/images/sports-icons/gymnastics.png";
 
-export const metadata = { title: "Gymnastikdamen | DJK/VfL Giesenkirchen", description: "Gymnastikdamen beim DJK/VfL Giesenkirchen: Informationen, Kontakt und aktuelle Trainingszeiten." };
+export const metadata = { title: "Gymnastikdamen", description: "Gymnastikdamen beim DJK/VfL Giesenkirchen: Informationen, Kontakt und aktuelle Trainingszeiten." };
 
 export default async function WomenGymnasticsPage() {
   await connection();

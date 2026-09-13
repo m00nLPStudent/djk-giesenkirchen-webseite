@@ -6,7 +6,7 @@ import { buildGoogleMapsEmbedUrl, normalizeGoogleMapsUrl } from "@/lib/maps";
 import { supabase } from "@/lib/supabase";
 
 export const metadata = {
-  title: "Sportanlage & Anfahrt | DJK/VfL Giesenkirchen",
+  title: "Sportanlage & Anfahrt",
   description: "Adresse und Anfahrt zur Sportanlage der DJK/VfL Giesenkirchen.",
 };
 

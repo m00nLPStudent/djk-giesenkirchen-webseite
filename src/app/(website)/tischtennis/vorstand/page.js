@@ -1,7 +1,7 @@
 import { PublicPageHero, PublicPageShell } from "@/components/website/layout";
 import { loadPublicTableTennisBoard, TableTennisPersonCard } from "@/components/website/table-tennis";
 
-export const metadata = { title: "Tischtennis-Vorstand | DJK/VfL Giesenkirchen", description: "Vorstand und öffentliche Ansprechpartner der Tischtennisabteilung." };
+export const metadata = { title: "Tischtennis-Vorstand", description: "Vorstand und öffentliche Ansprechpartner der Tischtennisabteilung." };
 
 export default async function TableTennisBoardPage() {
   const result = await loadPublicTableTennisBoard();

@@ -112,7 +112,7 @@ export default async function TrainingDetailPage({ params }) {
   });
 
   return (
-    <main className="min-h-screen bg-[var(--dunkel)] text-white">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="px-6 pt-32 pb-20">
         <div className="mx-auto max-w-5xl">
           <p className="text-sm uppercase tracking-[0.35em] text-red-400">

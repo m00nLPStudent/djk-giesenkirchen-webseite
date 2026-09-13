@@ -4,7 +4,7 @@ import { PublicDepartmentSectionPage, loadPublicDepartmentSection } from "@/comp
 
 const DEPARTMENT_SLUG = "behindertensport";
 
-export const metadata = { title: "Behindertensport | DJK/VfL Giesenkirchen", description: "Behindertensport beim DJK/VfL Giesenkirchen: Informationen, Kontakt und aktuelle Trainingszeiten." };
+export const metadata = { title: "Behindertensport", description: "Behindertensport beim DJK/VfL Giesenkirchen: Informationen, Kontakt und aktuelle Trainingszeiten." };
 
 export default async function DisabilitySportsPage() {
   await connection();

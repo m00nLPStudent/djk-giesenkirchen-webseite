@@ -4,7 +4,7 @@ import { PublicCard, PublicPageHero, PublicPageShell } from "@/components/websit
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "Fußball Spielplan & Tabelle | DJK/VfL Giesenkirchen",
+  title: "Fußball Spielplan & Tabelle",
   description: "Aktuelle Tabellen und Spielpläne unserer Fußballmannschaften.",
 };
 

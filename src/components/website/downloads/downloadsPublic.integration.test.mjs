@@ -8,7 +8,7 @@ const [page, component, service, repository, route, mediaService, footer, adminS
 ]);
 
 test("public page has metadata, grouped compact UI and a friendly empty state", () => {
-  assert.match(page, /Downloads \| DJK\/VfL Giesenkirchen/);
+  assert.match(page, /title: "Downloads"/);
   assert.match(page, /await connection\(\)/);
   assert.match(component, /groups\.map/);
   assert.match(component, /divide-y/);

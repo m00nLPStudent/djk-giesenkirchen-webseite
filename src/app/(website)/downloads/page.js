@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { DownloadsPublicPage, loadPublicDownloadGroups } from "@/components/website/downloads";
 
 export const metadata = {
-  title: "Downloads | DJK/VfL Giesenkirchen",
+  title: "Downloads",
   description: "Wichtige Dokumente, Formulare und Informationen des DJK/VfL Giesenkirchen zum sicheren Herunterladen.",
 };
 

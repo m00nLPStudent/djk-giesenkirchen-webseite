@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PublicCard, PublicPageHero, PublicPageShell } from "@/components/website/layout";
 
 export const metadata = {
-  title: "Cookie-Einstellungen | DJK/VfL Giesenkirchen",
+  title: "Cookie-Einstellungen",
   description: "Informationen zur vorbereiteten Cookie-Verwaltung.",
 };
 

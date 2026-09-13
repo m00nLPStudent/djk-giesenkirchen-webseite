@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PublicCard, PublicPageHero, PublicPageShell } from "@/components/website/layout";
 import { formatTableTennisWeekday, loadPublicTableTennisBoard, loadPublicTableTennisTeamSummaries, TableTennisTeamCard } from "@/components/website/table-tennis";
 
-export const metadata = { title: "Tischtennis | DJK/VfL Giesenkirchen", description: "Mannschaften, Trainingszeiten und Ansprechpartner der Tischtennisabteilung." };
+export const metadata = { title: "Tischtennis", description: "Mannschaften, Trainingszeiten und Ansprechpartner der Tischtennisabteilung." };
 
 const areas = [["Mannschaften", "/tischtennis/mannschaften"], ["Trainingszeiten", "/tischtennis/trainingszeiten"], ["Vorstand", "/tischtennis/vorstand"], ["Spielplan & Tabelle", "/tischtennis/spielplan-tabelle"]];
 

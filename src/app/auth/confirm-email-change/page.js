@@ -1,7 +1,10 @@
 import EmailChangeConfirmationForm from "@/components/auth/EmailChangeConfirmationForm";
 import { inspectAdminEmailChange } from "@/lib/admin-auth/adminEmailChange.service";
 
-export const metadata = { title: "Neue Login-E-Mail-Adresse bestätigen" };
+export const metadata = {
+  title: "Neue Login-E-Mail-Adresse bestätigen",
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function ConfirmEmailChangePage({ searchParams }) {
   const query = await searchParams;

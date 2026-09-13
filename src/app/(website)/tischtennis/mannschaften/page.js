@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { PublicPageHero, PublicPageShell } from "@/components/website/layout";
 import { loadPublicTableTennisTeamSummaries, TableTennisTeamCard } from "@/components/website/table-tennis";
 
-export const metadata = { title: "Tischtennis-Mannschaften | DJK/VfL Giesenkirchen", description: "Die aktiven Tischtennis-Mannschaften in der aktuellen Saison." };
+export const metadata = { title: "Tischtennis-Mannschaften", description: "Die aktiven Tischtennis-Mannschaften in der aktuellen Saison." };
 
 export default async function TableTennisTeamsPage() {
   await connection();

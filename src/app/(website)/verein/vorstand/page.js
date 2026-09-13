@@ -3,7 +3,7 @@ import { PublicPageHero, PublicPageShell } from "@/components/website/layout";
 import { connection } from "next/server";
 
 export const metadata = {
-  title: "Vorstand | DJK/VfL Giesenkirchen",
+  title: "Vorstand",
   description: "Vorstand des Gesamtvereins DJK/VfL Giesenkirchen.",
 };
 
