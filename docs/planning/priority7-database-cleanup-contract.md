@@ -1,6 +1,15 @@
 # Priorität 7 – Database/Season Cleanup Contract
 
-Status: **CORE CLEANUP COMPLETE / POSTCHECK PASSED / PUBLIC POST-CLEANUP REPAIR COMPLETE / MANUAL REVIEW PASSED**
+Status: **PRIORITY 7 COMPLETE / FINAL POSTCHECK AND MANUAL OPERATOR REVIEW PASSED**
+
+Der getrennte Media-/Storage-Schritt ist in
+[`priority7-media-storage-cleanup-execution-plan.md`](priority7-media-storage-cleanup-execution-plan.md)
+dokumentiert. Der freigegebene manifestbasierte Lauf entfernte 11 Usages, 33
+Assets und alle 109 Test-/Legacy-Storage-Objekte. Die fünf Buckets und die
+gesamte Keep-Foundation blieben erhalten. Der vollständige Pfad-/ID-Vertrag
+bleibt wegen personenbezogener Legacy-Dateinamen ausschließlich im
+git-ignorierten privaten Manifest. Der finale Priority-7-Gesamtpostcheck wurde
+vollständig bestanden (`final_sql_pass = true`).
 
 Live-Preflight-Korrektur: P7.09 enthielt zunächst die repositoryseitig nur als früheres additives Proposal beziehungsweise Zielmodell dokumentierte Relation `public.coach_staff_roles`. Diese Relation existiert live nicht. Trainer- und Betreuerfunktionen werden aktuell über `coach_team_seasons.role_de`/`role_en` sowie für teamlose oder historisierte Coaches über die Fallbackfelder `coaches.role`, `role_de` und `role_en` modelliert. P7.09 zählt deshalb nun `coach_team_seasons`; die bereits erfolgreichen Resultsets P7.01–P7.08 bleiben gültig und ausschließlich P7.09 ist erneut manuell auszuführen. Dadurch wurde weder die Datenbank noch Produktcode verändert.
 
@@ -12,8 +21,10 @@ Der Live-Preflight, private Recovery-Export, Dry Run, Core-Proposal und
 Read-only-Postcheck wurden in der freigegebenen Reihenfolge erfolgreich
 abgeschlossen. Decision-Preflight, Storage-Manifest und Recovery-Plan bilden
 den dokumentierten Sicherheitsvertrag. `TRUNCATE CASCADE` war und bleibt
-ausdrücklich ausgeschlossen. Auth- sowie Media-/Storage-Cleanup sind weiterhin
-separate, noch nicht ausgeführte Stufen.
+ausdrücklich ausgeschlossen. Auth- sowie Media-/Storage-Cleanup wurden als
+getrennte, ausdrücklich freigegebene Stufen abgeschlossen. Der finale
+Gesamtpostcheck sowie Superadmin-Login, Profiltest ohne Avatar und Public Smoke
+sind bestanden.
 
 ## Repositorybasierter Benutzervertrag
 
@@ -129,7 +140,7 @@ Risiken: Superadmin-Kaskaden, blockierende FKs, Trigger-Seiteneffekte, Media-Usa
 
 ## Nächster sicherer Schritt
 
-Recovery-Backup, Dry Run, Core-Ausführung und Postcheck sind erfolgreich abgeschlossen. Die 31 Core-Delete-Tabellen sind leer und die MUST-KEEP-Foundation ist intakt: 13 Rollen, 64 Permissions, 249 Rollen-Permission-Zuordnungen, 4 Departments, 2 Seasons und 25 Auditzeilen blieben erhalten; Closure Periods stehen bei 0. Genau ein Keep-Superadmin ist intakt, die fünf Nicht-Superadmin-Auth-User bleiben Gegenstand der nächsten getrennten Stufe. Der anschließende Public-Audit wies statisch vorgerenderte DB-Seiten als Ursache alter Inhalte nach; diese Routen laden nun request-dynamisch. Behindertensport und Gymnastikdamen unterscheiden außerdem zwischen vorhandenem Department und fehlender Section und zeigen dafür einen Empty State statt 404. Der abschließende manuelle Browserreview ist bestanden. Als Nächstes folgt das Auth-Cleanup ausschließlich über die bestehende serverseitige Supabase Admin API; Media-/Storage-Cleanup bleibt danach separat offen.
+Recovery-Backup, Dry Run, Core-Ausführung und Postcheck sind erfolgreich abgeschlossen. Die 31 Core-Delete-Tabellen sind leer und die MUST-KEEP-Foundation ist intakt: 13 Rollen, 64 Permissions, 249 Rollen-Permission-Zuordnungen, 4 Departments, 2 Seasons und 25 Auditzeilen blieben erhalten; Closure Periods stehen bei 0. Genau ein Keep-Superadmin ist intakt, die fünf Nicht-Superadmin-Auth-User wurden in der getrennten Auth-Stufe entfernt. Der anschließende Public-Audit wies statisch vorgerenderte DB-Seiten als Ursache alter Inhalte nach; diese Routen laden nun request-dynamisch. Behindertensport und Gymnastikdamen unterscheiden außerdem zwischen vorhandenem Department und fehlender Section und zeigen dafür einen Empty State statt 404. Der manuelle Browserreview, die getrennte Media-/Storage-Stufe und der finale Gesamtpostcheck sind bestanden.
 
 Direkte SQL-Maintenance umgeht die anwendungsseitigen `revalidatePath`-Aufrufe. Für weiterhin gecachte Public-Routen ist deshalb nach solcher Maintenance ein frischer Build/Redeploy oder eine definierte Pfad-Revalidation verpflichtend. Die in diesem Reparaturblock betroffenen fachlichen DB-Listen verwenden stattdessen `connection()` und lesen bei jedem Request den aktuellen Zustand.
 
@@ -180,12 +191,43 @@ Das Core-Proposal verwendet exakte Baseline- und Foundation-Guards und löscht a
 
 `club_closure_periods` würde bei Team-Season-Löschung kaskadieren. Deshalb verlangt der Guard dort exakt null Zeilen; jede Abweichung stoppt die gesamte Transaktion. Rollen, Permissions, Matrix, Departments, Settings, Lookups, Policies, RLS, Funktionen, Trigger, Constraints, Indizes und Buckets werden nicht verändert.
 
+Für `membership_request_recipients` bedeutet MUST KEEP die Relation und ihre
+Konfigurationsfähigkeit, nicht einen künstlichen Mindestbestand. Der private
+Vor-Cleanup-Export und der finale Live-Postcheck bestätigen jeweils 0 Zeilen;
+`0..n` ist fachlich zulässig, die Adminoberfläche unterstützt den Leerzustand
+und die spätere Neuanlage. Es liegt weder Datenverlust noch Reparaturbedarf vor.
+
 ## Bewusst getrennte Ausführungsstufen
 
 - Core SQL: alle final freigegebenen fachlichen Tabellen einschließlich Kontakte, Sections, Department-Training und Club-History/Pages.
 - Auth: fünf Nicht-Superadmin-User erst danach über die bestehende serverseitige Admin API; niemals direktes SQL auf `auth.users`.
 - Media/Storage: erst nach Core und finalem privatem Objektmanifest. Media Usages/Assets vor Storage Objects; Buckets bleiben.
 - `notification_audit`, Seasons, Closure-Period-Nullbestand und technische Foundation bleiben erhalten.
+
+## Auth-Cleanup-Abschluss
+
+Der Auth-Schritt ist abgeschlossen. Der server-only Löschmechanismus verwendete
+`auth.admin.deleteUser(userId)` über den nicht persistierenden Service-Role-Client;
+das Dashboard selbst bietet weiterhin nur eine Deaktivierung. Der Read-only Dry
+Run identifizierte den Keep-Superadmin ausschließlich relational und verlangte
+fail-closed exakt einen Keep-Kandidaten sowie exakt fünf Delete Candidates.
+E-Mail und UUID wurden weder hardcodiert noch ausgegeben.
+
+Artefakte und Ablauf stehen in
+[`priority7-auth-cleanup-execution-plan.md`](priority7-auth-cleanup-execution-plan.md),
+[`b15-priority7-auth-cleanup-dry-run-readonly.sql`](../sql/b15-priority7-auth-cleanup-dry-run-readonly.sql)
+und
+[`b15-priority7-auth-cleanup-postcheck-readonly.sql`](../sql/b15-priority7-auth-cleanup-postcheck-readonly.sql).
+Der spätere Delete erfolgt einzeln, nie parallel, stoppt beim ersten Fehler und
+verifiziert den Keep-Vertrag nach jedem erfolgreichen Admin-API-Aufruf.
+
+Der freigegebene Live-Lauf ist inzwischen abgeschlossen: fünf
+Nicht-Superadmin-User wurden einzeln per Admin API entfernt, exakt ein
+relational intakter Superadmin blieb erhalten und alle Foundation-Counts sind
+unverändert. Der vorhandene Profil-Delete-Trigger entfernte acht zu den
+gelöschten Profilen gehörende Avatar-Usages; alle 33 Media Assets blieben
+erhalten. Die anschließend separat freigegebene Media-/Storage-Stufe ist
+ebenfalls abgeschlossen.
 
 Für `club_closure_periods` ist ein direkter Count von null bestätigt; jede
 spätere Abweichung stoppt das Proposal. Alle zuvor offenen fachlichen Klassen

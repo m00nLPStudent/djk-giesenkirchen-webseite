@@ -1,6 +1,6 @@
 # Priority 7 – Cleanup Recovery Plan
 
-Status: **VARIANT B / PRIVATE EXPORT AND CORE RECOVERY GATE COMPLETED**
+Status: **VARIANT B / PRIVATE EXPORT RETAINED / PRIORITY 7 COMPLETE**
 
 Gelöschte Live-Daten lassen sich nach `COMMIT` nicht durch ein glaubwürdiges generisches SQL-Rollback rekonstruieren. Die Recovery-Grenze besteht deshalb aus einem vorab verifizierten Supabase-Backup beziehungsweise PITR und privaten Exporten. Dieses Dokument behauptet nicht, dass Backup/PITR im aktuellen Tarif oder Projekt aktiviert ist; das muss der Betreiber vor jeder Ausführung im Supabase-Dashboard bestätigen.
 
@@ -43,6 +43,14 @@ gesichert.
 - Storage-Objekte werden erst nach erfolgreichem DB-Manifest-Abgleich über einen kontrollierten Storage-API-Lauf entfernt. Buckets bleiben bestehen.
 - Tritt nach einem erfolgreichen Commit ein Fehler auf, erfolgt Recovery ausschließlich aus dem verifizierten Backup/PITR beziehungsweise den privaten Tabellen- und Storage-Manifest-Exporten.
 - Vor Restore keine improvisierten Teil-Inserts oder FK-Deaktivierungen durchführen.
+
+## Finaler Abschluss
+
+Core-, Auth- und Media-/Storage-Cleanup sowie Public Repair sind abgeschlossen.
+Der finale Read-only-Gesamtpostcheck und die manuellen Login-, Profil- und
+Public-Smoke-Gates sind bestanden. Der private Dump und die privaten Manifeste
+bleiben ausschließlich unter `.local/` und werden nicht versioniert. Eine
+Wiederherstellung ist aktuell nicht erforderlich.
 
 ## Stop-Bedingungen
 
