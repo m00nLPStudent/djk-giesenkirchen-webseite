@@ -77,12 +77,18 @@ in den Workflow. Sie verbleiben in der bestehenden Hetzner-Konfiguration.
 
 ### Dependency-Vertrag
 
-`package-lock.json` ist maßgeblich. Wenn `package.json` oder
-`package-lock.json` seit dem aktuell deployten Commit verändert wurden oder
-`node_modules` fehlt, führt das Skript im isolierten Worktree `npm ci` aus.
-Andernfalls wird das vorhandene `node_modules` ausschließlich für den Build
-wiederverwendet. Erst nach erfolgreichem Build wird ein neu installiertes
-Dependency-Verzeichnis aktiviert.
+`package-lock.json` ist maßgeblich. Das Skript führt bei jedem Deployment im
+isolierten Worktree `npm ci --no-audit --no-fund --prefer-offline` aus. Damit
+gehört `node_modules` vollständig zum Zielcommit und enthält keine Symlinks in
+das aktive Repository. Der normale npm-Cache des Hostingbenutzers darf dabei
+bereits geladene Pakete wiederverwenden; die Installation selbst bleibt durch
+das Lockfile reproduzierbar.
+
+Während Installation und Build existieren das aktive und das neue
+`node_modules` parallel. Das benötigt vorübergehend zusätzlichen Speicher, hält
+die laufende Anwendung aber bis zum erfolgreichen Build vollständig
+unangetastet. Reicht der verfügbare Speicher nicht aus, schlägt `npm ci`
+fail-closed vor der Aktivierung fehl.
 
 ### Sicherheits- und Fehlerverhalten
 
@@ -97,8 +103,13 @@ Dependency-Verzeichnis aktiviert.
   gibt kein `git clean`.
 - Nur ein Fast-Forward von `master` auf exakt den gepushten Commit ist erlaubt.
 - Der Production-Build läuft vor der Aktivierung in einem getrennten Worktree.
-- Bei einem fehlgeschlagenen isolierten Build bleiben Git-HEAD, aktive
+- Bei fehlgeschlagenem `npm ci` oder isoliertem Build bleiben Git-HEAD, aktive
   Dependencies und aktive `.next`-Ausgabe unverändert.
+- Der Worktree liegt auf demselben Dateisystem wie das Repository. Nach dem
+  Build werden das neue physische `node_modules` und die neue `.next`-Ausgabe
+  zunächst unter expliziten `*.deploy-new`-Pfaden bereitgestellt und danach per
+  kontrollierter Verzeichnisumbenennung aktiviert. Cross-Filesystem-Symlinks
+  werden nicht verwendet.
 - Es gibt keinen Prozess-Kill, keinen PM2-, systemd-, Docker- oder
   undokumentierten Hetzner-Restart.
 - Deploymentlogs enthalten ausschließlich Zeitpunkt, Phase und Commit-ID. Das
@@ -126,8 +137,8 @@ Dependency-Verzeichnis aktiviert.
 
 ### Rollback-Grundprinzip
 
-Das vorherige `.next`-Verzeichnis und bei Dependencyänderungen das vorherige
-`node_modules` bleiben zunächst als `.next.deploy-previous` beziehungsweise
+Das vorherige `.next`- und `node_modules`-Verzeichnis bleiben zunächst als
+`.next.deploy-previous` beziehungsweise
 `node_modules.deploy-previous` erhalten. Ein Rollback wird nicht automatisch
 und nicht durch einen ungeprüften Hard Reset ausgeführt. Zuerst wird der letzte
 bekannt funktionierende Commit ermittelt. Danach werden Repositorystand,

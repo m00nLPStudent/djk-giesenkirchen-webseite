@@ -37,7 +37,7 @@ trap cleanup EXIT
 [[ "$EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]] || fail "Ungültiger Zielcommit"
 [[ -n "$DEPLOY_PATH_BASE64" ]] || fail "Deploymentpfad fehlt"
 
-for command_name in base64 git node npm mktemp sed; do
+for command_name in base64 git node npm mktemp sed stat; do
   command -v "$command_name" >/dev/null 2>&1 || fail "Benötigtes Kommando fehlt: $command_name"
 done
 
@@ -102,15 +102,10 @@ git -C "$REPOSITORY_PATH" merge-base --is-ancestor "$previous_commit" "$EXPECTED
 node_major="$(node --version | sed -E 's/^v([0-9]+).*/\1/')"
 [[ "$node_major" == "24" ]] || fail "Auf dem Server ist nicht Node.js 24 aktiv"
 
-dependencies_changed=false
-if [[ ! -d "$REPOSITORY_PATH/node_modules" ]]; then
-  dependencies_changed=true
-elif ! git -C "$REPOSITORY_PATH" diff --quiet "$previous_commit" "$EXPECTED_COMMIT" -- package.json package-lock.json; then
-  dependencies_changed=true
-fi
-
 STAGING_PATH="$(mktemp -d "$cache_directory/djkvfl-release.XXXXXX")"
 git -C "$REPOSITORY_PATH" worktree add --detach "$STAGING_PATH" "$EXPECTED_COMMIT" >/dev/null
+
+[[ "$(stat -c '%d' "$STAGING_PATH")" == "$(stat -c '%d' "$REPOSITORY_PATH")" ]] || fail "Build-Worktree und Repository müssen auf demselben Dateisystem liegen"
 
 for environment_file in .env .env.local .env.production .env.production.local; do
   if [[ -f "$REPOSITORY_PATH/$environment_file" ]]; then
@@ -118,16 +113,11 @@ for environment_file in .env .env.local .env.production .env.production.local; d
   fi
 done
 
-if [[ "$dependencies_changed" == true ]]; then
-  log "Lockfile-abhängige Installation wird im isolierten Buildverzeichnis ausgeführt"
-  (
-    cd -- "$STAGING_PATH"
-    npm ci --no-audit --no-fund
-  )
-else
-  log "Unveränderte Dependencies werden für den isolierten Build wiederverwendet"
-  ln -s -- "$REPOSITORY_PATH/node_modules" "$STAGING_PATH/node_modules"
-fi
+log "Reproduzierbare Dependency-Installation wird im isolierten Buildverzeichnis ausgeführt"
+(
+  cd -- "$STAGING_PATH"
+  npm ci --no-audit --no-fund --prefer-offline
+)
 
 log "Isolierter Next.js-Production-Build wird gestartet"
 (
@@ -136,21 +126,22 @@ log "Isolierter Next.js-Production-Build wird gestartet"
 )
 
 [[ -d "$STAGING_PATH/.next" ]] || fail "Build war erfolgreich, aber .next fehlt"
+[[ -d "$STAGING_PATH/node_modules" && ! -L "$STAGING_PATH/node_modules" ]] || fail "Isoliertes node_modules fehlt oder ist ein Symlink"
+
+rm -rf -- "$REPOSITORY_PATH/node_modules.deploy-new" "$REPOSITORY_PATH/.next.deploy-new"
+mv -- "$STAGING_PATH/node_modules" "$REPOSITORY_PATH/node_modules.deploy-new"
+mv -- "$STAGING_PATH/.next" "$REPOSITORY_PATH/.next.deploy-new"
 
 log "Build erfolgreich; Serverrepository wird per Fast-Forward auf den Zielcommit gesetzt"
 git -C "$REPOSITORY_PATH" merge --ff-only "$EXPECTED_COMMIT"
 [[ "$(git -C "$REPOSITORY_PATH" rev-parse HEAD)" == "$EXPECTED_COMMIT" ]] || fail "Serverrepository steht nicht auf dem Zielcommit"
 
-if [[ "$dependencies_changed" == true ]]; then
-  rm -rf -- "$REPOSITORY_PATH/node_modules.deploy-previous"
-  if [[ -d "$REPOSITORY_PATH/node_modules" ]]; then
-    mv -- "$REPOSITORY_PATH/node_modules" "$REPOSITORY_PATH/node_modules.deploy-previous"
-  fi
-  mv -- "$STAGING_PATH/node_modules" "$REPOSITORY_PATH/node_modules"
+rm -rf -- "$REPOSITORY_PATH/node_modules.deploy-previous" "$REPOSITORY_PATH/.next.deploy-previous"
+if [[ -d "$REPOSITORY_PATH/node_modules" ]]; then
+  mv -- "$REPOSITORY_PATH/node_modules" "$REPOSITORY_PATH/node_modules.deploy-previous"
 fi
+mv -- "$REPOSITORY_PATH/node_modules.deploy-new" "$REPOSITORY_PATH/node_modules"
 
-rm -rf -- "$REPOSITORY_PATH/.next.deploy-new" "$REPOSITORY_PATH/.next.deploy-previous"
-mv -- "$STAGING_PATH/.next" "$REPOSITORY_PATH/.next.deploy-new"
 if [[ -d "$REPOSITORY_PATH/.next" ]]; then
   mv -- "$REPOSITORY_PATH/.next" "$REPOSITORY_PATH/.next.deploy-previous"
 fi
