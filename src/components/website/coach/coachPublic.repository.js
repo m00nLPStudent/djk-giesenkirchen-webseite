@@ -8,6 +8,7 @@ import {
   getCoachSeasonalReadModel,
   getCoachSeasonalReadModelsMap,
 } from "@/components/admin/persons/coachSeasonalReadModelRepository";
+import { sortPublicCoachesByPrimaryTeam } from "./coachPublic.core.mjs";
 
 const PUBLIC_COACH_SELECT =
   "id, first_name, last_name, name, slug, role, role_de, role_en, email, phone, whatsapp, license, nationality, image_url, photo_url, is_active, sort_order, department_id";
@@ -51,7 +52,7 @@ export async function loadActivePublicCoachDtos(
   const coachIds = coachList.map((coach) => coach.id).filter(Boolean);
   const readModels = await getReadModelsMap(supabaseServer, coachIds);
 
-  return mapCoachDtos(coachList, readModels);
+  return sortPublicCoachesByPrimaryTeam(mapCoachDtos(coachList, readModels));
 }
 
 export async function loadPublicCoachBySlug(

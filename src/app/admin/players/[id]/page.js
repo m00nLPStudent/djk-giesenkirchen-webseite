@@ -96,7 +96,7 @@ export default async function AdminPlayerDetailPage({ params, requiredDepartment
     ? canEditPlayerOnServer(scopeContext, playerTeamIds, teamById, player)
     : false;
   const canArchive = permissionResult.permissions.includes("players.delete")
-    ? canDeletePlayerOnServer(scopeContext, playerTeamIds, teamById)
+    ? canDeletePlayerOnServer(scopeContext, playerTeamIds, teamById, player)
     : false;
 
   return (

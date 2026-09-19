@@ -139,6 +139,7 @@ export function buildCoachAssignments({
           departmentId: team.department_id || null,
           departmentSlug: normalizeString(Array.isArray(team.departments) ? team.departments[0]?.slug : team.departments?.slug),
           departmentNameDe: normalizeString(Array.isArray(team.departments) ? team.departments[0]?.name_de : team.departments?.name_de),
+          teamSortOrder: team.sort_order ?? null,
           ageGroup: normalizeString(teamSeason.age_group) || normalizeString(team.age_group),
           seasonId: activeSeasonId,
           seasonName: activeSeasonName,

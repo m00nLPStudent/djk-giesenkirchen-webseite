@@ -4,6 +4,7 @@ import { AdminBackLink, AdminModuleHeader, AdminModulePage } from "@/components/
 import { redirect } from "next/navigation";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import {
+  canCreatePlayerOnServer,
   loadServerPersonScopeContext,
 } from "@/components/admin/persons/serverPersonScope";
 import { CURRENT_SEASON_STATUSES } from "@/components/admin/persons/seasonalReadModelCore.mjs";
@@ -36,7 +37,10 @@ export default async function NewPlayerPage({ searchParams, departmentSlug = "fu
   if (
     teamOptionsResult.activeSeasonStatus ===
       CURRENT_SEASON_STATUSES.RESOLVED &&
-    teamOptionsResult.teamOptions.length === 0
+    teamOptionsResult.teamOptions.length === 0 &&
+    !canCreatePlayerOnServer(scopeContext, [], new Map(), {
+      department_id: requiredDepartment?.id || null,
+    })
   ) {
     redirect("/admin/unauthorized?reason=missing-player-scope");
   }

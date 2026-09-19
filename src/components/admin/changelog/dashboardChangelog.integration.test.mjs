@@ -67,10 +67,11 @@ test("the modal is accessible, responsive and only confirmation can close it", (
 });
 
 test("version and visible copy have a single central source", () => {
-  assert.match(config, /version: "1\.0\.1"/);
+  assert.match(config, /version: "1\.0\.2"/);
+  assert.match(config, /Trainerübersicht verbessert/);
+  assert.match(config, /Einheitliche Trainerdarstellung/);
+  assert.match(config, /Mannschaftsbilder optimiert/);
   assert.match(config, /Spielerverwaltung verbessert/);
-  assert.match(config, /Trainingstermine übersichtlicher/);
-  assert.match(config, /Technische Verbesserungen/);
-  assert.doesNotMatch(gate, /version:\s*"1\.0\.1"/);
-  assert.doesNotMatch(dialog, /version:\s*"1\.0\.1"/);
+  assert.doesNotMatch(gate, /version:\s*"1\.0\.2"/);
+  assert.doesNotMatch(dialog, /version:\s*"1\.0\.2"/);
 });

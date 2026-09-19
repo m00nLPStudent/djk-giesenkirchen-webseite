@@ -40,6 +40,7 @@ function mapCoachAssignment(assignment = {}) {
     departmentId: assignment.departmentId || null,
     departmentSlug: assignment.departmentSlug || null,
     departmentNameDe: assignment.departmentNameDe || null,
+    teamSortOrder: assignment.teamSortOrder ?? null,
     roleDe: assignment.roleDe || null,
     roleEn: assignment.roleEn || null,
     seasonId: assignment.seasonId || null,

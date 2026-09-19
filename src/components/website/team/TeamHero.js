@@ -5,12 +5,18 @@ export default function TeamHero({ team }) {
   const seasonName = resolveSeasonDisplayName(team, "Keine Saison ausgewählt");
 
   return (
-    <section className="relative min-w-0 overflow-hidden rounded-[2rem] border border-white/10">
-      {team?.team_image_url ? <img
-        src={team.team_image_url}
-        alt={team.name_de}
-        className="h-52 w-full object-cover sm:h-72 md:h-[500px]"
-      /> : <TeamImagePlaceholder className="h-52 w-full sm:h-72 md:h-[500px]" sizes="(max-width: 1280px) 100vw, 1280px" />}
+    <section className="relative min-w-0 overflow-hidden rounded-[2rem] border border-white/10 bg-black">
+      {team?.team_image_url ? (
+        <div className="relative h-52 w-full overflow-hidden sm:h-72 md:h-[500px]">
+          <img
+            src={team.team_image_url}
+            alt={team.name_de}
+            className="h-full w-full object-cover object-[center_35%] sm:object-[center_32%] md:object-[center_30%]"
+          />
+        </div>
+      ) : (
+        <TeamImagePlaceholder className="h-52 w-full sm:h-72 md:h-[500px]" sizes="(max-width: 1280px) 100vw, 1280px" />
+      )}
 
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 

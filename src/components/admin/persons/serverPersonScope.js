@@ -15,6 +15,10 @@ import {
   canAccessBoardMember,
   isBoardGlobalBusinessManager,
 } from "@/components/admin/board/boardRoleContract.core.mjs";
+import {
+  isPlayerDepartmentManagerScope,
+  resolvePlayerDepartmentScopeDecision,
+} from "./playerDepartmentScope.core.mjs";
 
 const GLOBAL_PERSON_MODULE_ROLE_KEYS = ["vorstand"];
 
@@ -53,7 +57,7 @@ function canReadPeopleGlobally(scopeContext) {
 }
 
 export function isDepartmentManagerScope(scopeContext) {
-  return Boolean(scopeContext?.managedDepartmentId && hasScopeType(scopeContext, "department_manager"));
+  return isPlayerDepartmentManagerScope(scopeContext);
 }
 
 function isOwnCoachCard(scopeContext, coach = {}) {
@@ -149,8 +153,13 @@ export function canViewPlayerOnServer(
   teamById = new Map(),
   player = {},
 ) {
+  const departmentDecision = resolvePlayerDepartmentScopeDecision(scopeContext, {
+    departmentId: player.department_id || null,
+    teamIds: playerTeamIds,
+    teamById,
+  });
+  if (departmentDecision !== null) return departmentDecision;
   if (canReadPeopleGlobally(scopeContext)) return true;
-  if (isDepartmentManagerScope(scopeContext)) return player.department_id === scopeContext.managedDepartmentId;
 
   if (canAccessYouth(scopeContext)) {
     return playerTeamIds.some((teamId) => isYouthTeamId(teamId, teamById));
@@ -165,7 +174,12 @@ export function canEditPlayerOnServer(
   teamById = new Map(),
   player = {},
 ) {
-  if (isDepartmentManagerScope(scopeContext)) return player.department_id === scopeContext.managedDepartmentId;
+  const departmentDecision = resolvePlayerDepartmentScopeDecision(scopeContext, {
+    departmentId: player.department_id || null,
+    teamIds: playerTeamIds,
+    teamById,
+  });
+  if (departmentDecision !== null) return departmentDecision;
   return canMutateAllTargetTeams(scopeContext, playerTeamIds, teamById);
 }
 
@@ -173,7 +187,14 @@ export function canCreatePlayerOnServer(
   scopeContext,
   targetTeamIds = [],
   teamById = new Map(),
+  targetPlayer = {},
 ) {
+  const departmentDecision = resolvePlayerDepartmentScopeDecision(scopeContext, {
+    departmentId: targetPlayer.department_id || null,
+    teamIds: targetTeamIds,
+    teamById,
+  });
+  if (departmentDecision !== null) return departmentDecision;
   return canMutateAllTargetTeams(scopeContext, targetTeamIds, teamById);
 }
 
@@ -183,7 +204,12 @@ export function canDeletePlayerOnServer(
   teamById = new Map(),
   player = {},
 ) {
-  if (isDepartmentManagerScope(scopeContext)) return player.department_id === scopeContext.managedDepartmentId;
+  const departmentDecision = resolvePlayerDepartmentScopeDecision(scopeContext, {
+    departmentId: player.department_id || null,
+    teamIds: playerTeamIds,
+    teamById,
+  });
+  if (departmentDecision !== null) return departmentDecision;
   return canMutateAllTargetTeams(scopeContext, playerTeamIds, teamById);
 }
 

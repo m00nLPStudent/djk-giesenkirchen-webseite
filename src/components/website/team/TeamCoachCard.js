@@ -1,12 +1,14 @@
 import { FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { resolveCoachImageUrl } from "@/lib/people/imageUrl";
+import { getTeamCoachNameLines } from "./teamCoachCard.core.mjs";
 
 export default function TeamCoachCard({ coach }) {
   const imageUrl = resolveCoachImageUrl(coach, null);
   const roleLabel = coach.teamRoleDisplayLabel || "Rolle offen";
+  const nameLines = getTeamCoachNameLines(coach);
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/40">
+    <article className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/40">
       <div className="flex items-center gap-5">
         {imageUrl ? (
           <img
@@ -20,12 +22,16 @@ export default function TeamCoachCard({ coach }) {
           </div>
         )}
 
-        <div>
-          <h3 className="text-2xl font-black">
-            {coach.displayName || coach.name}
+        <div className="min-w-0 flex-1">
+          <h3
+            className="text-2xl font-black leading-7"
+            aria-label={coach.displayName || coach.name}
+          >
+            <span className="block min-h-7 break-words">{nameLines.firstName}</span>
+            <span className="block min-h-7 break-words">{nameLines.lastName}</span>
           </h3>
 
-          <p className="text-red-400 font-semibold">
+          <p className="mt-1 font-semibold text-red-400">
             {roleLabel}
           </p>
 
@@ -35,7 +41,7 @@ export default function TeamCoachCard({ coach }) {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-auto flex flex-wrap gap-3 pt-6">
         {coach.email && (
           <a
             href={`mailto:${coach.email}`}
@@ -58,6 +64,6 @@ export default function TeamCoachCard({ coach }) {
           </a>
         )}
       </div>
-    </div>
+    </article>
   );
 }

@@ -130,7 +130,7 @@ export async function savePlayerWithScopeAction(
     const hasValue = (field) => safePlayerPayload[field] != null && String(safePlayerPayload[field]).trim() !== "";
     if (isTableTennis && ["shirt_number", "position_de", "position_en", "strong_foot"].some((field) => hasValue(field) && !unchanged(field))) return buildError("Fußballspezifische Spielerfelder sind im Tischtennis nicht zulässig.");
     if (!isTableTennis && safePlayerPayload.strong_hand && !unchanged("strong_hand")) return buildError("Die starke Hand ist ausschließlich für Tischtennis vorgesehen.");
-    if (!canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap)) {
+    if (!canCreatePlayerOnServer(scopeContext, targetTeamIds, targetTeamMap, safePlayerPayload)) {
       return buildError(playerId
         ? "Du darfst den Spieler keiner fremden Mannschaft zuordnen."
         : "Du darfst keinen Spieler fuer diese Mannschaft anlegen.");

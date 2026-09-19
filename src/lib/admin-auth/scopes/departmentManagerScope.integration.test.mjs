@@ -51,7 +51,7 @@ test("player, coach, team and board actions retain server-side target checks", a
     read("../../../components/admin/teams/teamScope.js"),
     read("../../../app/admin/department/board/actions.js"),
   ]);
-  assert.match(players, /canCreatePlayerOnServer\(scopeContext, targetTeamIds, targetTeamMap\)/);
+  assert.match(players, /canCreatePlayerOnServer\(scopeContext, targetTeamIds, targetTeamMap, safePlayerPayload\)/);
   assert.match(players, /canEditPlayerOnServer\(scopeContext, existingTeamIds, teamById, existingPlayer\)/);
   assert.match(coaches, /canEditCoachOnServer\([\s\S]*scopeContext,[\s\S]*existingTeamIds,[\s\S]*teamById/);
   assert.match(coaches, /canCreateCoachOnServer\(scopeContext\)/);
