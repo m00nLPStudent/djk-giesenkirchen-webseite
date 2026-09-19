@@ -34,6 +34,17 @@ export function formatEventDate(value, locale = "de-DE") {
   }).format(new Date(value));
 }
 
+export function formatEventDateWithWeekday(value, locale = "de-DE") {
+  if (!value) return "Kein Datum";
+
+  return new Intl.DateTimeFormat(locale, {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
 export function formatEventTime(value, { isAllDay = false } = {}) {
   if (isAllDay) return "Ganztägig";
   if (!value) return "Uhrzeit offen";

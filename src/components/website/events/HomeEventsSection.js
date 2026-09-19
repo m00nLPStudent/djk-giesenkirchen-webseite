@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatEventDate, formatEventTime, getTrainingLocationTypeLabel } from "@/lib/events";
+import { formatEventDate, formatEventDateWithWeekday, formatEventTime, getTrainingLocationTypeLabel } from "@/lib/events";
 import TrainingSportIcon from "./TrainingSportIcon";
 
 export default function HomeEventsSection({ events = [], compact = false }) {
@@ -28,7 +28,7 @@ export default function HomeEventsSection({ events = [], compact = false }) {
                 </span>
                 <span className="min-w-0">
                   <span className="block truncate font-black leading-snug">{event.team_name_de || event.title_de}</span>
-                  <span className="mt-1 block text-xs text-white/50">{formatEventDate(event.starts_at)}</span>
+                  <span className="mt-1 block text-xs text-white/50">{formatEventDateWithWeekday(event.starts_at)}</span>
                 </span>
                 <span className="min-w-20 text-right">
                   <span className="block text-sm font-black text-white">{formatEventTime(event.starts_at, { isAllDay: event.is_all_day })}</span>

@@ -4,6 +4,7 @@ import { createEntityRepository } from "@/components/admin/services/entity.repos
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { syncTeamCoachAssignments } from "./teamCoachAssignments.service";
 import { TEAM_PLACEHOLDER_IMAGE } from "@/lib/football/publicTeamImage.core.mjs";
+import { createPlayerAssignmentSyncPlan } from "./teamPlayerAssignments.core.mjs";
 
 export { TEAM_PLACEHOLDER_IMAGE };
 export const TEAM_CONTACT_PLACEHOLDER_IMAGE = "";
@@ -111,23 +112,58 @@ async function replacePlayerAssignments(
   client = null,
 ) {
   const db = resolveClient(client);
-  const deleteResult = await db
+  const existingResult = await db
     .from("player_team_seasons")
-    .delete()
+    .select("id, player_id, sort_order, is_active")
     .eq("team_season_id", teamSeasonId);
 
-  if (deleteResult.error) return deleteResult;
+  if (existingResult.error) return existingResult;
 
-  if (!playerIds.length) return { error: null };
+  let syncPlan;
+  try {
+    syncPlan = createPlayerAssignmentSyncPlan(
+      existingResult.data || [],
+      playerIds,
+    );
+  } catch (error) {
+    return { data: null, error };
+  }
 
-  return await db.from("player_team_seasons").insert(
-    playerIds.map((playerId, index) => ({
-      player_id: playerId,
-      team_season_id: teamSeasonId,
-      sort_order: index,
-      is_active: true,
-    })),
-  );
+  for (const assignment of syncPlan.retainedAssignments) {
+    const updateResult = await db
+      .from("player_team_seasons")
+      .update({
+        sort_order: assignment.sort_order,
+        is_active: assignment.is_active,
+      })
+      .eq("id", assignment.id)
+      .eq("team_season_id", teamSeasonId);
+
+    if (updateResult.error) return updateResult;
+  }
+
+  if (syncPlan.addedAssignments.length) {
+    const insertResult = await db.from("player_team_seasons").insert(
+      syncPlan.addedAssignments.map((assignment) => ({
+        ...assignment,
+        team_season_id: teamSeasonId,
+      })),
+    );
+
+    if (insertResult.error) return insertResult;
+  }
+
+  if (syncPlan.removedAssignmentIds.length) {
+    const deleteResult = await db
+      .from("player_team_seasons")
+      .delete()
+      .eq("team_season_id", teamSeasonId)
+      .in("id", syncPlan.removedAssignmentIds);
+
+    if (deleteResult.error) return deleteResult;
+  }
+
+  return { data: null, error: null };
 }
 
 async function setCurrentPublicSeason(seasonId, client = null) {

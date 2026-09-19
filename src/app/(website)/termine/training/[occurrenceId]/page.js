@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildGoogleMapsSearchUrl } from "@/lib/maps";
 import {
-  formatEventDate,
+  formatEventDateWithWeekday,
   formatEventTime,
   getVirtualTrainingEvents,
   getTrainingLocationTypeLabel,
@@ -134,7 +134,7 @@ export default async function TrainingDetailPage({ params }) {
             </p>
             <p>
               <span className="font-bold text-white">Datum:</span>{" "}
-              {formatEventDate(event.starts_at)}
+              {formatEventDateWithWeekday(event.starts_at)}
             </p>
             <p>
               <span className="font-bold text-white">Uhrzeit:</span>{" "}

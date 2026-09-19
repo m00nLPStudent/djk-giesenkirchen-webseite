@@ -15,6 +15,7 @@ export {
 export {
   EVENT_RECURRENCE_LABELS,
   formatEventDate,
+  formatEventDateWithWeekday,
   formatEventTime,
   getEventStatusKey,
   getTrainingTypeLabel,
