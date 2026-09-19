@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { getCurrentAdminContext } from "@/lib/admin-auth/adminSession.service";
 import { getAdminFallbackUserContext } from "@/lib/admin-auth/permissionFallbacks";
 import { createEmptyScopeContext } from "@/lib/admin-auth/scopes/scopeContext";
@@ -9,6 +16,7 @@ const AdminUiContext = createContext({
   userContext: getAdminFallbackUserContext(),
   scopeContext: createEmptyScopeContext(),
   isReady: false,
+  updateOwnProfile: () => {},
 });
 
 export function AdminUiContextProvider({ children }) {
@@ -40,13 +48,27 @@ export function AdminUiContextProvider({ children }) {
     };
   }, []);
 
+  const updateOwnProfile = useCallback((profilePatch) => {
+    setUserContext((current) => {
+      if (!current?.profile) return current;
+      return {
+        ...current,
+        profile: {
+          ...current.profile,
+          ...profilePatch,
+        },
+      };
+    });
+  }, []);
+
   const value = useMemo(
     () => ({
       userContext,
       scopeContext: userContext.scopeContext || createEmptyScopeContext(),
       isReady,
+      updateOwnProfile,
     }),
-    [isReady, userContext],
+    [isReady, updateOwnProfile, userContext],
   );
 
   return (

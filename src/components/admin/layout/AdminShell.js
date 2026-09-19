@@ -5,6 +5,7 @@ import { AdminUiContextProvider } from "@/components/admin/auth/AdminUiContext";
 import AdminHeader from "./AdminHeader";
 import AdminContent from "./AdminContent";
 import AdminNavigationExperience from "@/components/admin/navigation/AdminNavigationExperience";
+import DashboardChangelogGate from "@/components/admin/changelog/DashboardChangelogGate";
 
 export default function AdminShell({
   children,
@@ -60,6 +61,7 @@ export default function AdminShell({
           </div>
         </div>
       </main>
+      <DashboardChangelogGate />
     </AdminUiContextProvider>
   );
 }
