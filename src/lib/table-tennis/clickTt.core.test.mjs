@@ -31,7 +31,55 @@ test("normalizes and filters schedule strictly by configured team ID", () => {
   assert.equal(result.error, null);
   assert.equal(result.data.length, 1);
   assert.equal(result.data[0].isHome, true);
+  assert.equal(result.data[0].status, "Geplant");
   assert.equal("player_profiles" in result.data[0], false);
+});
+
+test("converts provider UTC timestamps to official Europe/Berlin times and sorts meetings", () => {
+  const result = parseClickTtSchedule(html({ meetings: [
+    { meeting_id: 3, date: "2026-10-04T08:30:00.000+00:00", team_home_id: 3105537, team_away_id: 30, team_home: "DJK VfL Giesenkirchen", team_away: "TV Boisheim", state: "scheduled" },
+    { meeting_id: 2, date: "2026-09-11T17:30:00.000+00:00", team_home_id: 20, team_away_id: 3105537, team_home: "DJK VfL Willich III", team_away: "DJK VfL Giesenkirchen", state: "done", is_meeting_complete: true, matches_won: "6", matches_lost: "4", hall_number: "2" },
+    { meeting_id: 1, date: "2026-09-06T08:30:00.000+00:00", team_home_id: 3105537, team_away_id: 10, team_home: "DJK VfL Giesenkirchen", team_away: "TTC Waldniel IV", state: "done", is_meeting_complete: true, matches_won: "4", matches_lost: "6", hall_number: "1" },
+  ] }), config.external_team_id);
+
+  assert.deepEqual(result.data.map((meeting) => [meeting.date, meeting.time]), [
+    ["2026-09-06", "10:30"],
+    ["2026-09-11", "19:30"],
+    ["2026-10-04", "10:30"],
+  ]);
+  assert.deepEqual(result.data.map((meeting) => meeting.result), ["4:6", "6:4", ""]);
+  assert.deepEqual(result.data.map((meeting) => [meeting.isHome, meeting.isAway]), [[true, false], [false, true], [true, false]]);
+  assert.deepEqual(result.data.map((meeting) => meeting.venue), ["Halle 1", "Halle 2", ""]);
+  assert.equal(result.data[0].status, "");
+  assert.equal(result.data[2].status, "Geplant");
+});
+
+test("uses timezone rules instead of a hardcoded summer offset", () => {
+  const result = parseClickTtSchedule(html({ meetings: [
+    { meeting_id: "summer", date: "2026-10-18T08:30:00.000+00:00", team_home_id: 3105537, team_away_id: 1, team_home: "A", team_away: "B" },
+    { meeting_id: "winter", date: "2026-11-07T17:30:00.000+00:00", team_home_id: 1, team_away_id: 3105537, team_home: "B", team_away: "A" },
+  ] }), config.external_team_id);
+
+  assert.deepEqual(result.data.map((meeting) => meeting.time), ["10:30", "18:30"]);
+});
+
+test("deduplicates meetings and never exposes unknown provider states", () => {
+  const meeting = { meeting_id: 1, date: "2026-12-01T18:00:00.000+00:00", team_home_id: 3105537, team_away_id: 2, team_home: "A", team_away: "B", state: "provider_internal_state" };
+  const result = parseClickTtSchedule(html({ meetings_excerpt: [meeting, meeting] }), config.external_team_id);
+  assert.equal(result.data.length, 1);
+  assert.equal(result.data[0].status, "");
+  assert.equal(result.data[0].result, "");
+});
+
+test("missing optional schedule fields stay safe", () => {
+  const result = parseClickTtSchedule(html({ meetings: [
+    { meeting_id: 1, team_home_id: 3105537, team_away_id: 2 },
+  ] }), config.external_team_id);
+  assert.equal(result.error, null);
+  assert.deepEqual(result.data[0], {
+    meetingId: "1", date: "", time: "", homeTeam: "", awayTeam: "",
+    result: "", status: "", venue: "", isHome: true, isAway: false,
+  });
 });
 
 test("fails closed for missing provider structures and keeps teams isolated", () => {

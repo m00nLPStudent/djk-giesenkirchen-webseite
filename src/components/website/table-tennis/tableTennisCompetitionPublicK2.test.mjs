@@ -48,6 +48,8 @@ test("competition UI is semantic, responsive, attributed and independently falli
   assert.match(view, /overflow-x-auto/);
   assert.match(view, /<ul/);
   assert.match(view, /<article/);
+  assert.match(view, /match\.result \|\| match\.status \|\| "Offen"/);
+  assert.doesNotMatch(view, />done<|>scheduled</);
   assert.match(view, /Unsere Mannschaft/);
   assert.match(view, /competition\.tableError/);
   assert.match(view, /competition\.scheduleError/);

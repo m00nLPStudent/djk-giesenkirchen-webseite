@@ -87,6 +87,69 @@ function asText(value) { return typeof value === "string" || typeof value === "n
 function pick(row, ...keys) { for (const key of keys) { const value = key.split(".").reduce((item, part) => item?.[part], row); if (value !== undefined && value !== null) return value; } return null; }
 function ratio(row, relationKey, wonKey, lostKey) { const relation = asText(row?.[relationKey]); if (relation) return relation; const won = asText(row?.[wonKey]); const lost = asText(row?.[lostKey]); return won && lost ? `${won}:${lost}` : won; }
 
+const CLICK_TT_TIME_ZONE = "Europe/Berlin";
+const clickTtDateTimeFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: CLICK_TT_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+function normalizeClickTtDateTime(value, fallbackTime = "") {
+  const raw = asText(value);
+  if (!raw) return { date: "", time: asText(fallbackTime) };
+  const hasExplicitOffset = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(raw);
+  const parsed = hasExplicitOffset ? new Date(raw) : null;
+  if (parsed && !Number.isNaN(parsed.getTime())) {
+    const parts = Object.fromEntries(
+      clickTtDateTimeFormatter
+        .formatToParts(parsed)
+        .filter((part) => part.type !== "literal")
+        .map((part) => [part.type, part.value]),
+    );
+    return {
+      date: `${parts.year}-${parts.month}-${parts.day}`,
+      time: `${parts.hour}:${parts.minute}`,
+    };
+  }
+  return {
+    date: /^\d{4}-\d{2}-\d{2}/.test(raw) ? raw.slice(0, 10) : "",
+    time: raw.includes("T") ? raw.slice(11, 16) : asText(fallbackTime),
+  };
+}
+
+function asBoolean(value) {
+  return value === true || value === 1 || value === "1" || value === "true";
+}
+
+function normalizeMeetingResult(row) {
+  const explicitResult = asText(pick(row, "result", "meeting_result", "result_text"));
+  if (explicitResult) return explicitResult;
+  const state = asText(pick(row, "state", "status")).toLowerCase();
+  const completed = asBoolean(pick(row, "is_meeting_complete", "isMeetingComplete")) || state === "done";
+  if (!completed) return "";
+  const homeScore = asText(pick(row, "matches_won", "home_matches_won", "homeScore"));
+  const awayScore = asText(pick(row, "matches_lost", "away_matches_won", "awayScore"));
+  return homeScore && awayScore ? `${homeScore}:${awayScore}` : "";
+}
+
+function normalizeMeetingStatus(row, result) {
+  if (result) return "";
+  const state = asText(pick(row, "state", "status")).toLowerCase();
+  if (state === "scheduled") return "Geplant";
+  if (state === "done" || asBoolean(pick(row, "is_meeting_complete", "isMeetingComplete"))) return "Abgeschlossen";
+  return "";
+}
+
+function normalizeMeetingVenue(row) {
+  const hallNumber = asText(pick(row, "hall_number", "hallNumber"));
+  if (hallNumber) return /^halle\b/i.test(hallNumber) ? hallNumber : `Halle ${hallNumber}`;
+  return asText(pick(row, "venue", "location.label"));
+}
+
 export function parseClickTtTable(html, externalTeamId) {
   const candidates = hydrationValues(html).flatMap((value) => valuesByKey(value, ["league_table", "leagueTable"]));
   const rows = candidates.filter(Array.isArray).find((items) => items.length > 0);
@@ -111,15 +174,22 @@ export function parseClickTtSchedule(html, externalTeamId) {
     const homeId = asText(pick(row, "team_home_id", "home_team_id", "homeTeamId", "team_home.team_id", "team_home.id", "home_team.team_id", "home_team.id"));
     const awayId = asText(pick(row, "team_away_id", "away_team_id", "awayTeamId", "team_away.team_id", "team_away.id", "away_team.team_id", "away_team.id"));
     const dateTime = asText(pick(row, "date", "start_at", "startAt"));
+    const start = normalizeClickTtDateTime(dateTime, pick(row, "time"));
+    const result = normalizeMeetingResult(row);
     return {
-      meetingId: asText(pick(row, "meeting_id", "meetingId", "id")), date: dateTime ? dateTime.slice(0, 10) : "",
-      time: dateTime.includes("T") ? dateTime.slice(11, 16) : asText(pick(row, "time")),
+      meetingId: asText(pick(row, "meeting_id", "meetingId", "id")), date: start.date,
+      time: start.time,
       homeTeam: asText(pick(row, "team_home.team_name", "team_home.name", "home_team.team_name", "home_team.name", "homeTeam", "team_home_name", "team_home")),
       awayTeam: asText(pick(row, "team_away.team_name", "team_away.name", "away_team.team_name", "away_team.name", "awayTeam", "team_away_name", "team_away")),
-      result: asText(pick(row, "result", "matches_relation")), status: asText(pick(row, "state", "status")),
-      venue: asText(pick(row, "hall_number", "venue", "location.label")), isHome: homeId === id, isAway: awayId === id,
+      result, status: normalizeMeetingStatus(row, result),
+      venue: normalizeMeetingVenue(row), isHome: homeId === id, isAway: awayId === id,
     };
   }).filter((row) => row.isHome || row.isAway);
-  const data = [...new Map(normalizedRows.map((row) => [row.meetingId || `${row.date}/${row.time}/${row.homeTeam}/${row.awayTeam}`, row])).values()];
+  const data = [...new Map(normalizedRows.map((row) => [row.meetingId || `${row.date}/${row.time}/${row.homeTeam}/${row.awayTeam}`, row])).values()]
+    .sort((left, right) => {
+      const leftStart = left.date ? `${left.date}T${left.time || "99:99"}` : "9999-99-99T99:99";
+      const rightStart = right.date ? `${right.date}T${right.time || "99:99"}` : "9999-99-99T99:99";
+      return leftStart.localeCompare(rightStart) || left.meetingId.localeCompare(right.meetingId);
+    });
   return { data, error: null };
 }

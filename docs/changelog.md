@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-20
+
+### myTischtennis / click-TT – Spielplan-Korrektur
+
+- UTC-/Offset-Zeitstempel aus click-TT werden mit `Europe/Berlin` korrekt in deutsche Ortszeit umgerechnet; Sommer- und Winterzeit folgen den Zeitzonenregeln ohne hartcodierten Stunden-Offset.
+- Begegnungen werden unabhängig von der Providerreihenfolge nach Datum und Uhrzeit chronologisch sortiert.
+- Ergebnisse abgeschlossener Begegnungen werden aus `matches_won` und `matches_lost` übernommen; technische Providerstatus wie `done` und `scheduled` werden nicht öffentlich ausgegeben, offene Begegnungen erscheinen als `Geplant`.
+- Hallennummern werden verständlich als `Halle 1`, `Halle 2` usw. dargestellt; Heim- und Auswärtsspiele werden weiterhin ausschließlich über die externe Team-ID erkannt.
+- Deduplizierung über Meeting-ID beziehungsweise den bestehenden stabilen Fallback und die defensive Behandlung fehlender optionaler Providerdaten bleiben erhalten.
+- Die bestehende Ligatabelle wurde nicht verändert und bleibt funktionsfähig.
+- Referenzprüfung bestanden: DJK VfL Giesenkirchen – TTC Waldniel IV am 06.09.2026 um 10:30 Uhr mit 4:6 sowie DJK VfL Willich III – DJK VfL Giesenkirchen am 11.09.2026 um 19:30 Uhr mit 6:4.
+- Validierung: fokussierte Tischtennistests 43/43, vollständige Testsuite 1363/1363, Changed-Scope ESLint ohne Fehler, Production Build und TypeScript bestanden, `git diff --check` bestanden sowie sieben Referenzspiele live read-only verifiziert.
+- Keine Änderungen an Datenbank, Supabase, SQL, Auth, Permissions oder der gespeicherten click-TT-Konfiguration.
+
 ## 2026-08-26
 
 ### B15.18/B15.19 abgeschlossen und B15.20 dokumentiert
