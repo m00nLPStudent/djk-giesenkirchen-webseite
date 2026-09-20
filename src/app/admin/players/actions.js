@@ -12,6 +12,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import {
   loadScopedPlayerTeamSeasonOptions,
   resolvePlayerTeamSeasonTarget,
+  resolvePlayerTeamSeasonTargets,
 } from "@/components/admin/players/services/playerTeamSeasonOptions.repository";
 import { savePlayer } from "@/components/admin/players/services/playerWrite.service";
 import { loadPlayerCurrentSeasonAssignmentRows } from "@/components/admin/players/services/playerWrite.repository";
@@ -35,7 +36,7 @@ function buildError(message) {
 async function loadPlayerById(client, playerId) {
   const { data } = await client
     .from("players")
-    .select("id, first_name, last_name, is_active, department_id, image_media_asset_id, shirt_number, position_de, position_en, strong_foot, strong_hand")
+    .select("id, first_name, last_name, is_active, department_id, image_media_asset_id, shirt_number, position_de, position_en, strong_foot, strong_hand, departments(slug)")
     .eq("id", playerId)
     .maybeSingle();
 
@@ -106,10 +107,41 @@ export async function savePlayerWithScopeAction(
       ? await supabaseServer.from("departments").select("id, slug").eq("slug", expectedDepartmentSlug).eq("is_active", true).maybeSingle()
       : { data: null };
     if (expectedDepartmentSlug && !routeDepartment?.id) return buildError("Die Abteilung des aktuellen Bereichs konnte nicht aufgelöst werden.");
+    const existingDepartmentRelation = existingPlayer?.departments;
+    const existingDepartmentSlug = Array.isArray(existingDepartmentRelation)
+      ? existingDepartmentRelation[0]?.slug
+      : existingDepartmentRelation?.slug;
+    const isTableTennisMutation =
+      expectedDepartmentSlug === "tischtennis" ||
+      (!expectedDepartmentSlug && existingDepartmentSlug === "tischtennis");
     const safePlayerPayload = { ...playerPayload, department_id: routeDepartment?.id || existingPlayer?.department_id || null, image_media_asset_id: mediaResult.data?.id || null, image_url: mediaResult.data?.previewUrl || playerPayload?.image_url || null };
-    const targetResolution = safePlayerPayload.team_season_id
-      ? await resolvePlayerTeamSeasonTarget(supabaseServer, safePlayerPayload.team_season_id)
-      : { ok: true, teamSeasonOption: null };
+    const requestedTeamSeasonIds = isTableTennisMutation
+      ? [
+          ...new Set(
+            [
+              safePlayerPayload.team_season_id,
+              ...(Array.isArray(safePlayerPayload.team_season_ids)
+                ? safePlayerPayload.team_season_ids
+                : []),
+            ]
+              .map((value) => String(value || "").trim())
+              .filter(Boolean),
+          ),
+        ]
+      : [];
+    const multiTargetResolution = isTableTennisMutation
+      ? await resolvePlayerTeamSeasonTargets(supabaseServer, requestedTeamSeasonIds)
+      : null;
+    const targetResolution = isTableTennisMutation
+      ? {
+          ok: multiTargetResolution.ok,
+          message: multiTargetResolution.message,
+          teamSeasonOption: multiTargetResolution.teamSeasonOptions?.[0] || null,
+          teamSeasonOptions: multiTargetResolution.teamSeasonOptions || [],
+        }
+      : safePlayerPayload.team_season_id
+        ? await resolvePlayerTeamSeasonTarget(supabaseServer, safePlayerPayload.team_season_id)
+        : { ok: true, teamSeasonOption: null };
 
     if (!targetResolution.ok) {
       return buildError(
@@ -118,13 +150,23 @@ export async function savePlayerWithScopeAction(
       );
     }
 
-    const targetTeamIds = targetResolution.teamSeasonOption ? [targetResolution.teamSeasonOption.teamId] : [];
-    const targetTeamMap = targetResolution.teamSeasonOption ? new Map([[targetResolution.teamSeasonOption.team.id, targetResolution.teamSeasonOption.team]]) : new Map();
+    const resolvedTargetOptions = isTableTennisMutation
+      ? targetResolution.teamSeasonOptions
+      : [targetResolution.teamSeasonOption].filter(Boolean);
+    const targetTeamIds = resolvedTargetOptions.map((option) => option.teamId);
+    const targetTeamMap = new Map(
+      resolvedTargetOptions.map((option) => [option.team.id, option.team]),
+    );
     const relation = targetResolution.teamSeasonOption?.team?.departments;
     const targetDepartmentSlug = Array.isArray(relation) ? relation[0]?.slug : relation?.slug;
     if (!routeDepartment && targetResolution.teamSeasonOption?.team?.department_id) safePlayerPayload.department_id = targetResolution.teamSeasonOption.team.department_id;
     if (expectedDepartmentSlug && targetResolution.teamSeasonOption && targetDepartmentSlug !== expectedDepartmentSlug) return buildError("Die gewählte Mannschaft gehört nicht zum aktuellen Bereich.");
-    const isTableTennis = expectedDepartmentSlug === "tischtennis" || targetDepartmentSlug === "tischtennis";
+    const hasForeignTableTennisTarget = isTableTennisMutation && resolvedTargetOptions.some((option) => {
+      const department = option.team?.departments;
+      return (Array.isArray(department) ? department[0]?.slug : department?.slug) !== "tischtennis";
+    });
+    if (hasForeignTableTennisTarget) return buildError("Alle gewählten Mannschaften müssen zum Tischtennisbereich gehören.");
+    const isTableTennis = isTableTennisMutation || targetDepartmentSlug === "tischtennis";
     if (isTableTennis && !["Rechts", "Links"].includes(safePlayerPayload.strong_hand)) return buildError("Bitte eine gültige starke Hand auswählen.");
     const unchanged = (field) => playerId && (safePlayerPayload[field] ?? null) === (existingPlayer?.[field] ?? null);
     const hasValue = (field) => safePlayerPayload[field] != null && String(safePlayerPayload[field]).trim() !== "";
@@ -161,6 +203,8 @@ export async function savePlayerWithScopeAction(
     const saveResult = await savePlayer(safePlayerPayload, playerId, {
       client: writeClient,
       targetTeamSeasonOption: targetResolution.teamSeasonOption,
+      targetTeamSeasonOptions: resolvedTargetOptions,
+      allowMultipleAssignments: isTableTennisMutation,
       activeSeasonId,
     });
 

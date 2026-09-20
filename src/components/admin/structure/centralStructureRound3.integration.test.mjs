@@ -49,7 +49,10 @@ test("player edits support a missing or removed team and retain sport master fie
   ]);
   assert.match(action, /activeSeasonId[\s\S]*loadCurrentSeasonResolution/);
   assert.match(service, /PLAYER_ASSIGNMENT_OPERATIONS\.DEACTIVATE/);
-  assert.match(service, /targetTeamSeasonOption\?\.seasonId \|\| activeSeasonId/);
+  assert.match(
+    service,
+    /desiredTeamSeasonOptions\[0\]\?\.seasonId \|\| activeSeasonId/,
+  );
   assert.match(core, /strong_hand: toNullableString\(player\?\.strong_hand\)/);
   assert.doesNotMatch(validation, /position_de:/);
   assert.match(detailPage, /strong_foot, strong_hand/);

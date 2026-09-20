@@ -45,6 +45,10 @@ export default function AdminPlayersForm({
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("basic");
   const [selectedMedia, setSelectedMedia] = useState(player?.mediaAsset || null);
+  const initialSportContext = sportContext === "global"
+    && playerSeasonalReadModel?.assignments?.[0]?.departmentSlug === "tischtennis"
+    ? "table_tennis"
+    : sportContext;
   const teamOptions = useMemo(
     () => teamOptionsResult?.teamOptions || [],
     [teamOptionsResult?.teamOptions],
@@ -60,7 +64,11 @@ export default function AdminPlayersForm({
     validateForm,
     hasErrors,
   } = useEntityForm({
-    initialForm: createInitialPlayerForm(player, playerSeasonalReadModel),
+    initialForm: createInitialPlayerForm(
+      player,
+      playerSeasonalReadModel,
+      initialSportContext,
+    ),
     validate: (nextForm) => {
       const option = teamOptions.find((item) => item.teamSeasonId === nextForm.team_season_id);
       const relation = option?.team?.departments;
@@ -71,12 +79,6 @@ export default function AdminPlayersForm({
       return validatePlayerForm(nextForm, validationContext);
     },
   });
-
-  const blockingMessage = getPlayerFormBlockingMessage(
-    teamOptionsResult,
-    playerSeasonalReadModel,
-  );
-  const warningMessage = getPlayerFormWarningMessage(playerSeasonalReadModel);
 
   const selectedTeam = useMemo(
     () =>
@@ -90,8 +92,20 @@ export default function AdminPlayersForm({
     ? selectedTeamRelation[0]?.slug
     : selectedTeamRelation?.slug;
   const effectiveSportContext = sportContext === "global"
-    ? (selectedDepartmentSlug === "tischtennis" ? "table_tennis" : "football")
+    ? (
+        selectedDepartmentSlug === "tischtennis" ||
+        playerSeasonalReadModel?.assignments?.[0]?.departmentSlug === "tischtennis"
+          ? "table_tennis"
+          : "football"
+      )
     : sportContext;
+
+  const blockingMessage = getPlayerFormBlockingMessage(
+    teamOptionsResult,
+    playerSeasonalReadModel,
+    effectiveSportContext,
+  );
+  const warningMessage = getPlayerFormWarningMessage(playerSeasonalReadModel);
 
   const positionOptions = useMemo(
     () => getPositionOptions(selectedTeam?.teamNameDe),
@@ -114,6 +128,50 @@ export default function AdminPlayersForm({
   function handleMediaChange(media) {
     setSelectedMedia(media);
     setForm((current) => ({ ...current, image_media_asset_id: media?.id || null, image_url: media?.previewUrl || (media ? current.image_url : null) }));
+  }
+
+  function updateTableTennisTeams({
+    primaryTeamSeasonId,
+    addTeamSeasonId,
+    removeTeamSeasonId,
+  } = {}) {
+    setForm((current) => {
+      const currentIds = Array.isArray(current.team_season_ids)
+        ? current.team_season_ids.filter(Boolean)
+        : [];
+
+      if (primaryTeamSeasonId !== undefined) {
+        if (!primaryTeamSeasonId) {
+          return { ...current, team_season_id: "", team_season_ids: [] };
+        }
+        return {
+          ...current,
+          team_season_id: primaryTeamSeasonId,
+          team_season_ids: [
+            primaryTeamSeasonId,
+            ...currentIds.filter((id) => id !== primaryTeamSeasonId),
+          ],
+        };
+      }
+
+      if (addTeamSeasonId) {
+        const nextIds = [...new Set([...currentIds, addTeamSeasonId])];
+        return {
+          ...current,
+          team_season_id: current.team_season_id || addTeamSeasonId,
+          team_season_ids: nextIds,
+        };
+      }
+
+      if (removeTeamSeasonId) {
+        return {
+          ...current,
+          team_season_ids: currentIds.filter((id) => id !== removeTeamSeasonId),
+        };
+      }
+
+      return current;
+    });
   }
 
   async function handleSubmit(event) {
@@ -203,6 +261,7 @@ export default function AdminPlayersForm({
             teamOptions={teamOptions}
             updateField={updateField}
             sportContext={effectiveSportContext}
+            updateTableTennisTeams={updateTableTennisTeams}
           />
         </FormSection>
       )}

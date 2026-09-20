@@ -182,3 +182,28 @@ export async function resolvePlayerTeamSeasonTarget(supabaseServer, teamSeasonId
     },
   };
 }
+
+export async function resolvePlayerTeamSeasonTargets(
+  supabaseServer,
+  teamSeasonIds = [],
+) {
+  const normalizedIds = [
+    ...new Set(
+      (Array.isArray(teamSeasonIds) ? teamSeasonIds : [])
+        .map((value) => String(value || "").trim())
+        .filter(Boolean),
+    ),
+  ];
+  const teamSeasonOptions = [];
+
+  for (const teamSeasonId of normalizedIds) {
+    const result = await resolvePlayerTeamSeasonTarget(
+      supabaseServer,
+      teamSeasonId,
+    );
+    if (!result.ok) return { ...result, teamSeasonOptions: [] };
+    teamSeasonOptions.push(result.teamSeasonOption);
+  }
+
+  return { ok: true, teamSeasonOptions };
+}

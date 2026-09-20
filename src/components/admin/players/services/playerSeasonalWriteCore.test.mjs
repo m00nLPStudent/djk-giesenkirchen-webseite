@@ -5,7 +5,9 @@ import {
   buildPlayerAssignmentPayload,
   buildPlayerMasterPayload,
   buildPlayerMasterRollbackPayload,
+  createMultiPlayerAssignmentSyncPlan,
   determinePlayerAssignmentOperation,
+  normalizePlayerTeamSeasonIds,
   PLAYER_ASSIGNMENT_OPERATIONS,
 } from "./playerSeasonalWriteCore.mjs";
 
@@ -275,4 +277,71 @@ test("determinePlayerAssignmentOperation deactivates the current assignment when
   assert.equal(result.ok, true);
   assert.equal(result.operation, PLAYER_ASSIGNMENT_OPERATIONS.DEACTIVATE);
   assert.equal(result.currentAssignmentId, "pts-1");
+});
+
+test("multi-team ids support zero, one, two and more targets while removing duplicates", () => {
+  assert.deepEqual(normalizePlayerTeamSeasonIds([]), []);
+  assert.deepEqual(normalizePlayerTeamSeasonIds(["ts-1"]), ["ts-1"]);
+  assert.deepEqual(
+    normalizePlayerTeamSeasonIds(["ts-1", "ts-2", "ts-1", "ts-3"]),
+    ["ts-1", "ts-2", "ts-3"],
+  );
+});
+
+test("multi-team sync keeps retained assignment metadata and only adds missing teams", () => {
+  const retained = {
+    playerTeamSeasonId: "pts-1",
+    teamSeasonId: "ts-1",
+    shirtNumber: 9,
+    positionDe: "Stammspieler",
+    isCaptain: true,
+    sortOrder: 4,
+    isActive: true,
+  };
+  const result = createMultiPlayerAssignmentSyncPlan(
+    [retained],
+    ["ts-1", "ts-2", "ts-3"],
+  );
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.retainedAssignments, [retained]);
+  assert.deepEqual(result.addedTeamSeasonIds, ["ts-2", "ts-3"]);
+  assert.deepEqual(result.deactivatedAssignments, []);
+  assert.equal(result.retainedAssignments[0].shirtNumber, 9);
+  assert.equal(result.retainedAssignments[0].isCaptain, true);
+});
+
+test("multi-team sync removes only deselected teams and reactivates known inactive rows", () => {
+  const result = createMultiPlayerAssignmentSyncPlan(
+    [
+      { playerTeamSeasonId: "pts-1", teamSeasonId: "ts-1", isActive: true },
+      { playerTeamSeasonId: "pts-2", teamSeasonId: "ts-2", isActive: true },
+      { playerTeamSeasonId: "pts-3", teamSeasonId: "ts-3", isActive: false },
+    ],
+    ["ts-1", "ts-3"],
+  );
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(
+    result.deactivatedAssignments.map((item) => item.playerTeamSeasonId),
+    ["pts-2"],
+  );
+  assert.deepEqual(
+    result.reactivatedAssignments.map((item) => item.playerTeamSeasonId),
+    ["pts-3"],
+  );
+  assert.deepEqual(result.addedTeamSeasonIds, []);
+});
+
+test("multi-team sync fails closed for an ambiguous existing pair", () => {
+  const result = createMultiPlayerAssignmentSyncPlan(
+    [
+      { playerTeamSeasonId: "pts-1", teamSeasonId: "ts-1", isActive: true },
+      { playerTeamSeasonId: "pts-2", teamSeasonId: "ts-1", isActive: false },
+    ],
+    ["ts-1"],
+  );
+
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "INVALID_MULTI_TEAM_ASSIGNMENT_BASELINE");
 });

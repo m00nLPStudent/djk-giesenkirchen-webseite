@@ -5,6 +5,9 @@ import {
   getActiveFootballTeams,
   groupFootballTeams,
 } from "@/lib/football/teams";
+import { attachJuniorTeamBirthYears } from "@/lib/football/juniorTeamYearGroups.core.mjs";
+import { loadJuniorTeamYearGroups } from "@/lib/football/juniorTeamYearGroups.repository";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { connection } from "next/server";
 
 export default async function FootballJuniorTeamsPage() {
@@ -12,6 +15,15 @@ export default async function FootballJuniorTeamsPage() {
   const { data: teams = [] } = await getActiveFootballTeams();
   const grouped = groupFootballTeams(teams);
   const juniorTeams = grouped.junioren;
+  const adminDb = createSupabaseAdminClient();
+  const yearGroupsResult = await loadJuniorTeamYearGroups(
+    adminDb,
+    juniorTeams.map((team) => team.team_season_id),
+  );
+  const juniorTeamsWithYears = attachJuniorTeamBirthYears(
+    juniorTeams,
+    yearGroupsResult.data || [],
+  );
 
   return (
     <PublicPageShell>
@@ -32,7 +44,7 @@ export default async function FootballJuniorTeamsPage() {
           </Link>
         </section>
 
-        {juniorTeams.length === 0 ? (
+        {juniorTeamsWithYears.length === 0 ? (
           <section className="mt-8 rounded-3xl border border-white/10 bg-black/20 p-8">
             <p className="text-white/65">
               Aktuell sind keine Junioren-Mannschaften veröffentlicht.
@@ -40,8 +52,8 @@ export default async function FootballJuniorTeamsPage() {
           </section>
         ) : (
           <section className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {juniorTeams.map((team) => (
-              <FootballTeamCard key={team.id} team={team} />
+            {juniorTeamsWithYears.map((team) => (
+              <FootballTeamCard key={team.id} team={team} detail="birth-years" />
             ))}
           </section>
         )}

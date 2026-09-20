@@ -12,11 +12,13 @@ import {
 export function createInitialPlayerForm(
   player,
   playerSeasonalReadModel,
+  sportContext = "football",
 ) {
   return createInitialPlayerFormData(
     player,
     playerSeasonalReadModel,
     PLAYER_PLACEHOLDER_IMAGE,
+    sportContext,
   );
 }
 export { getYearGroupFromBirthdate };
@@ -32,11 +34,13 @@ export function createPlayerPayload(form, yearGroup) {
 export function getPlayerFormBlockingMessage(
   teamOptionsResult,
   playerSeasonalReadModel,
+  sportContext = "football",
 ) {
   return getPlayerFormBlockingMessageData(
     teamOptionsResult,
     playerSeasonalReadModel,
     CURRENT_SEASON_STATUSES,
+    sportContext,
   );
 }
 

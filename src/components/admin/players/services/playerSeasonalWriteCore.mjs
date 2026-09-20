@@ -182,3 +182,64 @@ export function determinePlayerAssignmentOperation(
     deactivateCurrentAssignmentId: currentAssignment.playerTeamSeasonId,
   };
 }
+
+export function normalizePlayerTeamSeasonIds(teamSeasonIds = []) {
+  return [
+    ...new Set(
+      (Array.isArray(teamSeasonIds) ? teamSeasonIds : [])
+        .map((value) => String(value || "").trim())
+        .filter(Boolean),
+    ),
+  ];
+}
+
+export function createMultiPlayerAssignmentSyncPlan(
+  existingAssignments = [],
+  desiredTeamSeasonIds = [],
+) {
+  const desiredIds = normalizePlayerTeamSeasonIds(desiredTeamSeasonIds);
+  const desiredIdSet = new Set(desiredIds);
+  const existingByTeamSeasonId = new Map();
+
+  for (const assignment of existingAssignments || []) {
+    const teamSeasonId = String(assignment?.teamSeasonId || "").trim();
+    if (!teamSeasonId || existingByTeamSeasonId.has(teamSeasonId)) {
+      return {
+        ok: false,
+        code: "INVALID_MULTI_TEAM_ASSIGNMENT_BASELINE",
+        message: "Die bestehenden Mannschaftszuordnungen sind nicht eindeutig.",
+      };
+    }
+    existingByTeamSeasonId.set(teamSeasonId, assignment);
+  }
+
+  const retainedAssignments = [];
+  const reactivatedAssignments = [];
+  const addedTeamSeasonIds = [];
+
+  for (const teamSeasonId of desiredIds) {
+    const existing = existingByTeamSeasonId.get(teamSeasonId);
+    if (!existing) {
+      addedTeamSeasonIds.push(teamSeasonId);
+    } else if (existing.isActive === false) {
+      reactivatedAssignments.push(existing);
+    } else {
+      retainedAssignments.push(existing);
+    }
+  }
+
+  const deactivatedAssignments = [...existingByTeamSeasonId.values()].filter(
+    (assignment) =>
+      assignment.isActive !== false &&
+      !desiredIdSet.has(String(assignment.teamSeasonId)),
+  );
+
+  return {
+    ok: true,
+    desiredTeamSeasonIds: desiredIds,
+    retainedAssignments,
+    reactivatedAssignments,
+    addedTeamSeasonIds,
+    deactivatedAssignments,
+  };
+}

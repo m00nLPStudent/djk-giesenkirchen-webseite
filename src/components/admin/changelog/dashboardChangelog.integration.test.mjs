@@ -67,10 +67,14 @@ test("the modal is accessible, responsive and only confirmation can close it", (
 });
 
 test("version and visible copy have a single central source", () => {
-  assert.match(config, /version: "1\.0\.3"/);
+  assert.match(config, /version: "1\.0\.4"/);
   assert.match(config, /releaseDate: "2026-09-20"/);
-  assert.match(config, /Trainingsübersicht verbessert/);
-  assert.match(config, /bis zu zehn kommende Trainingstermine/);
-  assert.doesNotMatch(gate, /version:\s*"1\.0\.3"/);
-  assert.doesNotMatch(dialog, /version:\s*"1\.0\.3"/);
+  assert.match(config, /Jahrgänge der Junioren auf einen Blick/);
+  assert.match(config, /automatisch aus der aktuellen Saison übernommen/);
+  assert.match(config, /Tischtennis-Spielpläne verbessert/);
+  assert.match(config, /Spielzeiten, Ergebnisse, Reihenfolge der Begegnungen und Hallenangaben/);
+  assert.match(config, /Flexible Mannschaftszuordnung im Tischtennis/);
+  assert.match(config, /allen zugeordneten Mannschaftskadern/);
+  assert.doesNotMatch(gate, /version:\s*"1\.0\.4"/);
+  assert.doesNotMatch(dialog, /version:\s*"1\.0\.4"/);
 });

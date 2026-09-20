@@ -1,7 +1,12 @@
 import Link from "next/link";
 import TeamImagePlaceholder from "@/components/website/team/TeamImagePlaceholder";
+import { formatTeamBirthYears } from "@/lib/football/juniorTeamYearGroups.core.mjs";
 
-export default function FootballTeamCard({ team }) {
+export default function FootballTeamCard({ team, detail = "training" }) {
+  const birthYearLabel = detail === "birth-years"
+    ? formatTeamBirthYears(team.birthYears)
+    : "";
+
   return (
     <Link
       href={`/fussball/${team.slug}`}
@@ -25,9 +30,15 @@ export default function FootballTeamCard({ team }) {
 
       <h2 className="mt-3 text-2xl font-black">{team.name_de}</h2>
 
-      <p className="mt-3 text-sm text-white/50">
-        {team.training_times_de || "Trainingszeiten folgen."}
-      </p>
+      {detail === "birth-years" ? (
+        birthYearLabel ? (
+          <p className="mt-3 text-sm text-white/50">{birthYearLabel}</p>
+        ) : null
+      ) : (
+        <p className="mt-3 text-sm text-white/50">
+          {team.training_times_de || "Trainingszeiten folgen."}
+        </p>
+      )}
     </Link>
   );
 }

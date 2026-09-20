@@ -1,5 +1,11 @@
-export function getInitialAssignment(playerSeasonalReadModel) {
-  if (playerSeasonalReadModel?.hasMultipleActiveAssignments) {
+export function getInitialAssignment(
+  playerSeasonalReadModel,
+  sportContext = "football",
+) {
+  if (
+    sportContext !== "table_tennis" &&
+    playerSeasonalReadModel?.hasMultipleActiveAssignments
+  ) {
     return null;
   }
 
@@ -10,11 +16,19 @@ export function createInitialPlayerFormData(
   player,
   playerSeasonalReadModel,
   placeholderImage,
+  sportContext = "football",
 ) {
-  const primaryAssignment = getInitialAssignment(playerSeasonalReadModel);
+  const primaryAssignment = getInitialAssignment(
+    playerSeasonalReadModel,
+    sportContext,
+  );
+  const assignmentIds = (playerSeasonalReadModel?.assignments || [])
+    .map((assignment) => assignment?.teamSeasonId)
+    .filter(Boolean);
 
   return {
     team_season_id: primaryAssignment?.teamSeasonId || "",
+    team_season_ids: assignmentIds,
     first_name: player?.first_name || "",
     last_name: player?.last_name || "",
     shirt_number: primaryAssignment?.shirtNumber ?? "",
@@ -54,8 +68,12 @@ export function getPlayerFormBlockingMessageData(
   teamOptionsResult,
   playerSeasonalReadModel,
   currentSeasonStatuses,
+  sportContext = "football",
 ) {
-  if (playerSeasonalReadModel?.hasMultipleActiveAssignments) {
+  if (
+    sportContext !== "table_tennis" &&
+    playerSeasonalReadModel?.hasMultipleActiveAssignments
+  ) {
     return "Dieser Spieler hat mehrere aktive Zuordnungen in der aktuellen Saison. Das Speichern wird blockiert, bis der Konflikt bereinigt ist.";
   }
 

@@ -83,6 +83,26 @@ test("createInitialPlayerForm does not silently prefill one assignment when mult
   assert.equal(form.shirt_number, "");
 });
 
+test("table-tennis form loads every active assignment and keeps the first as primary", () => {
+  const form = createInitialPlayerFormData(
+    { first_name: "Lina" },
+    {
+      primaryAssignment: { teamSeasonId: "ts-1", shirtNumber: null },
+      assignments: [
+        { teamSeasonId: "ts-1" },
+        { teamSeasonId: "ts-2" },
+        { teamSeasonId: "ts-3" },
+      ],
+      hasMultipleActiveAssignments: true,
+    },
+    PLACEHOLDER_IMAGE,
+    "table_tennis",
+  );
+
+  assert.equal(form.team_season_id, "ts-1");
+  assert.deepEqual(form.team_season_ids, ["ts-1", "ts-2", "ts-3"]);
+});
+
 test("createInitialPlayerForm still keeps master-only player fields", () => {
   const form = createInitialPlayerFormData(
     {
@@ -136,6 +156,20 @@ test("getPlayerFormBlockingMessage blocks multiple active assignments", () => {
   );
 
   assert.match(message, /mehrere aktive Zuordnungen/i);
+});
+
+test("getPlayerFormBlockingMessage accepts valid table-tennis multi-team assignments", () => {
+  const message = getPlayerFormBlockingMessageData(
+    {
+      activeSeasonStatus: CURRENT_SEASON_STATUSES.RESOLVED,
+      teamOptions: [{ teamSeasonId: "ts-1" }, { teamSeasonId: "ts-2" }],
+    },
+    { hasMultipleActiveAssignments: true },
+    CURRENT_SEASON_STATUSES,
+    "table_tennis",
+  );
+
+  assert.equal(message, null);
 });
 
 test("getPlayerFormWarningMessage explains an empty current-season assignment state without legacy wording", () => {

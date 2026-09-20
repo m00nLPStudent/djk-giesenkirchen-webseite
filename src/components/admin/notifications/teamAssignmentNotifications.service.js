@@ -80,11 +80,45 @@ async function recipientMapForEvents(db, events, actorUserId) {
 export async function notifyPlayerAssignmentChange({ player, change, actorUserId }) {
   if (!change || change.operation === "UNCHANGED_ASSIGNMENT") return { delivered: 0, skipped: 0, error: null };
   const events = [];
+  if (change.operation === "SYNC_MULTI_ASSIGNMENTS") {
+    const previousBySeason = new Map(
+      (change.previousAssignments || []).map((assignment) => [
+        assignment.teamSeasonId,
+        assignment,
+      ]),
+    );
+    const nextBySeason = new Map(
+      (change.nextAssignments || []).map((assignment) => [
+        assignment.teamSeasonId,
+        assignment,
+      ]),
+    );
+    for (const [teamSeasonId, previous] of previousBySeason) {
+      if (!nextBySeason.has(teamSeasonId)) {
+        events.push(buildPlayerRemovedNotification({
+          player,
+          assignment: previous,
+          assignmentId: previous.playerTeamSeasonId,
+        }));
+      }
+    }
+    for (const [teamSeasonId, next] of nextBySeason) {
+      if (!previousBySeason.has(teamSeasonId)) {
+        events.push(buildPlayerAssignedNotification({
+          player,
+          assignment: next,
+          assignmentId: next.playerTeamSeasonId,
+        }));
+      }
+    }
+  } else {
   const previous = change.previousAssignment;
   const target = change.targetAssignment;
   if (previous && previous.teamSeasonId !== target?.teamSeasonId) events.push(buildPlayerRemovedNotification({ player, assignment: previous, assignmentId: previous.playerTeamSeasonId }));
   if (target && (!previous || previous.teamSeasonId !== target.teamSeasonId)) events.push(buildPlayerAssignedNotification({ player, assignment: target, assignmentId: change.assignmentId }));
   else if (target) events.push(buildPlayerUpdatedNotification({ player, assignment: target, assignmentId: change.assignmentId }));
+  }
+  if (!events.length) return { delivered: 0, skipped: 0, error: null };
   const db = createSupabaseAdminClient();
   if (!db) return { delivered: 0, skipped: events.length, error: new Error("Notification-Service-Client ist nicht konfiguriert.") };
   const recipients = await recipientMapForEvents(db, events, actorUserId);
