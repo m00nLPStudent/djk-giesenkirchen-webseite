@@ -10,6 +10,7 @@ import {
 test("missing and older acknowledgements show the current changelog", () => {
   assert.equal(shouldShowDashboardChangelog(null), true);
   assert.equal(shouldShowDashboardChangelog("1.0.1"), true);
+  assert.equal(shouldShowDashboardChangelog("1.0.2"), true);
 });
 
 test("the current acknowledgement suppresses the changelog", () => {
@@ -20,7 +21,8 @@ test("the current acknowledgement suppresses the changelog", () => {
 });
 
 test("only the exact current RPC return value is accepted", () => {
-  assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.2"), true);
+  assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.3"), true);
+  assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.2"), false);
   assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.1"), false);
   assert.equal(isSuccessfulDashboardChangelogAcknowledgement(null), false);
 });
@@ -57,18 +59,13 @@ test("RPC errors and mismatched return values never acknowledge the release", as
 });
 
 test("the current release has complete user-facing content", () => {
-  assert.equal(CURRENT_DASHBOARD_CHANGELOG.version, "1.0.2");
-  assert.equal(CURRENT_DASHBOARD_CHANGELOG.releaseDate, "2026-09-19");
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.version, "1.0.3");
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.releaseDate, "2026-09-20");
   assert.equal(CURRENT_DASHBOARD_CHANGELOG.title, "Neu im Dashboard");
-  assert.equal(CURRENT_DASHBOARD_CHANGELOG.entries.length, 4);
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.entries.length, 1);
   assert.deepEqual(
     CURRENT_DASHBOARD_CHANGELOG.entries.map((entry) => entry.title),
-    [
-      "Trainerübersicht verbessert",
-      "Einheitliche Trainerdarstellung",
-      "Mannschaftsbilder optimiert",
-      "Spielerverwaltung verbessert",
-    ],
+    ["Trainingsübersicht verbessert"],
   );
   for (const entry of CURRENT_DASHBOARD_CHANGELOG.entries) {
     assert.ok(entry.title);

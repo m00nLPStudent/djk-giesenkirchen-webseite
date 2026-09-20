@@ -1,4 +1,4 @@
-export const HOME_TRAINING_LIMIT = 5;
+export const HOME_TRAINING_LIMIT = 10;
 
 export function selectUpcomingHomeTrainings(
   events = [],

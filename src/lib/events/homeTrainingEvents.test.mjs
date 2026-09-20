@@ -27,9 +27,13 @@ test("home trainings keep only future virtual team trainings in chronological or
 });
 
 test("home trainings use the bounded default limit", () => {
-  const events = Array.from({ length: 8 }, (_, index) =>
-    training(`training-${index}`, `2026-09-0${index + 1}T18:00:00.000Z`),
+  const events = Array.from({ length: 12 }, (_, index) =>
+    training(
+      `training-${index}`,
+      new Date(Date.UTC(2026, 8, index + 1, 18)).toISOString(),
+    ),
   );
+  assert.equal(HOME_TRAINING_LIMIT, 10);
   assert.equal(selectUpcomingHomeTrainings(events, { now: new Date("2026-09-01T00:00:00.000Z") }).length, HOME_TRAINING_LIMIT);
 });
 
@@ -52,10 +56,11 @@ test("home trainings merge teams globally before applying the limit", () => {
     "team-c-03",
     "team-a-08",
     "team-b-09",
+    "team-a-15",
   ]);
 });
 
-test("department occurrences participate in the same global top-five limit", () => {
+test("department occurrences participate in the same global top-ten limit", () => {
   const result = selectUpcomingHomeTrainings(
     [
       training("team-monday", "2026-09-07T18:00:00.000Z"),
@@ -68,7 +73,7 @@ test("department occurrences participate in the same global top-five limit", () 
     { now: new Date("2026-09-07T00:00:00.000Z") },
   );
 
-  assert.deepEqual(result.map(({ id }) => id), ["team-monday", "department-tuesday", "team-wednesday", "department-thursday", "team-friday"]);
+  assert.deepEqual(result.map(({ id }) => id), ["team-monday", "department-tuesday", "team-wednesday", "department-thursday", "team-friday", "later"]);
 });
 
 test("a nearer Bambini occurrence is never displaced by later E1 recurrences", () => {

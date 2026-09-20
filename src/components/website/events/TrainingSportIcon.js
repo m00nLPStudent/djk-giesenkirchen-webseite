@@ -13,7 +13,7 @@ export default function TrainingSportIcon({ event }) {
   const assetPath = SPORT_ICON_ASSETS[resolveTrainingSport(event)];
 
   if (!assetPath) {
-    return <CalendarDays aria-hidden="true" size={32} className="h-8 w-8 text-white/75" />;
+    return <CalendarDays aria-hidden="true" size={28} className="h-7 w-7 text-white/75" />;
   }
 
   return (
@@ -21,10 +21,10 @@ export default function TrainingSportIcon({ event }) {
       src={assetPath}
       alt=""
       aria-hidden="true"
-      width={48}
-      height={48}
-      sizes="48px"
-      className="h-12 w-12 object-contain drop-shadow-[0_3px_4px_rgba(0,0,0,0.42)]"
+      width={40}
+      height={40}
+      sizes="40px"
+      className="h-10 w-10 object-contain drop-shadow-[0_3px_4px_rgba(0,0,0,0.42)]"
     />
   );
 }

@@ -16,23 +16,25 @@ export default function HomeEventsSection({ events = [], compact = false }) {
         {events.length === 0 ? (
           <p className="mt-6 rounded-2xl border border-dashed border-white/15 bg-white/[0.04] p-5 text-sm leading-6 text-white/55">Aktuell sind keine kommenden Trainingstermine hinterlegt.</p>
         ) : (
-          <div className="mt-5 space-y-2.5">
+          <div className="mt-5 space-y-2">
             {events.map((event) => (
               <Link
                 key={event.occurrence_id || `${event.id}-${event.starts_at}`}
                 href={event.source_type === "department_training" && event.department_href ? event.department_href : `/termine/training/${event.occurrence_id}`}
-                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-white/[0.07] bg-[#1d1d24] p-3.5 transition hover:border-red-400/35 hover:bg-red-600/10 focus-visible:outline-2 focus-visible:outline-red-500"
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 rounded-2xl border border-white/[0.07] bg-[#1d1d24] px-3 py-2.5 transition hover:border-red-400/35 hover:bg-red-600/10 focus-visible:outline-2 focus-visible:outline-red-500 sm:gap-3"
               >
-                <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/12 bg-[#111117]/85 text-white/90 shadow-[0_5px_14px_rgba(0,0,0,0.24)]" aria-hidden="true">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/12 bg-[#111117]/85 text-white/90 shadow-[0_5px_14px_rgba(0,0,0,0.24)] sm:h-12 sm:w-12" aria-hidden="true">
                   <TrainingSportIcon event={event} />
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate font-black leading-snug">{event.team_name_de || event.title_de}</span>
-                  <span className="mt-1 block text-xs text-white/50">{formatEventDateWithWeekday(event.starts_at)}</span>
+                  <span className="block break-words text-sm font-black leading-snug sm:text-base">{event.team_name_de || event.title_de}</span>
+                  <span className="mt-0.5 block text-xs leading-4 text-white/50">{formatEventDateWithWeekday(event.starts_at)}</span>
                 </span>
-                <span className="min-w-20 text-right">
+                <span className="min-w-[4.5rem] text-right">
                   <span className="block text-sm font-black text-white">{formatEventTime(event.starts_at, { isAllDay: event.is_all_day })}</span>
-                  <span className="mt-1 block max-w-28 text-xs leading-4 text-white/40">{[getTrainingLocationTypeLabel(event.training_location_type), event.location_name, event.location_city].filter(Boolean).join(" · ") || "Ort offen"}</span>
+                  {getTrainingLocationTypeLabel(event.training_location_type) && (
+                    <span className="mt-0.5 block text-xs leading-4 text-white/45">{getTrainingLocationTypeLabel(event.training_location_type)}</span>
+                  )}
                 </span>
               </Link>
             ))}

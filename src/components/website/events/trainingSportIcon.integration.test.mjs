@@ -20,9 +20,9 @@ test("known sports render next image while only unknown sports use the neutral f
   assert.match(source, /import Image from "next\/image"/);
   assert.match(source, /if \(!assetPath\)/);
   assert.match(source, /return <CalendarDays/);
-  assert.match(source, /width=\{48\}/);
-  assert.match(source, /height=\{48\}/);
-  assert.match(source, /sizes="48px"/);
+  assert.match(source, /width=\{40\}/);
+  assert.match(source, /height=\{40\}/);
+  assert.match(source, /sizes="40px"/);
   assert.match(source, /alt=""/);
   assert.match(source, /aria-hidden="true"/);
 });
@@ -34,9 +34,9 @@ test("legacy sport svg render paths are fully removed", () => {
   assert.doesNotMatch(source, /<svg\b/);
 });
 
-test("training assets dominate the enlarged neutral container", () => {
+test("training assets remain clear inside the compact neutral container", () => {
   assert.match(rowSource, /bg-\[#111117\]\/85/);
-  assert.match(rowSource, /h-14 w-14/);
-  assert.match(source, /h-12 w-12 object-contain/);
+  assert.match(rowSource, /h-11 w-11/);
+  assert.match(source, /h-10 w-10 object-contain/);
   assert.doesNotMatch(rowSource, /bg-red-600\/15/);
 });
