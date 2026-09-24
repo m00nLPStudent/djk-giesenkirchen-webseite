@@ -1,11 +1,13 @@
 import { FaEnvelope, FaWhatsapp } from "react-icons/fa";
 import { resolveCoachImageUrl } from "@/lib/people/imageUrl";
 import { getTeamCoachNameLines } from "./teamCoachCard.core.mjs";
+import { getPublicCoachLicense } from "@/components/website/coach/coachPublic.core.mjs";
 
 export default function TeamCoachCard({ coach }) {
   const imageUrl = resolveCoachImageUrl(coach, null);
   const roleLabel = coach.teamRoleDisplayLabel || "Rolle offen";
   const nameLines = getTeamCoachNameLines(coach);
+  const license = getPublicCoachLicense(coach.license);
 
   return (
     <article className="flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 transition hover:border-red-500/40">
@@ -35,8 +37,8 @@ export default function TeamCoachCard({ coach }) {
             {roleLabel}
           </p>
 
-          {coach.license && (
-            <p className="mt-2 text-sm text-white/60">{coach.license}</p>
+          {license && (
+            <p className="mt-2 text-sm text-white/60">{license}</p>
           )}
         </div>
       </div>

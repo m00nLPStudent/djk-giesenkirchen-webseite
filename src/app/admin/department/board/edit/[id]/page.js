@@ -12,6 +12,8 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import { canDeleteBoardMemberOnServer, canEditBoardMemberOnServer, canManageAllBoardMembersOnServer, loadServerPersonScopeContext } from "@/components/admin/persons/serverPersonScope";
 import { loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 import { getBoardOrganizationLabel } from "@/components/admin/board/boardOrganizationScope.core.mjs";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { loadBoardResponsibilityConfigurations } from "@/components/admin/board/services/boardResponsibilities.repository";
 
 export const dynamic = "force-dynamic";
 const TT_ROLE_SLUGS = ["erster-vorsitzender", "zweiter-vorsitzender", "erster-geschaeftsfuehrer", "zweiter-geschaeftsfuehrer", "kassenwart", "stellvertretender-kassenwart"];
@@ -25,6 +27,8 @@ export default async function EditBoardMemberPage({ params, searchParams, requir
   const { data: member } = await auth.supabaseServer.from("board_members").select("*").eq("id", id).maybeSingle();
   if (!member || !canEditBoardMemberOnServer(scopeContext, member)) redirect("/admin/unauthorized?reason=missing-board-scope");
   const canManageAllBoardMembers = canManageAllBoardMembersOnServer(scopeContext);
+  const editAuth = await assertAdminActionPermission({ requiredPermission: "board.edit" });
+  const canManageResponsibilities = editAuth.ok;
   const isClub = requiredOrganizationScope === "club";
   const requestedSlug = ["fussball", "tischtennis"].includes(requiredDepartmentSlug)
     ? requiredDepartmentSlug
@@ -46,6 +50,13 @@ export default async function EditBoardMemberPage({ params, searchParams, requir
   else if (requestedSlug === "fussball") rolesQuery = rolesQuery.or(`department_id.is.null,department_id.eq.${requestedDepartment.id}`);
   else if (isClub) rolesQuery = rolesQuery.is("department_id", null);
   const { data: roles } = await rolesQuery;
+  const responsibilityClient = createSupabaseAdminClient();
+  const responsibilityScope = canManageAllBoardMembers
+    ? null
+    : { organization_scope: "department", department_id: scopeContext.managedDepartmentId };
+  const { data: responsibilityConfigurations } = responsibilityClient && canManageResponsibilities
+    ? await loadBoardResponsibilityConfigurations(responsibilityClient, responsibilityScope)
+    : { data: [] };
   const canDelete = canDeleteBoardMemberOnServer(scopeContext);
   const mediaResult = await loadMediaAssetForPicker(member.image_media_asset_id);
   const name = getBoardMemberName(member);
@@ -58,5 +69,5 @@ export default async function EditBoardMemberPage({ params, searchParams, requir
   );
   const dangerZone = canDelete ? <Can permission="board.delete" uiOnly><AdminDangerZone title="Vorstandsmitglied dauerhaft löschen" description="Das Vorstandsprofil wird mit der bestehenden Löschfunktion dauerhaft entfernt."><BoardMemberDeleteButton member={{ id: member.id, first_name: member.first_name, last_name: member.last_name }} /></AdminDangerZone></Can> : null;
   const header = <AdminDetailHeader backHref={returnPath} backLabel="Zurück zu Vorstand & Abteilungen" backVariant="pill" eyebrow={label} title={name} leading={<BoardMemberAvatar member={{ ...member, image_url: mediaResult.data?.previewUrl || member.image_url }} sizeClassName="h-20 w-20" />} status={<BoardMemberStatus member={member} />} meta={`${member.role_de || "Keine Funktion"} · ${label}`} actions={<AdminActionBar><AdminButton href="#board-member-editor" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />;
-  return <AdminLayout title="Vorstandsmitglied bearbeiten" subtitle={label} showHeader={false}><AdminDetailLayout header={header} dangerZone={dangerZone}><BoardMemberDetailOverview member={member} departmentLabel={label} /><AdminBoardMemberForm member={member} roles={roles || []} departments={departments || []} canManageOrganizationScope={canManageAllBoardMembers && !requestedSlug && !isClub} canManageStructuralFields={canManageAllBoardMembers} canManageUnassigned={scopeContext.isGlobal} initialMedia={mediaResult.data || null} returnPath={returnPath} departmentSlug={requestedSlug} organizationScope={isClub ? "club" : null} departmentLabel={label} /></AdminDetailLayout></AdminLayout>;
+  return <AdminLayout title="Vorstandsmitglied bearbeiten" subtitle={label} showHeader={false}><AdminDetailLayout header={header} dangerZone={dangerZone}><BoardMemberDetailOverview member={member} departmentLabel={label} /><AdminBoardMemberForm member={member} roles={roles || []} departments={departments || []} responsibilityConfigurations={responsibilityConfigurations || []} canManageResponsibilities={canManageResponsibilities} canManageOrganizationScope={canManageAllBoardMembers && !requestedSlug && !isClub} canManageStructuralFields={canManageAllBoardMembers} canManageUnassigned={scopeContext.isGlobal} initialMedia={mediaResult.data || null} returnPath={returnPath} departmentSlug={requestedSlug} organizationScope={isClub ? "club" : null} departmentLabel={label} /></AdminDetailLayout></AdminLayout>;
 }

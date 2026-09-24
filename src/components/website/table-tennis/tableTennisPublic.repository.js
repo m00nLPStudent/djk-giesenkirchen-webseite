@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { loadCompetitionConfigs } from "@/lib/table-tennis/competition.repository";
 import { loadCompetitionFromConfig } from "@/lib/table-tennis/competition.service";
+import { attachPublicBoardResponsibilities } from "@/components/website/board/boardResponsibilities.repository";
 import {
   TABLE_TENNIS_DEPARTMENT_SLUG,
   applyPublicMediaUrl,
@@ -108,7 +109,9 @@ export async function loadPublicTableTennisBoard({ db = supabase, mediaLoader = 
   if (department.error) return closed(department.error, true);
   const result = await db.from("board_members").select("*, board_roles(name_de)").eq("organization_scope", "department").eq("department_id", department.data.id).eq("is_active", true).order("sort_order", { ascending: true });
   if (result.error) return closed(result.error, true);
-  const board = selectPublicTableTennisBoard(result.data || [], department.data.id);
+  const withResponsibilities = await attachPublicBoardResponsibilities(db, result.data || []);
+  if (withResponsibilities.error) return closed(withResponsibilities.error, true);
+  const board = selectPublicTableTennisBoard(withResponsibilities.data, department.data.id);
   const mediaResult = await mediaLoader(board.map((member) => member.imageMediaAssetId));
   const mediaUrls = publicMediaUrlsOrEmpty(mediaResult);
   return { data: board.map((member) => applyPublicMediaUrl(member, mediaUrls)), error: null };

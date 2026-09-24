@@ -137,6 +137,7 @@ export function selectPublicTableTennisBoard(members = [], departmentId) {
       phone: member.phone || null,
       imageMediaAssetId: member.image_media_asset_id || null,
       legacyImageUrl: member.image_url || null,
+      responsibilities: Array.isArray(member.responsibilities) ? member.responsibilities : [],
       sortOrder: member.sort_order ?? null,
     }))
     .sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER) || a.name.localeCompare(b.name, "de"));

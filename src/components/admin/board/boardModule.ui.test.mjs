@@ -60,6 +60,14 @@ test("board writes carry the explicit organization scope through the authorized 
   assert.match(actions, /\.eq\("is_active", true\)/);
 });
 
+test("role responsibilities stay separate from the person and use the authorized server path", () => {
+  assert.match(form, /responsibilityConfigurations/);
+  assert.match(form, /responsibilitiesFor/);
+  assert.match(form, /Aufgaben \/ Zust/);
+  assert.match(actions, /persistBoardResponsibilities/);
+  assert.match(actions, /requiredPermission: "board\.edit"/);
+});
+
 test("public football board requires department scope and the football department", () => {
   assert.match(publicFootballBoard, /\.eq\("organization_scope", "department"\)[\s\S]*\.eq\("department_id", footballDepartment\.id\)/);
 });

@@ -4,6 +4,8 @@ import TeamImagePlaceholder from "@/components/website/team/TeamImagePlaceholder
 import { COACH_PLACEHOLDER_IMAGE } from "@/constants/images";
 import { getPhoneHref } from "@/lib/phone";
 import { buildPublicTableTennisTeamHref } from "./tableTennisPublic.core.mjs";
+import { getPublicCoachLicense } from "@/components/website/coach/coachPublic.core.mjs";
+import BoardResponsibilitiesList from "@/components/website/board/BoardResponsibilitiesList";
 
 const weekdayLabels = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
 
@@ -63,14 +65,16 @@ export function TableTennisTrainingList({ entries = [], showTeam = false }) {
 
 export function TableTennisPersonCard({ person, kind = "Person" }) {
   const phoneHref = getPhoneHref(person.phone || person.whatsapp || "");
+  const license = getPublicCoachLicense(person.license);
   return (
-    <article className="min-w-0 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+    <article className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5">
       <img src={person.imageUrl || COACH_PLACEHOLDER_IMAGE} alt={person.name} className="h-56 w-full object-cover md:h-72" />
-      <div className="p-5 sm:p-6">
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
         <p className="text-xs font-black uppercase tracking-[0.22em] text-red-400">{person.role || kind}</p>
         <h3 className="mt-3 break-words text-2xl font-black">{person.name}</h3>
-        {person.license && <p className="mt-2 text-sm text-white/55">Lizenz: {person.license}</p>}
-        {(phoneHref || person.email) && <div className="mt-5 flex gap-3">
+        {license && <p className="mt-2 text-sm text-white/55">Lizenz: {license}</p>}
+        <BoardResponsibilitiesList responsibilities={person.responsibilities} personName={person.name} roleLabel={person.role || kind} />
+        {(phoneHref || person.email) && <div className="mt-auto flex gap-3 pt-5">
           {phoneHref && <a href={phoneHref} aria-label={`${person.name} anrufen`} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/70 hover:border-red-500"><Phone size={18} /></a>}
           {person.email && <a href={`mailto:${person.email}`} aria-label={`${person.name} eine E-Mail schreiben`} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 text-white/70 hover:border-red-500"><Mail size={18} /></a>}
         </div>}

@@ -1,6 +1,27 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { sortPublicCoachesByPrimaryTeam } from "./coachPublic.core.mjs";
+import { getPublicCoachLicense, sortPublicCoachesByPrimaryTeam } from "./coachPublic.core.mjs";
+
+test("real coach licenses remain visible without changing their label", () => {
+  assert.equal(getPublicCoachLicense("Kindertrainer-Zertifikat"), "Kindertrainer-Zertifikat");
+  assert.equal(getPublicCoachLicense("Trainer C – Breitensport"), "Trainer C – Breitensport");
+});
+
+test("the stored no-license sentinel produces no public label", () => {
+  assert.equal(getPublicCoachLicense("Keine Lizenz"), null);
+  assert.equal(getPublicCoachLicense("  keine lizenz  "), null);
+});
+
+test("missing licenses produce no alternative public placeholder", () => {
+  assert.equal(getPublicCoachLicense(null), null);
+  assert.equal(getPublicCoachLicense(undefined), null);
+  assert.equal(getPublicCoachLicense(""), null);
+  assert.equal(getPublicCoachLicense("   "), null);
+});
+
+test("existing composite license text remains intact", () => {
+  assert.equal(getPublicCoachLicense("C-Lizenz, Torwart-Zertifikat"), "C-Lizenz, Torwart-Zertifikat");
+});
 
 function coach(id, options = {}) {
   const assignments = options.assignments || [];

@@ -8,6 +8,7 @@ export function selectPublicClubBoard(members = []) {
       name: text(`${member.first_name || ""} ${member.last_name || ""}`) || "Name nicht hinterlegt",
       role: member.board_roles?.name_de || member.role_de || "Vorstandsmitglied",
       imageMediaAssetId: member.image_media_asset_id || null,
+      responsibilities: Array.isArray(member.responsibilities) ? member.responsibilities : [],
       sortOrder: member.sort_order ?? null,
     }))
     .sort((left, right) =>
@@ -21,5 +22,6 @@ export function createPublicClubBoardDto(member, mediaUrls = new Map(), placehol
     name: member.name,
     role: member.role,
     imageUrl: (member.imageMediaAssetId && mediaUrls.get(member.imageMediaAssetId)) || placeholder,
+    responsibilities: member.responsibilities,
   };
 }

@@ -4,6 +4,8 @@ import { AdminBoardMemberForm } from "@/components/admin/board";
 import { AdminDetailHeader, AdminDetailLayout, AdminStatusChip } from "@/components/admin/design-system";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canCreateBoardMemberOnServer, canManageAllBoardMembersOnServer, loadServerPersonScopeContext } from "@/components/admin/persons/serverPersonScope";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import { loadBoardResponsibilityConfigurations } from "@/components/admin/board/services/boardResponsibilities.repository";
 
 export const dynamic = "force-dynamic";
 const TT_ROLE_SLUGS = ["erster-vorsitzender", "zweiter-vorsitzender", "erster-geschaeftsfuehrer", "zweiter-geschaeftsfuehrer", "kassenwart", "stellvertretender-kassenwart"];
@@ -15,6 +17,8 @@ export default async function NewBoardMemberPage({ searchParams, requiredDepartm
   const scopeContext = await loadServerPersonScopeContext(auth);
   if (!canCreateBoardMemberOnServer(scopeContext)) redirect("/admin/unauthorized?reason=missing-board-scope");
   const canManageAllBoardMembers = canManageAllBoardMembersOnServer(scopeContext);
+  const editAuth = await assertAdminActionPermission({ requiredPermission: "board.edit" });
+  const canManageResponsibilities = editAuth.ok;
   const isClub = requiredOrganizationScope === "club";
   const requestedSlug = ["fussball", "tischtennis"].includes(requiredDepartmentSlug)
     ? requiredDepartmentSlug
@@ -33,10 +37,17 @@ export default async function NewBoardMemberPage({ searchParams, requiredDepartm
   else if (requestedSlug === "fussball") rolesQuery = rolesQuery.or(`department_id.is.null,department_id.eq.${requestedDepartment.id}`);
   else if (isClub) rolesQuery = rolesQuery.is("department_id", null);
   const { data: roles } = await rolesQuery;
+  const responsibilityClient = createSupabaseAdminClient();
+  const responsibilityScope = canManageAllBoardMembers
+    ? null
+    : { organization_scope: "department", department_id: scopeContext.managedDepartmentId };
+  const { data: responsibilityConfigurations } = responsibilityClient && canManageResponsibilities
+    ? await loadBoardResponsibilityConfigurations(responsibilityClient, responsibilityScope)
+    : { data: [] };
   const label = isClub ? "Gesamtverein" : requestedDepartment?.name_de || "Nicht zugeordnet";
   const returnPath = isClub ? "/admin/club/board" : requestedSlug
     ? `/admin/${requestedSlug === "fussball" ? "football" : "table-tennis"}/board`
     : "/admin/department";
   const header = <AdminDetailHeader backHref={returnPath} backLabel="Zurück zum Vorstand" backVariant="pill" eyebrow={label} title="Neuer Eintrag" status={<AdminStatusChip compact>Entwurf</AdminStatusChip>} meta="Vorstandsmitglied und öffentliche Kontaktdaten anlegen." />;
-  return <AdminLayout title="Neues Vorstandsmitglied" subtitle={label} showHeader={false}><AdminDetailLayout header={header}><AdminBoardMemberForm member={{ department_id: departmentId, organization_scope: organizationScope }} roles={roles || []} departments={departments || []} canManageOrganizationScope={canManageAllBoardMembers && !requestedSlug && !isClub} canManageUnassigned={scopeContext.isGlobal} returnPath={returnPath} departmentSlug={requestedSlug} organizationScope={isClub ? "club" : null} departmentLabel={label} /></AdminDetailLayout></AdminLayout>;
+  return <AdminLayout title="Neues Vorstandsmitglied" subtitle={label} showHeader={false}><AdminDetailLayout header={header}><AdminBoardMemberForm member={{ department_id: departmentId, organization_scope: organizationScope }} roles={roles || []} departments={departments || []} responsibilityConfigurations={responsibilityConfigurations || []} canManageResponsibilities={canManageResponsibilities} canManageOrganizationScope={canManageAllBoardMembers && !requestedSlug && !isClub} canManageUnassigned={scopeContext.isGlobal} returnPath={returnPath} departmentSlug={requestedSlug} organizationScope={isClub ? "club" : null} departmentLabel={label} /></AdminDetailLayout></AdminLayout>;
 }

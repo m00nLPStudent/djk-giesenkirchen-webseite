@@ -16,6 +16,11 @@ import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPu
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { resolveBoardOrganizationTarget } from "@/components/admin/board/boardOrganizationScope.core.mjs";
 import { buildOwnBoardCardPayload } from "@/components/admin/board/boardRoleContract.core.mjs";
+import {
+  normalizeBoardResponsibilities,
+  normalizeBoardResponsibilityTarget,
+} from "@/components/admin/board/boardResponsibilities.core.mjs";
+import { persistBoardResponsibilities } from "@/components/admin/board/services/boardResponsibilities.repository";
 
 const SAFE_MEDIA_ERRORS = new Set(["Keine Datei ausgewÃ¤hlt.", "Dateityp ist nicht erlaubt.", "Datei ist zu groÃŸ.", "Dateiinhalt passt nicht zum Dateityp."]);
 
@@ -74,6 +79,8 @@ export async function saveBoardMemberWithScopeAction(
   boardMemberId = null,
   mutationContext = {},
 ) {
+  const includesResponsibilities = Object.prototype.hasOwnProperty.call(memberPayload || {}, "responsibilities");
+  const requestedResponsibilities = memberPayload?.responsibilities;
   const permissionResult = await assertAdminActionPermission({
     requiredPermission: boardMemberId ? "board.edit" : "board.create",
   });
@@ -103,6 +110,16 @@ export async function saveBoardMemberWithScopeAction(
   const routeOrganizationScope = mutationContext?.organizationScope === "club" ? "club" : null;
   if (routeOrganizationScope && mutationContext?.departmentSlug) {
     return buildError("Der Organisationsbereich ist ungültig.");
+  }
+
+  // Responsibilities are a role configuration, not a personal profile field.
+  // Their mutation therefore always requires the explicit edit permission,
+  // including while a new board member is being created.
+  if (includesResponsibilities && !boardMemberId) {
+    const responsibilityPermission = await assertAdminActionPermission({ requiredPermission: "board.edit" });
+    if (!responsibilityPermission.ok) {
+      return buildError(responsibilityPermission.message || "Berechtigung zum Bearbeiten der Aufgaben fehlt.");
+    }
   }
   if (routeOrganizationScope && existingMember
     && (existingMember.organization_scope !== "club" || existingMember.department_id)) {
@@ -148,6 +165,24 @@ export async function saveBoardMemberWithScopeAction(
   memberPayload = { ...memberPayload, ...organizationTarget.data };
   const roleValidationError = await validateBoardRoleDepartment(supabaseServer, memberPayload?.role_id, memberPayload.department_id);
   if (roleValidationError) return buildError(roleValidationError);
+  const normalizedResponsibilities = normalizeBoardResponsibilities(includesResponsibilities ? requestedResponsibilities : []);
+  if (!normalizedResponsibilities.ok) return buildError(normalizedResponsibilities.message);
+  const hasResponsibilityTarget = includesResponsibilities && ["club", "department"].includes(memberPayload.organization_scope);
+  const responsibilityTarget = hasResponsibilityTarget
+    ? normalizeBoardResponsibilityTarget(memberPayload)
+    : null;
+  if (responsibilityTarget && !responsibilityTarget.ok) return buildError(responsibilityTarget.message);
+  if (!hasResponsibilityTarget && normalizedResponsibilities.data.length) {
+    return buildError("Aufgaben ben\u00f6tigen einen zugeordneten Organisationsbereich.");
+  }
+  if (responsibilityTarget) {
+    const canManageResponsibilityScope = canManageAllBoardMembers
+      || (responsibilityTarget.data.organization_scope === "department"
+        && responsibilityTarget.data.department_id === scopeContext.managedDepartmentId);
+    if (!canManageResponsibilityScope) {
+      return buildError("Du darfst die Aufgaben dieses Organisationsbereichs nicht bearbeiten.");
+    }
+  }
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
   const mediaResult = await resolveEntityImageMedia(memberPayload?.image_media_asset_id || null, { allowArchived: Boolean(existingMember?.image_media_asset_id === memberPayload?.image_media_asset_id), allowedVisibilities });
   if (mediaResult.error) return buildError(mediaResult.error.message);
@@ -159,6 +194,16 @@ export async function saveBoardMemberWithScopeAction(
 
   if (error) {
     return buildError(error.message || "Fehler beim Speichern.");
+  }
+  if (responsibilityTarget) {
+    const responsibilitiesResult = await persistBoardResponsibilities(
+      writeClient,
+      responsibilityTarget.data,
+      normalizedResponsibilities.data,
+    );
+    if (responsibilitiesResult.error) {
+      return buildError("Die Aufgaben und Zust\u00e4ndigkeiten konnten nicht gespeichert werden.");
+    }
   }
   const usageResult = await synchronizeMediaAssignment("board_member", data.id, mediaResult.data?.id || null);
   if (usageResult.error) return buildError("Die Vorstandsbild-Verwendung konnte nicht gespeichert werden.");

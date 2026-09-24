@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-24
+
+### Version 1.0.6 – Vorstandsaufgaben und optimierte Lizenzanzeige
+
+- Public License Visibility: Der gespeicherte Wert `Keine Lizenz` wird auf öffentlichen Trainer-, Mannschafts- und Tischtennisseiten nicht mehr gerendert; echte Lizenzen bleiben unverändert sichtbar.
+- Board Responsibilities: Vorstandsfunktionen können scope- und rollenbezogene Aufgaben über `organization_scope`, `department_id` und `role_id` erhalten, unabhängig von der jeweils zugeordneten Person.
+- Die Dashboard-Bearbeitung und öffentliche Darstellung unterstützen Gesamtverein, Fußball und Tischtennis. Vorhandene Aufgaben öffnen sich über den kompakten Dialog `Aufgaben & Zuständigkeiten`; ohne Aufgaben erscheint kein Trigger.
+- Mutationen sind serverseitig durch `board.edit`, Organisationsscope und Abteilungszuordnung abgesichert.
+- Die neue Struktur `board_role_responsibilities` wurde über das abgeschlossene Preflight-/Proposal-/Rollback-/Postcheck-Verfahren eingeführt und verifiziert.
+
 ## 2026-09-20
 
 ### Version 1.0.5 – Dashboard-Terminverwaltung: bestehende Termine löschen

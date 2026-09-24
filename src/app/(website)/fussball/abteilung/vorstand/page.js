@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
 import { resolveLoadedPublicMediaImage } from "@/lib/people/publicMediaImage.mjs";
 import { COACH_PLACEHOLDER_IMAGE as BOARD_PLACEHOLDER_IMAGE } from "@/constants/images";
+import { attachPublicBoardResponsibilities } from "@/components/website/board/boardResponsibilities.repository";
 
 export const dynamic = "force-dynamic";
 
@@ -24,13 +25,15 @@ export default async function DepartmentBoardPage() {
   if (footballDepartment?.id) {
     const result = await supabase
       .from("board_members")
-      .select("id, first_name, last_name, role_de, role_en, phone, email, image_url, image_media_asset_id, is_active, sort_order, organization_scope, department_id, board_roles(name_de, name_en)")
+      .select("id, role_id, first_name, last_name, role_de, role_en, phone, email, image_url, image_media_asset_id, is_active, sort_order, organization_scope, department_id, board_roles(name_de, name_en)")
       .eq("organization_scope", "department")
       .eq("department_id", footballDepartment.id)
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
     if (result.error) throw new Error(`Football board query failed: ${result.error.message}`);
-    boardMembers = result.data || [];
+    const responsibilityResult = await attachPublicBoardResponsibilities(supabase, result.data || []);
+    if (responsibilityResult.error) throw new Error(`Football board responsibilities query failed: ${responsibilityResult.error.message}`);
+    boardMembers = responsibilityResult.data;
   }
 
   const mediaResult = await loadPublicMediaUrlMap((boardMembers || []).map((member) => member.image_media_asset_id));

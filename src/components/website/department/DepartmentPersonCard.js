@@ -2,6 +2,7 @@ import { Mail, Phone } from "lucide-react";
 import { resolveCoachImageUrl } from "@/lib/people/imageUrl";
 import { getPhoneHref } from "@/lib/phone";
 import { getDepartmentPersonDisplayName } from "./department.helpers";
+import BoardResponsibilitiesList from "@/components/website/board/BoardResponsibilitiesList";
 
 const fallbackImage =
   "https://dbiwxylqbkxpkwkfcjut.supabase.co/storage/v1/object/public/media/players/Blanko.png";
@@ -19,7 +20,7 @@ export default function DepartmentPersonCard({ person, meta, imageBadge }) {
     "Team";
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+    <article className="flex h-full overflow-hidden rounded-3xl border border-white/10 bg-white/5">
       <div className="relative flex h-56 items-center justify-center bg-black/20 md:h-72">
         <img
           src={imageUrl}
@@ -33,14 +34,15 @@ export default function DepartmentPersonCard({ person, meta, imageBadge }) {
         )}
       </div>
 
-      <div className="p-6">
+      <div className="flex flex-1 flex-col p-6">
         <p className="text-xs font-black uppercase tracking-[0.25em] text-red-400">
           {roleLabel}
         </p>
         <h3 className="mt-3 text-2xl font-black">{fullName}</h3>
         {meta && <p className="mt-2 text-sm font-bold text-white/45">{meta}</p>}
+        <BoardResponsibilitiesList responsibilities={person.responsibilities} personName={fullName} roleLabel={roleLabel} />
 
-        <div className="mt-6 flex gap-3">
+        <div className="mt-auto flex gap-3 pt-6">
           {phoneHref && (
             <a
               href={phoneHref}

@@ -11,6 +11,7 @@ import {
 import { loadPublicCoachBySlug } from "@/components/website/coach/coachPublic.repository";
 import ProfileDetailsCard from "@/components/website/profile/ProfileDetailsCard";
 import { supabase } from "@/lib/supabase";
+import { getPublicCoachLicense } from "@/components/website/coach/coachPublic.core.mjs";
 
 export default async function CoachProfilePage({ params }) {
   const { slug } = await params;
@@ -25,6 +26,7 @@ export default async function CoachProfilePage({ params }) {
   const team = getTeam(coach);
   const contact = getCoachContact(coach);
   const roleLabel = coach.roleLabels.join(", ") || coach.primaryRoleLabel;
+  const license = getPublicCoachLicense(coach.license);
   const teamName =
     coach.teamNames.length > 1
       ? coach.teamNames.join(", ")
@@ -39,7 +41,7 @@ export default async function CoachProfilePage({ params }) {
       value: teamName,
       href: teamHref,
     },
-    { label: "Lizenz", value: coach.license, type: "license" },
+    ...(license ? [{ label: "Lizenz", value: license, type: "license" }] : []),
     {
       label: "E-Mail",
       value: coach.email,

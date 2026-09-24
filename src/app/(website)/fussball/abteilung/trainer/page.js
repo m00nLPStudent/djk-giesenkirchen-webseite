@@ -6,6 +6,7 @@ import {
 } from "@/components/website/department";
 import { loadActivePublicCoachDtos } from "@/components/website/coach/coachPublic.repository";
 import { supabase } from "@/lib/supabase";
+import { getPublicCoachLicense } from "@/components/website/coach/coachPublic.core.mjs";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,7 @@ export default async function DepartmentCoachesPage() {
             key={coach.id}
             person={coach}
             imageBadge={getCoachTeamName(coach)}
-            meta={coach.license}
+            meta={getPublicCoachLicense(coach.license)}
           />
         ))}
       </DepartmentPersonGrid>

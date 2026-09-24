@@ -25,7 +25,7 @@ test("public club board follows sort_order and maps only the minimal public DTO"
   assert.deepEqual(members.map((member) => member.name), ["Anna Club", "Clara Club"]);
 
   const dto = createPublicClubBoardDto({ ...members[0], imageMediaAssetId: "asset" }, new Map(), "/placeholder.png");
-  assert.deepEqual(dto, { name: "Anna Club", role: "Kassenwartin", imageUrl: "/placeholder.png" });
+  assert.deepEqual(dto, { name: "Anna Club", role: "Kassenwartin", imageUrl: "/placeholder.png", responsibilities: [] });
   assert.equal("email" in dto, false);
   assert.equal("phone" in dto, false);
   assert.equal("organization_scope" in dto, false);

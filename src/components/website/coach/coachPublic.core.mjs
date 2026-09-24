@@ -11,6 +11,13 @@ function compareText(left, right) {
   return String(left || "").localeCompare(String(right || ""), "de");
 }
 
+export function getPublicCoachLicense(value) {
+  const license = String(value || "").trim();
+  return license && license.toLocaleLowerCase("de-DE") !== "keine lizenz"
+    ? license
+    : null;
+}
+
 export function sortPublicCoachesByPrimaryTeam(coaches = []) {
   return [...(coaches || [])].sort((left, right) => {
     const leftPrimary = left.primaryAssignment || null;
