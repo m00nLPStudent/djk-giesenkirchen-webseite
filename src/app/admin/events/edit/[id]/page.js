@@ -4,12 +4,14 @@ import { AdminEventsForm } from "@/components/admin/events";
 import EventDetailSummary from "@/components/admin/events/components/EventDetailSummary";
 import { createEventDto } from "@/components/admin/events/helpers/eventTypes.core";
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
-import { AdminActionBar, AdminButton, AdminDetailHeader, AdminDetailLayout, AdminStatusChip } from "@/components/admin/design-system";
+import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminDetailLayout, AdminStatusChip } from "@/components/admin/design-system";
 import { formatEventDate, formatEventTime, getEventStatusKey } from "@/lib/events";
 import { supabase } from "@/lib/supabase";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canManageMedia, loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
+import Can from "@/components/admin/auth/Can";
+import EventDeleteButton from "@/components/admin/events/components/EventDeleteButton";
 
 export default async function EditEventPage({ params }) {
   const { id } = await params;
@@ -32,5 +34,16 @@ export default async function EditEventPage({ params }) {
   const statusVariant = status === "entwurf" ? "default" : status === "geplant" ? "warning" : "success";
   const meta = `${formatEventDate(event.starts_at)} · ${formatEventTime(event.starts_at, { isAllDay: event.is_all_day })}`;
 
-  return <AdminLayout title="Termin bearbeiten" subtitle="Termine" showHeader={false}><AdminDetailLayout header={<AdminDetailHeader backHref="/admin/events" backLabel="Zurück zu Termine" backVariant="pill" eyebrow={eventDto.eventTypeLabel} title={event.title_de} status={<AdminStatusChip compact variant={statusVariant}>{statusLabel}</AdminStatusChip>} meta={meta} actions={<AdminActionBar><AdminButton href="#event-editor-form" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />}><EventDetailSummary event={eventDto} /><AdminEventsForm event={event} initialMedia={initialMedia} teams={teams || []} eventTypes={(eventTypes || []).filter((item) => item.is_active)} /></AdminDetailLayout></AdminLayout>;
+  const dangerZone = (
+    <Can permission="events.delete" uiOnly>
+      <AdminDangerZone
+        title="Termin löschen"
+        description="Der bestehende Termin wird dauerhaft entfernt. Zentrale Medien und Dateien bleiben erhalten."
+      >
+        <EventDeleteButton eventId={event.id} title={event.title_de} />
+      </AdminDangerZone>
+    </Can>
+  );
+
+  return <AdminLayout title="Termin bearbeiten" subtitle="Termine" showHeader={false}><AdminDetailLayout header={<AdminDetailHeader backHref="/admin/events" backLabel="Zurück zu Termine" backVariant="pill" eyebrow={eventDto.eventTypeLabel} title={event.title_de} status={<AdminStatusChip compact variant={statusVariant}>{statusLabel}</AdminStatusChip>} meta={meta} actions={<AdminActionBar><AdminButton href="#event-editor-form" variant="primary">Bearbeiten</AdminButton></AdminActionBar>} />} dangerZone={dangerZone}><EventDetailSummary event={eventDto} /><AdminEventsForm event={event} initialMedia={initialMedia} teams={teams || []} eventTypes={(eventTypes || []).filter((item) => item.is_active)} /></AdminDetailLayout></AdminLayout>;
 }

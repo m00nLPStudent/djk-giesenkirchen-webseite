@@ -1,8 +1,13 @@
 export const CURRENT_DASHBOARD_CHANGELOG = Object.freeze({
-  version: "1.0.4",
+  version: "1.0.5",
   releaseDate: "2026-09-20",
   title: "Neu im Dashboard",
   entries: Object.freeze([
+    Object.freeze({
+      title: "Termine direkt löschen",
+      description:
+        "Termine können jetzt direkt in der Terminverwaltung gelöscht werden. Eine Sicherheitsabfrage schützt vor versehentlichem Löschen.",
+    }),
     Object.freeze({
       title: "Jahrgänge der Junioren auf einen Blick",
       description:

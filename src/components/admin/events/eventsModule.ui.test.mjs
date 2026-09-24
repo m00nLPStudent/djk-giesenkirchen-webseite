@@ -38,9 +38,12 @@ test("team dates keep their existing team editor while club dates keep event edi
   assert.match(list, /events\.edit/);
 });
 
-test("club detail follows the shared detail header and has no header danger action", () => {
+test("club detail follows the shared detail layout and keeps deletion out of the header actions", () => {
   assert.match(editPage, /AdminDetailHeader/);
   assert.match(editPage, /AdminDetailLayout/);
   assert.match(editPage, /Bearbeiten/);
-  assert.doesNotMatch(editPage, /Löschen|Archivieren/);
+  assert.match(editPage, /dangerZone=\{dangerZone\}/);
+  assert.match(editPage, /permission="events\.delete"/);
+  const header = editPage.slice(editPage.indexOf("<AdminDetailHeader"), editPage.indexOf("dangerZone={dangerZone}"));
+  assert.doesNotMatch(header, /EventDeleteButton|AdminDangerZone/);
 });

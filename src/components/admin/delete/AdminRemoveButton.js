@@ -12,6 +12,10 @@ export default function AdminRemoveButton({
   hint = "",
   inlineError = false,
   successHref = null,
+  triggerLabel = "Löschen",
+  confirmLabel = "Bestätigen",
+  confirmationTitle = null,
+  confirmationDescription = null,
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -61,7 +65,7 @@ export default function AdminRemoveButton({
         disabled={busy}
         className="rounded-full border border-red-500/30 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
       >
-        {busy ? "Läuft..." : "Löschen"}
+        {busy ? "Läuft..." : triggerLabel}
       </button>
 
       {open && (
@@ -71,12 +75,12 @@ export default function AdminRemoveButton({
               Aktion bestätigen
             </p>
             <h2 className="mt-3 text-3xl font-black text-white">
-              {label} entfernen?
+              {confirmationTitle || `${label} entfernen?`}
             </h2>
             <p className="mt-5 text-base leading-7 text-white/65">
-              {name
+              {confirmationDescription || (name
                 ? `${name} wird aus dem Adminbereich entfernt.`
-                : "Dieser Eintrag wird entfernt."}
+                : "Dieser Eintrag wird entfernt.")}
             </p>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -139,7 +143,7 @@ export default function AdminRemoveButton({
                   disabled={busy}
                   className="rounded-full bg-red-600 px-5 py-3 text-sm font-black text-white disabled:opacity-50"
                 >
-                  {busy ? "Bitte warten..." : "Bestätigen"}
+                  {busy ? "Bitte warten..." : confirmLabel}
                 </button>
               ) : null}
             </div>

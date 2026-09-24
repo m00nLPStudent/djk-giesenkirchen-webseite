@@ -6,6 +6,35 @@ import { canManageMedia, loadMediaLibrary, loadMediaUrlMap, resolveEntityDocumen
 import { normalizePickerPurpose } from "@/components/admin/media-library/mediaPurpose.config.mjs";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { requiresPublishPermission } from "@/lib/admin-auth/publishPermission.core.mjs";
+import { revalidatePath } from "next/cache";
+import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+
+const eventActionError = (message) => ({ data: null, error: { message } });
+
+export async function deleteEventAction(eventId) {
+  const permission = await assertAdminActionPermission({ requiredPermission: "events.delete" });
+  if (!permission.ok) return eventActionError(permission.message || "Berechtigung fehlt.");
+
+  const db = createSupabaseAdminClient();
+  if (!db) return eventActionError("Termin-Service ist nicht konfiguriert.");
+
+  const existing = await db.from("events").select("id").eq("id", eventId).maybeSingle();
+  if (existing.error) {
+    console.error("[event-delete]", { stage: "load", code: existing.error.code || "EVENT_LOAD_FAILED" });
+    return eventActionError("Der Termin konnte nicht geprüft werden.");
+  }
+  if (!existing.data) return eventActionError("Termin nicht gefunden.");
+
+  const deleted = await db.from("events").delete().eq("id", eventId);
+  if (deleted.error) {
+    console.error("[event-delete]", { stage: "delete", code: deleted.error.code || "EVENT_DELETE_FAILED" });
+    return eventActionError("Der Termin konnte nicht gelöscht werden. Bitte versuche es erneut.");
+  }
+
+  revalidatePath("/admin/events");
+  await revalidatePublicContentAction("events");
+  return { data: { id: eventId }, error: null };
+}
 
 async function buildUniqueSlug(db, slug, ignoreId = null) {
   if (!slug) return null;

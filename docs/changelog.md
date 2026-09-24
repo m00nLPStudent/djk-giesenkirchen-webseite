@@ -2,6 +2,13 @@
 
 ## 2026-09-20
 
+### Version 1.0.5 – Dashboard-Terminverwaltung: bestehende Termine löschen
+
+- Bestehende Termine können in ihrer Bearbeitungsansicht nach einer ausdrücklichen Sicherheitsabfrage dauerhaft gelöscht werden.
+- Die Aktion ist in Oberfläche und Server Action durch `events.delete` geschützt; der Browser erhält keinen Service-Role-Zugriff.
+- Nach erfolgreichem Löschen werden Terminübersicht und öffentliche Terminansichten aktualisiert. Zugehörige Dokumentzeilen und Media-Usage-Verknüpfungen folgen dem bestehenden Datenbankvertrag; zentrale Medien und Dateien bleiben erhalten.
+- Die Funktion erscheint ausschließlich bei gespeicherten Terminen. Fehler verbleiben im Dialog und führen nicht auf eine tote Bearbeitungsroute.
+
 ### myTischtennis / click-TT – Spielplan-Korrektur
 
 - UTC-/Offset-Zeitstempel aus click-TT werden mit `Europe/Berlin` korrekt in deutsche Ortszeit umgerechnet; Sommer- und Winterzeit folgen den Zeitzonenregeln ohne hartcodierten Stunden-Offset.
