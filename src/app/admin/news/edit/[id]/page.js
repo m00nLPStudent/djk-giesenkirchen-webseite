@@ -5,27 +5,28 @@ import DeleteNewsButton from "@/components/admin/ui/DeleteNewsButton";
 import NewsDetailSummary from "@/components/admin/news/components/NewsDetailSummary";
 import NewsStatusBadge from "@/components/admin/news/components/NewsStatusBadge";
 import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminDetailLayout } from "@/components/admin/design-system";
-import { supabase } from "@/lib/supabase";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canManageMedia, loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
+import { redirect } from "next/navigation";
 
 export default async function EditNewsPage({ params }) {
   const { id } = await params;
   const auth = await assertAdminActionPermission({ requiredPermission: "news.edit" });
+  if (!auth.ok) redirect(`/admin/unauthorized?reason=${auth.reason}`);
 
-  const { data: news } = await supabase
+  const { data: news } = await auth.supabaseServer
     .from("news")
     .select("*, news_documents(*)")
     .eq("id", id)
     .single();
 
-  const { data: teams } = await supabase
+  const { data: teams } = await auth.supabaseServer
     .from("teams")
     .select("id, name_de, slug, is_active, sort_order")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
-  const [{ data: categories }, { data: allCategories }] = auth.ok ? await Promise.all([loadNewsCategories(auth.supabaseServer), loadNewsCategories(auth.supabaseServer, { activeOnly: false })]) : [{ data: [] }, { data: [] }];
+  const [{ data: categories }, { data: allCategories }] = await Promise.all([loadNewsCategories(auth.supabaseServer), loadNewsCategories(auth.supabaseServer, { activeOnly: false })]);
   const media = await loadMediaAssetForPicker(news.image_media_asset_id);
   const allowedVisibilities = canManageMedia(auth.roles) ? ["public", "admin"] : ["public"];
   const initialMedia = allowedVisibilities.includes(media.data?.visibility) ? media.data : null;

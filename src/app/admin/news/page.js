@@ -1,8 +1,8 @@
 import AdminLayout from "@/components/admin/layout/AdminLayout";
 import { AdminNewsList } from "@/components/admin/news";
-import { supabase } from "@/lib/supabase";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +22,10 @@ function getNewsStatus(item) {
 
 export default async function AdminNewsPage() {
   const auth = await assertAdminActionPermission({ requiredPermission: "news.view" });
-  const { data: categories } = auth.ok ? await loadNewsCategories(auth.supabaseServer, { activeOnly: false }) : { data: [] };
-  const { data: news } = await supabase
+  if (!auth.ok) redirect(`/admin/unauthorized?reason=${auth.reason}`);
+
+  const { data: categories } = await loadNewsCategories(auth.supabaseServer, { activeOnly: false });
+  const { data: news } = await auth.supabaseServer
     .from("news")
     .select("*, football_team:football_team_id(name_de)")
     .order("created_at", { ascending: false });

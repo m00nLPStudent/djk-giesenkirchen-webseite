@@ -18,6 +18,15 @@ test("news query and existing status calculations remain unchanged", () => {
   for (const status of ["entwurf", "geplant", "veroeffentlicht"]) assert.ok(page.includes(status));
 });
 
+test("admin news reads use the permission-checked session client", () => {
+  for (const source of [page, editPage]) {
+    assert.match(source, /assertAdminActionPermission/);
+    assert.match(source, /auth\.supabaseServer/);
+    assert.doesNotMatch(source, /from "@\/lib\/supabase"/);
+    assert.match(source, /redirect\(`\/admin\/unauthorized\?reason=\$\{auth\.reason\}`\)/);
+  }
+});
+
 test("overview uses shared header search summary and collapsed filters", () => {
   for (const primitive of ["AdminModulePage", "AdminModuleHeader", "AdminModuleSearch", "NewsStats"]) assert.ok(overview.includes(primitive));
   assert.match(overview, /News erstellen, bearbeiten und veröffentlichen\./);
