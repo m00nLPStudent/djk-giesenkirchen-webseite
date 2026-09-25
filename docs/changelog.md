@@ -40,14 +40,16 @@
 - Validierung: fokussierte Tischtennistests 43/43, vollständige Testsuite 1363/1363, Changed-Scope ESLint ohne Fehler, Production Build und TypeScript bestanden, `git diff --check` bestanden sowie sieben Referenzspiele live read-only verifiziert.
 - Keine Änderungen an Datenbank, Supabase, SQL, Auth, Permissions oder der gespeicherten click-TT-Konfiguration.
 
-### Fußball-Juniorenübersicht – Jahrgänge
+### Version 1.0.4 – Saisonale Mannschaftsdaten und Tischtennis-Multi-Team
+
+#### Fußball-Juniorenübersicht – Jahrgänge
 
 - Auf der öffentlichen Fußball-Juniorenübersicht werden die Jahrgänge der aktuellen Mannschaftssaison angezeigt: ein einzelner Wert als `Jahrgang 2016`, mehrere Werte beispielsweise als `Jahrgänge 2014 · 2015`.
 - Die Daten werden über die aktuelle `team_season` aus `team_season_year_groups` geladen, dedupliziert und aufsteigend sortiert.
 - Mannschaften ohne hinterlegte Jahrgänge erhalten keine zusätzliche Zeile.
 - Senioren, Damen und andere Sportbereiche bleiben unverändert.
 
-### Tischtennis – Mehrfachzuordnung von Spielern
+#### Tischtennis – Mehrfachzuordnung von Spielern
 
 - Ein Tischtennisspieler kann in der aktuellen Saison keiner, einer oder mehreren Mannschaften zugeordnet werden; ein zentraler Player-Master bleibt dabei die gemeinsame Person.
 - Die Zuordnungen werden ohne Datenbankmigration über `player_team_seasons` verwaltet. Create unterstützt null, eine oder mehrere Zuordnungen; Edit lädt alle aktiven Zuordnungen.
@@ -56,7 +58,7 @@
 - Öffentliche Tischtenniskader zeigen denselben Player automatisch in allen zugeordneten Mannschaften.
 - Der manuelle Browsertest wurde erfolgreich abgeschlossen.
 
-### Wartung – Tischtennis-Player Simon Georgens und Dominik Neeten
+#### Wartung – Tischtennis-Player Simon Georgens und Dominik Neeten
 
 - Vier bisherige doppelte Tischtennis-Player-Master wurden in einem kontrollierten Verfahren vollständig entfernt, damit beide Personen anschließend jeweils einmal über die Multi-Team-Funktion neu angelegt werden können.
 - Dabei wurden vier alte `player_team_seasons` und vier alte `media_asset_usages` entfernt; Contributions und Notifications waren nicht betroffen.

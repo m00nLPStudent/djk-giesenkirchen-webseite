@@ -28,12 +28,11 @@ Die erste passende Regel gewinnt und erfasst damit jede SQL-Datei:
 
 Alle Proposal-/Postcheck-/Rollback-Familien von A bis I bleiben als nachvollziehbare Schema-, RLS-, Grant-, RPC- und Rollbackhistorie erhalten. Commit-Historie und Anwendungscode belegen die Implementierung; ob jede einzelne Proposal-Datei gegen die betrachtete Datenbank ausgeführt wurde, muss bei Bedarf mit ihrem Postcheck manuell bestätigt werden.
 
-## Noch offen oder manuell zu verifizieren
+## Abgeschlossene Membership-Rollouts und weiterhin manuell zu verifizierende Altartefakte
 
-- B15.21B3 Request-Type-Constraint: Preflight, Proposal und Postcheck manuell in dieser Reihenfolge ausführen; der Rollback bricht bei bereits gespeicherten neuen Typen ab.
+- B15.21B3 Request-Type-Constraint und B15.21C1 Rollen/Permissions sind produktiv abgeschlossen. Die jeweiligen Preflight-/Proposal-/Rollback-/Postcheck-Familien bleiben Rolloutnachweise und sind keine offenen Ausführungsaufträge.
 - Department-Zuordnungen erst nach manueller fachlicher Bestätigung; das B15.21B0-Template enthält bewusst keine geratenen Zuordnungen.
 - B15.21B3.1 inventarisiert aktive Teams ohne Abteilung read-only. Das separate D2-Proposal enthält ausschließlich die manuell bestätigten Testdaten-UUIDs und darf nur bewusst für diesen Browsertest ausgeführt werden.
-- B15.21C1-Rollen/Permissions: `b15-21c1-membership-responsibility-roles-preflight-readonly.sql`, Proposal und Postcheck manuell in dieser Reihenfolge ausführen. Der Rollback bricht ab, sobald eine neue C1-Rolle bereits Benutzern zugewiesen wurde.
 
 - B12-Dateien mit `noch-nicht-ausführen-` beziehungsweise `nach-Prüfung-ausführbar-`.
 - B13-Legacy-Removal und saisonale Cleanup-Dateien vor dem späteren Datenbank-/Saison-Cleanup.

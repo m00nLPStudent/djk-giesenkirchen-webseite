@@ -35,15 +35,15 @@ B15.21A–C sind produktiv ausgerollt und geprüft: gehärteter Submit, Datenmod
 
 Geplante Consent-Nachweisfelder aus B15.21A: `privacy_consent`, `privacy_consent_at`, `privacy_policy_version`. Das finale Proposal aktiviert RLS, entfernt historische App-Metadata-Policies und entzieht `PUBLIC`, `anon` und `authenticated` sämtliche direkten Tabellen- und Spaltenrechte. Öffentlicher Submit und autorisierte Adminpfade laufen danach ausschließlich serverseitig über Service Role. Das Proposal wird ausschließlich manuell ausgeführt.
 
-## Offene Weiterentwicklung
+## Historischer Implementierungsstand B15.21B0/B2
 
-`team_season_year_groups` ordnet einer Mannschaftssaison null bis mehrere Geburtsjahre zu; derselbe Jahrgang darf mehreren Mannschaftssaisons zugeordnet sein. `membership_requests.desired_team_season_id` ist nullable vorbereitet. Browserrollen erhalten keinen direkten Tabellenzugriff. Die Adminpflege verwendet `teams.edit`, den bestehenden Team-Scope und erst nach Autorisierung den serverseitigen Admin-Client. B15.21B2 stellt zunächst nur die serverseitige Auflösungsschicht bereit; die vollständige Formularanbindung folgt separat.
+Dieser Abschnitt beschreibt die damalige B0/B2-Zwischenstufe. `team_season_year_groups` ordnet einer Mannschaftssaison null bis mehrere Geburtsjahre zu; derselbe Jahrgang darf mehreren Mannschaftssaisons zugeordnet sein. `membership_requests.desired_team_season_id` ist nullable. Browserrollen erhalten keinen direkten Tabellenzugriff. Die Adminpflege verwendet `teams.edit`, den bestehenden Team-Scope und erst nach Autorisierung den serverseitigen Admin-Client. Die damals noch folgende Formularanbindung wurde mit B15.21B3 abgeschlossen.
 
 ## Serverseitige Mannschaftsauflösung B15.21B2
 
 Der read-only Resolver bestimmt aus einem strikt validierten `YYYY-MM-DD`-Geburtsdatum das Geburtsjahr, löst `seasons.is_current` serverseitig auf und liest ausschließlich gepflegte Zuordnungen aus `team_season_year_groups`. Berücksichtigt werden aktive `team_seasons`, aktive Master-Teams und deren strukturelle `department_id`-Relation zur aktiven Fußballabteilung. Namen, Slugs von Mannschaften, Jugendklassen, Alter und feste Saisonregeln werden nicht interpretiert. Der Resolver unterscheidet keine, eine und mehrere passende Mannschaften und wählt bei mehreren Treffern niemals selbstständig aus.
 
-Der öffentliche technische Zugriff erfolgt per `POST /api/membership/team-options`. Das Geburtsdatum wird weder persistiert noch geloggt oder in einer URL übertragen. Die Antwort enthält nur Status sowie je Treffer `teamSeasonId`, Name und Altersbereich. Mapping-Rohdaten, Master-Team-ID und Department-Metadaten bleiben serverseitig. Die vollständige Formular- und Submit-Anbindung folgt im nächsten Teilblock; bestehende Anfragen bleiben unverändert.
+Der öffentliche technische Zugriff erfolgt per `POST /api/membership/team-options`. Das Geburtsdatum wird weder persistiert noch geloggt oder in einer URL übertragen. Die Antwort enthält nur Status sowie je Treffer `teamSeasonId`, Name und Altersbereich. Mapping-Rohdaten, Master-Team-ID und Department-Metadaten bleiben serverseitig. Die vollständige Formular- und Submit-Anbindung ist inzwischen mit B15.21B3 abgeschlossen.
 
 ## Formular- und Submit-Integration B15.21B3
 

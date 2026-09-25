@@ -1,4 +1,6 @@
-# Abgeschlossene größere Entwicklungsblöcke
+# Abgeschlossene größere Entwicklungsblöcke B15.18/B15.19
+
+Dieses Dokument ist bewusst ein kompaktes Facharchiv ausschließlich für B15.18 und B15.19. Spätere Abschlüsse und der aktuelle offene Stand werden nicht hier dupliziert; maßgeblich ist die [aktuelle Roadmap](current-roadmap.md).
 
 ## B15.18 – Notifications und Reminder
 
