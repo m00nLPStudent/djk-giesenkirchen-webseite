@@ -68,7 +68,9 @@ export function TableTennisPersonCard({ person, kind = "Person" }) {
   const license = getPublicCoachLicense(person.license);
   return (
     <article className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-      <img src={person.imageUrl || COACH_PLACEHOLDER_IMAGE} alt={person.name} className="h-56 w-full object-cover md:h-72" />
+      <div className="h-56 w-full shrink-0 overflow-hidden bg-black/20 md:h-72">
+        <img src={person.imageUrl || COACH_PLACEHOLDER_IMAGE} alt={person.name} className="h-full w-full object-cover" />
+      </div>
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <p className="text-xs font-black uppercase tracking-[0.22em] text-red-400">{person.role || kind}</p>
         <h3 className="mt-3 break-words text-2xl font-black">{person.name}</h3>

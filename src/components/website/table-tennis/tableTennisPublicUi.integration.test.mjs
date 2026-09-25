@@ -78,6 +78,8 @@ test("all table-tennis people use the established central person placeholder", (
   assert.match(ui, /COACH_PLACEHOLDER_IMAGE/);
   assert.match(ui, /person\.imageUrl \|\| COACH_PLACEHOLDER_IMAGE/);
   assert.doesNotMatch(ui, /person\.name\?\.charAt/);
+  assert.match(ui, /h-56 w-full shrink-0 overflow-hidden bg-black\/20 md:h-72/);
+  assert.match(ui, /alt=\{person\.name\} className="h-full w-full object-cover"/);
 });
 
 test("detail and competition pages stay table-tennis specific and omit football fields", () => {

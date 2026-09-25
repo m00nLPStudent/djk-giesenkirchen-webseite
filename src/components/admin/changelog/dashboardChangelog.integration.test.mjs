@@ -67,11 +67,10 @@ test("the modal is accessible, responsive and only confirmation can close it", (
 });
 
 test("version and visible copy have a single central source", () => {
-  assert.match(config, /version: "1\.0\.6"/);
-  assert.match(config, /releaseDate: "2026-09-24"/);
-  assert.match(config, /Vorstandsaufgaben & optimierte Lizenzanzeige/);
-  assert.match(config, /Aufgaben und Zuständigkeiten/);
-  assert.match(config, /Keine Lizenz/);
-  assert.doesNotMatch(gate, /version:\s*"1\.0\.6"/);
-  assert.doesNotMatch(dialog, /version:\s*"1\.0\.6"/);
+  assert.match(config, /version: "1\.0\.7"/);
+  assert.match(config, /releaseDate: "2026-09-25"/);
+  assert.match(config, /Einheitliche Trainer- und Vorstandskarten/);
+  assert.match(config, /responsiven vertikalen Kartenlayout/);
+  assert.doesNotMatch(gate, /version:\s*"1\.0\.7"/);
+  assert.doesNotMatch(dialog, /version:\s*"1\.0\.7"/);
 });

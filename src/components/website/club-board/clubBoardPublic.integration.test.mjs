@@ -28,3 +28,13 @@ test("Verein navigation links the distinct club board route", () => {
   assert.match(navigation, /href: "\/fussball\/abteilung\/vorstand"/);
   assert.match(navigation, /href: "\/tischtennis\/vorstand"/);
 });
+
+test("club board cards use the shared vertical public person-card geometry", () => {
+  const card = read("src/components/website/club-board/ClubBoardMemberCard.js");
+  assert.match(card, /flex h-full min-w-0 flex-col overflow-hidden/);
+  assert.match(card, /h-56 w-full shrink-0 overflow-hidden bg-black\/20 md:h-72/);
+  assert.match(card, /className="h-full w-full object-cover"/);
+  assert.match(card, /break-words text-xs/);
+  assert.match(card, /break-words text-2xl/);
+  assert.match(card, /BoardResponsibilitiesList/);
+});

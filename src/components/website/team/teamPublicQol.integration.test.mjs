@@ -18,8 +18,11 @@ test("team coach cards reserve two name lines and align variable contact content
   assert.match(card, /nameLines\.firstName/);
   assert.match(card, /nameLines\.lastName/);
   assert.equal((card.match(/min-h-7/g) || []).length, 2);
-  assert.match(card, /flex h-full flex-col/);
+  assert.match(card, /flex h-full min-w-0 flex-col overflow-hidden/);
   assert.match(card, /mt-auto flex flex-wrap gap-3 pt-6/);
+  assert.match(card, /h-56 w-full shrink-0 overflow-hidden bg-black\/20 md:h-72/);
+  assert.match(card, /className="h-full w-full object-cover"/);
+  assert.doesNotMatch(card, /h-24 w-24 rounded-full/);
   assert.match(section, /md:grid-cols-2 xl:grid-cols-3/);
 });
 

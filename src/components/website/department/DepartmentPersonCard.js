@@ -20,8 +20,8 @@ export default function DepartmentPersonCard({ person, meta, imageBadge }) {
     "Team";
 
   return (
-    <article className="flex h-full overflow-hidden rounded-3xl border border-white/10 bg-white/5">
-      <div className="relative flex h-56 items-center justify-center bg-black/20 md:h-72">
+    <article className="flex h-full min-w-0 flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+      <div className="relative h-56 w-full shrink-0 overflow-hidden bg-black/20 md:h-72">
         <img
           src={imageUrl}
           alt={fullName}
@@ -34,12 +34,12 @@ export default function DepartmentPersonCard({ person, meta, imageBadge }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-6">
+      <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
         <p className="text-xs font-black uppercase tracking-[0.25em] text-red-400">
           {roleLabel}
         </p>
-        <h3 className="mt-3 text-2xl font-black">{fullName}</h3>
-        {meta && <p className="mt-2 text-sm font-bold text-white/45">{meta}</p>}
+        <h3 className="mt-3 break-words text-2xl font-black">{fullName}</h3>
+        {meta && <p className="mt-2 break-words text-sm font-bold text-white/55">{meta}</p>}
         <BoardResponsibilitiesList responsibilities={person.responsibilities} personName={fullName} roleLabel={roleLabel} />
 
         <div className="mt-auto flex gap-3 pt-6">

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-25
+
+### Version 1.0.7 – Einheitliche Trainer- und Vorstandskarten
+
+- Öffentliche Personen-, Trainer- und Vorstandskarten verwenden jetzt ein einheitliches vertikales Layout mit dem Bildbereich oberhalb der Informationen.
+- Grid-basierte Kartenbreiten, harmonisierte Kartenhöhen und am Kartenende ausgerichtete Kontaktaktionen sorgen auf Mobile, Tablet und Desktop für eine konsistente Darstellung ohne horizontale Überbreite.
+- Bestehende Mannschafts- und Mehrfachzuordnungen sowie die öffentliche Lizenzlogik bleiben erhalten; echte Trainerlizenzen werden weiterhin angezeigt und `Keine Lizenz` bleibt ausgeblendet.
+- Board Responsibilities und der zugehörige Dialog bleiben unverändert erhalten. Die Darstellung berücksichtigt Gesamtverein, Fußball und Tischtennis sowie gemeinsam verwendete Personen- und Kontaktkarten.
+
 ## 2026-09-24
 
 ### Version 1.0.6 – Vorstandsaufgaben und optimierte Lizenzanzeige
