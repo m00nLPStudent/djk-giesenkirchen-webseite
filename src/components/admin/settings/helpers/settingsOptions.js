@@ -44,6 +44,7 @@ export const CONTACT_CATEGORY_OPTIONS = [
 ];
 
 export const ROLE_TEMPLATES = [
+  { value: "besitzer", role_de: "Besitzer", role_en: "Owner" },
   {
     value: "jugendschutzbeauftragter",
     role_de: "Jugendschutzbeauftragter",

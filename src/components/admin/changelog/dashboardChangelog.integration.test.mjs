@@ -71,6 +71,8 @@ test("version and visible copy have a single central source", () => {
   assert.match(config, /releaseDate: "2026-09-26"/);
   assert.match(config, /Kontaktdaten im Gesamtvorstand/);
   assert.match(config, /Telefon- und E-Mail-Schaltflächen/);
+  assert.match(config, /Neue Rollen-Vorlage Besitzer/);
+  assert.match(config, /Webmaster im Gesamtvorstand/);
   assert.doesNotMatch(gate, /version:\s*"1\.0\.8"/);
   assert.doesNotMatch(dialog, /version:\s*"1\.0\.8"/);
 });

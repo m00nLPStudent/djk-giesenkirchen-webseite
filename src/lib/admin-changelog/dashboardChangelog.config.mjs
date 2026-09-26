@@ -8,5 +8,15 @@ export const CURRENT_DASHBOARD_CHANGELOG = Object.freeze({
       description:
         "Auf den öffentlichen Vorstandskarten des Gesamtvereins werden hinterlegte Telefonnummern und E-Mail-Adressen jetzt direkt über Telefon- und E-Mail-Schaltflächen angezeigt.",
     }),
+    Object.freeze({
+      title: "Neue Rollen-Vorlage Besitzer",
+      description:
+        "Bei den allgemeinen Seitenkontakten steht jetzt die Rollen-Vorlage ‚Besitzer‘ zur Verfügung.",
+    }),
+    Object.freeze({
+      title: "Webmaster im Gesamtvorstand",
+      description:
+        "Für den Gesamtvorstand kann jetzt auch die Funktion ‚Webmaster‘ ausgewählt und einem Vorstandsmitglied zugeordnet werden.",
+    }),
   ]),
 });

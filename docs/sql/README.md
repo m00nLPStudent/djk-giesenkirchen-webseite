@@ -2,14 +2,14 @@
 
 > B15.21A und B15.21B0 sind produktiv abgeschlossen. Die B15.21B0-Dateifamilie bleibt als Rolloutnachweis erhalten; der Rollback ist nur ein destruktives Notfallartefakt.
 
-Stand: 26. August 2026. Inventar: 147 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
+Stand: 26. September 2026. Inventar: 270 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
 
 ## Vollständige Klassifikationsregeln
 
 Die erste passende Regel gewinnt und erfasst damit jede SQL-Datei:
 
-1. `*rollback*.sql` → **D: Rollback/Notfall**. 35 Dateien; immer behalten.
-2. `*postcheck*`, `*preflight*`, `*diagnostic*`, `*inventory*`, `*dry-run*`, `*audit*` → **C: Postcheck/Diagnose**, sofern der Inhalt read-only ist. 54 namensbasierte Diagnoseartefakte; behalten.
+1. `*rollback*.sql` → **D: Rollback/Notfall**. 57 Dateien; immer behalten.
+2. `*postcheck*`, `*preflight*`, `*diagnostic*`, `*inventory*`, `*dry-run*`, `*audit*` → **C: Postcheck/Diagnose**, sofern der Inhalt read-only ist. 123 namensbasierte Diagnoseartefakte außerhalb der Rollback-Kategorie; behalten.
 3. `b15-18*` und `b15-19*`, die nicht unter 1 oder 2 fallen → **B/G: historisches Implementierungs-/Rolloutartefakt; Ausführung im Zweifel manuell verifizieren**. Anwendung und Tests sind versioniert, Git beweist aber keine Ausführung gegen eine konkrete Datenbank.
 4. `b13-22*` sowie noch nicht abschließend entfernte B13-Legacy-Proposals → **A/G: für späteren Datenbank-/Saison-Cleanup aufbewahren; vor Ausführung Live-Audit erforderlich**.
 5. Dateien mit Präfix `noch-nicht-ausführen-` oder `nach-Prüfung-ausführbar-` → **A/G: offen beziehungsweise manuell zu verifizieren**. Der Dateiname ist keine Ausführungsfreigabe.
@@ -27,6 +27,10 @@ Die erste passende Regel gewinnt und erfasst damit jede SQL-Datei:
 ## B15.19
 
 Alle Proposal-/Postcheck-/Rollback-Familien von A bis I bleiben als nachvollziehbare Schema-, RLS-, Grant-, RPC- und Rollbackhistorie erhalten. Commit-Historie und Anwendungscode belegen die Implementierung; ob jede einzelne Proposal-Datei gegen die betrachtete Datenbank ausgeführt wurde, muss bei Bedarf mit ihrem Postcheck manuell bestätigt werden.
+
+## Version 1.0.8 – Board-Rolle Webmaster
+
+Die Familie `b15-board-role-webmaster-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert die kontrollierte Ergänzung der organisationsweiten Vorstandsfunktion `Webmaster`. Proposal und Postcheck wurden manuell erfolgreich ausgeführt beziehungsweise geprüft; der Rollback blieb ein unbenutztes Sicherheitsartefakt. Die technische Adminrolle `webmaster` ist davon unabhängig und unverändert.
 
 ## Abgeschlossene Membership-Rollouts und weiterhin manuell zu verifizierende Altartefakte
 

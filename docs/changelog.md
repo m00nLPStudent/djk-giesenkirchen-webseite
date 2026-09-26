@@ -8,6 +8,9 @@
 - Telefonlinks verwenden das vorhandene normalisierte `tel:`-Format; E-Mail-Adressen öffnen über `mailto:` das bevorzugte E-Mail-Programm.
 - Sind beide Kontaktdaten vorhanden, erscheinen beide Aktionen. Fehlt eine Angabe, wird nur die verfügbare Aktion dargestellt; ohne Kontaktdaten entsteht kein leerer Kontaktbereich.
 - Die Daten stammen ausschließlich aus `board_members.phone` und `board_members.email`. Club-Scope, Aktivfilter, Kartendesign und Responsibilities-Dialog bleiben unverändert; es wurden keine Datenbank-, RLS-, Policy- oder Permission-Änderungen vorgenommen.
+- Die zentrale Rollen-Vorlagenstruktur für allgemeine Seitenkontakte enthält jetzt `Besitzer` beziehungsweise `Owner`; Auswahl und DE-/EN-Vorbelegung folgen dem bestehenden Formularvertrag.
+- Für den Gesamtvorstand steht die neue organisationsweite Funktion `Webmaster` in `board_roles` zur Verfügung.
+- Die Board-Rolle wurde über den kontrollierten Preflight-/Proposal-/Rollback-/Postcheck-Ablauf ergänzt und live verifiziert. Es gab keine Schema-, RLS-, Policy- oder Permission-Änderung; die technische Adminrolle `webmaster` blieb separat und unverändert.
 
 ## 2026-09-25
 
