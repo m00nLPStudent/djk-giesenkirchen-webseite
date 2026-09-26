@@ -11,6 +11,9 @@
 - Die zentrale Rollen-Vorlagenstruktur für allgemeine Seitenkontakte enthält jetzt `Besitzer` beziehungsweise `Owner`; Auswahl und DE-/EN-Vorbelegung folgen dem bestehenden Formularvertrag.
 - Für den Gesamtvorstand steht die neue organisationsweite Funktion `Webmaster` in `board_roles` zur Verfügung.
 - Die Board-Rolle wurde über den kontrollierten Preflight-/Proposal-/Rollback-/Postcheck-Ablauf ergänzt und live verifiziert. Es gab keine Schema-, RLS-, Policy- oder Permission-Änderung; die technische Adminrolle `webmaster` blieb separat und unverändert.
+- Öffentliche Fußball- und Tischtennis-Mannschaftsseiten verwenden den gemeinsamen `TeamOverviewBackLink` für eine direkte, von der Browser-History unabhängige Rücknavigation zur fachlich passenden Mannschaftsübersicht.
+- Im Fußball wird die Zielroute ausschließlich aus dem strukturierten Feld `teams.age_group` bestimmt: Junioren führen nach `/fussball/mannschaften/junioren`, Senioren/Herren nach `/fussball/mannschaften/senioren` und Damen/Frauen nach `/fussball/mannschaften/damen`. Unbekannte oder historische Werte fallen sicher auf `/fussball/mannschaften` zurück.
+- Tischtennis-Mannschaftsseiten führen nach `/tischtennis/mannschaften`. Für diese Navigation war keine Datenbankänderung erforderlich.
 
 ## 2026-09-25
 

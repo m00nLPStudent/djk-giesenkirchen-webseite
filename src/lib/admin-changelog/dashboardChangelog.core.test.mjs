@@ -72,13 +72,14 @@ test("the current release has complete user-facing content", () => {
   assert.equal(CURRENT_DASHBOARD_CHANGELOG.version, "1.0.8");
   assert.equal(CURRENT_DASHBOARD_CHANGELOG.releaseDate, "2026-09-26");
   assert.equal(CURRENT_DASHBOARD_CHANGELOG.title, "Neu im Dashboard");
-  assert.equal(CURRENT_DASHBOARD_CHANGELOG.entries.length, 3);
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.entries.length, 4);
   assert.deepEqual(
     CURRENT_DASHBOARD_CHANGELOG.entries.map((entry) => entry.title),
     [
       "Kontaktdaten im Gesamtvorstand",
       "Neue Rollen-Vorlage Besitzer",
       "Webmaster im Gesamtvorstand",
+      "Zurück-Navigation bei Mannschaften",
     ],
   );
   for (const entry of CURRENT_DASHBOARD_CHANGELOG.entries) {

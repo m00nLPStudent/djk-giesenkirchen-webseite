@@ -73,6 +73,8 @@ test("version and visible copy have a single central source", () => {
   assert.match(config, /Telefon- und E-Mail-Schaltflächen/);
   assert.match(config, /Neue Rollen-Vorlage Besitzer/);
   assert.match(config, /Webmaster im Gesamtvorstand/);
+  assert.match(config, /Zurück-Navigation bei Mannschaften/);
+  assert.match(config, /passenden Mannschaftsübersicht/);
   assert.doesNotMatch(gate, /version:\s*"1\.0\.8"/);
   assert.doesNotMatch(dialog, /version:\s*"1\.0\.8"/);
 });

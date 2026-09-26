@@ -7,7 +7,9 @@ import {
   TeamDetailTabs,
   TeamHero,
   TeamIntroCard,
+  TeamOverviewBackLink,
 } from "@/components/website/team";
+import { resolveFootballTeamOverviewRoute } from "@/components/website/team/teamOverviewNavigation.core.mjs";
 import { mapTeamRosterPlayers } from "@/components/website/team/teamRoster.core.mjs";
 import { supabase } from "@/lib/supabase";
 import { loadPublicMediaUrlMap } from "@/components/admin/media-library/media.service";
@@ -189,6 +191,7 @@ export default async function TeamPage({ params }) {
       : { data: null };
 
   const displayTeam = mergeTeamSeason(team, teamSeason, selectedSeason);
+  const overviewHref = resolveFootballTeamOverviewRoute(displayTeam);
   const teamMediaUrls = await loadPublicMediaUrlMap([teamSeason?.team_image_media_asset_id, team?.team_image_media_asset_id, teamSeason?.contact_image_media_asset_id, team?.contact_image_media_asset_id]);
   displayTeam.team_image_url = resolvePublicTeamImage({
     seasonMediaAssetId: teamSeason?.team_image_media_asset_id,
@@ -249,6 +252,7 @@ export default async function TeamPage({ params }) {
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-[var(--dunkel)] text-white">
       <section className="overflow-x-hidden px-4 pt-28 pb-20 sm:px-6 md:pt-32 md:pb-24">
         <div className="mx-auto max-w-7xl min-w-0 space-y-8">
+          <TeamOverviewBackLink href={overviewHref} />
           <TeamHero team={displayTeam} />
           <TeamIntroCard team={displayTeam} />
 

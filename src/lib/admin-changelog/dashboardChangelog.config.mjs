@@ -18,5 +18,10 @@ export const CURRENT_DASHBOARD_CHANGELOG = Object.freeze({
       description:
         "Für den Gesamtvorstand kann jetzt auch die Funktion ‚Webmaster‘ ausgewählt und einem Vorstandsmitglied zugeordnet werden.",
     }),
+    Object.freeze({
+      title: "Zurück-Navigation bei Mannschaften",
+      description:
+        "Auf den Mannschaftsseiten von Fußball und Tischtennis führt ein neuer Zurück-Button direkt zur jeweils passenden Mannschaftsübersicht.",
+    }),
   ]),
 });
