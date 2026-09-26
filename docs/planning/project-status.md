@@ -1,6 +1,6 @@
 # Projektstatus
 
-Stand: **25. September 2026 · Version 1.0.7**
+Stand: **26. September 2026 · Version 1.0.8**
 
 Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene Prioritäten stehen ausschließlich in der [aktuellen Roadmap](current-roadmap.md).
 
@@ -10,6 +10,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Produktionsnahe Original-Webseite unter `djkvfl-test.de` auf Hetzner-Webhosting.
 - Pushes auf `master` deployen den exakten Commit über den host-key-verifizierten GitHub-Actions-Workflow in einem isolierten Worktree. Der Node-Neustart erfolgt anschließend bewusst manuell in konsoleH.
 - Version 1.0.7 ist committed, deployed, durch manuellen Node-Neustart aktiviert und live geprüft.
+- Version 1.0.8 wurde mit öffentlichen Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten begonnen.
 
 ## Fachlicher Stand
 
@@ -20,7 +21,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Rollen, Permissions, Department-Manager, Board-Scope sowie die relevanten RLS-/Grant-/Policy-Härtungen sind live beziehungsweise über die dokumentierten Postchecks bestätigt.
 - B15.24A–N ist abgeschlossen: gemeinsame Public-Designbasis, Fußball, Tischtennis/click-TT, Behindertensport, Gymnastikdamen, Vorstand, FUSSBALL.DE-Widgets, Trainingsrouting, Accessibility/Performance/SEO, Consent und zentrales Maildesign.
 - Die server-only myTischtennis-/click-TT-Competition-Integration funktioniert auf der Preproduction wieder. Der vorübergehende Hetzner-Fehler mit Provider-Weiterleitung und HTTP `429` ist dokumentiert; eine WTTV-Umstellung bleibt ein inaktiver [Fallback nur bei erneutem oder dauerhaftem Problem](table-tennis-competition-provider-fallback.md). Es besteht keine aktive Datenbankmigration.
-- Version 1.0.6 ergänzte Board Responsibilities und die sichere öffentliche Lizenzanzeige. Version 1.0.7 vereinheitlichte Trainer-, Vorstands- und gemeinsam verwendete Personenkarten vertikal und responsiv.
+- Version 1.0.6 ergänzte Board Responsibilities und die sichere öffentliche Lizenzanzeige. Version 1.0.7 vereinheitlichte Trainer-, Vorstands- und gemeinsam verwendete Personenkarten vertikal und responsiv. Version 1.0.8 ergänzt öffentliche Kontaktaktionen auf den Karten des Gesamtvorstands.
 
 ## Datenstand
 

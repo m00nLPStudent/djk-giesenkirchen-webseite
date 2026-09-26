@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-26
+
+### Version 1.0.8 – Kontaktdaten im Gesamtvorstand
+
+- Auf den öffentlichen Vorstandskarten des Gesamtvereins werden hinterlegte Telefonnummern und E-Mail-Adressen jetzt direkt über Telefon- und E-Mail-Schaltflächen angezeigt.
+- Telefonlinks verwenden das vorhandene normalisierte `tel:`-Format; E-Mail-Adressen öffnen über `mailto:` das bevorzugte E-Mail-Programm.
+- Sind beide Kontaktdaten vorhanden, erscheinen beide Aktionen. Fehlt eine Angabe, wird nur die verfügbare Aktion dargestellt; ohne Kontaktdaten entsteht kein leerer Kontaktbereich.
+- Die Daten stammen ausschließlich aus `board_members.phone` und `board_members.email`. Club-Scope, Aktivfilter, Kartendesign und Responsibilities-Dialog bleiben unverändert; es wurden keine Datenbank-, RLS-, Policy- oder Permission-Änderungen vorgenommen.
+
 ## 2026-09-25
 
 ### Version 1.0.7 – Einheitliche Trainer- und Vorstandskarten

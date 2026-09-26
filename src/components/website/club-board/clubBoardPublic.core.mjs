@@ -7,6 +7,8 @@ export function selectPublicClubBoard(members = []) {
     .map((member) => ({
       name: text(`${member.first_name || ""} ${member.last_name || ""}`) || "Name nicht hinterlegt",
       role: member.board_roles?.name_de || member.role_de || "Vorstandsmitglied",
+      phone: text(member.phone) || null,
+      email: text(member.email) || null,
       imageMediaAssetId: member.image_media_asset_id || null,
       responsibilities: Array.isArray(member.responsibilities) ? member.responsibilities : [],
       sortOrder: member.sort_order ?? null,
@@ -21,6 +23,8 @@ export function createPublicClubBoardDto(member, mediaUrls = new Map(), placehol
   return {
     name: member.name,
     role: member.role,
+    phone: member.phone,
+    email: member.email,
     imageUrl: (member.imageMediaAssetId && mediaUrls.get(member.imageMediaAssetId)) || placeholder,
     responsibilities: member.responsibilities,
   };

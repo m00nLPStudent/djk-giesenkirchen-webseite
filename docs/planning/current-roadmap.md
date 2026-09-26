@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-Stand: **25. September 2026 · Version 1.0.7**
+Stand: **26. September 2026 · Version 1.0.8**
 
 Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go-live- und optionale Arbeiten. Historische B12–B15-Planungs- und SQL-Dateien bleiben Nachweise, bilden aber keine parallele To-do-Liste.
 
@@ -22,6 +22,7 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **1.0.5:** sicheres, permissiongeschütztes Löschen bestehender Termine.
 - **1.0.6:** öffentliche Ausblendung von `Keine Lizenz`, Board Responsibilities, Dashboard-Aufgabenverwaltung und öffentlicher Responsibilities-Dialog.
 - **1.0.7:** vertikale öffentliche Trainer- und Vorstandskarten, einheitliche responsive Gridbreiten, harmonisierte Kontaktfooter und erfolgreicher Live-Review.
+- **1.0.8 (begonnen):** öffentliche Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten.
 
 ## In Arbeit / teilweise erledigt
 

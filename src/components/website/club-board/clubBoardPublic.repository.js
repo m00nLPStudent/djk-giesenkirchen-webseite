@@ -9,7 +9,7 @@ import { attachPublicBoardResponsibilities } from "@/components/website/board/bo
 export async function loadPublicClubBoard({ db = supabase, mediaLoader = loadPublicMediaUrlMap } = {}) {
   const result = await db
     .from("board_members")
-    .select("id, role_id, first_name, last_name, role_de, image_media_asset_id, sort_order, is_active, organization_scope, department_id, board_roles(name_de)")
+    .select("id, role_id, first_name, last_name, role_de, phone, email, image_media_asset_id, sort_order, is_active, organization_scope, department_id, board_roles(name_de)")
     .eq("organization_scope", "club")
     .is("department_id", null)
     .eq("is_active", true)
