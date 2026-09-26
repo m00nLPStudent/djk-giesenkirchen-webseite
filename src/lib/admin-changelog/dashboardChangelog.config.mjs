@@ -1,27 +1,17 @@
 export const CURRENT_DASHBOARD_CHANGELOG = Object.freeze({
-  version: "1.0.8",
-  releaseDate: "2026-09-26",
+  version: "1.0.9",
+  releaseDate: "2026-09-27",
   title: "Neu im Dashboard",
   entries: Object.freeze([
     Object.freeze({
-      title: "Kontaktdaten im Gesamtvorstand",
+      title: "Ergebnisverwaltung im Dashboard",
       description:
-        "Auf den öffentlichen Vorstandskarten des Gesamtvereins werden hinterlegte Telefonnummern und E-Mail-Adressen jetzt direkt über Telefon- und E-Mail-Schaltflächen angezeigt.",
+        "Berechtigte Vereinsverantwortliche können Fußball- und Tischtennisergebnisse zentral im Dashboard erfassen, bearbeiten, veröffentlichen und verwalten.",
     }),
     Object.freeze({
-      title: "Neue Rollen-Vorlage Besitzer",
+      title: "Öffentlicher Ergebnisticker",
       description:
-        "Bei den allgemeinen Seitenkontakten steht jetzt die Rollen-Vorlage ‚Besitzer‘ zur Verfügung.",
-    }),
-    Object.freeze({
-      title: "Webmaster im Gesamtvorstand",
-      description:
-        "Für den Gesamtvorstand kann jetzt auch die Funktion ‚Webmaster‘ ausgewählt und einem Vorstandsmitglied zugeordnet werden.",
-    }),
-    Object.freeze({
-      title: "Zurück-Navigation bei Mannschaften",
-      description:
-        "Auf den Mannschaftsseiten von Fußball und Tischtennis führt ein neuer Zurück-Button direkt zur jeweils passenden Mannschaftsübersicht.",
+        "Aktuelle Fußball- und Tischtennisergebnisse werden abhängig vom Webseitenbereich automatisch in einer kompakten Ergebnisleiste angezeigt.",
     }),
   ]),
 });

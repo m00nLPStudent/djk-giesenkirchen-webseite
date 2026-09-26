@@ -40,6 +40,7 @@ export const ADMIN_NAVIGATION_SECTIONS = [
       active("club-history", "Vereinsgeschichte", "/admin/club-history", "book-open", "club_history.view", "permission_only", 40, "Vereinsgeschichte veröffentlichen."),
       { ...active("club-board", "Vorstand Gesamtverein", "/admin/club/board", "landmark", "board.view", "permission_only", 45, "Vorstand des Gesamtvereins verwalten."), accessPolicy: "club_board" },
       active("downloads", "Downloads", "/admin/downloads", "download", "downloads.view", "permission_only", 50, "Download-Dokumente verwalten."),
+      active("results", "Ergebnisse", "/admin/results", "trophy", "results.view", "permission_only", 55, "Fußball- und Tischtennisergebnisse verwalten."),
       { ...active("membership-requests", "Mitgliedsanfragen", "/admin/membership-requests", "inbox", "membership_requests.view", "permission_only", 60, "Mitgliedsanfragen, Empfänger und Weiterleitungen verwalten."), accessPolicy: "membership_requests" },
       { ...active("media", "Medien", "/admin/media", "image", null, "permission_only", 70, "Zentrale Medienbibliothek für registrierte Uploads."), accessPolicy: "media_roles" },
       active("settings", "Seiten, Kontakte & Einstellungen", "/admin/settings", "settings", "settings.view", "permission_only", 80, "CMS-Seiten, Kontakte und Einstellungen."),

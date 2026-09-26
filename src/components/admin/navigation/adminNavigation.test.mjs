@@ -36,7 +36,7 @@ test("active navigation follows the agreed club, football and system structure",
     .find((section) => section.key === sectionKey).items
     .filter((item) => item.implementationStatus === "active")
     .map((item) => item.key);
-  assert.deepEqual(keys("club"), ["news", "sponsors", "events", "club-history", "club-board", "downloads", "membership-requests", "media", "settings"]);
+  assert.deepEqual(keys("club"), ["news", "sponsors", "events", "club-history", "club-board", "downloads", "results", "membership-requests", "media", "settings"]);
   assert.deepEqual(keys("football"), ["teams", "players", "coaches", "contributions", "department"]);
   assert.deepEqual(keys("system"), ["structure-assignment", "users", "roles", "permissions", "notification-email-settings", "notification-monitoring"]);
 });

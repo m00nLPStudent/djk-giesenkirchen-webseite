@@ -62,3 +62,12 @@ test("department sections use the central image assignment contract", () => {
   assert.equal(buildMediaAssignmentPayload("department_section", "section-1", "asset-1", "image").ok, true);
   assert.equal(buildMediaAssignmentPayload("department_section", "section-1", "asset-1", "file").ok, false);
 });
+
+test("results use the dedicated optional opponent logo assignment", () => {
+  assert.deepEqual(buildMediaAssignmentPayload("result", "result-1", "asset-1", "opponent_logo"), {
+    ok: true,
+    payload: { p_entity_type: "result", p_entity_id: "result-1", p_media_asset_id: "asset-1", p_field_name: "opponent_logo" },
+  });
+  assert.equal(buildMediaAssignmentPayload("result", "result-1", null, "opponent_logo").ok, true);
+  assert.equal(buildMediaAssignmentPayload("result", "result-1", "asset-1", "image").ok, false);
+});

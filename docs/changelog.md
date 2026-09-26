@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-09-27
+
+### Version 1.0.9 – Ergebnisse und öffentlicher Ergebnisticker
+
+- `public.club_results` wurde über den kontrollierten Read-only-Preflight-/Proposal-/Postcheck-Ablauf eingeführt. Der vorhandene Rollback wurde nicht ausgeführt. RLS erlaubt öffentlich ausschließlich veröffentlichte Ergebnisse innerhalb des wirksamen Sichtbarkeitsfensters; administrative Schreibvorgänge bleiben serverseitig geschützt.
+- Das Permission-System umfasst `results.view`, `results.create`, `results.edit`, `results.delete` und `results.publish`. Der Medienvertrag wurde um `purpose = result`, `entity_type = result` und `field = opponent_logo` erweitert.
+- Berechtigte Vereinsverantwortliche können Fußball- und Tischtennisergebnisse zentral unter `/admin/results` erfassen, bearbeiten, veröffentlichen, zurückziehen und löschen.
+- Die Verwaltung prüft Session, granulare `results.*`-Permission und Department-Scope serverseitig. Superadmin und technische Webmaster-Rolle verwalten beide Sportarten; die jeweiligen Department-Vorstände bleiben auf Fußball beziehungsweise Tischtennis begrenzt.
+- Mannschaften werden ausschließlich aus aktiven Fußball- und Tischtennis-Mannschaftssaisons gewählt. Gegnername, Ergebnis, Heim-/Auswärtsstatus, Wettbewerb, Spielzeitpunkt und optionaler Anzeigezeitraum folgen dem live verifizierten `club_results`-Vertrag.
+- Optionale Gegnerlogos verwenden die zentrale Medienbibliothek mit `purpose = result`, `entity_type = result` und `field = opponent_logo`.
+- Ohne individuellen Zeitraum gilt weiterhin das Datenbankmodell vom Spielbeginn bis sieben Tage danach.
+- Ein kompakter Ergebnisticker im öffentlichen Header zeigt aktuelle Fußball- und Tischtennisergebnisse abhängig vom Webseitenbereich: `mixed` auf allgemeinen Seiten, `football` beziehungsweise `table-tennis` in den Sportbereichen und `hidden` bei Gymnastikdamen und Behindertensport.
+- Heim-/Auswärts-Mapping, zentral bezogenes Vereinslogo, Gegnerlogo mit neutralem Fallback und die bestehenden Sportart-Icons bilden eine kompakte Logo–Score–Logo-Darstellung. Desktop bleibt der Ticker rechts und kompakt, auf kleineren Geräten responsiv.
+- Ab einem Ergebnis läuft der Ticker permanent mit 45 Sekunden linearer Laufzeit. Hover und Tastaturfokus pausieren; `prefers-reduced-motion` liefert eine statische horizontal erreichbare Darstellung. Beidseitiger Fade und `translate3d()` sorgen für einen weichen, compositor-freundlichen Lauf.
+
 ## 2026-09-26
 
 ### Version 1.0.8 – Kontaktdaten im Gesamtvorstand

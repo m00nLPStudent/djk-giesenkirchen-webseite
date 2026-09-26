@@ -200,6 +200,7 @@ const ADMIN_ROUTE_PERMISSION_RULES = [
   }),
   buildRule("/admin/news", "news.view", { matchType: "prefix", priority: 300 }),
   buildRule("/admin/downloads", "downloads.view", { matchType: "prefix", priority: 300 }),
+  buildRule("/admin/results", "results.view", { matchType: "prefix", priority: 300 }),
   buildRule("/admin/events", "events.view", {
     matchType: "prefix",
     priority: 300,
@@ -386,6 +387,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin/gymnastikdamen": "department_sections.view",
   "/admin/news": "news.view",
   "/admin/downloads": "downloads.view",
+  "/admin/results": "results.view",
   "/admin/department": "board.view",
   "/admin/club/board": "board.view",
   "/admin/sponsors": "sponsors.view",
@@ -415,6 +417,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
 export const ADMIN_DASHBOARD_ACTION_PERMISSION_MAP = {
   "/admin/news/new": "news.create",
   "/admin/downloads": "downloads.view",
+  "/admin/results": "results.view",
   "/admin/events/new": "events.create",
   "/admin/users": "users.view",
   "/admin/roles": "roles.view",

@@ -2,7 +2,7 @@
 
 > B15.21A und B15.21B0 sind produktiv abgeschlossen. Die B15.21B0-Dateifamilie bleibt als Rolloutnachweis erhalten; der Rollback ist nur ein destruktives Notfallartefakt.
 
-Stand: 26. September 2026. Inventar: 270 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
+Stand: 27. September 2026. Inventar: 274 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
 
 ## Vollständige Klassifikationsregeln
 
@@ -31,6 +31,10 @@ Alle Proposal-/Postcheck-/Rollback-Familien von A bis I bleiben als nachvollzieh
 ## Version 1.0.8 – Board-Rolle Webmaster
 
 Die Familie `b15-board-role-webmaster-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert die kontrollierte Ergänzung der organisationsweiten Vorstandsfunktion `Webmaster`. Proposal und Postcheck wurden manuell erfolgreich ausgeführt beziehungsweise geprüft; der Rollback blieb ein unbenutztes Sicherheitsartefakt. Die technische Adminrolle `webmaster` ist davon unabhängig und unverändert.
+
+## Version 1.0.9 – Ergebnismodul
+
+Die Familie `b15-results-module-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert die kontrollierte Einführung von `club_results`, den granularen `results.*`-Permissions sowie dem Resultat-Medienvertrag. Preflight, Proposal und korrigierter Postcheck wurden manuell erfolgreich ausgeführt; der Rollback blieb unbenutzt. Die SQL-Artefakte sind kein automatischer Deploymentpfad.
 
 ## Abgeschlossene Membership-Rollouts und weiterhin manuell zu verifizierende Altartefakte
 

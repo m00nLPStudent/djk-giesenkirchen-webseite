@@ -12,7 +12,8 @@ test("known training sports map to the new local raster assets", () => {
     assert.match(source, new RegExp(`/images/sports-icons/${asset.replace(".", "\\.")}`));
     assert.equal(existsSync(resolve(root, `public/images/sports-icons/${asset}`)), true, asset);
   }
-  assert.match(source, /SPORT_ICON_ASSETS\[resolveTrainingSport\(event\)\]/);
+  assert.match(source, /SPORT_ICON_ASSETS\[sport\]/);
+  assert.match(source, /sport=\{resolveTrainingSport\(event\)\}/);
   assert.match(source, /src=\{assetPath\}/);
 });
 
@@ -22,9 +23,15 @@ test("known sports render next image while only unknown sports use the neutral f
   assert.match(source, /return <CalendarDays/);
   assert.match(source, /width=\{40\}/);
   assert.match(source, /height=\{40\}/);
-  assert.match(source, /sizes="40px"/);
+  assert.match(source, /sizes = "40px"/);
+  assert.match(source, /sizes=\{sizes\}/);
   assert.match(source, /alt=""/);
   assert.match(source, /aria-hidden="true"/);
+});
+
+test("the established sport icon renderer is reusable by other public surfaces", () => {
+  assert.match(source, /export function SportIcon/);
+  assert.match(source, /sport=\{resolveTrainingSport\(event\)\}/);
 });
 
 test("legacy sport svg render paths are fully removed", () => {

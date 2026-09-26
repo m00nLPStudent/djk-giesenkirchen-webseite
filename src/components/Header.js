@@ -5,13 +5,14 @@ import { Navigation } from "@/components/website/navigation";
 import { PUBLIC_SITE_LOGO_URL } from "@/config/publicSite";
 import { resolveSocialLinks, selectMobileHeaderSocialLinks } from "@/lib/socialLinks";
 import { supabase } from "@/lib/supabase";
+import ResultsTicker from "@/components/website/results/ResultsTicker";
+import { loadPublicResultsTicker } from "@/components/website/results/resultsTickerPublic.repository";
 
 export default async function Header() {
-  const { data: settings } = await supabase
-    .from("club_settings")
-    .select("social_links")
-    .eq("singleton", true)
-    .maybeSingle();
+  const [{ data: settings }, tickerResult] = await Promise.all([
+    supabase.from("club_settings").select("social_links").eq("singleton", true).maybeSingle(),
+    loadPublicResultsTicker(),
+  ]);
   const socialLinks = resolveSocialLinks(settings?.social_links);
   const mobileSocialLinks = selectMobileHeaderSocialLinks(socialLinks);
   const serviceLinks = [
@@ -20,7 +21,7 @@ export default async function Header() {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 overflow-visible border-b border-white/10 bg-[#0d0d12]/95 text-white shadow-[0_10px_35px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+    <header className="public-header fixed inset-x-0 top-0 z-50 overflow-visible border-b border-white/10 bg-[#0d0d12]/95 text-white shadow-[0_10px_35px_rgba(0,0,0,0.38)] backdrop-blur-xl">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-[radial-gradient(circle_at_12%_10%,rgba(220,38,38,0.16),transparent_32%)]" />
       <div className="relative mx-auto flex h-20 max-w-[90rem] items-center gap-3 px-4 sm:px-6 xl:block xl:h-36">
         <Link
@@ -77,6 +78,10 @@ export default async function Header() {
             <MapPin aria-hidden="true" size={18} className="block shrink-0 text-red-500 transition-colors group-hover:text-red-400" />
           </Link>
         </nav>
+
+        <div className="absolute inset-x-0 top-full xl:top-[4.35rem] xl:right-6 xl:left-auto xl:w-[min(50%,44rem)]">
+          <ResultsTicker results={tickerResult.data || []} />
+        </div>
 
         <div className="shrink-0 xl:absolute xl:right-6 xl:bottom-0 xl:left-[9.5rem] xl:flex xl:translate-y-1/2 xl:justify-end 2xl:left-[10.5rem]">
           <Navigation />

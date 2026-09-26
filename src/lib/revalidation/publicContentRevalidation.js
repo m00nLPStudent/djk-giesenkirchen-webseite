@@ -43,6 +43,7 @@ const PUBLIC_REVALIDATION_PATHS = {
     { path: "/datenschutz" },
   ],
   settings: [{ path: "/", type: "layout" }],
+  results: [{ path: "/", type: "layout" }],
 };
 
 export const PUBLIC_REVALIDATION_SCOPES = Object.freeze(
