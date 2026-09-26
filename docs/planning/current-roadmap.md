@@ -93,6 +93,7 @@ Widgetintegration, Multi-Team-Unterstützung, Spielplan-/Tabellendarstellung, Li
 
 ## Optional / Post-Go-live
 
+- **Tischtennis-Competition-Provider-Fallback:** Die bestehende myTischtennis-/click-TT-Integration funktioniert wieder. Eine WTTV-Umstellung ist [zurückgestellt und wird nur bei einem erneut wiederholten oder dauerhaften Providerproblem reaktiviert](table-tennis-competition-provider-fallback.md).
 - eigenständige Gesamtvereins-„Vereinsstruktur“ erst nach einem fachlich getrennten Routen- und Datenquellenkonzept
 - zusätzliche Rollen für weitere Abteilungen
 - atomarer Adoption-Pfad für private unbenutzte Download-PDFs
