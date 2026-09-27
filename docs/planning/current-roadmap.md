@@ -70,6 +70,19 @@ Membership-, Notification-, Recovery-, Invite- und Admin-E-Mail-Wechsel-Technik 
 - finale Recovery-, Membership- und Notification-Smokes
 - Links aus Transaktionsmails mit der finalen `NEXT_PUBLIC_SITE_URL` prüfen
 
+### Support-/Ticketsystem – VOR PRODUKTIV-GO-LIVE ZWINGEND ABSCHLIESSEN
+
+**Go-live-Blocker:** Das interne Support-/Ticketsystem muss nach Vorliegen der endgültigen Domain- und Mailserver-Zugangsdaten umgesetzt, mit dem finalen Mail-System verbunden und vollständig getestet werden. Solange dieser Punkt nicht abgeschlossen ist, darf die endgültige Produktivfreigabe nicht erfolgen.
+
+- Alle aktiven Dashboard-Benutzer außer dem Superadmin können eigene Tickets erstellen, ausschließlich eigene Tickets und deren Status sehen sowie innerhalb ihres Tickets antworten. Vorgesehene Status sind `Offen`, `In Bearbeitung` und `Abgeschlossen`; Ticketarten umfassen mindestens Problem/Fehler, Frage/Hilfe, Verbesserungsvorschlag und Sonstiges.
+- Auswählbare Ticketbereiche werden serverseitig aus dem bestehenden Permission- und Scope-System abgeleitet. Benutzer erhalten nur tatsächlich freigegebene Arbeitsbereiche sowie einen allgemeinen Bereich wie „Allgemein / Verbesserungsvorschlag“. Manipulierte Bereiche und fremde Ticket-IDs müssen serverseitig abgewiesen werden.
+- Der Superadmin erstellt grundsätzlich keine eigenen Support-Tickets, sondern erhält eine zentrale Verwaltung für alle Tickets mit Detailansicht, Filtern nach Status, Bereich, Benutzer und Datum, Antworten sowie Statuswechseln bis zum Abschluss.
+- Tickets erhalten einen nachvollziehbaren Nachrichtenverlauf. Andere Benutzer dürfen weder fremde Tickets noch fremde Antworten lesen oder verändern.
+- Das bestehende Dashboard-Benachrichtigungssystem informiert den Superadmin über neue Tickets und Benutzerantworten sowie den Ticket-Ersteller über Superadmin-Antworten und Statuswechsel.
+- Das finale Vereins-Mail-System versendet Eingangsbestätigung, Superadmin-Benachrichtigung, Antwort-, Status- und Abschlussmails über das zentrale Vereins-Template mit HTML- und Textversion. Mailfehler dürfen erfolgreiche Ticket-, Antworts- oder Statusmutationen nicht zurückrollen und müssen kontrolliert auditiert werden; die Ticketlogik bleibt providerunabhängig.
+- Vor der Umsetzung erfolgt eine Architekturprüfung von Rollen, Permissions, Department-/Team-Scope, Notifications, Mail-System, Templates, Audit, Admin-Profilen und RLS. Notwendige Datenbankarbeiten folgen zwingend dem etablierten Ablauf Read-only-Preflight, Proposal, Rollback und Read-only-Postcheck; Preflight und Postcheck liefern jeweils ein Statement, ein kombiniertes Resultset und einen CSV-Export mit `result_block`, `result_order`, `row_order`, `row_type` und `data`.
+- Der verpflichtende Live-Test umfasst Trainer, Jugendleiter, Tischtennisvorstand, Kassierer, Vorstand, weitere relevante Rollen und Superadmin. Zu prüfen sind erlaubte und verbotene Bereiche, manipulierte Requests, eigene und fremde Tickets, Antworten, Statuswechsel, Dashboard-Benachrichtigungen, alle vorgesehenen E-Mails, das finale Template auf Desktop/Mobil sowie Mailfehler ohne Ticketdatenverlust.
+
 ### Contribution Reminder
 
 Die technische Vorbereitung ist abgeschlossen, die Produktivaktivierung ausdrücklich noch nicht:
@@ -110,7 +123,7 @@ Widgetintegration, Multi-Team-Unterstützung, Spielplan-/Tabellendarstellung, Li
 - individuelle Route-Metadaten, Structured Data, eigene 404-UX und instrumentelle Kontrastmessung
 - vollständiger Turniere-&-Events-Ausbau
 - Google Maps Inline/Embed mit API-/Referrer-beschränktem Key und bestehendem Consent-Gate, sofern betrieblich gewünscht
-- Ticketsystem, Turnierverwaltung, Community/Tauschbörse, PWA, native Android-/iOS-App und Social-Media-Automatisierung
+- Turnierverwaltung, Community/Tauschbörse, PWA, native Android-/iOS-App und Social-Media-Automatisierung
 - ESLint-/Dependency-/Dateigrößen-/Bildoptimierungsinventur
 
 ## Ersetzt / überholt
@@ -124,9 +137,10 @@ Keine aktiven Aufgaben mehr sind: eine allgemeine `persons`-Tabelle, eine separa
 3. Finale Domain- und Environmentplanung abschließen.
 4. Legal-/Provider-Endprüfung durchführen.
 5. Finalen Mail-/Auth-Smoke durchführen.
-6. Contribution-Reminder kontrolliert in Betrieb nehmen.
-7. Finalen Desktop-/Tablet-/Mobile-Gesamtsmoke durchführen.
-8. Finale Domainumschaltung und Go-live.
+6. Nach Vorliegen der endgültigen Domain-/Mailserver-Zugangsdaten das verpflichtende Support-/Ticketsystem umsetzen und vollständig mit realen Rollen, Benachrichtigungen und E-Mails testen.
+7. Contribution-Reminder kontrolliert in Betrieb nehmen.
+8. Finalen Desktop-/Tablet-/Mobile-Gesamtsmoke durchführen.
+9. Finale Domainumschaltung und Go-live.
 
 ## Historische Nachweise
 
