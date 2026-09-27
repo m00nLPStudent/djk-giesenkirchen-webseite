@@ -13,6 +13,15 @@ test("trainer actions validate permission, team scope and existing team-season i
   assert.match(actions, /\.eq\("id", teamSeasonId\)\s*\.eq\("team_id", teamId\)/s);
 });
 
+test("authorized team mutation context preserves the resolved permissions", () => {
+  const contextStart = actions.indexOf("async function loadAuthorizedTeamMutationContext");
+  const contextEnd = actions.indexOf("async function hasPersonsWithoutDepartmentAssignment");
+  const context = actions.slice(contextStart, contextEnd);
+
+  assert.match(context, /assertAdminActionPermission\(\{\s*requiredPermission/s);
+  assert.match(context, /permissions: permissionResult\.permissions \|\| \[\]/);
+});
+
 test("trainer field actions use update instead of team season upsert", () => {
   const targetedStart = actions.indexOf("async function saveTrainerTeamSeasonFields");
   const targetedEnd = actions.indexOf("export async function saveTrainerTeamRosterAction");
@@ -43,7 +52,20 @@ test("trainer tabs dispatch only targeted operations", () => {
 });
 
 test("roster changes additionally require players.edit", () => {
-  assert.match(actions, /\(auth\.permissions \|\| \[\]\)\.includes\("players\.edit"\)/);
+  const rosterStart = actions.indexOf("export async function saveTrainerTeamRosterAction");
+  const rosterEnd = actions.indexOf("export async function saveTeamSeasonYearGroupsAction");
+  const roster = actions.slice(rosterStart, rosterEnd);
+
+  assert.match(roster, /loadAuthorizedTeamMutationContext\("teams\.edit"\)/);
+  assert.match(roster, /\(auth\.permissions \|\| \[\]\)\.includes\("players\.edit"\)/);
+  assert.match(roster, /Fehlende Berechtigung: players\.edit/);
+  assert.match(roster, /loadScopedExistingTeamSeason\(auth, teamId, teamSeasonId\)/);
+  assert.match(roster, /hasPersonsWithoutDepartmentAssignment/);
+  assert.match(roster, /replacePlayerAssignments\(context\.teamSeason\.id, normalizedPlayerIds, writeDb\)/);
+
+  assert.ok(roster.indexOf('includes("players.edit")') < roster.indexOf("loadScopedExistingTeamSeason"));
+  assert.ok(roster.indexOf("loadScopedExistingTeamSeason") < roster.indexOf("createSupabaseAdminClient()"));
+  assert.ok(roster.indexOf("createSupabaseAdminClient()") < roster.indexOf("replacePlayerAssignments"));
 });
 
 test("approved trainer writes switch to service role only after permission and scope checks", () => {

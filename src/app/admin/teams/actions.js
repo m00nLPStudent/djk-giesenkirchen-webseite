@@ -65,6 +65,7 @@ async function loadAuthorizedTeamMutationContext(requiredPermission) {
     scopeContext,
     userId: permissionResult.userId,
     roles: permissionResult.roles || [],
+    permissions: permissionResult.permissions || [],
   };
 }
 
