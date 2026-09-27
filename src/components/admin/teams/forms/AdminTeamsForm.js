@@ -30,7 +30,10 @@ import TeamTrainingTab from "./tabs/TeamTrainingTab";
 import useTeamScope from "../useTeamScope";
 import { isYouthTeam } from "../teamScope";
 import useTeamMedia from "./useTeamMedia";
-import { canRestrictedTrainerEditTab } from "../trainerTeamEdit.core.mjs";
+import {
+  canRestrictedTrainerEditTab,
+  synchronizeTrainerTeamFormAfterSave,
+} from "../trainerTeamEdit.core.mjs";
 
 function getCoachStatusMessage(currentSeasonResolution, currentTeamSeasons = []) {
   if (!currentSeasonResolution?.activeSeasonStatus) return null;
@@ -251,6 +254,16 @@ export default function AdminTeamsForm({
       return;
     }
 
+    if (restrictedTrainer) {
+      setForm((current) =>
+        synchronizeTrainerTeamFormAfterSave(
+          current,
+          activeTab,
+          result.data,
+        ),
+      );
+    }
+
     logAdminSaveEvent({
       module: "teams",
       mode: team?.id ? "edit" : "create",
@@ -260,7 +273,9 @@ export default function AdminTeamsForm({
     });
 
     await revalidatePublicContentAction("teams");
-    router.push(returnPath);
+    if (!restrictedTrainer) {
+      router.push(returnPath);
+    }
     router.refresh();
   }
 

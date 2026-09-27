@@ -47,3 +47,31 @@ export function pickTrainerTeamMutationPayload(operation, input = {}) {
   }
   return null;
 }
+
+export function synchronizeTrainerTeamFormAfterSave(
+  current = {},
+  operation,
+  saved = {},
+) {
+  if (operation === "description") {
+    return { ...current, description_de: saved.description_de || "" };
+  }
+  if (operation === "training") {
+    return { ...current, training_times_de: saved.training_times_de || "" };
+  }
+  if (operation === "contact") {
+    return {
+      ...current,
+      contact_name: saved.contact_name || "",
+      contact_email: saved.contact_email || "",
+      contact_phone: saved.contact_phone || "",
+    };
+  }
+  if (operation === "players") {
+    return {
+      ...current,
+      selected_player_ids: [...(saved.selected_player_ids || [])],
+    };
+  }
+  return current;
+}

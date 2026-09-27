@@ -239,7 +239,7 @@ async function saveTrainerTeamSeasonFields(operation, teamId, teamSeasonId, inpu
   revalidatePath(`/admin/teams/edit/${teamId}`);
   revalidatePath(`/admin/football/teams/edit/${teamId}`);
   revalidatePublicContent("teams");
-  return { error: null };
+  return { data: payload, error: null };
 }
 
 export async function saveTrainerTeamDescriptionAction(teamId, teamSeasonId, input) {
@@ -277,7 +277,10 @@ export async function saveTrainerTeamRosterAction(teamId, teamSeasonId, playerId
   revalidatePath(`/admin/teams/edit/${teamId}`);
   revalidatePath(`/admin/football/teams/edit/${teamId}`);
   revalidatePublicContent("teams");
-  return { error: null };
+  return {
+    data: { selected_player_ids: normalizedPlayerIds },
+    error: null,
+  };
 }
 
 export async function saveTeamSeasonYearGroupsAction(teamId, teamSeasonId, values) {

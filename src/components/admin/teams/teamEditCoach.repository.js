@@ -9,7 +9,7 @@ export async function loadTeamEditCoachData(supabaseServer, teamId, departmentId
 
   const { data: teamSeasons, error: teamSeasonsError } = await supabaseServer
     .from("team_seasons")
-    .select("id, team_id, season_id, name_de, name_en, slug, age_group, is_active")
+    .select("id, team_id, season_id, name_de, name_en, slug, age_group, description_de, description_en, training_times_de, training_times_en, contact_name, contact_email, contact_phone, is_active")
     .eq("team_id", teamId);
 
   if (teamSeasonsError) {

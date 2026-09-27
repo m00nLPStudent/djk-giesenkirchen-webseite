@@ -6,6 +6,7 @@ const actions = await readFile(new URL("../../../app/admin/teams/actions.js", im
 const form = await readFile(new URL("./forms/AdminTeamsForm.js", import.meta.url), "utf8");
 const page = await readFile(new URL("../../../app/admin/teams/edit/[id]/page.js", import.meta.url), "utf8");
 const trainingActions = await readFile(new URL("../../../app/admin/teams/training/actions.js", import.meta.url), "utf8");
+const editRepository = await readFile(new URL("./teamEditCoach.repository.js", import.meta.url), "utf8");
 
 test("trainer actions validate permission, team scope and existing team-season identity", () => {
   assert.match(actions, /loadAuthorizedTeamMutationContext\("teams\.edit"\)/);
@@ -49,6 +50,23 @@ test("trainer tabs dispatch only targeted operations", () => {
   assert.match(form, /training: \(\) => saveTrainerTeamTrainingSummaryAction/);
   assert.match(form, /players: \(\) => saveTrainerTeamRosterAction/);
   assert.match(form, /contact: \(\) => saveTrainerTeamContactAction/);
+});
+
+test("successful trainer saves keep the editor mounted and synchronize returned data", () => {
+  assert.match(actions, /return \{ data: payload, error: null \}/);
+  assert.match(actions, /data: \{ selected_player_ids: normalizedPlayerIds \}/);
+  assert.match(form, /synchronizeTrainerTeamFormAfterSave/);
+  assert.match(form, /if \(!restrictedTrainer\) \{\s*router\.push\(returnPath\)/s);
+  assert.match(form, /router\.refresh\(\)/);
+  for (const field of [
+    "description_de",
+    "training_times_de",
+    "contact_name",
+    "contact_email",
+    "contact_phone",
+  ]) {
+    assert.match(editRepository, new RegExp(field));
+  }
 });
 
 test("roster changes additionally require players.edit", () => {
