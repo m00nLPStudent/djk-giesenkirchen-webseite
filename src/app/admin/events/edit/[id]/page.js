@@ -6,23 +6,29 @@ import { createEventDto } from "@/components/admin/events/helpers/eventTypes.cor
 import { loadEventTypes } from "@/components/admin/events/services/eventTypes.repository";
 import { AdminActionBar, AdminButton, AdminDangerZone, AdminDetailHeader, AdminDetailLayout, AdminStatusChip } from "@/components/admin/design-system";
 import { formatEventDate, formatEventTime, getEventStatusKey } from "@/lib/events";
-import { supabase } from "@/lib/supabase";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canManageMedia, loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import Can from "@/components/admin/auth/Can";
 import EventDeleteButton from "@/components/admin/events/components/EventDeleteButton";
+import { loadEditorialDepartmentScope } from "@/lib/admin-auth/scopes/editorialDepartmentScope.server";
 
 export default async function EditEventPage({ params }) {
   const { id } = await params;
   const auth = await assertAdminActionPermission({ requiredPermission: "events.edit" });
   if (!auth.ok) redirect("/admin/unauthorized?reason=missing-events-permission");
+  const { scope } = await loadEditorialDepartmentScope(auth);
+  if (!scope.valid) redirect("/admin/unauthorized?reason=invalid-department-scope");
   const adminClient = createSupabaseAdminClient();
   if (!adminClient) throw new Error("Termin-Service ist nicht konfiguriert.");
+  let eventQuery = adminClient.from("events").select("*, event_documents(*)").eq("id", id);
+  if (scope.mode === "department") eventQuery = eventQuery.eq("department_id", scope.departmentId);
+  let teamsQuery = auth.supabaseServer.from("teams").select("id, name_de, is_active, sort_order, department_id").eq("is_active", true).order("sort_order", { ascending: true });
+  if (scope.mode === "department") teamsQuery = teamsQuery.eq("department_id", scope.departmentId);
   const [{ data: event }, { data: teams }, { data: eventTypes }] = await Promise.all([
-    adminClient.from("events").select("*, event_documents(*)").eq("id", id).single(),
-    supabase.from("teams").select("id, name_de, is_active, sort_order").eq("is_active", true).order("sort_order", { ascending: true }),
-    loadEventTypes(supabase, { activeOnly: false }),
+    eventQuery.maybeSingle(),
+    teamsQuery,
+    loadEventTypes(auth.supabaseServer, { activeOnly: false }),
   ]);
   if (!event) notFound();
   const media = await loadMediaAssetForPicker(event.image_media_asset_id);

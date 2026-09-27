@@ -9,6 +9,7 @@ import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermiss
 import { getVirtualTrainingEvents } from "@/lib/events";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { redirect } from "next/navigation";
+import { loadEditorialDepartmentScope } from "@/lib/admin-auth/scopes/editorialDepartmentScope.server";
 
 export const dynamic = "force-dynamic";
 
@@ -16,13 +17,15 @@ export default async function AdminEventsPage() {
   const permissionResult = await assertAdminActionPermission({ requiredPermission: "events.view" });
   if (!permissionResult.ok) redirect("/admin/unauthorized?reason=missing-events-permission");
   const scopeContext = await loadServerTeamScopeContext(permissionResult);
+  const { scope: editorialScope } = await loadEditorialDepartmentScope(permissionResult);
+  if (!editorialScope.valid) redirect("/admin/unauthorized?reason=invalid-department-scope");
   const adminClient = createSupabaseAdminClient();
   if (!adminClient) throw new Error("Termin-Service ist nicht konfiguriert.");
 
   const now = new Date();
   const tomorrow = getNextCalendarDayWindow(now);
   const [{ data: events }, virtualTrainings, { data: eventTypes }] = await Promise.all([
-    getAdminEvents(adminClient),
+    getAdminEvents(adminClient, editorialScope),
     getVirtualTrainingEvents({ ...tomorrow, maxOccurrencesPerTraining: 1, supabaseClient: permissionResult.supabaseServer }),
     loadEventTypes(permissionResult.supabaseServer, { activeOnly: false }),
   ]);

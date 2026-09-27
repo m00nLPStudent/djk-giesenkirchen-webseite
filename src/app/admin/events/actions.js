@@ -8,8 +8,26 @@ import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { requiresPublishPermission } from "@/lib/admin-auth/publishPermission.core.mjs";
 import { revalidatePath } from "next/cache";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
+import { loadEditorialDepartmentScope } from "@/lib/admin-auth/scopes/editorialDepartmentScope.server";
+import { canAccessEditorialRecord, canUseEditorialTeam, scopeEditorialWritePayload } from "@/lib/admin-auth/scopes/editorialDepartmentScope.core.mjs";
 
 const eventActionError = (message) => ({ data: null, error: { message } });
+
+async function authorizeEventScope(auth, eventId = null, db = createSupabaseAdminClient()) {
+  const { scope } = await loadEditorialDepartmentScope(auth);
+  if (!scope.valid) return { ok: false, message: "Der Abteilungsbereich konnte nicht sicher bestimmt werden." };
+  if (!eventId) return { ok: true, scope };
+  if (scope.mode === "global") return { ok: true, scope };
+  const existing = await db.from("events").select("id, department_id").eq("id", eventId).maybeSingle();
+  if (existing.error || !existing.data || !canAccessEditorialRecord(scope, existing.data)) return { ok: false, message: "Termin nicht gefunden oder nicht für diesen Bereich freigegeben." };
+  return { ok: true, scope, record: existing.data };
+}
+
+async function validateEventTeamScope(db, scope, teamId) {
+  if (!teamId || scope.mode === "global") return true;
+  const team = await db.from("teams").select("id, department_id").eq("id", teamId).maybeSingle();
+  return !team.error && Boolean(team.data) && canUseEditorialTeam(scope, team.data);
+}
 
 export async function deleteEventAction(eventId) {
   const permission = await assertAdminActionPermission({ requiredPermission: "events.delete" });
@@ -18,12 +36,8 @@ export async function deleteEventAction(eventId) {
   const db = createSupabaseAdminClient();
   if (!db) return eventActionError("Termin-Service ist nicht konfiguriert.");
 
-  const existing = await db.from("events").select("id").eq("id", eventId).maybeSingle();
-  if (existing.error) {
-    console.error("[event-delete]", { stage: "load", code: existing.error.code || "EVENT_LOAD_FAILED" });
-    return eventActionError("Der Termin konnte nicht geprüft werden.");
-  }
-  if (!existing.data) return eventActionError("Termin nicht gefunden.");
+  const authorization = await authorizeEventScope(permission, eventId, db);
+  if (!authorization.ok) return eventActionError(authorization.message);
 
   const deleted = await db.from("events").delete().eq("id", eventId);
   if (deleted.error) {
@@ -55,6 +69,9 @@ export async function saveEventWithNotificationAction(payload, eventId = null) {
   if (!auth.ok) return { data: null, error: { message: auth.message || "Berechtigung fehlt." } };
   const db = createSupabaseAdminClient();
   if (!db) return { data: null, error: { message: "Termin-Service ist nicht konfiguriert." } };
+  const scopeAuthorization = await authorizeEventScope(auth, eventId, db);
+  if (!scopeAuthorization.ok) return eventActionError(scopeAuthorization.message);
+  if (!await validateEventTeamScope(db, scopeAuthorization.scope, payload?.team_id || null)) return eventActionError("Die Mannschaft liegt außerhalb des erlaubten Abteilungsbereichs.");
   let previous = null;
   if (eventId) {
     const snapshot = await db.from("events").select("*").eq("id", eventId).maybeSingle();
@@ -74,12 +91,12 @@ export async function saveEventWithNotificationAction(payload, eventId = null) {
   });
   if (media.error) return { data: null, error: { message: media.error.message } };
   const { remove_legacy_image: removeLegacyImage, ...persistedPayload } = payload || {};
-  const writePayload = {
+  const writePayload = scopeEditorialWritePayload(scopeAuthorization.scope, {
     ...persistedPayload,
     image_url: removeLegacyImage === true ? null : persistedPayload.image_url || null,
     image_media_asset_id: media.data?.id || null,
     slug: uniqueSlug.slug,
-  };
+  });
   const result = eventId
     ? await db.from("events").update(writePayload).eq("id", eventId).select("*").single()
     : await db.from("events").insert(writePayload).select("*").single();
@@ -98,11 +115,9 @@ export async function saveEventWithNotificationAction(payload, eventId = null) {
 async function authorizeEventMedia(eventId = null) {
   const auth = await assertAdminActionPermission({ requiredPermission: eventId ? "events.edit" : "events.create" });
   if (!auth.ok) return { ok: false, message: auth.message || "Berechtigung fehlt." };
-  if (eventId) {
-    const existing = await auth.supabaseServer.from("events").select("id").eq("id", eventId).maybeSingle();
-    if (existing.error || !existing.data) return { ok: false, message: "Termin nicht gefunden." };
-  }
-  return { ok: true, auth };
+  const scopeAuthorization = await authorizeEventScope(auth, eventId);
+  if (!scopeAuthorization.ok) return { ok: false, message: scopeAuthorization.message };
+  return { ok: true, auth, scope: scopeAuthorization.scope };
 }
 
 export async function loadEventMediaPickerAction(filters = {}, eventId = null) {
@@ -211,6 +226,8 @@ export async function updateEventDocumentAction(documentId, updates = {}) {
   if (!db) return eventDocumentError("Event-Dokument-Service ist nicht konfiguriert.");
   const current = await db.from("event_documents").select("id,event_id").eq("id", documentId).maybeSingle();
   if (current.error || !current.data) return eventDocumentError("Dokument nicht gefunden.");
+  const authorization = await authorizeEventScope(permission, current.data.event_id, db);
+  if (!authorization.ok) return eventDocumentError(authorization.message);
   const allowed = ["display_name_de", "description_de", "sort_order", "is_public"];
   const safe = Object.fromEntries(Object.entries(updates).filter(([key]) => allowed.includes(key)));
   if ("sort_order" in safe) safe.sort_order = Math.max(0, Math.trunc(Number(safe.sort_order) || 0));
@@ -222,8 +239,10 @@ export async function deleteEventDocumentAction(documentId) {
   if (!permission.ok) return eventDocumentError(permission.message || "Berechtigung fehlt.");
   const db = getEventDocumentAdminClient();
   if (!db) return eventDocumentError("Event-Dokument-Service ist nicht konfiguriert.");
-  const current = await db.from("event_documents").select("id,media_asset_id,file_path").eq("id", documentId).maybeSingle();
+  const current = await db.from("event_documents").select("id,event_id,media_asset_id,file_path").eq("id", documentId).maybeSingle();
   if (current.error || !current.data) return eventDocumentError("Dokument nicht gefunden.");
+  const authorization = await authorizeEventScope(permission, current.data.event_id, db);
+  if (!authorization.ok) return eventDocumentError(authorization.message);
   if (!current.data.media_asset_id && current.data.file_path) {
     const removed = await db.storage.from("events-documents").remove([decodeURIComponent(current.data.file_path)]);
     if (removed.error) return eventDocumentError(removed.error.message);

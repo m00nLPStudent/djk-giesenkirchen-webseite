@@ -44,6 +44,10 @@ Die Familie `b15-trainer-team-edit-permissions-{preflight-readonly,proposal,roll
 
 Die Familie `b15-youth-coordinator-permissions-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert die kontrollierte Entfernung von `settings.view` und die Zuordnung der fünf bestehenden `results.*`-Permissions für den Jugendleiter. `teams.create`, `settings.edit`, RLS und die `team_seasons`-Policies bleiben unverändert. Preflight, Proposal und Postcheck wurden manuell erfolgreich ausgeführt; der Postcheck bestätigte 71 Zeilen, 11/11 Ergebnisblöcke und `overall_ok = true`. Der Rollback blieb unbenutzt. Die SQL-Artefakte sind kein automatischer Deploymentpfad.
 
+## Version 1.0.12 – Tischtennis-Redaktion und Kassierer-Berechtigungen
+
+Die Familie `b15-table-tennis-board-cashier-permissions-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert die Department-Zuordnung von News und Events, scope-aware Policies, die zehn Editorial-Permissions des Tischtennisvorstands sowie den Entzug von `settings.view` und `settings.edit` beim Kassierer. Preflight, Proposal und Postcheck wurden manuell ausgeführt; der Postcheck bestätigte 46 Zeilen, 10/10 Diagnoseblöcke und `overall_ok = true`. Der Rollback blieb unbenutzt. Bestehende globale Datensätze mit leerer Department-Zuordnung bleiben zulässig; SQL wird nicht durch das Deployment ausgeführt.
+
 ## Abgeschlossene Membership-Rollouts und weiterhin manuell zu verifizierende Altartefakte
 
 - B15.21B3 Request-Type-Constraint und B15.21C1 Rollen/Permissions sind produktiv abgeschlossen. Die jeweiligen Preflight-/Proposal-/Rollback-/Postcheck-Familien bleiben Rolloutnachweise und sind keine offenen Ausführungsaufträge.

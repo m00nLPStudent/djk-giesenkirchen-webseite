@@ -9,24 +9,32 @@ import { loadNewsCategories } from "@/components/admin/news/services/newsCategor
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { canManageMedia, loadMediaAssetForPicker } from "@/components/admin/media-library/media.service";
 import { redirect } from "next/navigation";
+import { loadEditorialDepartmentScope } from "@/lib/admin-auth/scopes/editorialDepartmentScope.server";
 
 export default async function EditNewsPage({ params }) {
   const { id } = await params;
   const auth = await assertAdminActionPermission({ requiredPermission: "news.edit" });
   if (!auth.ok) redirect(`/admin/unauthorized?reason=${auth.reason}`);
+  const { scope } = await loadEditorialDepartmentScope(auth);
+  if (!scope.valid) redirect("/admin/unauthorized?reason=invalid-department-scope");
 
-  const { data: news } = await auth.supabaseServer
+  let newsQuery = auth.supabaseServer
     .from("news")
     .select("*, news_documents(*)")
-    .eq("id", id)
-    .single();
+    .eq("id", id);
+  if (scope.mode === "department") newsQuery = newsQuery.eq("department_id", scope.departmentId);
+  const { data: news } = await newsQuery.maybeSingle();
+  if (!news) redirect("/admin/unauthorized?reason=editorial-department-scope");
 
-  const { data: teams } = await auth.supabaseServer
+  let teamsQuery = auth.supabaseServer
     .from("teams")
-    .select("id, name_de, slug, is_active, sort_order")
+    .select("id, name_de, slug, is_active, sort_order, department_id")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
-  const [{ data: categories }, { data: allCategories }] = await Promise.all([loadNewsCategories(auth.supabaseServer), loadNewsCategories(auth.supabaseServer, { activeOnly: false })]);
+  if (scope.mode === "department") teamsQuery = teamsQuery.eq("department_id", scope.departmentId);
+  const [{ data: teams }, { data: loadedCategories }, { data: loadedAllCategories }] = await Promise.all([teamsQuery, loadNewsCategories(auth.supabaseServer), loadNewsCategories(auth.supabaseServer, { activeOnly: false })]);
+  const categories = scope.mode === "department" ? (loadedCategories || []).filter((item) => item.slug === scope.departmentSlug) : loadedCategories;
+  const allCategories = scope.mode === "department" ? (loadedAllCategories || []).filter((item) => item.slug === scope.departmentSlug) : loadedAllCategories;
   const media = await loadMediaAssetForPicker(news.image_media_asset_id);
   const allowedVisibilities = canManageMedia(auth.roles) ? ["public", "admin"] : ["public"];
   const initialMedia = allowedVisibilities.includes(media.data?.visibility) ? media.data : null;

@@ -10,7 +10,7 @@ const helpers = read("./eventList.helpers.js");
 const actions = read("../../../app/admin/events/actions.js");
 
 test("admin overview authorizes and resolves scope before using the admin read client", () => {
-  assert.match(page, /requiredPermission: "events\.view"[\s\S]*loadServerTeamScopeContext\(permissionResult\)[\s\S]*createSupabaseAdminClient\(\)[\s\S]*getAdminEvents\(adminClient\)/);
+  assert.match(page, /requiredPermission: "events\.view"[\s\S]*loadServerTeamScopeContext\(permissionResult\)[\s\S]*loadEditorialDepartmentScope\(permissionResult\)[\s\S]*createSupabaseAdminClient\(\)[\s\S]*getAdminEvents\(adminClient, editorialScope\)/);
   assert.match(page, /scopedTrainings = virtualTrainings\.filter\(\(event\) => canAccessTeamOnServer\(scopeContext, event\)\)/);
 });
 

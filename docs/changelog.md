@@ -2,6 +2,16 @@
 
 ## 2026-09-27
 
+### Version 1.0.12 – Tischtennis-Redaktion und Kassierer-Berechtigungen
+
+- Der Tischtennisvorstand besitzt alle fünf bestehenden `news.*`- und alle fünf bestehenden `events.*`-Permissions. News und allgemeine Termine werden in Listen, Detailzugriffen und Mutationen serverseitig ausschließlich auf das Department Tischtennis begrenzt.
+- `public.news` und `public.events` wurden um nullable `department_id`-Zuordnungen mit Foreign Keys auf `departments(id) ON DELETE SET NULL` und partiellen Indizes ergänzt. Bestehende Teamzuordnungen wurden kontrolliert übernommen; globale Datensätze mit `NULL` bleiben erhalten.
+- Create-Payloads erhalten den autorisierten Department-Scope serverseitig. Edit, Delete, Publish/Unpublish sowie News-/Event-Dokumentaktionen verweigern fremde Fußball- und Gesamtvereins-IDs.
+- Die relevanten News-, News-Dokument- und Event-Read-Policies verwenden den zentralen Department-Permission-Vertrag. Öffentliche Veröffentlichungsfilter bleiben unverändert.
+- Dem Kassierer wurden `settings.view` und `settings.edit` entzogen. Alle neun bestehenden `contributions.*`-Permissions bleiben erhalten; Superadmin bleibt vollständiger Beitragsmanager und Vorstand behält ausschließlich `contributions.view` und `contributions.export`.
+- Preflight, Proposal und Postcheck wurden manuell erfolgreich ausgeführt. Der Postcheck lieferte 46 Zeilen, 10/10 Diagnoseblöcke, keine Scope-/Referenzabweichung und `overall_ok = true`; der Rollback wurde nicht ausgeführt.
+- Der Trainervertrag aus Version 1.0.10 und der Jugendleitervertrag aus Version 1.0.11 bleiben unverändert.
+
 ### Version 1.0.11 – Jugendleiter-Berechtigungen und Mannschaftsspeicherung
 
 - Der Jugendleiter besitzt nicht mehr `settings.view`; `settings.edit` bleibt ebenfalls unvergeben. Allgemeine Einstellungen, Seiten und Vereinskontakte gehören damit nicht zu seinem Zugriffsbereich.

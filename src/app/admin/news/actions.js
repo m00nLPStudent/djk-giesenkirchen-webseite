@@ -8,6 +8,18 @@ import { extractNewsInlineMediaAssetIds, hasInvalidNewsInlineMediaAssetIds, hasN
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import { requiresPublishPermission } from "@/lib/admin-auth/publishPermission.core.mjs";
+import { loadEditorialDepartmentScope } from "@/lib/admin-auth/scopes/editorialDepartmentScope.server";
+import { canAccessEditorialRecord, isAllowedEditorialCategory, scopeEditorialWritePayload } from "@/lib/admin-auth/scopes/editorialDepartmentScope.core.mjs";
+
+async function authorizeNewsScope(permissionResult, newsId = null, db = permissionResult.supabaseServer) {
+  const { scope } = await loadEditorialDepartmentScope(permissionResult);
+  if (!scope.valid) return { ok: false, message: "Der Abteilungsbereich konnte nicht sicher bestimmt werden." };
+  if (!newsId) return { ok: true, scope };
+  if (scope.mode === "global") return { ok: true, scope };
+  const existing = await db.from("news").select("id, department_id").eq("id", newsId).maybeSingle();
+  if (existing.error || !existing.data || !canAccessEditorialRecord(scope, existing.data)) return { ok: false, message: "News nicht gefunden oder nicht für diesen Bereich freigegeben." };
+  return { ok: true, scope, record: existing.data };
+}
 
 async function prepareNewsInlineContent(content, previousContent = "") {
   if (hasNewTransientImageSources(content, previousContent)) return { error: "Eingefügte Bilder müssen zuerst über die Medienbibliothek hochgeladen werden." };
@@ -28,8 +40,8 @@ export async function deleteNewsAction(newsId) {
   if (!permission.ok) return { data: null, error: { message: permission.message || "Berechtigung fehlt." } };
   const db = createSupabaseAdminClient();
   if (!db) return { data: null, error: { message: "News-Service ist nicht konfiguriert." } };
-  const existing = await db.from("news").select("id").eq("id", newsId).maybeSingle();
-  if (existing.error || !existing.data) return { data: null, error: { message: "News nicht gefunden." } };
+  const authorization = await authorizeNewsScope(permission, newsId, db);
+  if (!authorization.ok) return { data: null, error: { message: authorization.message } };
   const result = await db.from("news").delete().eq("id", newsId);
   if (!result.error) await revalidatePublicContentAction("news");
   return result;
@@ -40,6 +52,9 @@ export async function saveNewsWithAuthorAction(payload, newsId = null) {
   if (!permissionResult.ok) return { data: null, error: { message: permissionResult.message || "Berechtigung fehlt." } };
 
   const db = permissionResult.supabaseServer;
+  const scopeAuthorization = await authorizeNewsScope(permissionResult, newsId, db);
+  if (!scopeAuthorization.ok) return { data: null, error: { message: scopeAuthorization.message } };
+  if (!isAllowedEditorialCategory(scopeAuthorization.scope, payload?.category_key)) return { data: null, error: { message: "Die News-Kategorie liegt außerhalb des erlaubten Abteilungsbereichs." } };
   const allowedVisibilities = canManageMedia(permissionResult.roles) ? ["public", "admin"] : ["public"];
   let existing = null;
   if (newsId) {
@@ -55,7 +70,7 @@ export async function saveNewsWithAuthorAction(payload, newsId = null) {
   if (media.error) return { data: null, error: { message: media.error.message } };
   const inline = await prepareNewsInlineContent(payload?.content_de || "", existing?.content_de || "");
   if (inline.error) return { data: null, error: { message: inline.error } };
-  const safePayload = sanitizeNewsWritePayload({ ...payload, content_de: inline.content, image_url: payload?.remove_legacy_image === true ? null : payload?.image_url || null });
+  const safePayload = scopeEditorialWritePayload(scopeAuthorization.scope, sanitizeNewsWritePayload({ ...payload, content_de: inline.content, image_url: payload?.remove_legacy_image === true ? null : payload?.image_url || null }));
 
   if (newsId) {
     const saved = await db.from("news").update({ ...safePayload, author: existing.author }).eq("id", newsId).select("*").single();
@@ -88,11 +103,9 @@ export async function saveNewsWithAuthorAction(payload, newsId = null) {
 async function authorizeNewsMedia(newsId = null) {
   const permissionResult = await assertAdminActionPermission({ requiredPermission: newsId ? "news.edit" : "news.create" });
   if (!permissionResult.ok) return { ok: false, message: permissionResult.message || "Berechtigung fehlt." };
-  if (newsId) {
-    const { data } = await permissionResult.supabaseServer.from("news").select("id").eq("id", newsId).maybeSingle();
-    if (!data) return { ok: false, message: "News nicht gefunden." };
-  }
-  return { ok: true, permissionResult };
+  const scopeAuthorization = await authorizeNewsScope(permissionResult, newsId);
+  if (!scopeAuthorization.ok) return { ok: false, message: scopeAuthorization.message };
+  return { ok: true, permissionResult, scope: scopeAuthorization.scope };
 }
 
 export async function loadNewsMediaPickerAction(filters = {}, newsId = null) {
@@ -192,6 +205,8 @@ export async function replaceNewsDocumentFileAction(documentId, mediaAssetId) {
   if (!permission.ok) return documentError(permission.message || "Berechtigung fehlt.");
   const current = await permission.supabaseServer.from("news_documents").select("id,news_id,media_asset_id").eq("id", documentId).maybeSingle();
   if (current.error || !current.data) return documentError("Dokument nicht gefunden.");
+  const scopeAuthorization = await authorizeNewsScope(permission, current.data.news_id);
+  if (!scopeAuthorization.ok) return documentError(scopeAuthorization.message);
   const allowed = canManageMedia(permission.roles) ? ["public", "admin"] : ["public"];
   const media = await resolveEntityDocumentMedia(mediaAssetId, { allowedVisibilities: allowed });
   if (media.error) return documentError(media.error.message);
@@ -208,6 +223,10 @@ export async function replaceNewsDocumentFileAction(documentId, mediaAssetId) {
 export async function updateNewsDocumentAction(documentId, updates = {}) {
   const permission = await assertAdminActionPermission({ requiredPermission: "news.edit" });
   if (!permission.ok) return documentError(permission.message || "Berechtigung fehlt.");
+  const current = await permission.supabaseServer.from("news_documents").select("id,news_id").eq("id", documentId).maybeSingle();
+  if (current.error || !current.data) return documentError("Dokument nicht gefunden.");
+  const scopeAuthorization = await authorizeNewsScope(permission, current.data.news_id);
+  if (!scopeAuthorization.ok) return documentError(scopeAuthorization.message);
   const allowed = ["display_name_de", "description_de", "sort_order", "is_public"];
   const safe = Object.fromEntries(Object.entries(updates).filter(([key]) => allowed.includes(key)));
   if ("sort_order" in safe) safe.sort_order = Math.max(0, Math.trunc(Number(safe.sort_order) || 0));
@@ -217,8 +236,10 @@ export async function updateNewsDocumentAction(documentId, updates = {}) {
 export async function deleteNewsDocumentAction(documentId) {
   const permission = await assertAdminActionPermission({ requiredPermission: "news.edit" });
   if (!permission.ok) return documentError(permission.message || "Berechtigung fehlt.");
-  const current = await permission.supabaseServer.from("news_documents").select("id,media_asset_id,file_path").eq("id", documentId).maybeSingle();
+  const current = await permission.supabaseServer.from("news_documents").select("id,news_id,media_asset_id,file_path").eq("id", documentId).maybeSingle();
   if (current.error || !current.data) return documentError("Dokument nicht gefunden.");
+  const scopeAuthorization = await authorizeNewsScope(permission, current.data.news_id);
+  if (!scopeAuthorization.ok) return documentError(scopeAuthorization.message);
   if (!current.data.media_asset_id && current.data.file_path) {
     const removed = await permission.supabaseServer.storage.from("news-documents").remove([decodeURIComponent(current.data.file_path)]);
     if (removed.error) return documentError(removed.error.message);

@@ -67,12 +67,12 @@ test("the modal is accessible, responsive and only confirmation can close it", (
 });
 
 test("version and visible copy have a single central source", () => {
-  assert.match(config, /version: "1\.0\.11"/);
+  assert.match(config, /version: "1\.0\.12"/);
   assert.match(config, /releaseDate: "2026-09-27"/);
-  assert.match(config, /Jugendleiter-Berechtigungen/);
-  assert.match(config, /Fußball-Ergebnisse vollständig verwalten/);
-  assert.match(config, /Mannschaftsbearbeitung/);
-  assert.match(config, /Mannschafts- und Saisoninformationen/);
-  assert.doesNotMatch(gate, /version:\s*"1\.0\.11"/);
-  assert.doesNotMatch(dialog, /version:\s*"1\.0\.11"/);
+  assert.match(config, /Tischtennis – News & Termine/);
+  assert.match(config, /Kassierer-Berechtigungen/);
+  assert.match(config, /News und Termine der Tischtennisabteilung/);
+  assert.match(config, /vollständige Beitragsverwaltung bleibt erhalten/);
+  assert.doesNotMatch(gate, /version:\s*"1\.0\.12"/);
+  assert.doesNotMatch(dialog, /version:\s*"1\.0\.12"/);
 });

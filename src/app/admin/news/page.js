@@ -3,6 +3,7 @@ import { AdminNewsList } from "@/components/admin/news";
 import { loadNewsCategories } from "@/components/admin/news/services/newsCategories.repository";
 import { assertAdminActionPermission } from "@/lib/admin-auth/adminActionPermissions";
 import { redirect } from "next/navigation";
+import { loadEditorialDepartmentScope } from "@/lib/admin-auth/scopes/editorialDepartmentScope.server";
 
 export const dynamic = "force-dynamic";
 
@@ -24,11 +25,16 @@ export default async function AdminNewsPage() {
   const auth = await assertAdminActionPermission({ requiredPermission: "news.view" });
   if (!auth.ok) redirect(`/admin/unauthorized?reason=${auth.reason}`);
 
-  const { data: categories } = await loadNewsCategories(auth.supabaseServer, { activeOnly: false });
-  const { data: news } = await auth.supabaseServer
+  const { scope } = await loadEditorialDepartmentScope(auth);
+  if (!scope.valid) redirect("/admin/unauthorized?reason=invalid-department-scope");
+  const { data: loadedCategories } = await loadNewsCategories(auth.supabaseServer, { activeOnly: false });
+  let newsQuery = auth.supabaseServer
     .from("news")
     .select("*, football_team:football_team_id(name_de)")
     .order("created_at", { ascending: false });
+  if (scope.mode === "department") newsQuery = newsQuery.eq("department_id", scope.departmentId);
+  const { data: news } = await newsQuery;
+  const categories = scope.mode === "department" ? (loadedCategories || []).filter((item) => item.slug === scope.departmentSlug) : loadedCategories;
 
   const newsList = news || [];
 

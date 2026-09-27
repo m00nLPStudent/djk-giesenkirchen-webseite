@@ -38,12 +38,14 @@ async function buildUniqueSlug(slug, ignoreId = null) {
   return candidate;
 }
 
-export async function getAdminEvents(client = supabase) {
-  return await client
+export async function getAdminEvents(client = supabase, editorialScope = null) {
+  let query = client
     .from("events")
     .select("*")
     .order("starts_at", { ascending: true })
     .order("created_at", { ascending: false });
+  if (editorialScope?.mode === "department") query = query.eq("department_id", editorialScope.departmentId);
+  return await query;
 }
 
 export async function getPublishedEvents() {

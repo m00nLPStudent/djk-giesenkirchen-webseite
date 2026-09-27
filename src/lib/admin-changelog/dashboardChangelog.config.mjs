@@ -1,17 +1,17 @@
 export const CURRENT_DASHBOARD_CHANGELOG = Object.freeze({
-  version: "1.0.11",
+  version: "1.0.12",
   releaseDate: "2026-09-27",
   title: "Neu im Dashboard",
   entries: Object.freeze([
     Object.freeze({
-      title: "Jugendleiter-Berechtigungen",
+      title: "Tischtennis – News & Termine",
       description:
-        "Die Berechtigungen für Jugendleiter wurden präzisiert. Jugendleiter können nun Fußball-Ergebnisse vollständig verwalten, während allgemeine Vereinseinstellungen und Seitenkontakte nicht mehr zu ihrem Zugriffsbereich gehören.",
+        "Der Tischtennisvorstand kann jetzt News und Termine der Tischtennisabteilung vollständig verwalten. Die Inhalte bleiben dabei sauber auf die eigene Abteilung begrenzt.",
     }),
     Object.freeze({
-      title: "Mannschaftsbearbeitung",
+      title: "Kassierer-Berechtigungen",
       description:
-        "Die Speicherung bestehender Mannschafts- und Saisoninformationen wurde korrigiert, sodass berechtigte Jugendleiter Mannschaften zuverlässig bearbeiten können.",
+        "Die Berechtigungen des Kassierers wurden präzisiert. Die vollständige Beitragsverwaltung bleibt erhalten, während allgemeine Seiten- und Vereinseinstellungen nicht mehr zu seinem Arbeitsbereich gehören.",
     }),
   ]),
 });
