@@ -6,6 +6,7 @@ import { canAccessTeamOnServer, loadServerTeamScopeContext } from "@/components/
 import { getTrainingExceptionPlan, getTrainingTimePlan, normalizeTrainingExceptionPayload, normalizeTrainingTimePayload } from "@/components/admin/teams/training/trainingMutation.core.mjs";
 import { logTrainingNotificationFailure, notifyTrainingMutation } from "@/components/admin/notifications/trainingNotifications.service";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
+import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 
 const errorResult = (message) => ({ data: null, error: { message } });
 const TYPES = { tischtennis: new Set(["training", "foerdertraining", "sonstiges"]), default: new Set(["training", "spiel", "torwart", "foerdertraining", "athletik", "hallentraining", "sonstiges"]) };
@@ -22,7 +23,9 @@ function validateTrainingContract(item, context) {
 async function loadBaseAuth() {
   const auth = await assertAdminActionPermission({ requiredPermission: "teams.edit" });
   if (!auth.ok) return { error: errorResult(auth.message || "Berechtigung fehlt.") };
-  return { auth, scope: await loadServerTeamScopeContext(auth) };
+  const writeDb = createSupabaseAdminClient();
+  if (!writeDb) return { error: errorResult("Serverseitiger Datenbankzugriff ist nicht konfiguriert.") };
+  return { auth, scope: await loadServerTeamScopeContext(auth), writeDb };
 }
 
 async function loadTeamContext(db, teamSeasonId) {
@@ -66,10 +69,10 @@ export async function createTrainingTimeAction(payload) {
   if (context.error) return errorResult(context.error.message);
   const contractError = items.map((item) => validateTrainingContract(item, context)).find(Boolean);
   if (contractError) return errorResult(contractError);
-  const write = await state.auth.supabaseServer.from("team_training_times").insert(items).select("*");
+  const write = await state.writeDb.from("team_training_times").insert(items).select("*");
   if (write.error) return write;
   const ids = (write.data || []).map((item) => item.id);
-  const postcheck = ids.length ? await state.auth.supabaseServer.from("team_training_times").select("*").in("id", ids) : { data: [], error: null };
+  const postcheck = ids.length ? await state.writeDb.from("team_training_times").select("*").in("id", ids) : { data: [], error: null };
   if (postcheck.error || postcheck.data?.length !== ids.length) return errorResult(postcheck.error?.message || "Postcheck der Trainingszeiten fehlgeschlagen.");
   revalidateTraining(context.data.teamId);
   for (const item of postcheck.data || []) await notify(state.auth, { model: "time", plan: getTrainingTimePlan(null, item), next: item, teamContext: context.data }, "training-time-created");
@@ -88,7 +91,7 @@ export async function updateTrainingTimeAction(id, payload) {
   if (newContext.error) return errorResult(newContext.error.message);
   const contractError = validateTrainingContract(nextPayload, newContext);
   if (contractError) return errorResult(contractError);
-  const write = await state.auth.supabaseServer.from("team_training_times").update(nextPayload).eq("id", id).select("*").single();
+  const write = await state.writeDb.from("team_training_times").update(nextPayload).eq("id", id).select("*").single();
   if (write.error) return write;
   const plan = getTrainingTimePlan(before.data, write.data);
   revalidateTraining(oldContext.data.teamId);
@@ -107,9 +110,9 @@ export async function deleteTrainingTimeAction(id) {
   if (before.error || !before.data) return errorResult(before.error?.message || "Trainingszeit nicht gefunden.");
   const context = await authorizeContext(state, before.data.team_season_id);
   if (context.error) return errorResult(context.error.message);
-  const write = await state.auth.supabaseServer.from("team_training_times").delete().eq("id", id);
+  const write = await state.writeDb.from("team_training_times").delete().eq("id", id);
   if (write.error) return write;
-  const postcheck = await state.auth.supabaseServer.from("team_training_times").select("id").eq("id", id).maybeSingle();
+  const postcheck = await state.writeDb.from("team_training_times").select("id").eq("id", id).maybeSingle();
   if (postcheck.error || postcheck.data) return errorResult(postcheck.error?.message || "Trainingszeit konnte nicht sicher entfernt werden.");
   revalidateTraining(context.data.teamId);
   await notify(state.auth, { model: "time", plan: getTrainingTimePlan(before.data, null), previous: before.data, teamContext: context.data }, "training-time-removed");
@@ -131,7 +134,7 @@ export async function createTrainingExceptionAction(payload) {
   if (time.error || !time.data) return errorResult(time.error?.message || "Trainingszeit nicht gefunden.");
   const context = await authorizeContext(state, time.data.team_season_id);
   if (context.error) return errorResult(context.error.message);
-  const write = await state.auth.supabaseServer.from("team_training_exceptions").insert(normalized).select("*").single();
+  const write = await state.writeDb.from("team_training_exceptions").insert(normalized).select("*").single();
   if (write.error) return write;
   revalidateTraining(context.data.teamId);
   await notify(state.auth, { model: "exception", plan: getTrainingExceptionPlan(null, write.data), next: write.data, teamContext: context.data }, "training-exception-created");
@@ -147,7 +150,7 @@ export async function updateTrainingExceptionAction(id, payload) {
   if (context.error) return errorResult(context.error.message);
   const normalized = normalizeTrainingExceptionPayload(payload);
   if (normalized.team_training_time_id !== before.data.team_training_time_id) return errorResult("Die Trainingszeit einer Ausnahme kann nicht gewechselt werden.");
-  const write = await state.auth.supabaseServer.from("team_training_exceptions").update(normalized).eq("id", id).select("*").single();
+  const write = await state.writeDb.from("team_training_exceptions").update(normalized).eq("id", id).select("*").single();
   if (write.error) return write;
   revalidateTraining(context.data.teamId);
   await notify(state.auth, { model: "exception", plan: getTrainingExceptionPlan(before.data, write.data), previous: before.data, next: write.data, teamContext: context.data }, "training-exception-updated");
@@ -161,9 +164,9 @@ export async function deleteTrainingExceptionAction(id) {
   if (before.error) return errorResult(before.error.message);
   const context = await authorizeContext(state, before.time.team_season_id);
   if (context.error) return errorResult(context.error.message);
-  const write = await state.auth.supabaseServer.from("team_training_exceptions").delete().eq("id", id);
+  const write = await state.writeDb.from("team_training_exceptions").delete().eq("id", id);
   if (write.error) return write;
-  const postcheck = await state.auth.supabaseServer.from("team_training_exceptions").select("id").eq("id", id).maybeSingle();
+  const postcheck = await state.writeDb.from("team_training_exceptions").select("id").eq("id", id).maybeSingle();
   if (postcheck.error || postcheck.data) return errorResult(postcheck.error?.message || "Ausnahme konnte nicht sicher entfernt werden.");
   revalidateTraining(context.data.teamId);
   await notify(state.auth, { model: "exception", plan: getTrainingExceptionPlan(before.data, null), previous: before.data, teamContext: context.data }, "training-exception-removed");

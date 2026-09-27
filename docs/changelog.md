@@ -2,6 +2,16 @@
 
 ## 2026-09-27
 
+### Version 1.0.10 – Trainer-Berechtigungen für zugeordnete Mannschaften
+
+- Ursache der bisherigen Speicherstörung war der allgemeine Mannschafts-Full-Save: Er führte auch reine Traineränderungen in einen `team_seasons`-Upsert, dessen INSERT-Pfad das bewusst nicht an Trainer vergebene `teams.create` benötigt.
+- Trainer können im Dashboard ausschließlich ihre zugeordneten Mannschaften bearbeiten. Der Team- und Mannschaftssaison-Scope wird vor jeder freigegebenen Mutation serverseitig geprüft.
+- Freigegeben sind Beschreibung, Trainingsübersicht und Trainingszeiten, Trainingsausnahmen, Kaderzuordnungen sowie Mannschaftskontakt. Kaderänderungen erfordern zusätzlich `players.edit` und schreiben ausschließlich in `player_team_seasons`.
+- Stammdaten, Saison- und Jahrgangsstruktur, Wettbewerb, FUSSBALL.DE-Konfiguration, Medien sowie das Anlegen und Löschen von Mannschaften bleiben für die reine Trainerrolle schreibgeschützt.
+- Höher privilegierte Rollen behalten ihre bestehenden Rechte. Service-Role-Zugriffe erfolgen weiterhin erst nach Session-, Permission- und Scope-Prüfung.
+- Das Datenbank-Hardening für `current_admin_has_non_table_tennis_permission(text)` wurde über Read-only-Preflight, manuell ausgeführtes Proposal und erfolgreichen Read-only-Postcheck verifiziert. Der vorhandene Rollback wurde nicht ausgeführt; `overall_ok = true`.
+- Der Stand ist lokal automatisiert validiert. Deployment, manueller Node-Neustart und abschließender Live-Rollentest stehen noch aus.
+
 ### Version 1.0.9 – Ergebnisse und öffentlicher Ergebnisticker
 
 - `public.club_results` wurde über den kontrollierten Read-only-Preflight-/Proposal-/Postcheck-Ablauf eingeführt. Der vorhandene Rollback wurde nicht ausgeführt. RLS erlaubt öffentlich ausschließlich veröffentlichte Ergebnisse innerhalb des wirksamen Sichtbarkeitsfensters; administrative Schreibvorgänge bleiben serverseitig geschützt.

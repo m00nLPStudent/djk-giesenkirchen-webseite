@@ -2,7 +2,7 @@
 
 > B15.21A und B15.21B0 sind produktiv abgeschlossen. Die B15.21B0-Dateifamilie bleibt als Rolloutnachweis erhalten; der Rollback ist nur ein destruktives Notfallartefakt.
 
-Stand: 27. September 2026. Inventar: 274 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
+Stand: 27. September 2026. Inventar: 278 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
 
 ## Vollständige Klassifikationsregeln
 
@@ -35,6 +35,10 @@ Die Familie `b15-board-role-webmaster-{preflight-readonly,proposal,rollback,post
 ## Version 1.0.9 – Ergebnismodul
 
 Die Familie `b15-results-module-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert die kontrollierte Einführung von `club_results`, den granularen `results.*`-Permissions sowie dem Resultat-Medienvertrag. Preflight, Proposal und korrigierter Postcheck wurden manuell erfolgreich ausgeführt; der Rollback blieb unbenutzt. Die SQL-Artefakte sind kein automatischer Deploymentpfad.
+
+## Version 1.0.10 – Trainer-Mannschaftsbearbeitung
+
+Die Familie `b15-trainer-team-edit-permissions-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert das Hardening von `current_admin_has_non_table_tennis_permission(text)`: Die reine Trainerrolle erhält darüber keine allgemeinen Mannschaftsrechte; höher privilegierte Rollen bleiben unverändert wirksam. Preflight, Proposal und Postcheck wurden manuell erfolgreich ausgeführt, der Postcheck bestätigte `overall_ok = true`; der Rollback blieb unbenutzt. Die freigegebenen Trainer-Mutationen werden zusätzlich im Anwendungscode auf zugeordnete Mannschaften und feste Feldverträge begrenzt.
 
 ## Abgeschlossene Membership-Rollouts und weiterhin manuell zu verifizierende Altartefakte
 

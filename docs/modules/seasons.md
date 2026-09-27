@@ -22,3 +22,7 @@ Technisch aktiv.
 ## Regel
 
 Die öffentliche Website zeigt die Saison, die im Adminbereich als öffentlich ausgewählt wurde.
+
+## Trainer-Mannschaftsbearbeitung
+
+Die reine Trainerrolle darf ausschließlich zugeordnete Mannschaften bearbeiten. Freigegeben sind Beschreibung, Training, Kader und Kontakt; Kaderänderungen erfordern zusätzlich `players.edit`. Stammdaten, Saison-/Jahrgangsstruktur, Wettbewerb, Providerkonfiguration, Medien sowie Mannschaften anlegen oder löschen bleiben gesperrt. Alle freigegebenen Mutationen prüfen Permission, Mannschafts- und Mannschaftssaison-Scope serverseitig vor dem Einsatz des serverseitigen Clients.

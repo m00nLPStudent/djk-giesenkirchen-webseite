@@ -7,7 +7,7 @@ import {
   loadServerTeamScopeContext,
 } from "@/components/admin/teams/serverTeamScope";
 import { canCreateTeamInScope } from "@/components/admin/teams/teamScope";
-import { saveTeamWithSeason } from "@/components/admin/teams/services/teams.service";
+import { replacePlayerAssignments, saveTeamWithSeason } from "@/components/admin/teams/services/teams.service";
 import { archiveTeam } from "@/components/admin/archiving/archive.service";
 import { revalidatePath } from "next/cache";
 import { revalidatePublicContent } from "@/lib/revalidation/publicContentRevalidation";
@@ -24,6 +24,10 @@ import { findTeamDepartmentById } from "@/components/admin/teams/services/teamDe
 import { normalizeClickTtConfig } from "@/lib/table-tennis/clickTt.core.mjs";
 import { upsertCompetitionConfig } from "@/lib/table-tennis/competition.repository";
 import { validateFootballDeWidgetCode } from "@/lib/football-de";
+import {
+  isRestrictedTrainerRoleSet,
+  pickTrainerTeamMutationPayload,
+} from "@/components/admin/teams/trainerTeamEdit.core.mjs";
 
 function buildError(message) {
   return { error: { message } };
@@ -79,6 +83,10 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
 
   if (!authContext.ok) {
     return authContext.result;
+  }
+
+  if (teamId && isRestrictedTrainerRoleSet(authContext.roles)) {
+    return buildError("Trainer koennen nur freigegebene Bereiche ihrer Mannschaft speichern.");
   }
 
   const { supabaseServer, scopeContext } = authContext;
@@ -193,9 +201,88 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   return { error: null };
 }
 
+async function loadScopedExistingTeamSeason(authContext, teamId, teamSeasonId) {
+  const team = await loadTeamById(authContext.supabaseServer, teamId);
+  if (!team || !canAccessTeamOnServer(authContext.scopeContext, team)) {
+    return { error: buildError("Du hast keinen Zugriff auf diese Mannschaft.") };
+  }
+  const result = await authContext.supabaseServer
+    .from("team_seasons")
+    .select("id, team_id, season_id")
+    .eq("id", teamSeasonId)
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (result.error || !result.data) {
+    return { error: buildError("Die Mannschaftssaison ist ungueltig.") };
+  }
+  return { team, teamSeason: result.data };
+}
+
+async function saveTrainerTeamSeasonFields(operation, teamId, teamSeasonId, input) {
+  const auth = await loadAuthorizedTeamMutationContext("teams.edit");
+  if (!auth.ok) return auth.result;
+  const context = await loadScopedExistingTeamSeason(auth, teamId, teamSeasonId);
+  if (context.error) return context.error;
+  const payload = pickTrainerTeamMutationPayload(operation, input);
+  if (!payload) return buildError("Die angeforderte Mannschaftsaktion ist nicht erlaubt.");
+  const writeDb = createSupabaseAdminClient();
+  if (!writeDb) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
+  const result = await writeDb
+    .from("team_seasons")
+    .update(payload)
+    .eq("id", context.teamSeason.id)
+    .eq("team_id", context.team.id)
+    .select("id")
+    .single();
+  if (result.error) return buildError(result.error.message || "Der Bereich konnte nicht gespeichert werden.");
+  revalidatePath(`/admin/teams/edit/${teamId}`);
+  revalidatePath(`/admin/football/teams/edit/${teamId}`);
+  revalidatePublicContent("teams");
+  return { error: null };
+}
+
+export async function saveTrainerTeamDescriptionAction(teamId, teamSeasonId, input) {
+  return saveTrainerTeamSeasonFields("description", teamId, teamSeasonId, input);
+}
+
+export async function saveTrainerTeamTrainingSummaryAction(teamId, teamSeasonId, input) {
+  return saveTrainerTeamSeasonFields("training", teamId, teamSeasonId, input);
+}
+
+export async function saveTrainerTeamContactAction(teamId, teamSeasonId, input) {
+  return saveTrainerTeamSeasonFields("contact", teamId, teamSeasonId, input);
+}
+
+export async function saveTrainerTeamRosterAction(teamId, teamSeasonId, playerIds = []) {
+  const auth = await loadAuthorizedTeamMutationContext("teams.edit");
+  if (!auth.ok) return auth.result;
+  if (!(auth.permissions || []).includes("players.edit")) {
+    return buildError("Fehlende Berechtigung: players.edit.");
+  }
+  const context = await loadScopedExistingTeamSeason(auth, teamId, teamSeasonId);
+  if (context.error) return context.error;
+  const normalizedPlayerIds = [...new Set((playerIds || []).filter((id) => typeof id === "string" && id))];
+  try {
+    if (await hasPersonsWithoutDepartmentAssignment(auth.supabaseServer, "player_team_seasons", "player_id", normalizedPlayerIds, context.team.department_id)) {
+      return buildError("Der Kader enthaelt Spieler ohne aktive Zuordnung zu dieser Abteilung.");
+    }
+  } catch {
+    return buildError("Die Abteilungszuordnungen des Kaders konnten nicht geprueft werden.");
+  }
+  const writeDb = createSupabaseAdminClient();
+  if (!writeDb) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
+  const result = await replacePlayerAssignments(context.teamSeason.id, normalizedPlayerIds, writeDb);
+  if (result.error) return buildError(result.error.message || "Der Kader konnte nicht gespeichert werden.");
+  revalidatePath(`/admin/teams/edit/${teamId}`);
+  revalidatePath(`/admin/football/teams/edit/${teamId}`);
+  revalidatePublicContent("teams");
+  return { error: null };
+}
+
 export async function saveTeamSeasonYearGroupsAction(teamId, teamSeasonId, values) {
   const auth = await loadAuthorizedTeamMutationContext("teams.edit");
   if (!auth.ok) return auth.result;
+  if (isRestrictedTrainerRoleSet(auth.roles)) return buildError("Jahrgaenge sind fuer Trainer nur lesbar.");
   const team = await loadTeamById(auth.supabaseServer, teamId);
   if (!team || !canAccessTeamOnServer(auth.scopeContext, team)) return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
   const normalized = normalizeBirthYears(values);
@@ -214,6 +301,7 @@ export async function saveTeamSeasonYearGroupsAction(teamId, teamSeasonId, value
 export async function saveTeamCompetitionConfigAction(teamId, teamSeasonId, input) {
   const auth = await loadAuthorizedTeamMutationContext("teams.edit");
   if (!auth.ok) return auth.result;
+  if (isRestrictedTrainerRoleSet(auth.roles)) return buildError("Der Spielbetrieb ist fuer Trainer nur lesbar.");
   const team = await loadTeamById(auth.supabaseServer, teamId);
   if (!team || !canAccessTeamOnServer(auth.scopeContext, team)) return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
   const { data: department } = await auth.supabaseServer.from("departments").select("id, slug, is_active").eq("id", team.department_id).maybeSingle();
@@ -234,6 +322,7 @@ export async function saveTeamCompetitionConfigAction(teamId, teamSeasonId, inpu
 async function mutateFootballDeWidget(teamId, teamSeasonId, kind, widgetCode, remove = false) {
   const auth = await loadAuthorizedTeamMutationContext("teams.edit");
   if (!auth.ok) return auth.result;
+  if (isRestrictedTrainerRoleSet(auth.roles)) return buildError("Der Spielbetrieb ist fuer Trainer nur lesbar.");
   const team = await loadTeamById(auth.supabaseServer, teamId);
   if (!team || !canAccessTeamOnServer(auth.scopeContext, team)) return buildError("Du hast keinen Zugriff auf diese Mannschaft.");
   const { data: department } = await auth.supabaseServer.from("departments").select("id, slug, is_active").eq("id", team.department_id).maybeSingle();
@@ -267,6 +356,7 @@ export async function removeFootballDeWidgetAction(teamId, teamSeasonId, kind) {
 async function authorizeTeamMedia(teamId = null) {
   const permissionResult = await assertAdminActionPermission({ requiredPermission: teamId ? "teams.edit" : "teams.create" });
   if (!permissionResult.ok) return { ok: false, message: permissionResult.message || "Berechtigung fehlt." };
+  if (teamId && isRestrictedTrainerRoleSet(permissionResult.roles)) return { ok: false, message: "Medien sind fuer Trainer nur lesbar." };
   const scopeContext = await loadServerTeamScopeContext(permissionResult);
   if (teamId) {
     const team = await loadTeamById(permissionResult.supabaseServer, teamId);

@@ -106,7 +106,7 @@ function createTeamSeasonPayload(team, teamId, seasonId) {
   };
 }
 
-async function replacePlayerAssignments(
+export async function replacePlayerAssignments(
   teamSeasonId,
   playerIds = [],
   client = null,

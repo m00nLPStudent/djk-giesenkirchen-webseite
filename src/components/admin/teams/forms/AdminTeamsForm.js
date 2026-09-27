@@ -2,7 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveTeamWithScopeAction } from "@/app/admin/teams/actions";
+import {
+  saveTeamWithScopeAction,
+  saveTrainerTeamContactAction,
+  saveTrainerTeamDescriptionAction,
+  saveTrainerTeamRosterAction,
+  saveTrainerTeamTrainingSummaryAction,
+} from "@/app/admin/teams/actions";
 import { revalidatePublicContentAction } from "@/app/admin/actions/publicContentRevalidation";
 import { FormAlert } from "@/components/admin/forms";
 import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
@@ -24,6 +30,7 @@ import TeamTrainingTab from "./tabs/TeamTrainingTab";
 import useTeamScope from "../useTeamScope";
 import { isYouthTeam } from "../teamScope";
 import useTeamMedia from "./useTeamMedia";
+import { canRestrictedTrainerEditTab } from "../trainerTeamEdit.core.mjs";
 
 function getCoachStatusMessage(currentSeasonResolution, currentTeamSeasons = []) {
   if (!currentSeasonResolution?.activeSeasonStatus) return null;
@@ -68,6 +75,7 @@ export default function AdminTeamsForm({
   initialTeamContactMedia = null,
   initialSeasonContactMediaByTeamSeasonId = {},
   initialCompetitionConfigsByTeamSeasonId = {},
+  restrictedTrainer = false,
   returnPath = "/admin/teams",
 }) {
   const router = useRouter();
@@ -197,21 +205,37 @@ export default function AdminTeamsForm({
       return;
     }
 
-    if (!form.name_de || !form.slug) {
+    if (!restrictedTrainer && (!form.name_de || !form.slug)) {
       alert("Bitte zuerst im Reiter Mannschaft eine Mannschaft auswaehlen.");
       setActiveTab("base");
       return;
     }
 
-    if (!form.department_id) {
-      alert("Bitte eine Abteilung auswählen.");
-      setActiveTab("base");
-      return;
+    if (!restrictedTrainer) {
+      if (!form.department_id) {
+        alert("Bitte eine Abteilung auswählen.");
+        setActiveTab("base");
+        return;
+      }
     }
 
     setLoading(true);
-    const payload = createTeamFormPayload(form);
-    const { error } = await saveTeamWithScopeAction(payload, team?.id ?? null);
+    let result;
+    if (restrictedTrainer) {
+      const actionByTab = {
+        description: () => saveTrainerTeamDescriptionAction(team.id, form.team_season_id, { description_de: form.description_de }),
+        training: () => saveTrainerTeamTrainingSummaryAction(team.id, form.team_season_id, { training_times_de: form.training_times_de }),
+        players: () => saveTrainerTeamRosterAction(team.id, form.team_season_id, form.selected_player_ids),
+        contact: () => saveTrainerTeamContactAction(team.id, form.team_season_id, { contact_name: form.contact_name, contact_email: form.contact_email, contact_phone: form.contact_phone }),
+      };
+      result = actionByTab[activeTab]
+        ? await actionByTab[activeTab]()
+        : { error: { message: "Dieser Bereich ist fuer Trainer nur lesbar." } };
+    } else {
+      const payload = createTeamFormPayload(form);
+      result = await saveTeamWithScopeAction(payload, team?.id ?? null);
+    }
+    const { error } = result;
     setLoading(false);
 
     if (error) {
@@ -248,6 +272,7 @@ export default function AdminTeamsForm({
         <FormAlert tone="warning">{coachStatusMessage}</FormAlert>
       )}
 
+      <fieldset disabled={restrictedTrainer && !canRestrictedTrainerEditTab(activeTab)} className="min-w-0 border-0 p-0 disabled:opacity-75">
       {activeTab === "season" && (
         <TeamSeasonTab
           seasons={seasons}
@@ -320,8 +345,11 @@ export default function AdminTeamsForm({
           onFieldChange={updateField}
         />
       )}
+      </fieldset>
 
-      <TeamSubmitBar loading={loading} />
+      {(!restrictedTrainer || canRestrictedTrainerEditTab(activeTab)) && (
+        <TeamSubmitBar loading={loading} />
+      )}
     </form>
   );
 }

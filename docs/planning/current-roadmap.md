@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-Stand: **27. September 2026 · Version 1.0.9**
+Stand: **27. September 2026 · Version 1.0.10**
 
 Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go-live- und optionale Arbeiten. Historische B12–B15-Planungs- und SQL-Dateien bleiben Nachweise, bilden aber keine parallele To-do-Liste.
 
@@ -24,6 +24,7 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **1.0.7:** vertikale öffentliche Trainer- und Vorstandskarten, einheitliche responsive Gridbreiten, harmonisierte Kontaktfooter und erfolgreicher Live-Review.
 - **1.0.8 (begonnen):** öffentliche Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten.
 - **1.0.9 (implementiert und lokal validiert):** permission- und departmentgeschützte Ergebnisverwaltung für Fußball und Tischtennis sowie öffentlicher, routenabhängiger Ergebnisticker. Dashboard und responsive Tickerdarstellung sind manuell abgenommen; Deployment und Livekontrolle stehen noch aus.
+- **1.0.10 (implementiert und lokal validiert):** Trainer können Beschreibung, Trainingsdaten, Kader und Kontakt ausschließlich für ihre zugeordneten Mannschaften pflegen. Stammdaten, Wettbewerb, Medien und strukturelle Mutationen bleiben gesperrt. Das zugehörige DB-Hardening ist nach manuellem Proposal mit `overall_ok = true` verifiziert; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
 
 ## In Arbeit / teilweise erledigt
 

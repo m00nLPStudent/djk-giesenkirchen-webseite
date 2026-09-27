@@ -15,6 +15,7 @@ import { loadActiveTeamDepartments } from "@/components/admin/teams/services/tea
 import { loadTeamTypes } from "@/components/admin/settings/team-types/teamTypes.repository";
 import { createSupabaseAdminClient } from "@/lib/supabase.admin";
 import { loadCompetitionConfigs } from "@/lib/table-tennis/competition.repository";
+import { isRestrictedTrainerRoleSet } from "@/components/admin/teams/trainerTeamEdit.core.mjs";
 
 export default async function EditTeamPage({ params, requiredDepartmentSlug = null }) {
   const { id } = await params;
@@ -110,6 +111,7 @@ export default async function EditTeamPage({ params, requiredDepartmentSlug = nu
           initialSeasonMediaByTeamSeasonId={initialSeasonMediaByTeamSeasonId}
           initialSeasonContactMediaByTeamSeasonId={initialSeasonContactMediaByTeamSeasonId}
           initialCompetitionConfigsByTeamSeasonId={initialCompetitionConfigsByTeamSeasonId}
+          restrictedTrainer={isRestrictedTrainerRoleSet(permissionResult.roles)}
           returnPath={basePath}
         />
       </TeamScopeGate>
