@@ -17,6 +17,9 @@ export function resolveResultDepartmentSlugs(scopeContext = {}) {
   if (scopeContext.isGlobal || roles.has("superadmin") || roles.has("webmaster")) {
     return [...RESULT_DEPARTMENT_SLUGS];
   }
+  if (scopeContext.canAccessYouthAll || (scopeContext.roleScopeTypes || []).includes("youth_all")) {
+    return ["fussball"];
+  }
   return RESULT_DEPARTMENT_SLUGS.includes(scopeContext.managedDepartmentSlug)
     ? [scopeContext.managedDepartmentSlug]
     : [];

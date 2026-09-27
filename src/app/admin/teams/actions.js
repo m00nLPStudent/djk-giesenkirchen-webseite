@@ -145,6 +145,14 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
   const existingTeamSeason = teamPayload?.season_id && existingTeam?.id
     ? (await supabaseServer.from("team_seasons").select("id, team_image_media_asset_id, contact_image_media_asset_id").eq("team_id", existingTeam.id).eq("season_id", teamPayload.season_id).maybeSingle()).data
     : null;
+  const canCreateTeamSeason = authContext.roles.some(
+    (role) => role.key === "superadmin",
+  ) || authContext.permissions.includes("teams.create");
+  if (teamPayload?.season_id && !existingTeamSeason && !canCreateTeamSeason) {
+    return buildError(
+      "Eine neue Mannschaftssaison erfordert die Berechtigung teams.create.",
+    );
+  }
   const seasonMediaResult = await resolveEntityImageMedia(teamPayload?.season_team_image_media_asset_id || null, { allowArchived: Boolean(existingTeamSeason?.team_image_media_asset_id === teamPayload?.season_team_image_media_asset_id), allowedVisibilities });
   if (seasonMediaResult.error) return buildError(seasonMediaResult.error.message);
   const seasonContactMediaResult = await resolveEntityImageMedia(teamPayload?.season_contact_image_media_asset_id || null, { allowArchived: Boolean(existingTeamSeason?.contact_image_media_asset_id === teamPayload?.season_contact_image_media_asset_id), allowedVisibilities });
@@ -156,6 +164,8 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
 
   const result = await saveTeamWithSeason(teamPayload || {}, teamId, {
     client: supabaseServer,
+    existingTeamSeasonId: existingTeamSeason?.id || null,
+    canCreateTeamSeason,
   });
 
   if (result?.error) {

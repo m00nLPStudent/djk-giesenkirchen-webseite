@@ -2,7 +2,7 @@
 
 > B15.21A und B15.21B0 sind produktiv abgeschlossen. Die B15.21B0-Dateifamilie bleibt als Rolloutnachweis erhalten; der Rollback ist nur ein destruktives Notfallartefakt.
 
-Stand: 27. September 2026. Inventar: 278 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
+Stand: 27. September 2026. Inventar: 282 SQL-Dateien. Dieses Register führt keine SQL-Ausführung durch und behauptet keinen Live-Ausführungsstatus, der nicht repositoryseitig belegt ist.
 
 ## Vollständige Klassifikationsregeln
 
@@ -39,6 +39,10 @@ Die Familie `b15-results-module-{preflight-readonly,proposal,rollback,postcheck-
 ## Version 1.0.10 – Trainer-Mannschaftsbearbeitung
 
 Die Familie `b15-trainer-team-edit-permissions-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert das Hardening von `current_admin_has_non_table_tennis_permission(text)`: Die reine Trainerrolle erhält darüber keine allgemeinen Mannschaftsrechte; höher privilegierte Rollen bleiben unverändert wirksam. Preflight, Proposal und Postcheck wurden manuell erfolgreich ausgeführt, der Postcheck bestätigte `overall_ok = true`; der Rollback blieb unbenutzt. Die freigegebenen Trainer-Mutationen werden zusätzlich im Anwendungscode auf zugeordnete Mannschaften und feste Feldverträge begrenzt.
+
+## Version 1.0.11 – Jugendleiter-Berechtigungen
+
+Die Familie `b15-youth-coordinator-permissions-{preflight-readonly,proposal,rollback,postcheck-readonly}.sql` dokumentiert die kontrollierte Entfernung von `settings.view` und die Zuordnung der fünf bestehenden `results.*`-Permissions für den Jugendleiter. `teams.create`, `settings.edit`, RLS und die `team_seasons`-Policies bleiben unverändert. Preflight, Proposal und Postcheck wurden manuell erfolgreich ausgeführt; der Postcheck bestätigte 71 Zeilen, 11/11 Ergebnisblöcke und `overall_ok = true`. Der Rollback blieb unbenutzt. Die SQL-Artefakte sind kein automatischer Deploymentpfad.
 
 ## Abgeschlossene Membership-Rollouts und weiterhin manuell zu verifizierende Altartefakte
 

@@ -2,6 +2,19 @@
 
 ## 2026-09-27
 
+### Version 1.0.11 – Jugendleiter-Berechtigungen und Mannschaftsspeicherung
+
+- Der Jugendleiter besitzt nicht mehr `settings.view`; `settings.edit` bleibt ebenfalls unvergeben. Allgemeine Einstellungen, Seiten und Vereinskontakte gehören damit nicht zu seinem Zugriffsbereich.
+- Die fünf vorhandenen Permissions `results.view`, `results.create`, `results.edit`, `results.delete` und `results.publish` wurden dem Jugendleiter zugeordnet. Der zentrale Results-Scope begrenzt `jugendleiter` beziehungsweise `youth_all` weiterhin ausschließlich auf Fußball; Tischtennis bleibt ausgeschlossen.
+- `teams.create` wurde dem Jugendleiter ausdrücklich nicht zugeordnet. Bestehende Jugendmannschaften bleiben über `teams.edit` bearbeitbar.
+- Ursache des Full-Save-Fehlers war der bisherige pauschale `team_seasons.upsert()`: Auch beim Bearbeiten einer vorhandenen Team-Season musste dadurch der mögliche INSERT-Pfad autorisiert werden.
+- Der Schreibvertrag trennt jetzt eindeutig: Bestehende Team-Seasons werden per `UPDATE` mit `teams.edit` gespeichert; neue Team-Seasons werden erst nach serverseitiger Prüfung von `teams.create` per `INSERT` angelegt.
+- Ein konkurrierender INSERT, der den Unique-Contract `(team_id, season_id)` verletzt, wird über PostgreSQL-Code `23505` kontrolliert und ohne unsicheren INSERT-/UPDATE-Fallback behandelt.
+- RLS und die fünf bestehenden `team_seasons`-Policies blieben unverändert: INSERT erfordert weiterhin `teams.create`, UPDATE weiterhin `teams.edit`.
+- Der Trainervertrag aus Version 1.0.10 einschließlich Spezialmutationen, Team-Scope, Full-Save-Sperre und fehlendem `teams.create` blieb unverändert.
+- Read-only-Preflight, manuelles Proposal und Read-only-Postcheck wurden erfolgreich abgeschlossen; der Postcheck lieferte 71 Zeilen, 11/11 Ergebnisblöcke und `overall_ok = true`. Der vorhandene Rollback wurde nicht ausgeführt.
+- Code und Datenbank sind für Version 1.0.11 vorbereitet. Deployment, manueller Node-Neustart und Live-Rollentest sind noch nicht erfolgt.
+
 ### Version 1.0.10 – Trainer-Berechtigungen für zugeordnete Mannschaften
 
 - Ursache der bisherigen Speicherstörung war der allgemeine Mannschafts-Full-Save: Er führte auch reine Traineränderungen in einen `team_seasons`-Upsert, dessen INSERT-Pfad das bewusst nicht an Trainer vergebene `teams.create` benötigt.

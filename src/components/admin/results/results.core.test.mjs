@@ -39,8 +39,17 @@ test("result department scope separates technical global roles and department bo
   assert.deepEqual(resolveResultDepartmentSlugs({ roleKeys: ["webmaster"] }), ["fussball", "tischtennis"]);
   assert.deepEqual(resolveResultDepartmentSlugs({ roleKeys: ["fussball-vorstand"], managedDepartmentSlug: "fussball" }), ["fussball"]);
   assert.deepEqual(resolveResultDepartmentSlugs({ roleKeys: ["tischtennis-vorstand"], managedDepartmentSlug: "tischtennis" }), ["tischtennis"]);
+  assert.deepEqual(resolveResultDepartmentSlugs({ roleKeys: ["jugendleiter"], canAccessYouthAll: true, roleScopeTypes: ["youth_all"] }), ["fussball"]);
   assert.deepEqual(resolveResultDepartmentSlugs({ roleKeys: ["vorstand"] }), []);
   assert.deepEqual(resolveResultDepartmentSlugs({ roleKeys: [], boardRoleSlug: "webmaster" }), []);
+});
+
+test("youth results scope allows football and rejects table tennis", () => {
+  const youth = { roleKeys: ["jugendleiter"], canAccessYouthAll: true, roleScopeTypes: ["youth_all"] };
+  assert.equal(canAccessResultDepartment(youth, "fussball"), true);
+  assert.equal(canAccessResultDepartment(youth, "tischtennis"), false);
+  assert.equal(canAccessResultTeamSeason(youth, season("fussball")), true);
+  assert.equal(canAccessResultTeamSeason(youth, season("tischtennis")), false);
 });
 
 test("team-season access is active and department-bound", () => {

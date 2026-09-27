@@ -1,6 +1,6 @@
 # Project Health
 
-Stand: **27. September 2026 · Version 1.0.10**
+Stand: **27. September 2026 · Version 1.0.11**
 
 ## Aktueller Stand
 
@@ -13,6 +13,7 @@ Stand: **27. September 2026 · Version 1.0.10**
 - Version 1.0.8 wurde mit öffentlichen Kontaktaktionen auf den Gesamtvorstandskarten begonnen.
 - Version 1.0.9 ergänzt die zentrale Ergebnisverwaltung und den öffentlichen, routenabhängigen Header-Ticker. Core-, Integrations-, Motion- und Accessibility-Verträge sind automatisiert validiert; Dashboard und responsive Tickeransicht sind manuell abgenommen. Deployment, manueller Node-Neustart und Livekontrolle stehen noch aus.
 - Version 1.0.10 führt einen serverseitig erzwungenen Mannschaftsscope für Trainer ein. Beschreibung, Training, Kader und Kontakt der zugeordneten Mannschaften sind freigegeben; strukturelle, mediale und wettbewerbsbezogene Mutationen bleiben gesperrt. Das DB-Hardening ist postcheck-bestätigt, Deployment und Live-Rollentest stehen noch aus.
+- Version 1.0.11 begrenzt die neue vollständige Ergebnisverwaltung des Jugendleiters auf Fußball, entzieht allgemeine Einstellungen und erhält den fehlenden `teams.create`-Vertrag. Bestehende Team-Seasons werden per UPDATE, neue nur nach Create-Prüfung per INSERT gespeichert. Der DB-Postcheck ist mit `overall_ok = true` bestanden; Deployment und Live-Rollentest stehen noch aus.
 - Die server-only myTischtennis-/click-TT-Competition-Integration ist wieder funktionsfähig. Der zeitweise Hetzner-Providerfehler (`/verify`, HTTP `429`) ist kein aktueller Blocker; der bestehende Revalidate-Vertrag beträgt 15 Minuten. Ein [WTTV-Fallback](../planning/table-tennis-competition-provider-fallback.md) wird nur bei einem erneut wiederholten oder dauerhaften Ausfall reaktiviert.
 
 ## Architekturregeln
@@ -24,6 +25,7 @@ Stand: **27. September 2026 · Version 1.0.10**
 
 ## Qualität
 
+- Release 1.0.11: fokussierte Jugendleiter-, Results-, Team-Season-, Trainer-, Permission- und Scope-Regressionen, Changed-Scope ESLint, TypeScript, Production Build, Admin-Route-Audit, `git diff --check` und Sensitive-Data-Check bestanden. Die bekannte, unabhängige Roadmap-Baseline zu `GOOGLE_MAPS_EMBED_API_KEY` bleibt der einzige rote Gesamttest.
 - Release 1.0.10: fokussierte Team-/Trainer-/Scope-Regressionen, Changed-Scope ESLint, TypeScript, Production Build, Admin-Route-Audit, `git diff --check` und Sensitive-Data-Check bestanden. Die bekannte, unabhängige Roadmap-Baseline zu `GOOGLE_MAPS_EMBED_API_KEY` bleibt der einzige rote Gesamttest.
 - Release 1.0.9: 1457/1458 Tests bestanden; allein die bekannte, unabhängige Roadmap-Baseline zur Zeichenfolge `GOOGLE_MAPS_EMBED_API_KEY` bleibt rot. Changed-Scope ESLint ohne Fehler, TypeScript, Production Build, Admin-Route-Audit und `git diff --check` sind bestanden.
 - Release 1.0.7: 1412/1412 Tests, Changed-Scope ESLint ohne Fehler, TypeScript, Production Build, Admin-Route-Audit, `git diff --check` und Secret-Check bestanden.

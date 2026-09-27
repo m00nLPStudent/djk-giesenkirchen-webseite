@@ -1,6 +1,6 @@
 # Projektstatus
 
-Stand: **27. September 2026 · Version 1.0.10**
+Stand: **27. September 2026 · Version 1.0.11**
 
 Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene Prioritäten stehen ausschließlich in der [aktuellen Roadmap](current-roadmap.md).
 
@@ -13,6 +13,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Version 1.0.8 wurde mit öffentlichen Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten begonnen.
 - Version 1.0.9 führt die zentrale, serverseitig permission- und departmentgeschützte Ergebnisverwaltung sowie den routenabhängigen öffentlichen Ergebnisticker für Fußball und Tischtennis ein. Dashboard und Ticker sind lokal automatisiert validiert und responsiv manuell abgenommen; Deployment, manueller Node-Neustart und Livekontrolle sind noch nicht bestätigt.
 - Version 1.0.10 begrenzt die Mannschaftsbearbeitung der reinen Trainerrolle auf zugeordnete Mannschaften und die freigegebenen Bereiche Beschreibung, Training, Kader und Kontakt. Das Datenbank-Hardening wurde manuell ausgeführt und mit `overall_ok = true` postcheck-bestätigt; Deployment, Node-Neustart und Live-Rollentest sind noch nicht bestätigt.
+- Version 1.0.11 präzisiert den Jugendleiter-Vertrag: allgemeine Einstellungen sind entzogen, alle fünf vorhandenen `results.*`-Permissions gelten ausschließlich für Fußball und `teams.create` bleibt unvergeben. Der Team-Season-Full-Save trennt UPDATE bestehender Zeilen von permissiongeschützten INSERTs. Der DB-Prozess ist mit 11/11 Postcheck-Blöcken und `overall_ok = true` abgeschlossen; Deployment, Node-Neustart und Live-Rollentest sind noch nicht bestätigt.
 
 ## Fachlicher Stand
 
@@ -50,6 +51,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 
 ## Qualität
 
+- Release 1.0.11: fokussierte Jugendleiter-, Results-, Team-Season-, Trainer-, Permission- und Scope-Regressionen, Changed-Scope ESLint, TypeScript, Production Build, Admin-Route-Audit, `git diff --check` und Sensitive-Data-Check sind lokal bestanden. Die Gesamtsuite bleibt ausschließlich wegen der bekannten, unabhängigen Roadmap-Baseline zur Zeichenfolge `GOOGLE_MAPS_EMBED_API_KEY` rot.
 - Release 1.0.10: fokussierte Team-, Trainer-, Permission- und Scope-Regressionen, Changed-Scope ESLint, TypeScript, Production Build, Admin-Route-Audit, `git diff --check` und Sensitive-Data-Check sind lokal bestanden. Die Gesamtsuite bleibt ausschließlich wegen der bekannten, unabhängigen Roadmap-Baseline zur Zeichenfolge `GOOGLE_MAPS_EMBED_API_KEY` rot.
 - Release 1.0.9: fokussierte Results-/Ticker-Regressionen, Changed-Scope ESLint ohne Fehler, TypeScript, Production Build, Admin-Route-Audit, `git diff --check` und Sensitive-Data-Check bestanden. Die Gesamtsuite besteht mit 1457/1458; ausschließlich der ältere Roadmap-Test zur Zeichenfolge `GOOGLE_MAPS_EMBED_API_KEY` bleibt als unabhängige Baseline rot.
 - Der Release-1.0.7-Abschluss bestand 1412/1412 Tests, Changed-Scope ESLint ohne Fehler, TypeScript, Production Build, Admin-Route-Audit, `git diff --check` und Secret-Check.

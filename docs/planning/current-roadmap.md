@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-Stand: **27. September 2026 · Version 1.0.10**
+Stand: **27. September 2026 · Version 1.0.11**
 
 Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go-live- und optionale Arbeiten. Historische B12–B15-Planungs- und SQL-Dateien bleiben Nachweise, bilden aber keine parallele To-do-Liste.
 
@@ -25,6 +25,7 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **1.0.8 (begonnen):** öffentliche Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten.
 - **1.0.9 (implementiert und lokal validiert):** permission- und departmentgeschützte Ergebnisverwaltung für Fußball und Tischtennis sowie öffentlicher, routenabhängiger Ergebnisticker. Dashboard und responsive Tickerdarstellung sind manuell abgenommen; Deployment und Livekontrolle stehen noch aus.
 - **1.0.10 (implementiert und lokal validiert):** Trainer können Beschreibung, Trainingsdaten, Kader und Kontakt ausschließlich für ihre zugeordneten Mannschaften pflegen. Stammdaten, Wettbewerb, Medien und strukturelle Mutationen bleiben gesperrt. Das zugehörige DB-Hardening ist nach manuellem Proposal mit `overall_ok = true` verifiziert; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
+- **1.0.11 (für Release vorbereitet):** Jugendleiter verwalten Fußball-Ergebnisse über die fünf bestehenden `results.*`-Permissions, besitzen keinen Zugriff mehr auf allgemeine Einstellungen und erhalten weiterhin kein `teams.create`. Bestehende Team-Seasons werden per UPDATE gespeichert; neue Team-Seasons bleiben create-berechtigten Rollen vorbehalten. Der DB-Prozess ist mit `overall_ok = true` abgeschlossen, Code und Tests sind lokal validiert; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
 
 ## In Arbeit / teilweise erledigt
 

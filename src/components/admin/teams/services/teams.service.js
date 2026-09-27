@@ -5,6 +5,7 @@ import { logAdminSaveEvent } from "@/lib/admin-auth/adminSaveDiagnostics";
 import { syncTeamCoachAssignments } from "./teamCoachAssignments.service";
 import { TEAM_PLACEHOLDER_IMAGE } from "@/lib/football/publicTeamImage.core.mjs";
 import { createPlayerAssignmentSyncPlan } from "./teamPlayerAssignments.core.mjs";
+import { resolveTeamSeasonWriteContract } from "./teamSeasonWriteContract.core.mjs";
 
 export { TEAM_PLACEHOLDER_IMAGE };
 export const TEAM_CONTACT_PLACEHOLDER_IMAGE = "";
@@ -200,9 +201,24 @@ export async function saveTeam(team, id = null, { client = null } = {}) {
 export async function saveTeamWithSeason(
   team,
   id = null,
-  { client = null } = {},
+  {
+    client = null,
+    existingTeamSeasonId = null,
+    canCreateTeamSeason = false,
+  } = {},
 ) {
   const db = resolveClient(client);
+  const writeContract = team.season_id
+    ? resolveTeamSeasonWriteContract({
+        existingTeamSeasonId,
+        canCreateTeamSeason,
+      })
+    : null;
+
+  if (writeContract && !writeContract.ok) {
+    return { data: null, error: { message: writeContract.error } };
+  }
+
   const currentSeasonResult = await setCurrentPublicSeason(
     team.public_season_id,
     db,
@@ -232,28 +248,59 @@ export async function saveTeamWithSeason(
     return teamResult;
   }
 
-  const seasonResult = await db
-    .from("team_seasons")
-    .upsert(createTeamSeasonPayload(team, teamId, team.season_id), {
-      onConflict: "team_id,season_id",
-    })
-    .select("*");
+  const teamSeasonPayload = createTeamSeasonPayload(
+    team,
+    teamId,
+    team.season_id,
+  );
+  const seasonResult = writeContract.operation === "update"
+    ? await db
+        .from("team_seasons")
+        .update(teamSeasonPayload)
+        .eq("id", writeContract.teamSeasonId)
+        .eq("team_id", teamId)
+        .eq("season_id", team.season_id)
+        .select("*")
+        .maybeSingle()
+    : await db
+        .from("team_seasons")
+        .insert(teamSeasonPayload)
+        .select("*")
+        .maybeSingle();
 
   logAdminSaveEvent({
     module: "team_seasons",
     mode: id ? "edit" : "create",
     step: "service.saveTeamWithSeason.teamSeason",
-    operation: "upsert",
+    operation: writeContract.operation,
     success: !seasonResult.error,
     error: seasonResult.error,
     data: seasonResult.data,
   });
 
-  if (seasonResult.error) return seasonResult;
+  if (seasonResult.error) {
+    if (writeContract.operation === "insert" && seasonResult.error.code === "23505") {
+      return {
+        data: null,
+        error: {
+          ...seasonResult.error,
+          message: "Für diese Mannschaft und Saison existiert bereits eine Saisonzuordnung. Bitte lade die Seite neu.",
+        },
+      };
+    }
+    return seasonResult;
+  }
 
-  const savedTeamSeason = Array.isArray(seasonResult.data)
-    ? seasonResult.data[0]
-    : seasonResult.data;
+  if (!seasonResult.data) {
+    return {
+      data: null,
+      error: {
+        message: "Die bestehende Mannschaftssaison wurde nicht gefunden. Bitte lade die Seite neu.",
+      },
+    };
+  }
+
+  const savedTeamSeason = seasonResult.data;
 
   if (savedTeamSeason?.id) {
     const playerResult = await replacePlayerAssignments(

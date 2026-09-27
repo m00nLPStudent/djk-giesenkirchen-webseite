@@ -33,9 +33,10 @@ test("department is required in the UI and persisted in the team payload", async
 });
 
 test("server action rejects malformed, missing and inactive departments after permission and scope checks", async () => {
-  const [action, core] = await Promise.all([
+  const [action, core, service] = await Promise.all([
     read("../../../app/admin/teams/actions.js"),
     read("services/teamDepartments.core.mjs"),
+    read("services/teams.service.js"),
   ]);
   const authorization = action.indexOf("loadAuthorizedTeamMutationContext(requiredPermission)");
   const scope = action.indexOf("canAccessTeamOnServer(scopeContext, existingTeam)");
@@ -44,5 +45,11 @@ test("server action rejects malformed, missing and inactive departments after pe
   assert.ok(authorization >= 0 && scope > authorization && validation > scope && save > validation);
   assert.match(action, /findTeamDepartmentById/);
   assert.match(action, /validateActiveTeamDepartment/);
+  assert.match(action, /!existingTeamSeason && !canCreateTeamSeason/);
+  assert.match(action, /existingTeamSeasonId: existingTeamSeason\?\.id \|\| null/);
+  assert.match(service, /writeContract\.operation === "update"/);
+  assert.match(service, /\.from\("team_seasons"\)[\s\S]*\.update\(teamSeasonPayload\)/);
+  assert.match(service, /\.from\("team_seasons"\)[\s\S]*\.insert\(teamSeasonPayload\)/);
+  assert.doesNotMatch(service, /\.upsert\(createTeamSeasonPayload/);
   assert.match(core, /existiert nicht oder ist inaktiv/);
 });
