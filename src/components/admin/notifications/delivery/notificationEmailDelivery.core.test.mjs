@@ -5,6 +5,7 @@ import {
   getNotificationEmailPolicy, isPlausibleNotificationEmail, notificationEmailIdempotencyKey,
   renderNotificationEmail, sanitizeDeliveryErrorClass,
 } from "./notificationEmailDelivery.core.mjs";
+import { notificationEmailSettingDefinitions } from "../email-settings/notificationEmailSettings.core.mjs";
 
 const notification = { id: "11111111-1111-4111-8111-111111111111", recipient_user_id: "user-1", type: "membership_assigned", title: "Mia Muster", message: "private", metadata: { requestId: "secret" } };
 const fixedNow = () => new Date("2026-08-27T10:00:00.000Z");
@@ -44,11 +45,22 @@ function createStore({ email = "trainer@example.org", active = true } = {}) {
   };
 }
 
-test("registry contains all 16 globally recommended renderers and remains default-deny", () => {
-  assert.equal(NOTIFICATION_EMAIL_TYPES.length, 16);
-  for (const type of ["membership_created", "player_assigned", "team_changed", "membership_processing", "membership_payment_overdue", "membership_payment_partial_open", "member_activated", "member_deactivated", "member_archived", "event_updated"]) assert.ok(NOTIFICATION_EMAIL_TYPES.includes(type));
+const addedRendererTypes = [
+  "player_removed", "player_updated", "membership_payment_created", "membership_payment_updated",
+  "membership_payment_received", "membership_payment_deleted", "membership_payment_due_soon",
+  "membership_payment_due_today", "membership_payment_deferral_ending", "event_created", "event_cancelled",
+];
+
+test("all 27 configurable email types have exactly one renderer", () => {
+  const configuredTypes = notificationEmailSettingDefinitions.map(({ type }) => type).sort();
+  const rendererTypes = [...NOTIFICATION_EMAIL_TYPES].sort();
+  assert.equal(configuredTypes.length, 27);
+  assert.equal(new Set(configuredTypes).size, configuredTypes.length);
+  assert.equal(rendererTypes.length, 27);
+  assert.equal(new Set(rendererTypes).size, rendererTypes.length);
+  assert.deepEqual(rendererTypes, configuredTypes);
   assert.equal(getNotificationEmailPolicy("membership_created").enabled, true);
-  assert.equal(getNotificationEmailPolicy("event_cancelled").enabled, false);
+  assert.equal(getNotificationEmailPolicy("event_cancelled").enabled, true);
   assert.equal(getNotificationEmailPolicy("future_type").enabled, false);
 });
 
@@ -64,13 +76,46 @@ test("renderer is generic and excludes dashboard content, metadata and ids", () 
   assert.match(rendered.data.html, /\/datenschutz/);
 });
 
-test("all 16 configured active types have datensparse renderers", () => {
+test("all 27 configurable types have datensparse renderers", () => {
   const forbidden = [notification.title, notification.message, notification.id, "requestId", "secret", "100,00", "Geburtsdatum"];
   for (const type of NOTIFICATION_EMAIL_TYPES) {
     const rendered = renderNotificationEmail(type, { dashboardUrl: "https://verein.example/admin" });
     assert.equal(rendered.error, null);
     const combined = `${rendered.data.subject}\n${rendered.data.text}\n${rendered.data.html}`;
     for (const value of forbidden) assert.doesNotMatch(combined, new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
+test("all eleven added renderers remain generic and exclude notification data", () => {
+  const privateNotification = {
+    ...notification,
+    title: "Private dashboard title",
+    message: "Private dashboard message",
+    entity_id: "private-entity-id",
+    metadata: { playerName: "Private Person", amount: "1234,56", secret: "private-metadata" },
+  };
+  const forbidden = [privateNotification.title, privateNotification.message, privateNotification.entity_id, "Private Person", "1234,56", "private-metadata"];
+  for (const type of addedRendererTypes) {
+    const rendered = renderNotificationEmail(type, { dashboardUrl: "https://verein.example/admin", siteUrl: "https://verein.example" });
+    assert.equal(rendered.error, null);
+    const combined = `${rendered.data.subject}\n${rendered.data.text}\n${rendered.data.html}`;
+    for (const value of forbidden) assert.doesNotMatch(combined, new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
+test("all eleven added types send once when master and type are enabled", async () => {
+  for (const [index, type] of addedRendererTypes.entries()) {
+    const current = { ...notification, id: `11111111-1111-4111-8111-${String(index + 1).padStart(12, "0")}`, type };
+    const store = createStore();
+    const messages = [];
+    const result = await executeNotificationEmailDelivery(current, {
+      db: {}, store, now: fixedNow, siteUrl: "https://verein.example", providerName: "resend", deliveryPolicy: enabledPolicy,
+      mailer: async (message) => { messages.push(message); return { ok: true, status: "sent", providerMessageId: `provider-${index}` }; },
+    });
+    assert.equal(result.status, "sent");
+    assert.equal(messages.length, 1);
+    assert.equal(messages[0].idempotencyKey, notificationEmailIdempotencyKey(current.id));
+    assert.equal(store.rows.get(current.id).status, "sent");
   }
 });
 
@@ -113,11 +158,11 @@ test("sent is terminal while provider failure is sanitized and retry-ready", asy
   assert.equal(sends, 2);
 });
 
-test("denied types and unavailable recipients become skipped without mail", async () => {
+test("unknown types and unavailable recipients become skipped without mail", async () => {
   let sends = 0;
   const mailer = async () => { sends += 1; return { ok: true, status: "sent" }; };
   const deniedStore = createStore();
-  const denied = await executeNotificationEmailDelivery({ ...notification, type: "player_updated" }, { db: {}, store: deniedStore, mailer, now: fixedNow, deliveryPolicy: enabledPolicy });
+  const denied = await executeNotificationEmailDelivery({ ...notification, type: "future_type" }, { db: {}, store: deniedStore, mailer, now: fixedNow, deliveryPolicy: enabledPolicy });
   assert.equal(denied.status, "skipped");
   assert.equal(deniedStore.rows.get(notification.id).status, "skipped");
   assert.equal(deniedStore.rows.get(notification.id).last_error_class, "notification_email_renderer_unavailable");

@@ -42,7 +42,7 @@ sonst
 
 Eine fehlende Singletonzeile, ein Lookupfehler, eine fehlende Typzeile, ein unbekannter Typ oder ein fehlender Renderer ist immer deny. Der DB-Default `false` schützt neue Zeilen; die entscheidende Missing-row-Semantik muss zusätzlich im Delivery-Service mit `false` umgesetzt werden. Zukünftige Typen werden nicht durch bloßes Auftauchen in einem Fachservice mailfähig.
 
-Der bestehende Renderer-Sicherheitsgurt bleibt unabhängig bestehen. Eine DB-Freigabe allein darf nie einen Typ ohne datensparsamen, getesteten Renderer versenden. D8 erweitert deshalb weder die sieben Code-Typen noch deren Renderer.
+Der bestehende Renderer-Sicherheitsgurt bleibt unabhängig bestehen. Eine DB-Freigabe allein darf nie einen Typ ohne datensparsamen, getesteten Renderer versenden. Inzwischen besitzen alle 27 organisationsweit konfigurierbaren Typen einen getesteten Renderer; ein Konsistenztest erzwingt die exakte Mengengleichheit mit der UI-Type-Registry.
 
 ## Initiale Konfiguration
 
@@ -64,7 +64,7 @@ Initial `email_enabled = false`:
 - `membership_payment_due_soon`, `membership_payment_due_today`, `membership_payment_deferral_ending`
 - `event_created`, `event_cancelled`
 
-Diese Werte sind Konfiguration, keine Erweiterung der produktiven D5-Allowlist. Vor Aktivierung eines heute noch nicht gerenderten Typs muss ein eigener Implementierungsblock einen generischen datensparsamen Renderer und Tests ergänzen.
+Diese Werte bleiben organisationsweite Konfiguration mit unveränderten Default-/Empfehlungswerten. Jeder konfigurierbare Typ besitzt nun einen generischen datensparsamen Renderer; die Aktivierung eines standardmäßig ausgeschalteten Typs bleibt eine bewusste Superadmin-Entscheidung.
 
 ## Delivery-Coordinator und Ledger
 

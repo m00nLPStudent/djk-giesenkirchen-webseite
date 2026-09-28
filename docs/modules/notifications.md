@@ -4,7 +4,7 @@
 
 Dashboard-Notifications werden nach erfolgreicher Fachmutation serverseitig persistiert. B15.21D5 ergänzt direkt danach einen zentralen Best-Effort-E-Mail-Kanal. Fachservices erzeugen weiterhin ausschließlich Notifications und kennen weder Mailprovider noch Empfängeradresse.
 
-Der zentrale Hook verarbeitet nur tatsächlich neu persistierte Rohzeilen aus `createNotification`, `createNotifications` und `createNotificationsOnce`. Versand ist ausschließlich zulässig, wenn der standardmäßig deaktivierte globale Master, die serverseitige Type-Einstellung und ein expliziter sicherer Renderer gemeinsam freigeben. Die Renderer-Registry umfasst die 16 empfohlenen Typen der 16/11-Matrix; unbekannte, deaktivierte oder nicht sicher gerenderte Typen erhalten einen terminalen `skipped`-Ledgerzustand und lösen keinen Provideraufruf aus.
+Der zentrale Hook verarbeitet nur tatsächlich neu persistierte Rohzeilen aus `createNotification`, `createNotifications` und `createNotificationsOnce`. Versand ist ausschließlich zulässig, wenn der standardmäßig deaktivierte globale Master, die serverseitige Type-Einstellung und ein expliziter sicherer Renderer gemeinsam freigeben. Alle 27 organisationsweit konfigurierbaren E-Mail-Typen besitzen einen datensparsamen Renderer; ein zentraler Konsistenztest erzwingt die exakte Mengengleichheit von UI-Type-Registry und Renderer-Registry. Die 16/11-Empfehlungsmatrix und die gespeicherten Schalterstände bleiben davon unberührt. Unbekannte oder deaktivierte Typen erhalten einen terminalen `skipped`-Ledgerzustand und lösen keinen Provideraufruf aus.
 
 ## Datenschutz und Empfänger
 
@@ -16,7 +16,7 @@ Die Empfängeradresse wird ausschließlich über `notification.recipient_user_id
 
 Providererfolg setzt `sent`, `sent_at`, Provider-Key und optional nur die Provider-Message-ID. Fehler werden auf eine kleine technische Fehlerklasse reduziert, lösen das Lock, setzen `failed` und berechnen ein exponentielles `next_attempt_at` ab 15 Minuten, begrenzt auf 24 Stunden. Es gibt in D5 keinen Cron und keinen automatischen Retry. `sent` und `skipped` sind terminal. Ein Ledger- oder Mailfehler verändert weder Fachaktion noch Dashboard-Notification.
 
-Die vorhandenen In-App-Preferences bleiben unverändert; `in_app_enabled` wird nicht als Mailpreference verwendet. Persönliche E-Mail-Schalter pro Benutzer sind aktuell bewusst nicht vorgesehen. Die globale Entscheidung über E-Mail-Typen verbleibt beim Superadmin. `notification_audit` bleibt unverändert und ist nicht der Delivery-State.
+Die vorhandenen In-App-Preferences bleiben unverändert; `in_app_enabled` wird nicht als Mailpreference verwendet. Persönliche E-Mail-Schalter pro Benutzer sind aktuell bewusst nicht vorgesehen. Die organisationsweite Entscheidung über E-Mail-Typen verbleibt beim Superadmin. `notification_audit` bleibt unverändert und ist nicht der Delivery-State.
 
 ## B15.21D8/D9 – Globale E-Mail-Steuerung
 
