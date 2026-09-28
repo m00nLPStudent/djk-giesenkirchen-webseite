@@ -25,6 +25,8 @@ B15.24N inventarisiert die vorhandenen E-Mail-Wege und vereinheitlicht ausschlie
 
 Der anwendungseigene Mail-Service ist providerneutral. Aktuell ist ausschließlich der Resend-Adapter implementiert. Er benötigt serverseitig `MAIL_PROVIDER`, `RESEND_API_KEY`, `MAIL_FROM` und optional `MAIL_REPLY_TO`. Fehlende oder unbekannte Providerkonfiguration läuft kontrolliert in `skipped`/Fehlerzustände; Secrets und Empfänger werden nicht protokolliert. Auth-Mails bleiben davon getrennt und gehören Supabase Auth beziehungsweise dessen externer SMTP-Konfiguration.
 
+Für den produktiven anwendungseigenen Versand ist die dedizierte Resend-Versanddomain `mail.djkvfl-giesenkirchen.de` extern vollständig verifiziert. Alle eigenen Mailfamilien verwenden weiterhin dieselbe zentrale Absenderkonfiguration; es werden keine fachlich unterschiedlichen From-Adressen eingeführt. Der Hetzner-Vertrag lautet `MAIL_PROVIDER=resend` und `MAIL_FROM=noreply@mail.djkvfl-giesenkirchen.de`. `MAIL_FROM` enthält bewusst nur die reine Adresse, weil konsoleH den vollständigen RFC-From-Wert am Zeichen `<` abschneidet. Der zentrale Resend-Adapter validiert diese Adresse fail-closed und ergänzt genau einmal den Anzeigenamen `DJK/VfL Giesenkirchen 05/09 e.V.`, sodass Resend den vollständigen Wert `DJK/VfL Giesenkirchen 05/09 e.V. <noreply@mail.djkvfl-giesenkirchen.de>` erhält. `RESEND_API_KEY` bleibt unverändert server-only. `MAIL_REPLY_TO` bleibt optional und darf erst nach Betreiberfreigabe auf ein tatsächlich vorhandenes Vereins-/Supportpostfach gesetzt werden; es wird keine Antwortadresse erfunden. Supabase-Auth-Mails sind von dieser Anwendungskonfiguration getrennt und müssen weiterhin im Supabase Dashboard geprüft werden.
+
 Damit existieren acht aktive Versandflüsse: zwei Supabase-Auth-Flüsse, vier Zustände des bestätigten Admin-E-Mail-Wechsels, eine Membership-Bestätigung und eine generische Notification-Mailfamilie. Der Beitragsreminder ist ein neunter vorbereiteter Triggerpfad, aber keine eigene Mailfamilie: Er erzeugt Notifications und kann nur über den bestehenden, global freigegebenen Delivery-Vertrag eine der unterstützten Beitrags-Notification-Mails auslösen. Kontaktformular-, Beitragsrechnungs-, Mahnungs-, Annahme-/Ablehnungs- oder sonstige frei stehende Systemmail-Renderer existieren nicht.
 
 ## Zentraler eigener Template-Vertrag
@@ -163,7 +165,7 @@ Das finale Maildesign wurde durch den Betreiber freigegeben. Keine Retrys oder R
 
 - finale Vereins-/Impressums-/Footerangaben rechtlich freigeben und danach den gemeinsamen Footer bei Bedarf erweitern;
 - finale Vereinsdomain und `NEXT_PUBLIC_SITE_URL`, Auth Site URL sowie Redirect-Allowlist prüfen;
-- finale Absenderdomain, SPF/DKIM/DMARC, Mailserver/SMTP, `MAIL_FROM` und `MAIL_REPLY_TO` freigeben;
+- die verifizierte Resend-Versanddomain und den zentralen `MAIL_FROM`-Vertrag auf Hetzner setzen; eine optionale reale `MAIL_REPLY_TO`-Adresse bleibt eine Betreiberentscheidung;
 - den ersten echten neu eingeladenen Benutzer als operativen Invite-Smoke-Test verwenden;
 - Zustellbarkeit, Spamdarstellung, Barrierearmut und Textfallback mit finaler Domain und finalem SMTP erneut abnehmen;
 - Contribution-Reminder-Cron erst im eigenen Go-live-Ablauf mit Secret, Idempotenzprüfung und Monitoring aktivieren.

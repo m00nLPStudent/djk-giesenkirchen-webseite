@@ -75,6 +75,29 @@ Actions** folgende Repository-Secrets benötigt:
 Anwendungssecrets, Supabase-Schlüssel und Provider-Zugangsdaten gehören nicht
 in den Workflow. Sie verbleiben in der bestehenden Hetzner-Konfiguration.
 
+### Anwendungseigener Mailversand
+
+Der anwendungseigene Transaktionsmailversand verwendet zentral den vorhandenen
+Resend-Adapter. Für die verifizierte Vereins-Versanddomain werden auf Hetzner
+serverseitig folgende Variablen benötigt:
+
+```env
+MAIL_PROVIDER=resend
+MAIL_FROM=noreply@mail.djkvfl-giesenkirchen.de
+RESEND_API_KEY=<bestehender-serverseitiger-key>
+```
+
+`MAIL_FROM` enthält in konsoleH ausschließlich die reine E-Mail-Adresse, weil
+die Oberfläche einen vollständigen RFC-From-Wert am Zeichen `<` abschneidet.
+Der zentrale Resend-Adapter validiert die Adresse und ergänzt genau einmal den
+Anzeigenamen `DJK/VfL Giesenkirchen 05/09 e.V.`.
+
+`RESEND_API_KEY` wird weder geändert noch dokumentiert. `MAIL_REPLY_TO` ist
+optional und darf erst nach Freigabe eines tatsächlich vorhandenen
+Vereins-/Supportpostfachs gesetzt werden. Alle Werte bleiben ohne
+`NEXT_PUBLIC_`-Präfix ausschließlich serverseitig. Die getrennten Supabase-
+Auth-Mails werden nicht durch diese Variablen umgestellt.
+
 ### Dependency-Vertrag
 
 `package-lock.json` ist maßgeblich. Das Skript führt bei jedem Deployment im
