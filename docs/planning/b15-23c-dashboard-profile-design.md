@@ -26,6 +26,8 @@ Ein anschließender Live-Nachweis bestätigte, dass Supabase bereits korrekt auf
 
 Für die Entwicklungs-/Übergangsumgebung sind die Resend-Versanddomain `mail.mavermg.de`, DKIM und Sending-CNAMEs verifiziert. Das derzeit englische Supabase-Invite-Template gehört nicht zu B15.23D und bleibt für einen späteren zentralen Mailtemplate-/Corporate-Design-Block offen. Ebenso bleibt die Umstellung auf den finalen Vereins-Mailserver eine Go-live-Aufgabe.
 
+**Aktueller Go-live-Follow-up (28. September 2026):** Die historische Übergangskonfiguration wurde für die produktiven Versandwege abgelöst. Supabase Auth nutzt weiterhin Custom SMTP über Resend, jetzt mit `noreply@mail.djkvfl-giesenkirchen.de` und dem Vereinsnamen als Sender. Der Passwort-Recovery-Versand wurde damit real erfolgreich getestet; offen bleiben nur die finalen Domain-/Redirect-Smokes nach der Hauptdomainumschaltung.
+
 ## Ausgangsvertrag vor B15.23C
 
 - Route: `/admin/profile`, geschützt über das bestehende Adminrouting mit `dashboard.view`.

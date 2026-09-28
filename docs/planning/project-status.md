@@ -1,6 +1,6 @@
 # Projektstatus
 
-Stand: **27. September 2026 · Version 1.0.12**
+Stand: **28. September 2026 · Version 1.0.12**
 
 Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene Prioritäten stehen ausschließlich in der [aktuellen Roadmap](current-roadmap.md).
 
@@ -9,6 +9,8 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Next.js-App mit öffentlicher Website und permissiongeschütztem Dashboard.
 - Produktionsnahe Original-Webseite unter `djkvfl-test.de` auf Hetzner-Webhosting.
 - Pushes auf `master` deployen den exakten Commit über den host-key-verifizierten GitHub-Actions-Workflow in einem isolierten Worktree. Der Node-Neustart erfolgt anschließend bewusst manuell in konsoleH.
+- Die endgültige Vereinsdomain ist `djkvfl-giesenkirchen.de`. Ihr DNS wird weiterhin bei All-Inkl/KAS verwaltet und zeigt noch auf den bisherigen All-Inkl-Webserver. Der vollständige Ausgangsbestand wurde geprüft und als private BIND-Zonefile-Rollbackgrundlage gesichert; eine produktive DNS-Umschaltung ist noch nicht erfolgt.
+- Der Hetzner-Zielbetrieb für die Hauptdomain ist analysiert. `djkvfl-test.de` bleibt bis zur kontrollierten Domainumschaltung als funktionierende Preproduction mit gültigem HTTPS bestehen; finale Hauptdomain-SSL-Aktivierung und -Abnahme stehen noch aus.
 - Version 1.0.7 ist committed, deployed, durch manuellen Node-Neustart aktiviert und live geprüft.
 - Version 1.0.8 wurde mit öffentlichen Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten begonnen.
 - Version 1.0.9 führt die zentrale, serverseitig permission- und departmentgeschützte Ergebnisverwaltung sowie den routenabhängigen öffentlichen Ergebnisticker für Fußball und Tischtennis ein. Dashboard und Ticker sind lokal automatisiert validiert und responsiv manuell abgenommen; Deployment, manueller Node-Neustart und Livekontrolle sind noch nicht bestätigt.
@@ -20,6 +22,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 
 - Membership B15.21A–C einschließlich Geburtsdatum/Jahrgang, saisonaler Mannschaftsauflösung, Anfragearten, Zuständigkeiten und Weiterleitung ist abgeschlossen.
 - Notification Center, persönliche Präferenzen, zentrale E-Mail-Delivery und globale Superadmin-Mailsteuerung einschließlich D11-Mehrfachauswahl und Sammellöschung sind abgeschlossen.
+- Der produktive Mailaufbau ist abgeschlossen und live getestet: Resend versendet Anwendungs-/Notification-Mails mit der verifizierten Domain `mail.djkvfl-giesenkirchen.de`; alle 27 konfigurierbaren Notification-Typen besitzen Renderer. Eine Mannschafts-/Spieler-Notification wurde erfolgreich zugestellt. Supabase Auth verwendet weiterhin Custom SMTP über Resend mit demselben Vereinsabsender; ein realer Passwort-Reset wurde erfolgreich zugestellt.
 - Downloads B15.22A–E sind vollständig integriert.
 - Das Results-Modul besitzt eine produktiv verifizierte `club_results`-Basis, eine zentrale Admin-Verwaltung mit granularen `results.*`-Permissions und Department-Scope sowie ein server-only Public Repository für den Header-Ticker. Standardfenster, Override, aktive Strukturen, Public-Media-Auflösung und Route-Context werden vor Ausgabe zentral geprüft.
 - Benutzer/Profile/Auth B15.23A–E einschließlich Recovery, Einladung, bestätigtem E-Mail-Wechsel, Guard und Compensation-Vertrag sind abgeschlossen.
@@ -43,8 +46,9 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 
 ## Technisch abgeschlossen, betrieblich noch offen
 
-- Finale Vereinsdomain, SSL-Endzustand, Environment-URLs, Supabase Redirects und produktive Indexierung.
-- Finale Maildomain beziehungsweise finaler Mailserver, From/Reply-To, SPF/DKIM/DMARC und finale Mail-/Auth-Smokes.
+- Verpflichtendes Support-/Ticketsystem als nächster offener Go-live-Blocker; vor der Umsetzung erfolgt eine Bestands-/Architekturanalyse.
+- Kontrollierte Umschaltung der finalen Vereinsdomain, SSL-Endzustand, Environment-URLs, Supabase Site URL/Redirects und produktive Indexierung.
+- Optionales reales Reply-To, erster Invite-Smoke und finale Mail-/Auth-Linktests mit der echten Produktivdomain. Maildomain, zentraler From-Vertrag und Auth-SMTP sind bereits abgeschlossen und live vorgetestet.
 - Finale Legal-/Providerprüfung trotz technisch vorhandener CMS-Rechtsseiten und funktionsfähigem Consent-Manager.
 - Contribution-Reminder-Cron einschließlich Secret/Vault, Produktivendpunkt, Idempotenzprüfung, Monitoring, Rollen-Livetest und Rotation.
 - FUSSBALL.DE-Domainfreigabe sowie finale reale Widget-/Mannschaftszuordnungen.

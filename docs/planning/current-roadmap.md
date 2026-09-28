@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-Stand: **27. September 2026 · Version 1.0.12**
+Stand: **28. September 2026 · Version 1.0.12**
 
 Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go-live- und optionale Arbeiten. Historische B12–B15-Planungs- und SQL-Dateien bleiben Nachweise, bilden aber keine parallele To-do-Liste.
 
@@ -15,6 +15,7 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **B15.24A–N:** öffentliche Designbasis, Navigation, Header/Footer, Fußball, Tischtennis, Behindertensport, Gymnastikdamen, Vorstand, Trainingsrouting, Accessibility/Performance/SEO, Consent sowie zentrales E-Mail-Layout. Details bleiben in den jeweiligen As-built-Dokumenten.
 - **Priority 7:** kontrollierte Core-, Auth-, Media- und Storage-Testdatenbereinigung samt finalem Read-only-Gesamtpostcheck.
 - **Preproduction-Betrieb:** Hetzner-Webhosting unter `djkvfl-test.de`, produktionsnaher Node-Betrieb, GitHub-Actions-Deployment, isolierter Lockfile-Build und manueller Node-Neustart in konsoleH als etablierter Betriebsablauf.
+- **Go-live-Vorbereitung 1–3:** All-Inkl-/DNS-Bestand und Hetzner-Zielbetrieb für die endgültige Domain sind analysiert. Der zentrale produktive Mailaufbau für Anwendungs-/Notification-Mails und Supabase Auth verwendet die verifizierte Versanddomain `mail.djkvfl-giesenkirchen.de` und wurde mit realen Zustellungen erfolgreich getestet. Eine DNS-Umschaltung der Hauptdomain hat noch nicht stattgefunden.
 
 ### Abgeschlossene Releases
 
@@ -61,18 +62,13 @@ Impressum, Datenschutz, AGB, CMS-/Renderingintegration und Consent-Manager sind 
 
 ### E-Mail und Auth
 
-Membership-, Notification-, Recovery-, Invite- und Admin-E-Mail-Wechsel-Technik sowie die zentralen Templates sind umgesetzt. Vor Go-live bleiben:
+Der produktive Mailaufbau ist festgelegt und live getestet. Anwendungs- und Notification-Mails verwenden Resend mit `MAIL_PROVIDER=resend`; `MAIL_FROM` enthält im Hosting die reine Adresse `noreply@mail.djkvfl-giesenkirchen.de`, während der Provider zentral den Anzeigenamen `DJK/VfL Giesenkirchen 05/09 e.V.` ergänzt. Alle 27 organisationsweit konfigurierbaren Notification-Typen besitzen einen Renderer. Eine reale Mannschafts-/Spieler-Notification wurde zugestellt und von Resend als `Delivered` bestätigt.
 
-- finale Vereins-Maildomain beziehungsweise finaler Mailserver
-- endgültige From-/Reply-To-Adressen
-- SPF, DKIM und DMARC
-- erster echter Invite-Smoke
-- finale Recovery-, Membership- und Notification-Smokes
-- Links aus Transaktionsmails mit der finalen `NEXT_PUBLIC_SITE_URL` prüfen
+Supabase Auth verwendet weiterhin Custom SMTP über Resend mit demselben Vereinsabsender. Ein realer Passwort-Reset wurde erfolgreich zugestellt. Offen bleiben eine optionale freigegebene Reply-To-Adresse, der erste echte Invite-Smoke sowie die abschließenden Link-/Redirect-Smokes mit der finalen produktiven Website-Domain nach der DNS-Umschaltung.
 
 ### Support-/Ticketsystem – VOR PRODUKTIV-GO-LIVE ZWINGEND ABSCHLIESSEN
 
-**Go-live-Blocker:** Das interne Support-/Ticketsystem muss nach Vorliegen der endgültigen Domain- und Mailserver-Zugangsdaten umgesetzt, mit dem finalen Mail-System verbunden und vollständig getestet werden. Solange dieser Punkt nicht abgeschlossen ist, darf die endgültige Produktivfreigabe nicht erfolgen.
+**Nächster offener Go-live-Blocker:** Das interne Support-/Ticketsystem muss als nächster Entwicklungsblock zunächst vollständig fachlich und technisch inventarisiert und anschließend umgesetzt, mit dem finalen Mail-System verbunden und vollständig getestet werden. Solange dieser Punkt nicht abgeschlossen ist, darf die endgültige Produktivfreigabe nicht erfolgen.
 
 - Alle aktiven Dashboard-Benutzer außer dem Superadmin können eigene Tickets erstellen, ausschließlich eigene Tickets und deren Status sehen sowie innerhalb ihres Tickets antworten. Vorgesehene Status sind `Offen`, `In Bearbeitung` und `Abgeschlossen`; Ticketarten umfassen mindestens Problem/Fehler, Frage/Hilfe, Verbesserungsvorschlag und Sonstiges.
 - Auswählbare Ticketbereiche werden serverseitig aus dem bestehenden Permission- und Scope-System abgeleitet. Benutzer erhalten nur tatsächlich freigegebene Arbeitsbereiche sowie einen allgemeinen Bereich wie „Allgemein / Verbesserungsvorschlag“. Manipulierte Bereiche und fremde Ticket-IDs müssen serverseitig abgewiesen werden.
@@ -132,15 +128,19 @@ Keine aktiven Aufgaben mehr sind: eine allgemeine `persons`-Tabelle, eine separa
 
 ## Aktuelle Arbeitsreihenfolge
 
-1. Echtdaten und Content weiter einpflegen und prüfen.
-2. Dabei auftretende UI-/Funktionsprobleme kontrolliert korrigieren.
-3. Finale Domain- und Environmentplanung abschließen.
-4. Legal-/Provider-Endprüfung durchführen.
-5. Finalen Mail-/Auth-Smoke durchführen.
-6. Nach Vorliegen der endgültigen Domain-/Mailserver-Zugangsdaten das verpflichtende Support-/Ticketsystem umsetzen und vollständig mit realen Rollen, Benachrichtigungen und E-Mails testen.
-7. Contribution-Reminder kontrolliert in Betrieb nehmen.
-8. Finalen Desktop-/Tablet-/Mobile-Gesamtsmoke durchführen.
-9. Finale Domainumschaltung und Go-live.
+1. **All-Inkl-Bestandsaufnahme – ABGESCHLOSSEN.** `djkvfl-giesenkirchen.de` wird weiterhin im All-Inkl/KAS verwaltet und zeigt noch auf den bisherigen Webserver. DNS wurde einschließlich Web-, Mail-, Resend-, MX-, SPF- und DKIM-Kontext geprüft und vor jeder Änderung als BIND-Zonefile gesichert. Es fand keine DNS-Umschaltung statt; der gesicherte Bestand ist die Rollback-Grundlage.
+2. **Hetzner für die endgültige Domain analysieren – ABGESCHLOSSEN.** `djkvfl-test.de` läuft mit Next.js, Dashboard, Node.js 24, gültigem HTTPS und dem Workflow `Deploy to Hetzner preproduction`. Nach einem Deployment bleibt der manuelle Node-Neustart in konsoleH erforderlich. Die Hauptdomain zeigt noch nicht auf Hetzner; `djkvfl-test.de` bleibt während der Vorbereitung bestehen.
+3. **Mail endgültig festlegen und testen – ABGESCHLOSSEN.** Anwendungs-/Notification-Mails und Supabase-Auth-Mails verwenden erfolgreich den neuen Vereinsabsender der verifizierten Domain `mail.djkvfl-giesenkirchen.de`. Notification und Passwort-Recovery wurden real zugestellt.
+4. **Ticketsystem bauen – NÄCHSTER OFFENER GO-LIVE-BLOCKER.** Zuerst Bestands-/Architekturanalyse, danach geschützte Umsetzung für Erstellen, eigene/fremde Sichtbarkeit, Antworten, Status, Superadmin-Verwaltung, Dashboard-/E-Mail-Benachrichtigungen und vollständige Rollentests. Erforderliche DB-Arbeiten folgen zwingend Read-only-Preflight, Proposal, Rollback und Read-only-Postcheck.
+5. **Hetzner auf Produktivdomain vorbereiten – OFFEN.** Keine normale manuelle SSH-Deploymentmethode einführen.
+6. **Supabase/Auth auf Produktivdomain vorbereiten – TEILWEISE VORBEREITET.** Mailabsender und SMTP sind erledigt; Site URL, Redirect URLs und finale Domainabhängigkeiten bleiben offen.
+7. **Pre-Go-live-Komplettcheck – OFFEN.** Echtdaten, Content, Legal-/Providerfreigabe, Rollen, Public/Dashboard, Consent und responsive Darstellung prüfen.
+8. **DNS bei All-Inkl umstellen – OFFEN.** Erst nach Freigabe mit gesichertem Ausgangsbestand und Rollbackplan.
+9. **SSL und Hauptdomain prüfen – OFFEN.** HTTPS für `djkvfl-giesenkirchen.de` erst nach der Domainumschaltung final aktivieren und abnehmen.
+10. **Produktive Mail- und Auth-Tests – TEILWEISE BEREITS VORGETESTET.** Versand über die neue Maildomain ist erfolgreich; finale Website-Links und Auth-Redirects müssen nach DNS-Umschaltung mit der echten Produktivdomain erneut getestet werden.
+11. **FUSSBALL.DE und weitere domainabhängige Integrationen finalisieren – OFFEN.** Reale Zuordnungen und Desktop-/Mobile-Abnahme auf der finalen Domain durchführen.
+12. **Automatische Beitragserinnerungen produktiv aktivieren – OFFEN.** Secret/Vault, Produktivendpunkt, Idempotenz, Monitoring, Rollen-Livetest und Rotation kontrolliert abschließen.
+13. **Finaler Live-Test und Freigabe – OFFEN.** Abschließender Desktop-/Tablet-/Mobile-Gesamtsmoke und formale Produktivfreigabe.
 
 ## Historische Nachweise
 

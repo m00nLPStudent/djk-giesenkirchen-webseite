@@ -15,6 +15,8 @@ Die produktionsnahe Abnahmeversion läuft auf `djkvfl-test.de`. Ein Push auf
 Workflow deployt ausschließlich den konkreten Push-Commit und führt keinen
 Datenbank- oder SQL-Schritt aus.
 
+Die endgültige Vereinsdomain ist `djkvfl-giesenkirchen.de`. Der DNS-Bestand wird weiterhin bei All-Inkl/KAS verwaltet, wurde einschließlich Web-, Mail- und Resend-Kontext vollständig inventarisiert und vor jeder Änderung privat als BIND-Zonefile gesichert. Die Hauptdomain zeigt noch auf den bisherigen All-Inkl-Webserver; es wurde keine produktive DNS-Umschaltung vorgenommen. `djkvfl-test.de` bleibt während der Vorbereitung erhalten. Die finale Let's-Encrypt-/HTTPS-Aktivierung für die Hauptdomain erfolgt erst im kontrollierten Domainumschaltungsblock. Normale manuelle SSH-Deployments bleiben ausgeschlossen.
+
 ### Ablauf
 
 1. Änderungen lokal entwickeln.
@@ -97,6 +99,8 @@ optional und darf erst nach Freigabe eines tatsächlich vorhandenen
 Vereins-/Supportpostfachs gesetzt werden. Alle Werte bleiben ohne
 `NEXT_PUBLIC_`-Präfix ausschließlich serverseitig. Die getrennten Supabase-
 Auth-Mails werden nicht durch diese Variablen umgestellt.
+
+Dieser Anwendungs-Mailvertrag ist produktiv aktiviert und live bestätigt: Eine Mannschafts-/Spieler-Notification wurde zugestellt und bei Resend als `Delivered` ausgewiesen. Supabase Auth verwendet getrennt davon weiterhin Custom SMTP über Resend; Senderadresse und Sendername entsprechen demselben Vereinsabsender, und ein realer Passwort-Reset wurde erfolgreich zugestellt. SMTP-Credentials werden nicht im Repository dokumentiert. Finale Links und Redirects mit `djkvfl-giesenkirchen.de` bleiben bis nach der DNS-Umschaltung ein eigener Smoke-Test.
 
 ### Dependency-Vertrag
 

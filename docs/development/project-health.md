@@ -1,11 +1,13 @@
 # Project Health
 
-Stand: **27. September 2026 · Version 1.0.12**
+Stand: **28. September 2026 · Version 1.0.12**
 
 ## Aktueller Stand
 
 - Next.js App Router mit getrennter öffentlicher Website und geschütztem Adminbereich.
 - Hetzner-Preproduction unter `djkvfl-test.de` mit reproduzierbarem GitHub-Actions-Deployment; der Node-Neustart bleibt ein manueller konsoleH-Schritt.
+- All-Inkl-/DNS-Ausgangsbestand und Hetzner-Zielbetrieb für `djkvfl-giesenkirchen.de` sind analysiert. Die Hauptdomain ist noch nicht umgestellt; der private BIND-Export dient als Rollbackgrundlage.
+- Der produktive Vereinsabsender über `mail.djkvfl-giesenkirchen.de` ist für Resend-Anwendungs-/Notification-Mails und Supabase-Auth-Mails eingerichtet und durch reale Notification- sowie Recovery-Zustellung bestätigt. Die Renderer-Abdeckung beträgt 27/27.
 - Dashboardmodule für Settings/CMS, Membership, Notifications, News, Events, Downloads, Ergebnisse, Teams, Personen, Beiträge, Sponsoren, Medien, Chronik und Abteilungsverwaltung sind integriert.
 - Öffentliche Gesamtvereins-, Fußball-, Tischtennis-, Behindertensport- und Gymnastikbereiche einschließlich responsive Designbasis, Consent, Accessibility-/SEO-Basis und zentralem E-Mail-Layout sind umgesetzt.
 - Priority 7 hat die kontrollierte Testdatenbereinigung abgeschlossen. Die echte Vereinsdatenbefüllung läuft und ist noch nicht vollständig.
@@ -38,8 +40,9 @@ Stand: **27. September 2026 · Version 1.0.12**
 ## Offene Gesundheits- und Go-live-Punkte
 
 - Echtdaten-/Contentbefüllung vervollständigen.
-- Finale Domain-, Environment-, Indexierungs- und Supabase-Redirect-Konfiguration.
-- Finale Legal-/Provider- sowie Mail-/Auth-Prüfung.
+- Support-/Ticketsystem nach vorgelagerter Bestands-/Architekturanalyse als nächsten zwingenden Go-live-Blocker umsetzen.
+- Finale Domainumschaltung, Environment-, Indexierungs-, SSL- und Supabase-Redirect-Konfiguration.
+- Finale Legal-/Providerprüfung sowie Mail-/Auth-Linksmokes mit der echten Produktivdomain; der produktive Mailabsender selbst ist bereits live getestet.
 - Contribution-Reminder kontrolliert produktiv aktivieren.
 - Abschließender Desktop-/Tablet-/Mobile-Gesamtsmoke auf der finalen Domain.
 
