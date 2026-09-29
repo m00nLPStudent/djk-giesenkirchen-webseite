@@ -9,6 +9,7 @@
 - Neue Tickets, Antworten und echte Statusänderungen nutzen nach erfolgreichem Business-RPC die zentrale, idempotente Dashboard-Notification- und Delivery-Pipeline. Actor-Ausschluss und permission-basierte Support-Empfänger verhindern Selbst- und Streuzustellungen.
 - Alle drei Tickettypen besitzen datensparsame HTML-/Text-Renderer im zentralen Vereinslayout. `ticket_created`, `ticket_reply_created` und `ticket_status_changed` wurden kontrolliert aktiviert und erfolgreich live zugestellt; der geschützte Ticket-CTA wurde praktisch bestätigt.
 - Die automatisierte Pre-Release-Prüfung und die manuelle Live-Abnahme mit Superadmin und berechtigtem Trainer sind bestanden. Der Permission-Guard-Hotfix für die Support-Liste und -Detailseite gehört zu Release 1.0.13; Ticket-Erstellung, Antworten, Status/Priorität/Zuweisung, Abschluss und Wiederöffnung wurden erfolgreich geprüft.
+- Der Pre-Go-live-Status wurde ohne neue Release-Version synchronisiert: Punkt 7 ist einschließlich der freigegebenen Prüfungen 7.1 bis 7.8 und des technischen Repository-Audits 7.9 abgeschlossen. Es wurde kein neuer Produktcode-Go-live-Blocker gefunden; bekannte Baseline-Test-/ESLint-Probleme bleiben separat dokumentiert. DNS, SSL, Site-URL-Wechsel und finale domainabhängige Tests folgen als Cutover-Arbeiten unter den Roadmap-Punkten 8 ff.
 
 ## 2026-09-27
 

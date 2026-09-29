@@ -24,33 +24,22 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **1.0.5:** sicheres, permissiongeschütztes Löschen bestehender Termine.
 - **1.0.6:** öffentliche Ausblendung von `Keine Lizenz`, Board Responsibilities, Dashboard-Aufgabenverwaltung und öffentlicher Responsibilities-Dialog.
 - **1.0.7:** vertikale öffentliche Trainer- und Vorstandskarten, einheitliche responsive Gridbreiten, harmonisierte Kontaktfooter und erfolgreicher Live-Review.
-- **1.0.8 (begonnen):** öffentliche Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten.
-- **1.0.9 (implementiert und lokal validiert):** permission- und departmentgeschützte Ergebnisverwaltung für Fußball und Tischtennis sowie öffentlicher, routenabhängiger Ergebnisticker. Dashboard und responsive Tickerdarstellung sind manuell abgenommen; Deployment und Livekontrolle stehen noch aus.
-- **1.0.10 (implementiert und lokal validiert):** Trainer können Beschreibung, Trainingsdaten, Kader und Kontakt ausschließlich für ihre zugeordneten Mannschaften pflegen. Stammdaten, Wettbewerb, Medien und strukturelle Mutationen bleiben gesperrt. Das zugehörige DB-Hardening ist nach manuellem Proposal mit `overall_ok = true` verifiziert; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
-- **1.0.11 (für Release vorbereitet):** Jugendleiter verwalten Fußball-Ergebnisse über die fünf bestehenden `results.*`-Permissions, besitzen keinen Zugriff mehr auf allgemeine Einstellungen und erhalten weiterhin kein `teams.create`. Bestehende Team-Seasons werden per UPDATE gespeichert; neue Team-Seasons bleiben create-berechtigten Rollen vorbehalten. Der DB-Prozess ist mit `overall_ok = true` abgeschlossen, Code und Tests sind lokal validiert; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
-- **1.0.12 (für Release vorbereitet):** Der Tischtennisvorstand verwaltet News und Termine ausschließlich im Tischtennis-Department. Kassierer behalten die vollständige Beitragsverwaltung, besitzen aber keinen allgemeinen Settings-Zugriff mehr. Der DB-Prozess ist mit 10/10 Diagnoseblöcken und `overall_ok = true` abgeschlossen; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
+- **1.0.8:** öffentliche Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten.
+- **1.0.9:** permission- und departmentgeschützte Ergebnisverwaltung für Fußball und Tischtennis sowie öffentlicher, routenabhängiger Ergebnisticker; deployed und live geprüft.
+- **1.0.10:** serverseitig begrenzte Mannschaftsbearbeitung für Trainer; deployed und im Rollen-Livetest geprüft.
+- **1.0.11:** gehärteter Jugendleiter-Vertrag und getrennte Team-Season-Update-/Create-Rechte; deployed und live geprüft.
+- **1.0.12:** Tischtennis-Scope für News/Termine und präzisierter Kassierer-Vertrag; deployed und live geprüft.
 - **1.0.13:** B15.25 Support Tickets V1 ist implementiert, deployed und nach dem Permission-Guard-Hotfix live abgenommen. Ticket-Erstellung, Antworten, Status, Priorität, Zuweisung, Abschluss/Wiederöffnung, Dashboard-Benachrichtigungen und alle drei aktivierten Ticket-Mailtypen wurden erfolgreich geprüft.
 
 ## In Arbeit / teilweise erledigt
 
 ### Echtdaten / Content-Befüllung
 
-Die technische Plattform ist produktionsfähig und die kontrollierte Testdatenbereinigung ist abgeschlossen. `djkvfl-test.de` enthält die fertige Original-Webseite auf der aktuellen Test-/Preproduction-Domain. Seit der Bereinigung wird sie schrittweise mit echten Vereins-/Produktivdaten befüllt.
-
-Noch nicht vollständig abgeschlossen sind insbesondere:
-
-- Mannschaften und Saisonzuordnungen
-- Trainer und Betreuer
-- Gesamtvereins-, Fußball- und Tischtennisvorstände
-- Sponsoren und Kontakte
-- Inhalte weiterer Abteilungen
-- Downloads und Medien
-- reale click-TT- und FUSSBALL.DE-Zuordnungen
-- abschließende Prüfung aller öffentlichen Texte und Inhalte
+Die technische Plattform ist produktionsfähig und die kontrollierte Testdatenbereinigung ist abgeschlossen. `djkvfl-test.de` enthält die für den Cutover freigegebene Original-Webseite mit echten Vereins-/Produktivdaten. Der noch unvollständige Behindertensport-Content sowie kleinere redaktionelle Inhalts- und Rollendetails werden nachgeführt und sind keine Go-live-Blocker.
 
 ### Legal und Provider
 
-Impressum, Datenschutz, AGB, CMS-/Renderingintegration und Consent-Manager sind technisch umgesetzt und manuell geprüft. Offen bleiben finale Betreiber-/Vertretungsangaben, Hosting- und Mailanbieter, das endgültige Inventar externer Dienste, gegebenenfalls AV-Verträge/Drittlandtransfers sowie die abschließende juristische und betriebliche Freigabe.
+Impressum, Datenschutz, AGB, CMS-/Renderingintegration und Consent-Manager sind technisch umgesetzt, erreichbar und manuell geprüft. Verbleibende redaktionelle oder juristische Feinprüfungen werden getrennt nachgeführt und sind nach aktueller Betreiberbewertung keine Cutover-Blocker.
 
 ## Offen vor Go-live
 
@@ -136,9 +125,9 @@ Keine aktiven Aufgaben mehr sind: eine allgemeine `persons`-Tabelle, eine separa
 2. **Hetzner für die endgültige Domain analysieren – ABGESCHLOSSEN.** `djkvfl-test.de` läuft mit Next.js, Dashboard, Node.js 24, gültigem HTTPS und dem Workflow `Deploy to Hetzner preproduction`. Nach einem Deployment bleibt der manuelle Node-Neustart in konsoleH erforderlich. Die Hauptdomain zeigt noch nicht auf Hetzner; `djkvfl-test.de` bleibt während der Vorbereitung bestehen.
 3. **Mail endgültig festlegen und testen – ABGESCHLOSSEN.** Anwendungs-/Notification-Mails und Supabase-Auth-Mails verwenden erfolgreich den neuen Vereinsabsender der verifizierten Domain `mail.djkvfl-giesenkirchen.de`. Notification und Passwort-Recovery wurden real zugestellt.
 4. **Ticketsystem fertigstellen – ABGESCHLOSSEN.** B15.25 und Release 1.0.13 sind einschließlich Rollen-Livetest, Dashboard-Notifications, kontrollierter Mailtyp-Aktivierung, erfolgreicher Zustellung und CTA-Prüfung abgeschlossen.
-5. **Hetzner auf Produktivdomain vorbereiten – NÄCHSTER AKTIVER GO-LIVE-PUNKT.** Hauptdomain, finale Hosting-/Domainkonfiguration, Environment einschließlich `NEXT_PUBLIC_SITE_URL`, Mailparameter und SSL-Voraussetzungen vorbereiten. `djkvfl-test.de` zunächst erhalten; noch keine DNS-Umschaltung und keine normale manuelle SSH-Deploymentmethode einführen.
-6. **Supabase/Auth auf Produktivdomain vorbereiten – TEILWEISE VORBEREITET.** Mailabsender und SMTP sind erledigt; Site URL, Redirect URLs und finale Domainabhängigkeiten bleiben offen.
-7. **Pre-Go-live-Komplettcheck – OFFEN.** Echtdaten, Content, Legal-/Providerfreigabe, Rollen, Public/Dashboard, Consent und responsive Darstellung prüfen.
+5. **Hetzner auf Produktivdomain vorbereiten – VORBEREITET / CUTOVER-RESTARBEIT OFFEN.** Zielvertrag: Node.js 24, `app.js`, Working Directory `djk-giesenkirchen-webseite`, 384 MB, keine Script-Parameter, Varnish aus, `NEXT_PUBLIC_SITE_URL=https://djkvfl-giesenkirchen.de` und `MAIL_FROM=noreply@mail.djkvfl-giesenkirchen.de`. Die Produktions-Node-Konfiguration ist nicht als dauerhaft aktiviert anzunehmen und muss beim Cutover erneut gesetzt beziehungsweise geprüft werden. `djkvfl-test.de` bleibt zunächst erhalten; SSL folgt erst bei/nach DNS-Cutover. `new.djkvfl-giesenkirchen.de` gehört nicht zur Zielarchitektur.
+6. **Supabase/Auth auf Produktivdomain vorbereiten – VORBEREITET / FINALER SITE-URL-WECHSEL OFFEN.** Redirect-Ziele erlauben derzeit Test- und Produktivdomain einschließlich der jeweiligen Set-Password-Pfade. Die Site URL bleibt bis zur tatsächlichen HTTPS-Erreichbarkeit der Produktivdomain bewusst `https://djkvfl-test.de` und wird erst beim Cutover auf `https://djkvfl-giesenkirchen.de` geändert.
+7. **Pre-Go-live-Komplettcheck – ABGESCHLOSSEN.** 7.1 bis 7.8 wurden erfolgreich geprüft beziehungsweise für den Go-live freigegeben; der technische Repository-Audit 7.9 ist abgeschlossen und hat keinen neuen Produktcode-Go-live-Blocker gefunden. Bekannte Baseline-Test-/ESLint-Probleme bleiben separat dokumentiert. Die noch offenen Cutover-Arbeiten gehören zu den Roadmap-Punkten 8 ff. Unvollständiger Behindertensport-Content und kleinere Inhalts-/Rollendetails sind keine Blocker. Code-Rollback, gesicherter DNS-/BIND-Ausgangszustand und Supabase Scheduled Backups sind vorhanden. Das sichtbare physische DB-Backup vom 29.09.2026 03:20:25 UTC enthält keine Storage-Objekte selbst, sondern nur deren Datenbankmetadaten; dies ist aktuell kein Go-live-Blocker.
 8. **DNS bei All-Inkl umstellen – OFFEN.** Erst nach Freigabe mit gesichertem Ausgangsbestand und Rollbackplan.
 9. **SSL und Hauptdomain prüfen – OFFEN.** HTTPS für `djkvfl-giesenkirchen.de` erst nach der Domainumschaltung final aktivieren und abnehmen.
 10. **Produktive Mail- und Auth-Tests – TEILWEISE BEREITS VORGETESTET.** Versand über die neue Maildomain ist erfolgreich; finale Website-Links und Auth-Redirects müssen nach DNS-Umschaltung mit der echten Produktivdomain erneut getestet werden.

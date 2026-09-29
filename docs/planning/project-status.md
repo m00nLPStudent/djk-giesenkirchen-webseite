@@ -11,12 +11,10 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Pushes auf `master` deployen den exakten Commit über den host-key-verifizierten GitHub-Actions-Workflow in einem isolierten Worktree. Der Node-Neustart erfolgt anschließend bewusst manuell in konsoleH.
 - Die endgültige Vereinsdomain ist `djkvfl-giesenkirchen.de`. Ihr DNS wird weiterhin bei All-Inkl/KAS verwaltet und zeigt noch auf den bisherigen All-Inkl-Webserver. Der vollständige Ausgangsbestand wurde geprüft und als private BIND-Zonefile-Rollbackgrundlage gesichert; eine produktive DNS-Umschaltung ist noch nicht erfolgt.
 - Der Hetzner-Zielbetrieb für die Hauptdomain ist analysiert. `djkvfl-test.de` bleibt bis zur kontrollierten Domainumschaltung als funktionierende Preproduction mit gültigem HTTPS bestehen; finale Hauptdomain-SSL-Aktivierung und -Abnahme stehen noch aus.
+- Die Cutover-Zielkonfiguration ist vorbereitet: Node.js 24, `app.js`, Working Directory `djk-giesenkirchen-webseite`, 384 MB, keine Script-Parameter und Varnish aus. `NEXT_PUBLIC_SITE_URL` wird beim Cutover auf `https://djkvfl-giesenkirchen.de` gesetzt; `MAIL_FROM` bleibt die reine Adresse `noreply@mail.djkvfl-giesenkirchen.de`. Die Produktions-Node-Konfiguration muss beim Cutover erneut gesetzt beziehungsweise kontrolliert werden. `new.djkvfl-giesenkirchen.de` ist nicht Teil der Zielarchitektur.
+- Supabase erlaubt bereits Redirects für Test- und Produktivdomain einschließlich Set-Password-Pfaden. Die Site URL bleibt bewusst bis zur tatsächlichen HTTPS-Erreichbarkeit der Hauptdomain auf `https://djkvfl-test.de`; der Wechsel auf `https://djkvfl-giesenkirchen.de` erfolgt erst beim Cutover.
 - Version 1.0.7 ist committed, deployed, durch manuellen Node-Neustart aktiviert und live geprüft.
-- Version 1.0.8 wurde mit öffentlichen Telefon- und E-Mail-Aktionen auf den Gesamtvorstandskarten begonnen.
-- Version 1.0.9 führt die zentrale, serverseitig permission- und departmentgeschützte Ergebnisverwaltung sowie den routenabhängigen öffentlichen Ergebnisticker für Fußball und Tischtennis ein. Dashboard und Ticker sind lokal automatisiert validiert und responsiv manuell abgenommen; Deployment, manueller Node-Neustart und Livekontrolle sind noch nicht bestätigt.
-- Version 1.0.10 begrenzt die Mannschaftsbearbeitung der reinen Trainerrolle auf zugeordnete Mannschaften und die freigegebenen Bereiche Beschreibung, Training, Kader und Kontakt. Das Datenbank-Hardening wurde manuell ausgeführt und mit `overall_ok = true` postcheck-bestätigt; Deployment, Node-Neustart und Live-Rollentest sind noch nicht bestätigt.
-- Version 1.0.11 präzisiert den Jugendleiter-Vertrag: allgemeine Einstellungen sind entzogen, alle fünf vorhandenen `results.*`-Permissions gelten ausschließlich für Fußball und `teams.create` bleibt unvergeben. Der Team-Season-Full-Save trennt UPDATE bestehender Zeilen von permissiongeschützten INSERTs. Der DB-Prozess ist mit 11/11 Postcheck-Blöcken und `overall_ok = true` abgeschlossen; Deployment, Node-Neustart und Live-Rollentest sind noch nicht bestätigt.
-- Version 1.0.12 ergänzt die vollständige News- und Terminverwaltung für den Tischtennisvorstand mit zentralem, serverseitigem Tischtennis-Scope. Kassierer behalten alle neun Beitragsrechte, besitzen jedoch keinen Zugriff mehr auf allgemeine Einstellungen. Der DB-Prozess ist mit 46 Postcheck-Zeilen, 10/10 Diagnoseblöcken und `overall_ok = true` abgeschlossen; der Rollback blieb unbenutzt.
+- Versionen 1.0.8 bis 1.0.12 einschließlich öffentlicher Vorstandskontakte, Ergebnisverwaltung/-ticker sowie der gehärteten Trainer-, Jugendleiter-, Tischtennisvorstand- und Kassierer-Verträge sind deployed und live geprüft.
 - Version 1.0.13 schließt B15.25 Support Tickets V1 ab. Nach dem Permission-Guard-Hotfix wurden Superadmin- und Trainerpfad, Ticket-Erstellung, Antworten, Status/Priorität/Zuweisung, Abschluss/Wiederöffnung, Dashboard-Benachrichtigungen und die drei kontrolliert aktivierten Ticket-Mailtypen live erfolgreich geprüft.
 
 ## Fachlicher Stand
@@ -36,7 +34,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 
 - Priority 7 Core-, Auth-, Media- und Storage-Testdatenbereinigung ist abgeschlossen; der finale Read-only-Gesamtpostcheck war erfolgreich.
 - Die Datenbank ist für echte Vereinsdaten freigegeben.
-- Die schrittweise Echtdatenbefüllung läuft. Vollständige Mannschafts-, Saison-, Trainer-, Vorstands-, Sponsoren-, Kontakt-, Medien-, Download- und weitere Abteilungsinhalte sowie reale Providerzuordnungen sind noch nicht vollständig abgeschlossen.
+- Die für den Cutover freigegebenen Vereins-/Produktivdaten sind eingepflegt. Unvollständiger Behindertensport-Content sowie kleinere redaktionelle Inhalts- und Rollendetails werden nachgeführt und blockieren den Go-live nicht.
 
 ## Security- und Betriebsverträge
 
@@ -48,12 +46,14 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 ## Technisch abgeschlossen, betrieblich noch offen
 
 - Das verpflichtende Support-/Ticketsystem ist abgeschlossen und kein Go-live-Blocker mehr. DB/RLS/ACL/Permissions, atomare RPCs, Application Layer, Dashboard-UI, Rollen-/Ownership-Vertrag, Notifications und Ticket-Mails sind live verifiziert. Nächster aktiver Go-live-Punkt ist die kontrollierte Hetzner-Vorbereitung für die Produktivdomain; noch ohne DNS-Umschaltung.
+- Der Pre-Go-live-Komplettcheck ist abgeschlossen: 7.1 bis 7.8 sind erfolgreich geprüft beziehungsweise für den Go-live freigegeben, und der technische Repository-Audit 7.9 fand keinen neuen Produktcode-Go-live-Blocker. Bekannte Baseline-Test-/ESLint-Probleme bleiben separat dokumentiert; die offenen Cutover-Arbeiten folgen unter den Roadmap-Punkten 8 ff. Noch unvollständiger Behindertensport-Content sowie kleinere Inhalts- oder Rollenfeinheiten sind ausdrücklich keine Cutover-Blocker.
+- Rollback und Backup sind über Git/GitHub, den gesicherten DNS-/BIND-Ausgangszustand und Supabase Scheduled Backups abgedeckt. Das sichtbare physische Backup vom 29.09.2026 03:20:25 UTC umfasst keine Storage-Objekte selbst, sondern nur deren Datenbankmetadaten; dies ist aktuell kein Go-live-Blocker.
 - Kontrollierte Umschaltung der finalen Vereinsdomain, SSL-Endzustand, Environment-URLs, Supabase Site URL/Redirects und produktive Indexierung.
 - Optionales reales Reply-To, erster Invite-Smoke und finale Mail-/Auth-Linktests mit der echten Produktivdomain. Maildomain, zentraler From-Vertrag und Auth-SMTP sind bereits abgeschlossen und live vorgetestet.
-- Finale Legal-/Providerprüfung trotz technisch vorhandener CMS-Rechtsseiten und funktionsfähigem Consent-Manager.
+- Impressum, Datenschutz und Downloads sind vorhanden und erreichbar. Verbleibende redaktionelle oder juristische Feinprüfungen werden getrennt nachgeführt und sind nach aktueller Betreiberbewertung kein Cutover-Blocker.
 - Contribution-Reminder-Cron einschließlich Secret/Vault, Produktivendpunkt, Idempotenzprüfung, Monitoring, Rollen-Livetest und Rotation.
 - FUSSBALL.DE-Domainfreigabe sowie finale reale Widget-/Mannschaftszuordnungen.
-- Vollständige Echtdatenbefüllung und finaler geräteübergreifender Go-live-Smoke.
+- Finaler geräteübergreifender Go-live-Smoke; nicht blockierende Inhaltsnachpflege bleibt separat.
 - Nicht blockierende, von B15.25 getrennte Follow-ups: mögliche eigene Support-Hauptnavigation sowie eine separate Reproduktionsanalyse für `getActorContext is not defined` (Digest `1973645967`) und ältere `Failed to find Server Action ...`-Meldungen.
 
 ## Qualität

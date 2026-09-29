@@ -1,22 +1,20 @@
 # Project Health
 
-Stand: **28. September 2026 · Version 1.0.12**
+Stand: **29. September 2026 · Version 1.0.13**
 
 ## Aktueller Stand
 
 - Next.js App Router mit getrennter öffentlicher Website und geschütztem Adminbereich.
 - Hetzner-Preproduction unter `djkvfl-test.de` mit reproduzierbarem GitHub-Actions-Deployment; der Node-Neustart bleibt ein manueller konsoleH-Schritt.
 - All-Inkl-/DNS-Ausgangsbestand und Hetzner-Zielbetrieb für `djkvfl-giesenkirchen.de` sind analysiert. Die Hauptdomain ist noch nicht umgestellt; der private BIND-Export dient als Rollbackgrundlage.
-- Der produktive Vereinsabsender über `mail.djkvfl-giesenkirchen.de` ist für Resend-Anwendungs-/Notification-Mails und Supabase-Auth-Mails eingerichtet und durch reale Notification- sowie Recovery-Zustellung bestätigt. Die Renderer-Abdeckung beträgt 27/27.
+- Der produktive Vereinsabsender über `mail.djkvfl-giesenkirchen.de` ist für Resend-Anwendungs-/Notification-Mails und Supabase-Auth-Mails eingerichtet und durch reale Notification-, Ticket- sowie Recovery-Zustellung bestätigt. Die Renderer-Abdeckung beträgt 30/30.
 - Dashboardmodule für Settings/CMS, Membership, Notifications, News, Events, Downloads, Ergebnisse, Teams, Personen, Beiträge, Sponsoren, Medien, Chronik und Abteilungsverwaltung sind integriert.
 - Öffentliche Gesamtvereins-, Fußball-, Tischtennis-, Behindertensport- und Gymnastikbereiche einschließlich responsive Designbasis, Consent, Accessibility-/SEO-Basis und zentralem E-Mail-Layout sind umgesetzt.
 - Priority 7 hat die kontrollierte Testdatenbereinigung abgeschlossen. Die echte Vereinsdatenbefüllung läuft und ist noch nicht vollständig.
 - Version 1.0.7 mit vertikalen Trainer-/Vorstandskarten ist live geprüft.
 - Version 1.0.8 wurde mit öffentlichen Kontaktaktionen auf den Gesamtvorstandskarten begonnen.
-- Version 1.0.9 ergänzt die zentrale Ergebnisverwaltung und den öffentlichen, routenabhängigen Header-Ticker. Core-, Integrations-, Motion- und Accessibility-Verträge sind automatisiert validiert; Dashboard und responsive Tickeransicht sind manuell abgenommen. Deployment, manueller Node-Neustart und Livekontrolle stehen noch aus.
-- Version 1.0.10 führt einen serverseitig erzwungenen Mannschaftsscope für Trainer ein. Beschreibung, Training, Kader und Kontakt der zugeordneten Mannschaften sind freigegeben; strukturelle, mediale und wettbewerbsbezogene Mutationen bleiben gesperrt. Das DB-Hardening ist postcheck-bestätigt, Deployment und Live-Rollentest stehen noch aus.
-- Version 1.0.11 begrenzt die neue vollständige Ergebnisverwaltung des Jugendleiters auf Fußball, entzieht allgemeine Einstellungen und erhält den fehlenden `teams.create`-Vertrag. Bestehende Team-Seasons werden per UPDATE, neue nur nach Create-Prüfung per INSERT gespeichert. Der DB-Postcheck ist mit `overall_ok = true` bestanden; Deployment und Live-Rollentest stehen noch aus.
-- Version 1.0.12 begrenzt News und allgemeine Termine des Tischtennisvorstands zentral und serverseitig auf Tischtennis. Der Kassierer behält alle neun Beitragsrechte, während der allgemeine Settings-Zugriff entfällt. Der DB-Postcheck ist mit 10/10 Blöcken und `overall_ok = true` bestanden; Deployment und Live-Rollentest stehen noch aus.
+- Versionen 1.0.9 bis 1.0.12 einschließlich Ergebnisverwaltung/-ticker sowie der gehärteten Trainer-, Jugendleiter-, Tischtennisvorstand- und Kassierer-Verträge sind deployed und live geprüft.
+- Version 1.0.13 schließt das Support-/Ticketsystem einschließlich Rollen-Livetest, Dashboard-Notifications, kontrollierter Mailtyp-Aktivierung, realer Zustellung und CTA-Prüfung ab.
 - Die server-only myTischtennis-/click-TT-Competition-Integration ist wieder funktionsfähig. Der zeitweise Hetzner-Providerfehler (`/verify`, HTTP `429`) ist kein aktueller Blocker; der bestehende Revalidate-Vertrag beträgt 15 Minuten. Ein [WTTV-Fallback](../planning/table-tennis-competition-provider-fallback.md) wird nur bei einem erneut wiederholten oder dauerhaften Ausfall reaktiviert.
 
 ## Architekturregeln
@@ -39,9 +37,9 @@ Stand: **28. September 2026 · Version 1.0.12**
 
 ## Offene Gesundheits- und Go-live-Punkte
 
-- Echtdaten-/Contentbefüllung vervollständigen.
-- Support-/Ticketsystem nach vorgelagerter Bestands-/Architekturanalyse als nächsten zwingenden Go-live-Blocker umsetzen.
-- Finale Domainumschaltung, Environment-, Indexierungs-, SSL- und Supabase-Redirect-Konfiguration.
+- Der Pre-Go-live-Komplettcheck ist abgeschlossen: 7.1 bis 7.8 sind erfolgreich geprüft beziehungsweise für den Go-live freigegeben, und der technische Repository-Audit 7.9 fand keinen neuen Produktcode-Go-live-Blocker. Bekannte Baseline-Test-/ESLint-Probleme bleiben separat dokumentiert; die offenen Cutover-Arbeiten folgen unter den Roadmap-Punkten 8 ff. Unvollständiger Behindertensport-Content und kleinere Inhalts-/Rollendetails sind keine Cutover-Blocker.
+- Hetzner-Cutover-Konfiguration für Node.js 24, `app.js`, Working Directory, 384 MB, fehlende Script-Parameter, Varnish aus, `NEXT_PUBLIC_SITE_URL=https://djkvfl-giesenkirchen.de` und den bestehenden `MAIL_FROM`-Vertrag erneut setzen beziehungsweise prüfen.
+- Finale DNS-Umschaltung, SSL-Aktivierung, Supabase Site URL und produktive Indexierung in der kontrollierten Cutover-Reihenfolge durchführen. `djkvfl-test.de` bleibt bis dahin bestehen; `new.djkvfl-giesenkirchen.de` ist kein Ziel.
 - Finale Legal-/Providerprüfung sowie Mail-/Auth-Linksmokes mit der echten Produktivdomain; der produktive Mailabsender selbst ist bereits live getestet.
 - Contribution-Reminder kontrolliert produktiv aktivieren.
 - Abschließender Desktop-/Tablet-/Mobile-Gesamtsmoke auf der finalen Domain.
