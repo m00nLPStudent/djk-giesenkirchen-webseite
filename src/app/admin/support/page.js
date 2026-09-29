@@ -7,7 +7,7 @@ import { supportTicketService } from "@/lib/support-tickets/supportTickets.servi
 export const dynamic = "force-dynamic";
 
 export default async function SupportPage() {
-  const base = await assertAdminActionPermission();
+  const base = await assertAdminActionPermission({ requiredPermission: null });
   if (!base.ok) notFound();
   const isSuperadmin = (base.roles || []).some((role) => role?.key === "superadmin");
   const auth = isSuperadmin ? await assertSuperadminActionPermission({ requiredPermission: "support_tickets.manage" }) : await assertAdminActionPermission({ requiredPermission: "support_tickets.view_own" });

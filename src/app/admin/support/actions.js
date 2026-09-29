@@ -16,7 +16,7 @@ export async function loadSupportTicketsForAdminAction(filters = {}) {
 }
 
 export async function loadSupportTicketDetailAction(ticketId) {
-  const base = await assertAdminActionPermission();
+  const base = await assertAdminActionPermission({ requiredPermission: null });
   if (!base.ok) return denied(base);
   const superadmin = (base.roles || []).some((role) => role?.key === "superadmin");
   const permission = superadmin ? "support_tickets.manage" : "support_tickets.view_own";
@@ -35,7 +35,7 @@ export async function createSupportTicketAction(input = {}) {
 }
 
 export async function replySupportTicketAction(input = {}) {
-  const base = await assertAdminActionPermission();
+  const base = await assertAdminActionPermission({ requiredPermission: null });
   if (!base.ok) return denied(base);
   const superadmin = (base.roles || []).some((role) => role?.key === "superadmin");
   const auth = superadmin ? await assertSuperadminActionPermission({ requiredPermission: "support_tickets.manage" }) : await assertAdminActionPermission({ requiredPermission: "support_tickets.reply_own" });

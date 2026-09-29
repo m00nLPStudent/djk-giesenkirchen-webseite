@@ -2,6 +2,18 @@
 
 Zielumgebung: `djkvfl-test.de`
 
+## Aktueller Live-Teststatus
+
+**BLOCKIERT – `/admin/support` endete nach erfolgreichem Deployment und Node-Neustart mit einem serverseitigen Fehler (Digest `932740903`). Der Hotfix ist lokal implementiert; ein erneuter Live-Test steht aus.**
+
+- Reproduziert mit Superadmin und berechtigtem Trainer.
+- Der Navigationseintrag ist für beide Rollen sichtbar; der Fehler tritt beim serverseitigen Laden der gemeinsamen Ticketliste auf.
+- Changelog und übrige geprüfte Release-Funktionen sind erreichbar.
+- Root Cause: Die Support-Liste und -Detailseite riefen den Auth-Guard ohne das von dessen Runtime-Vertrag erwartete Optionsobjekt auf; dadurch scheiterte die Destrukturierung von `requiredPermission`.
+- Separat im Runtime-Log vorhanden und nicht Bestandteil dieses Hotfixes: `getActorContext is not defined` (Digest `1973645967`) sowie ältere Meldungen `Failed to find Server Action ...`.
+- Die gewünschte spätere Einordnung von „Support“ als eigener Hauptnavigationsbereich ist ein separater UI-Folgepunkt und nicht Bestandteil der Blockerdiagnose.
+- Bis zur Fehlerklärung keine fachlichen Live-Testschritte und keine Ticket-Mailtests ausführen.
+
 Dieser Plan wird erst nach Deployment und dem vertraglich erforderlichen manuellen Node.js-Neustart abgearbeitet. Es werden ausschließlich eigens angelegte Testtickets verwendet. Personenbezogene Daten, Secrets und produktive Inhalte gehören nicht in Testtickets oder Nachweise.
 
 ## Voraussetzungen und Testrollen

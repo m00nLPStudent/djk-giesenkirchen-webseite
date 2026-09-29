@@ -1,12 +1,46 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { resolveAdminRoutePermission } from "../admin-auth/adminPermissionConfig.js";
 
-const [repository, service, actions] = await Promise.all([
+const [repository, service, actions, listPage, detailPage, createPage] = await Promise.all([
   readFile(new URL("./supportTickets.repository.js", import.meta.url), "utf8"),
   readFile(new URL("./supportTickets.service.js", import.meta.url), "utf8"),
   readFile(new URL("../../app/admin/support/actions.js", import.meta.url), "utf8"),
+  readFile(new URL("../../app/admin/support/page.js", import.meta.url), "utf8"),
+  readFile(new URL("../../app/admin/support/[id]/page.js", import.meta.url), "utf8"),
+  readFile(new URL("../../app/admin/support/new/page.js", import.meta.url), "utf8"),
 ]);
+
+test("runtime permission resolver maps every support route and fails closed for unknown admin routes", () => {
+  assert.deepEqual(
+    [
+      ["/admin/support", "support_tickets.view_own"],
+      ["/admin/support/new", "support_tickets.create"],
+      ["/admin/support/00000000-0000-0000-0000-000000000000", "support_tickets.view_own"],
+    ].map(([route, permission]) => {
+      const resolution = resolveAdminRoutePermission(route);
+      return [resolution.matched, resolution.permission, permission];
+    }),
+    [
+      [true, "support_tickets.view_own", "support_tickets.view_own"],
+      [true, "support_tickets.create", "support_tickets.create"],
+      [true, "support_tickets.view_own", "support_tickets.view_own"],
+    ],
+  );
+
+  const unknown = resolveAdminRoutePermission("/admin/unknown-support-route");
+  assert.equal(unknown.matched, false);
+  assert.equal(unknown.permission, null);
+});
+
+test("support pages and actions always pass an explicit permission options object", () => {
+  const combined = `${listPage}\n${detailPage}\n${createPage}\n${actions}`;
+  assert.doesNotMatch(combined, /assertAdminActionPermission\(\)/);
+  assert.match(listPage, /assertAdminActionPermission\(\{ requiredPermission: null \}\)/);
+  assert.match(detailPage, /assertAdminActionPermission\(\{ requiredPermission: null \}\)/);
+  assert.match(createPage, /requiredPermission: "support_tickets\.create"[\s\S]*role\?\.key === "superadmin"[\s\S]*notFound\(\)/);
+});
 
 test("repository own list and detail apply ownership before returning rows", () => {
   assert.match(repository, /findOwnTickets[\s\S]*\.eq\("created_by_profile_id", profileId\)/);
