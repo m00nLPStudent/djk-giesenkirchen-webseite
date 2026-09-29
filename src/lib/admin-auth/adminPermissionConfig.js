@@ -46,6 +46,14 @@ function buildRule(
 }
 
 const ADMIN_ROUTE_PERMISSION_RULES = [
+  buildRule("/admin/support/new", "support_tickets.create", {
+    matchType: "exact",
+    priority: 500,
+  }),
+  buildRule("/admin/support", "support_tickets.view_own", {
+    matchType: "prefix",
+    priority: 300,
+  }),
   buildRule("/admin/system/structure", "dashboard.view", {
     matchType: "prefix",
     priority: 310,
@@ -380,6 +388,7 @@ export const ADMIN_PUBLIC_ROUTE_PATTERNS = [
 
 export const ADMIN_NAV_PERMISSION_MAP = {
   "/admin": "dashboard.view",
+  "/admin/support": "support_tickets.view_own",
   "/admin/system/structure": "dashboard.view",
   "/admin/notifications": "dashboard.view",
   "/admin/system/notification-email-settings": "dashboard.view",
@@ -416,6 +425,7 @@ export const ADMIN_NAV_PERMISSION_MAP = {
 
 export const ADMIN_DASHBOARD_ACTION_PERMISSION_MAP = {
   "/admin/news/new": "news.create",
+  "/admin/support/new": "support_tickets.create",
   "/admin/downloads": "downloads.view",
   "/admin/results": "results.view",
   "/admin/events/new": "events.create",

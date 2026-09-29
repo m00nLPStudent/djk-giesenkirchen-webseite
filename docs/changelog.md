@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-29
+
+### Version 1.0.13 – Support-/Ticketsystem (Release vorbereitet)
+
+- Der live verifizierte DB-/RPC-Unterbau ist durch eine serverseitige Core-, Repository-, Service- und Server-Action-Schicht angebunden. Eigene Ticketzugriffe, Superadmin-Verwaltung, Scope-Allowlist, IDOR-Schutz und die Sperre für Antworten auf abgeschlossene Tickets werden serverseitig durchgesetzt.
+- Die responsive Dashboard-Oberfläche bietet eigene Ticketlisten, ein scopebegrenztes Create-Formular, sichere Detail- und Antwortansichten sowie die Superadmin-Verwaltung für Status, Priorität, Zuweisung und Wiederöffnung.
+- Neue Tickets, Antworten und echte Statusänderungen nutzen nach erfolgreichem Business-RPC die zentrale, idempotente Dashboard-Notification- und Delivery-Pipeline. Actor-Ausschluss und permission-basierte Support-Empfänger verhindern Selbst- und Streuzustellungen.
+- Alle drei Tickettypen besitzen datensparsame HTML-/Text-Renderer im zentralen Vereinslayout. Die DB-Mailtypen bleiben bis zum kontrollierten Live-Test deaktiviert; vollständige Rollen-/Browser-/Live-Abnahme und Releasefreigabe stehen noch aus.
+- Die automatisierte Pre-Release-Prüfung ist bestanden. Der sichtbare Dashboard-Changelog enthält Version 1.0.13 und bewahrt den Inhalt von Version 1.0.12; die manuelle Live-Abnahme ist noch offen.
+
 ## 2026-09-27
 
 ### Version 1.0.12 – Tischtennis-Redaktion und Kassierer-Berechtigungen

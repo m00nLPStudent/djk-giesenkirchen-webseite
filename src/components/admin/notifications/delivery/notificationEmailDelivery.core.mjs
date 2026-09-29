@@ -31,6 +31,9 @@ const EMAIL_COPY = Object.freeze({
   event_created: "Ein für dich relevanter Termin oder eine Trainingszeit wurde erstellt.",
   event_updated: "Ein für dich relevanter Termin oder eine Trainingsinformation wurde geändert.",
   event_cancelled: "Ein für dich relevanter Termin oder eine Trainingszeit wurde abgesagt oder entfernt.",
+  ticket_created: "Ein neues Support-Ticket wurde erstellt.",
+  ticket_reply_created: "Zu einem Support-Ticket ist eine neue Antwort eingegangen.",
+  ticket_status_changed: "Der Status eines Support-Tickets wurde geändert.",
 });
 
 export const NOTIFICATION_EMAIL_TYPES = Object.freeze(Object.keys(EMAIL_COPY));
@@ -61,21 +64,51 @@ export function buildTrustedDashboardUrl(value) {
   }
 }
 
-export function renderNotificationEmail(type, { dashboardUrl = null, siteUrl = null } = {}) {
+export function buildTrustedNotificationTargetUrl(siteUrl, targetUrl) {
+  try {
+    const base = new URL(String(siteUrl || ""));
+    if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password) return null;
+    const target = String(targetUrl || "");
+    if (!target.startsWith("/admin/") || target.startsWith("//")) return null;
+    const url = new URL(target, base);
+    if (url.origin !== base.origin || url.username || url.password) return null;
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function ticketEmailCopy(type, notification = {}) {
+  if (!type.startsWith("ticket_")) return null;
+  notification ||= {};
+  const ticketNumber = String(notification.metadata?.ticketNumber || "Ticket").trim().slice(0, 80) || "Ticket";
+  const subject = String(notification.metadata?.subject || "Support-Anfrage").trim().slice(0, 200) || "Support-Anfrage";
+  const status = String(notification.metadata?.status || "").trim();
+  const statusLabel = ({ open: "Offen", in_progress: "In Bearbeitung", waiting_for_response: "Wartet auf Rückmeldung", completed: "Abgeschlossen" })[status] || "Geändert";
+  if (type === "ticket_created") return { subject: `Neues Support-Ticket ${ticketNumber}`, paragraphs: ["Hallo,", `Ein neues Support-Ticket wurde erstellt: ${ticketNumber}.`, `Betreff: ${subject}`] };
+  if (type === "ticket_reply_created") return { subject: `Neue Antwort zu ${ticketNumber}`, paragraphs: ["Hallo,", `Zu ${ticketNumber} ist eine neue Antwort eingegangen.`, `Betreff: ${subject}`] };
+  return { subject: `Status von ${ticketNumber} geändert`, paragraphs: ["Hallo,", `Der Status von ${ticketNumber} wurde geändert.`, `Betreff: ${subject}`, `Neuer Status: ${statusLabel}`] };
+}
+
+export function renderNotificationEmail(type, { dashboardUrl = null, siteUrl = null, notification = null } = {}) {
   const policy = getNotificationEmailPolicy(type);
   if (!policy.enabled) return { data: null, error: { code: "notification_email_type_denied" } };
+  const ticketCopy = ticketEmailCopy(type, notification);
   const eventText = EMAIL_COPY[policy.templateKey];
   const callToAction = dashboardUrl
-    ? `Bitte melde dich im Vereinsdashboard an, um die Details einzusehen:\n${dashboardUrl}`
+    ? `Bitte melde dich im Vereinsdashboard an, um die Details einzusehen${ticketCopy ? "." : `:\n${dashboardUrl}`}`
     : "Bitte melde dich im Vereinsdashboard an, um die Details einzusehen.";
-  const text = ["Hallo,", "", eventText, "", callToAction, "", "Sportliche Grüße", "DJK/VfL Giesenkirchen"].join("\n");
+  const paragraphs = ticketCopy?.paragraphs || ["Hallo,", eventText];
+  const text = [...paragraphs, "", callToAction, "", "Sportliche Grüße", "DJK/VfL Giesenkirchen"].join("\n");
   const html = renderClubMailLayout({
-    title: NOTIFICATION_EMAIL_SUBJECT,
-    paragraphs: ["Hallo,", eventText, "Bitte melde dich im Vereinsdashboard an, um die Details einzusehen."],
-    action: dashboardUrl ? { label: "Vereinsdashboard öffnen", url: dashboardUrl } : null,
+    title: ticketCopy?.subject || NOTIFICATION_EMAIL_SUBJECT,
+    paragraphs: [...paragraphs, "Bitte melde dich im Vereinsdashboard an, um die Details einzusehen."],
+    action: dashboardUrl ? { label: ticketCopy ? "Support-Ticket öffnen" : "Vereinsdashboard öffnen", url: dashboardUrl } : null,
     siteUrl,
   });
-  return { data: { subject: NOTIFICATION_EMAIL_SUBJECT, text, html }, error: null };
+  return { data: { subject: ticketCopy?.subject || NOTIFICATION_EMAIL_SUBJECT, text, html }, error: null };
 }
 
 export function notificationEmailIdempotencyKey(notificationId) {
@@ -140,7 +173,7 @@ export async function executeNotificationEmailDelivery(notification, {
     return skipped.error || !skipped.data ? deliveryResult("failed", { code: "notification_delivery_skip_failed" }) : deliveryResult("skipped", { code: "notification_email_recipient_unavailable" });
   }
 
-  const rendered = renderNotificationEmail(notification.type, { dashboardUrl: buildTrustedDashboardUrl(siteUrl), siteUrl });
+  const rendered = renderNotificationEmail(notification.type, { dashboardUrl: buildTrustedNotificationTargetUrl(siteUrl, notification.target_url) || buildTrustedDashboardUrl(siteUrl), siteUrl, notification });
   if (rendered.error) return deliveryResult("skipped", { code: rendered.error.code });
   const claimed = await store.claimNotificationDelivery(db, delivery, createdAt.toISOString());
   if (claimed.error || !claimed.data) return deliveryResult(claimed.error ? "failed" : "not_claimed", { code: claimed.error ? "notification_delivery_claim_failed" : undefined });

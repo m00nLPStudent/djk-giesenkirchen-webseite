@@ -14,6 +14,25 @@ function formatReleaseDate(value) {
   }).format(date);
 }
 
+function ChangelogEntries({ entries, startIndex = 0 }) {
+  return entries.map((entry, index) => (
+    <li
+      key={entry.title}
+      className="flex gap-3 rounded-2xl border border-white/8 bg-white/[0.035] p-4 sm:gap-4"
+    >
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/12 text-sm font-black text-red-200">
+        {startIndex + index + 1}
+      </span>
+      <div className="min-w-0">
+        <h3 className="font-black text-white">{entry.title}</h3>
+        <p className="mt-1 text-sm leading-6 text-white/65">
+          {entry.description}
+        </p>
+      </div>
+    </li>
+  ));
+}
+
 export default function DashboardChangelogDialog({
   changelog,
   busy,
@@ -102,23 +121,21 @@ export default function DashboardChangelogDialog({
 
         <div className="max-h-[min(52vh,31rem)] overflow-y-auto px-5 py-5 sm:px-7 sm:py-6">
           <ol className="space-y-3">
-            {changelog.entries.map((entry, index) => (
-              <li
-                key={entry.title}
-                className="flex gap-3 rounded-2xl border border-white/8 bg-white/[0.035] p-4 sm:gap-4"
-              >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-red-500/12 text-sm font-black text-red-200">
-                  {index + 1}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="font-black text-white">{entry.title}</h3>
-                  <p className="mt-1 text-sm leading-6 text-white/65">
-                    {entry.description}
-                  </p>
-                </div>
-              </li>
-            ))}
+            <ChangelogEntries entries={changelog.entries} />
           </ol>
+          {(changelog.previousReleases || []).map((release) => (
+            <section key={release.version} className="mt-6 border-t border-white/10 pt-5">
+              <p className="mb-3 text-xs font-black uppercase tracking-[0.2em] text-white/45">
+                Version {release.version}
+                {formatReleaseDate(release.releaseDate)
+                  ? ` · ${formatReleaseDate(release.releaseDate)}`
+                  : ""}
+              </p>
+              <ol className="space-y-3">
+                <ChangelogEntries entries={release.entries} />
+              </ol>
+            </section>
+          ))}
         </div>
 
         <div className="border-t border-white/10 bg-black/15 px-5 py-4 sm:px-7 sm:py-5">

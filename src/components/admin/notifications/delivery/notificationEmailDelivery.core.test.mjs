@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  NOTIFICATION_EMAIL_TYPES, buildTrustedDashboardUrl, executeNotificationEmailDelivery,
+  NOTIFICATION_EMAIL_TYPES, buildTrustedDashboardUrl, buildTrustedNotificationTargetUrl, executeNotificationEmailDelivery,
   getNotificationEmailPolicy, isPlausibleNotificationEmail, notificationEmailIdempotencyKey,
   renderNotificationEmail, sanitizeDeliveryErrorClass,
 } from "./notificationEmailDelivery.core.mjs";
@@ -51,12 +51,10 @@ const addedRendererTypes = [
   "membership_payment_due_today", "membership_payment_deferral_ending", "event_created", "event_cancelled",
 ];
 
-test("all 27 configurable email types have exactly one renderer", () => {
+test("all configurable email types have exactly one renderer", () => {
   const configuredTypes = notificationEmailSettingDefinitions.map(({ type }) => type).sort();
   const rendererTypes = [...NOTIFICATION_EMAIL_TYPES].sort();
-  assert.equal(configuredTypes.length, 27);
   assert.equal(new Set(configuredTypes).size, configuredTypes.length);
-  assert.equal(rendererTypes.length, 27);
   assert.equal(new Set(rendererTypes).size, rendererTypes.length);
   assert.deepEqual(rendererTypes, configuredTypes);
   assert.equal(getNotificationEmailPolicy("membership_created").enabled, true);
@@ -76,7 +74,7 @@ test("renderer is generic and excludes dashboard content, metadata and ids", () 
   assert.match(rendered.data.html, /\/datenschutz/);
 });
 
-test("all 27 configurable types have datensparse renderers", () => {
+test("all configurable types have datensparse renderers", () => {
   const forbidden = [notification.title, notification.message, notification.id, "requestId", "secret", "100,00", "Geburtsdatum"];
   for (const type of NOTIFICATION_EMAIL_TYPES) {
     const rendered = renderNotificationEmail(type, { dashboardUrl: "https://verein.example/admin" });
@@ -125,6 +123,32 @@ test("recipient validation and dashboard URL accept only plausible trusted value
   assert.equal(buildTrustedDashboardUrl("https://verein.example/path?q=1#x"), "https://verein.example/admin");
   assert.equal(buildTrustedDashboardUrl("javascript:alert(1)"), null);
   assert.equal(buildTrustedDashboardUrl("https://user:secret@verein.example"), null);
+  assert.equal(buildTrustedNotificationTargetUrl("https://verein.example", "/admin/support/ticket-id"), "https://verein.example/admin/support/ticket-id");
+  assert.equal(buildTrustedNotificationTargetUrl("https://verein.example", "//evil.example/admin/support/x"), null);
+  assert.equal(buildTrustedNotificationTargetUrl("https://verein.example", "https://evil.example/admin/support/x"), null);
+});
+
+test("ticket renderers provide private German copy and direct safe HTML CTA", () => {
+  const ticketNotification = {
+    ...notification,
+    type: "ticket_status_changed",
+    target_url: "/admin/support/11111111-1111-4111-8111-111111111111",
+    metadata: { ticketNumber: "SUP-42", subject: "Anzeige prüfen", status: "waiting_for_response", ticketId: "11111111-1111-4111-8111-111111111111" },
+  };
+  for (const type of ["ticket_created", "ticket_reply_created", "ticket_status_changed"]) {
+    const current = { ...ticketNotification, type };
+    const target = buildTrustedNotificationTargetUrl("https://verein.example", current.target_url);
+    const rendered = renderNotificationEmail(type, { dashboardUrl: target, siteUrl: "https://verein.example", notification: current });
+    assert.equal(rendered.error, null);
+    assert.ok(rendered.data.subject);
+    assert.ok(rendered.data.text);
+    assert.ok(rendered.data.html);
+    assert.match(rendered.data.html, /https:\/\/verein\.example\/admin\/support\/11111111/);
+    assert.doesNotMatch(rendered.data.text, /11111111-1111-4111-8111-111111111111/);
+    assert.doesNotMatch(`${rendered.data.text}${rendered.data.html}`, /private|Nachrichteninhalt/);
+  }
+  const status = renderNotificationEmail("ticket_status_changed", { notification: ticketNotification });
+  assert.match(status.data.text, /Wartet auf Rückmeldung/);
 });
 
 test("parallel delivery claims once and sends exactly once", async () => {

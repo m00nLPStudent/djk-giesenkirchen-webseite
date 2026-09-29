@@ -1,6 +1,6 @@
 # Projektstatus
 
-Stand: **28. September 2026 · Version 1.0.12**
+Stand: **29. September 2026 · Version 1.0.13 vorbereitet**
 
 Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene Prioritäten stehen ausschließlich in der [aktuellen Roadmap](current-roadmap.md).
 
@@ -17,12 +17,13 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Version 1.0.10 begrenzt die Mannschaftsbearbeitung der reinen Trainerrolle auf zugeordnete Mannschaften und die freigegebenen Bereiche Beschreibung, Training, Kader und Kontakt. Das Datenbank-Hardening wurde manuell ausgeführt und mit `overall_ok = true` postcheck-bestätigt; Deployment, Node-Neustart und Live-Rollentest sind noch nicht bestätigt.
 - Version 1.0.11 präzisiert den Jugendleiter-Vertrag: allgemeine Einstellungen sind entzogen, alle fünf vorhandenen `results.*`-Permissions gelten ausschließlich für Fußball und `teams.create` bleibt unvergeben. Der Team-Season-Full-Save trennt UPDATE bestehender Zeilen von permissiongeschützten INSERTs. Der DB-Prozess ist mit 11/11 Postcheck-Blöcken und `overall_ok = true` abgeschlossen; Deployment, Node-Neustart und Live-Rollentest sind noch nicht bestätigt.
 - Version 1.0.12 ergänzt die vollständige News- und Terminverwaltung für den Tischtennisvorstand mit zentralem, serverseitigem Tischtennis-Scope. Kassierer behalten alle neun Beitragsrechte, besitzen jedoch keinen Zugriff mehr auf allgemeine Einstellungen. Der DB-Prozess ist mit 46 Postcheck-Zeilen, 10/10 Diagnoseblöcken und `overall_ok = true` abgeschlossen; der Rollback blieb unbenutzt.
+- Version 1.0.13 bereitet B15.25 Support Tickets V1 für das Deployment vor. Implementierung und automatisierte Pre-Release-Prüfung sind abgeschlossen; manuelle Live-Abnahme, kontrollierte Aktivierung der drei Ticket-Mailtypen und finale Releasefreigabe stehen noch aus.
 
 ## Fachlicher Stand
 
 - Membership B15.21A–C einschließlich Geburtsdatum/Jahrgang, saisonaler Mannschaftsauflösung, Anfragearten, Zuständigkeiten und Weiterleitung ist abgeschlossen.
 - Notification Center, persönliche Präferenzen, zentrale E-Mail-Delivery und globale Superadmin-Mailsteuerung einschließlich D11-Mehrfachauswahl und Sammellöschung sind abgeschlossen.
-- Der produktive Mailaufbau ist abgeschlossen und live getestet: Resend versendet Anwendungs-/Notification-Mails mit der verifizierten Domain `mail.djkvfl-giesenkirchen.de`; alle 27 konfigurierbaren Notification-Typen besitzen Renderer. Eine Mannschafts-/Spieler-Notification wurde erfolgreich zugestellt. Supabase Auth verwendet weiterhin Custom SMTP über Resend mit demselben Vereinsabsender; ein realer Passwort-Reset wurde erfolgreich zugestellt.
+- Der produktive Mailaufbau ist abgeschlossen und live getestet: Resend versendet Anwendungs-/Notification-Mails mit der verifizierten Domain `mail.djkvfl-giesenkirchen.de`; alle 30 konfigurierbaren Notification-Typen einschließlich der drei deaktivierten Tickettypen besitzen Renderer. Eine Mannschafts-/Spieler-Notification wurde erfolgreich zugestellt. Supabase Auth verwendet weiterhin Custom SMTP über Resend mit demselben Vereinsabsender; ein realer Passwort-Reset wurde erfolgreich zugestellt.
 - Downloads B15.22A–E sind vollständig integriert.
 - Das Results-Modul besitzt eine produktiv verifizierte `club_results`-Basis, eine zentrale Admin-Verwaltung mit granularen `results.*`-Permissions und Department-Scope sowie ein server-only Public Repository für den Header-Ticker. Standardfenster, Override, aktive Strukturen, Public-Media-Auflösung und Route-Context werden vor Ausgabe zentral geprüft.
 - Benutzer/Profile/Auth B15.23A–E einschließlich Recovery, Einladung, bestätigtem E-Mail-Wechsel, Guard und Compensation-Vertrag sind abgeschlossen.
@@ -46,7 +47,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 
 ## Technisch abgeschlossen, betrieblich noch offen
 
-- Verpflichtendes Support-/Ticketsystem als nächster offener Go-live-Blocker; vor der Umsetzung erfolgt eine Bestands-/Architekturanalyse.
+- Das verpflichtende Support-/Ticketsystem bleibt aktiver Go-live-Blocker. DB/RLS/ACL/Permissions und die drei atomaren RPCs sind live verifiziert; Application Layer, responsive Dashboard-UI, Notification-Integration und drei zentrale Mail-Renderer sind implementiert. Ticket-Mailtypen bleiben deaktiviert; vollständige Rollen-/Browser-/Live-Tests stehen noch aus.
 - Kontrollierte Umschaltung der finalen Vereinsdomain, SSL-Endzustand, Environment-URLs, Supabase Site URL/Redirects und produktive Indexierung.
 - Optionales reales Reply-To, erster Invite-Smoke und finale Mail-/Auth-Linktests mit der echten Produktivdomain. Maildomain, zentraler From-Vertrag und Auth-SMTP sind bereits abgeschlossen und live vorgetestet.
 - Finale Legal-/Providerprüfung trotz technisch vorhandener CMS-Rechtsseiten und funktionsfähigem Consent-Manager.

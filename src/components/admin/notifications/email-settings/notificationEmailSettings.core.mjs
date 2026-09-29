@@ -26,6 +26,9 @@ const definitions = [
   ["event_created", "events", "Termin erstellt", "Ein relevanter Termin oder eine Trainingszeit wurde erstellt.", false],
   ["event_updated", "events", "Termin geändert", "Ein relevanter Termin oder eine Trainingsinformation wurde geändert.", true],
   ["event_cancelled", "events", "Termin abgesagt oder entfernt", "Ein Termin oder eine Trainingszeit wurde abgesagt oder entfernt.", false],
+  ["ticket_created", "support", "Neues Support-Ticket", "Ein neues Support-Ticket wurde erstellt.", false],
+  ["ticket_reply_created", "support", "Neue Ticket-Antwort", "Zu einem Support-Ticket ist eine neue Antwort eingegangen.", false],
+  ["ticket_status_changed", "support", "Ticketstatus geändert", "Der Status eines Support-Tickets wurde geändert.", false],
 ].map(([type, group, label, description, recommended]) => ({ type, group, label, description, recommended }));
 
 export const notificationEmailSettingDefinitions = Object.freeze(definitions);
@@ -36,6 +39,7 @@ export const notificationEmailSettingGroups = Object.freeze([
   { key: "contributions", label: "Vereinsbeiträge" },
   { key: "members", label: "Mitglieder" },
   { key: "events", label: "Termine & Training" },
+  { key: "support", label: "Support" },
 ]);
 const byType = new Map(definitions.map((item) => [item.type, item]));
 export const normalizeNotificationEmailSettingType = (value) => String(value || "").trim().toLowerCase();

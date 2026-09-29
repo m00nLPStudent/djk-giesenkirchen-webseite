@@ -2,11 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { buildNotificationEmailSettingsDto, hasActiveSuperadminRole, isKnownNotificationEmailSettingType, notificationEmailSettingDefinitions, recommendedNotificationEmailSettings, resolveNotificationEmailDeliveryPolicy } from "./notificationEmailSettings.core.mjs";
 
-test("registry contains exactly the D8 27-type matrix", () => {
-  assert.equal(notificationEmailSettingDefinitions.length, 27);
-  assert.equal(new Set(notificationEmailSettingDefinitions.map(({ type }) => type)).size, 27);
+test("registry extends the verified D8 matrix with the three disabled ticket types", () => {
+  assert.equal(new Set(notificationEmailSettingDefinitions.map(({ type }) => type)).size, notificationEmailSettingDefinitions.length);
+  for (const type of ["ticket_created", "ticket_reply_created", "ticket_status_changed"]) assert.equal(isKnownNotificationEmailSettingType(type), true);
   assert.equal(notificationEmailSettingDefinitions.filter(({ recommended }) => recommended).length, 16);
-  assert.equal(notificationEmailSettingDefinitions.filter(({ recommended }) => !recommended).length, 11);
+  assert.equal(notificationEmailSettingDefinitions.filter(({ recommended }) => !recommended).length, notificationEmailSettingDefinitions.length - 16);
   assert.equal(isKnownNotificationEmailSettingType(" event_updated "), true);
   assert.equal(isKnownNotificationEmailSettingType("future_type"), false);
 });
@@ -24,12 +24,13 @@ test("delivery policy is deny-by-default", () => {
   assert.deepEqual(resolveNotificationEmailDeliveryPolicy({ setting_key: "global", email_delivery_enabled: true }, [{ notification_type: "event_updated", email_enabled: true }], "event_updated"), { globalEnabled: true, typeEnabled: true });
 });
 
-test("recommended restore is a fresh exact 16/11 matrix", () => {
+test("recommended restore is fresh and keeps all ticket types disabled", () => {
   const first = recommendedNotificationEmailSettings();
   first[0].email_enabled = false;
   const second = recommendedNotificationEmailSettings();
-  assert.equal(second.length, 27);
+  assert.equal(second.length, notificationEmailSettingDefinitions.length);
   assert.equal(second.filter(({ email_enabled }) => email_enabled).length, 16);
+  for (const type of ["ticket_created", "ticket_reply_created", "ticket_status_changed"]) assert.equal(second.find((item) => item.notification_type === type)?.email_enabled, false);
 });
 
 test("only an active superadmin role satisfies the mutation boundary", () => {

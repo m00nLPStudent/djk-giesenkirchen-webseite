@@ -20,6 +20,7 @@ test("missing and older acknowledgements show the current changelog", () => {
   assert.equal(shouldShowDashboardChangelog("1.0.9"), true);
   assert.equal(shouldShowDashboardChangelog("1.0.10"), true);
   assert.equal(shouldShowDashboardChangelog("1.0.11"), true);
+  assert.equal(shouldShowDashboardChangelog("1.0.12"), true);
 });
 
 test("the current acknowledgement suppresses the changelog", () => {
@@ -30,7 +31,8 @@ test("the current acknowledgement suppresses the changelog", () => {
 });
 
 test("only the exact current RPC return value is accepted", () => {
-  assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.12"), true);
+  assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.13"), true);
+  assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.12"), false);
   assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.10"), false);
   assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.11"), false);
   assert.equal(isSuccessfulDashboardChangelogAcknowledgement("1.0.9"), false);
@@ -76,17 +78,22 @@ test("RPC errors and mismatched return values never acknowledge the release", as
   );
 });
 
-test("the current release has complete user-facing content", () => {
-  assert.equal(CURRENT_DASHBOARD_CHANGELOG.version, "1.0.12");
-  assert.equal(CURRENT_DASHBOARD_CHANGELOG.releaseDate, "2026-09-27");
+test("the current and previous release have complete user-facing content", () => {
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.version, "1.0.13");
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.releaseDate, "2026-09-29");
   assert.equal(CURRENT_DASHBOARD_CHANGELOG.title, "Neu im Dashboard");
-  assert.equal(CURRENT_DASHBOARD_CHANGELOG.entries.length, 2);
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.entries.length, 3);
   assert.deepEqual(
     CURRENT_DASHBOARD_CHANGELOG.entries.map((entry) => entry.title),
-    ["Tischtennis – News & Termine", "Kassierer-Berechtigungen"],
+    ["Neuer Supportbereich", "Übersichtlicher Bearbeitungsstand", "Supportverwaltung"],
   );
   for (const entry of CURRENT_DASHBOARD_CHANGELOG.entries) {
     assert.ok(entry.title);
     assert.ok(entry.description);
   }
+  assert.equal(CURRENT_DASHBOARD_CHANGELOG.previousReleases[0].version, "1.0.12");
+  assert.deepEqual(
+    CURRENT_DASHBOARD_CHANGELOG.previousReleases[0].entries.map((entry) => entry.title),
+    ["Tischtennis – News & Termine", "Kassierer-Berechtigungen"],
+  );
 });

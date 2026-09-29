@@ -30,6 +30,9 @@ const definitions = [
   ["event_created","events","Termin oder Trainingszeit erstellt","Ein Mannschaftstermin oder eine Trainingszeit wurde erstellt.",false],
   ["event_updated","events","Termin oder Training geändert","Ein Termin, eine Trainingszeit oder Ausnahme wurde geändert.",false],
   ["event_cancelled","events","Termin oder Training abgesagt","Ein Termin oder Training wurde abgesagt oder entfernt.",false],
+  ["ticket_created","support","Neues Support-Ticket","Ein neues Support-Ticket wurde erstellt.",false],
+  ["ticket_reply_created","support","Neue Ticket-Antwort","Zu einem Support-Ticket ist eine neue Antwort eingegangen.",false],
+  ["ticket_status_changed","support","Ticketstatus geändert","Der Status eines Support-Tickets wurde geändert.",false],
   ["system_information","system","Wichtige Systeminformation","Eine technisch oder sicherheitsrelevante Information.",true],
 ].map(([type,group,label,description,mandatory]) => ({ type, group, label, description, mandatory, configurable: !mandatory, defaultEnabled: true }));
 
@@ -38,6 +41,7 @@ export const notificationPreferenceGroups = Object.freeze([
   { key:"team", label:"Spieler & Mannschaft" }, { key:"membership", label:"Mitgliedschaft" },
   { key:"contributions", label:"Beiträge" }, { key:"events", label:"Termine & Training" },
   { key:"editorial", label:"Redaktion" }, { key:"system", label:"System" },
+  { key:"support", label:"Support" },
 ]);
 const byType = new Map(definitions.map((item) => [item.type, item]));
 export const getNotificationPreferenceDefinition = (type) => byType.get(String(type || "")) || null;

@@ -2,7 +2,7 @@ import {
   Activity, BookOpen, Building2, CalendarDays, CalendarRange, CircleDot, Download,
   Contact, Handshake, HeartHandshake, Image, Inbox, KeyRound, Landmark,
   LayoutDashboard, LockKeyhole, Mail, Menu, Newspaper, Settings, Shield,
-  Trophy, UserRound, Users, Wallet, Network,
+  Trophy, UserRound, Users, Wallet, Network, LifeBuoy,
 } from "lucide-react";
 
 const ICONS = Object.freeze({
@@ -20,6 +20,7 @@ const ICONS = Object.freeze({
   inbox: Inbox,
   "key-round": KeyRound,
   landmark: Landmark,
+  "life-buoy": LifeBuoy,
   "layout-dashboard": LayoutDashboard,
   "lock-keyhole": LockKeyhole,
   mail: Mail,

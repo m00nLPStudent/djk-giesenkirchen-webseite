@@ -27,7 +27,13 @@ export const ADMIN_NAVIGATION_SECTIONS = [
     key: "overview", label: "Übersicht", iconKey: "layout-dashboard", href: "/admin",
     description: "Persönlicher Einstieg in das CMS.", order: 10,
     visibility: { strategy: "visible_items" }, implementationStatus: "active",
-    items: [active("dashboard", "Übersicht", "/admin", "layout-dashboard", "dashboard.view", "permission_only", 10, "Aufgaben und relevante Vereinsinformationen.")],
+    items: [
+      active("dashboard", "Übersicht", "/admin", "layout-dashboard", "dashboard.view", "permission_only", 10, "Aufgaben und relevante Vereinsinformationen."),
+      {
+        ...active("support", "Support", "/admin/support", "life-buoy", "support_tickets.view_own", "permission_only", 20, "Eigene Support-Tickets und Anfragen verwalten."),
+        permissionKeys: ["support_tickets.view_own", "support_tickets.manage"],
+      },
+    ],
   },
   {
     key: "club", label: "Gesamtverein", iconKey: "building-2", href: null,
