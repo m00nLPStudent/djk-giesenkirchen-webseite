@@ -4,15 +4,17 @@ Zielumgebung: `djkvfl-test.de`
 
 ## Aktueller Live-Teststatus
 
-**BLOCKIERT – `/admin/support` endete nach erfolgreichem Deployment und Node-Neustart mit einem serverseitigen Fehler (Digest `932740903`). Der Hotfix ist lokal implementiert; ein erneuter Live-Test steht aus.**
+**BESTANDEN – B15.25 wurde nach Deployment des Hotfixes und manuellem Node-Neustart auf `djkvfl-test.de` erfolgreich live geprüft.**
 
-- Reproduziert mit Superadmin und berechtigtem Trainer.
-- Der Navigationseintrag ist für beide Rollen sichtbar; der Fehler tritt beim serverseitigen Laden der gemeinsamen Ticketliste auf.
-- Changelog und übrige geprüfte Release-Funktionen sind erreichbar.
+- `/admin/support`, `/admin/support/new` und autorisierte `/admin/support/[id]`-Aufrufe funktionieren mit Superadmin beziehungsweise berechtigtem Trainer vertragsgemäß.
+- Der frühere Fehler mit Digest `932740903` ist durch Commit `2992018c9c9515595cc8248130fe5a7b31805e56` behoben und live nachgetestet.
 - Root Cause: Die Support-Liste und -Detailseite riefen den Auth-Guard ohne das von dessen Runtime-Vertrag erwartete Optionsobjekt auf; dadurch scheiterte die Destrukturierung von `requiredPermission`.
 - Separat im Runtime-Log vorhanden und nicht Bestandteil dieses Hotfixes: `getActorContext is not defined` (Digest `1973645967`) sowie ältere Meldungen `Failed to find Server Action ...`.
-- Die gewünschte spätere Einordnung von „Support“ als eigener Hauptnavigationsbereich ist ein separater UI-Folgepunkt und nicht Bestandteil der Blockerdiagnose.
-- Bis zur Fehlerklärung keine fachlichen Live-Testschritte und keine Ticket-Mailtests ausführen.
+- Die gewünschte spätere Einordnung von „Support“ als eigener Hauptnavigationsbereich ist ein separater UI-Folgepunkt und nicht Bestandteil dieses Abschlusses.
+- Ticket-Erstellung, Antworten in beide Richtungen, Priorität, Status, Abschluss, Wiederöffnung, Listen/Zähler sowie Actor-Ausschluss wurden live bestätigt.
+- `ticket_created`, `ticket_reply_created` und `ticket_status_changed` wurden kontrolliert über die bestehende Dashboard-Konfiguration aktiviert. Dashboard- und E-Mail-Zustellung sowie der geschützte Ticket-CTA wurden erfolgreich geprüft.
+- Die Testtickets `ST-00000001` und `ST-00000002` bleiben als Live-Testnachweis erhalten.
+- Ein zusätzlicher Fremdzugriffstest mit einem dritten Nicht-Superadmin wurde mangels bewusst nicht angelegtem Testaccount nicht durchgeführt. Der serverseitige Ownership-Vertrag und die automatisierten Regressionen bleiben maßgeblich; dies blockiert die Freigabe nicht.
 
 Dieser Plan wird erst nach Deployment und dem vertraglich erforderlichen manuellen Node.js-Neustart abgearbeitet. Es werden ausschließlich eigens angelegte Testtickets verwendet. Personenbezogene Daten, Secrets und produktive Inhalte gehören nicht in Testtickets oder Nachweise.
 
@@ -21,7 +23,7 @@ Dieser Plan wird erst nach Deployment und dem vertraglich erforderlichen manuell
 - [ ] Aktiver berechtigter Nicht-Superadmin steht als Testrolle bereit.
 - [ ] Superadmin mit `support_tickets.manage` steht als Testrolle bereit.
 - [ ] Optional: aktiver Benutzer ohne Supportberechtigung steht sicher als Negativtestrolle bereit.
-- [ ] Die drei Ticket-Mailtypen sind vor Phase A weiterhin deaktiviert.
+- [x] Die drei Ticket-Mailtypen waren vor Phase A deaktiviert.
 - [ ] Testticket-Betreff und -Nachrichten enthalten ausschließlich neutrale Testdaten.
 
 ## A. Normaler berechtigter Benutzer
@@ -106,7 +108,7 @@ Nur nicht destruktive Prüfungen mit den vorgesehenen Testtickets durchführen.
 - [ ] Es entsteht keine horizontale Seitenüberbreite.
 - [ ] Status ist zusätzlich zur Farbe immer textlich erkennbar.
 
-## E. E-Mail-Phase A – Ticket-Mailtypen deaktiviert
+## E. E-Mail-Phase A – Ausgangszustand mit deaktivierten Ticket-Mailtypen
 
 Keine Mail-Einstellung verändern.
 
@@ -116,9 +118,9 @@ Keine Mail-Einstellung verändern.
 - [ ] Für die drei deaktivierten Tickettypen wird keine Ticket-E-Mail versendet.
 - [ ] Es erfolgt kein unerwarteter Provideraufruf für die deaktivierten Typen.
 
-## F. E-Mail-Phase B – nur nach ausdrücklicher Freigabe
+## F. E-Mail-Phase B – kontrolliert freigegeben und durchgeführt
 
-Diese Phase erst nach kontrollierter Aktivierung der Ticket-Mailtypen durchführen. Die Aktivierung ist nicht Teil dieses Testplanschritts.
+Die Aktivierung erfolgte kontrolliert über die vorhandene Superadmin-Dashboardkonfiguration, nicht per SQL oder direkte Datenmanipulation.
 
 - [ ] `ticket_created`-E-Mail wird einmalig versendet.
 - [ ] `ticket_reply_created`-E-Mail wird einmalig versendet.
@@ -134,9 +136,9 @@ Diese Phase erst nach kontrollierter Aktivierung der Ticket-Mailtypen durchführ
 - [ ] Mobile Maildarstellung ist plausibel.
 - [ ] Resend-Delivery und genau ein Versandversuch werden kontrolliert geprüft.
 
-## Release-Gate
+## Release-Gate und Freigabe
 
-B15.25 darf erst freigegeben werden, wenn:
+B15.25 wurde nach erfolgreichem Live-Test freigegeben. Die automatisierten Checks besitzen ausschließlich die dokumentierten unabhängigen Baselines; der zusätzliche dritte Fremdnutzer-Test war optional und wurde nicht durchgeführt.
 
 - [ ] Automatisierte Checks sind grün, ausgenommen bestätigte unabhängige Baselines.
 - [ ] Test des normalen berechtigten Benutzers bestanden.
@@ -151,11 +153,11 @@ B15.25 darf erst freigegeben werden, wenn:
 
 ## Ergebnisprotokoll
 
-- Testdatum:
-- Getesteter Commit:
-- Umgebung:
-- Rollen (nur Rollenbezeichnungen):
-- Mail-Phase A Ergebnis:
-- Mail-Phase B Ergebnis beziehungsweise „noch nicht freigegeben“:
-- Offene Abweichungen:
-- Freigabeentscheidung:
+- Testdatum: 29. September 2026
+- Getesteter Hotfix-Commit: `2992018c9c9515595cc8248130fe5a7b31805e56`
+- Umgebung: `djkvfl-test.de`
+- Rollen: Superadmin und berechtigter Trainer
+- Mail-Phase A Ergebnis: deaktivierter Ausgangszustand bestätigt
+- Mail-Phase B Ergebnis: alle drei Tickettypen aktiviert und erfolgreich zugestellt
+- Offene Abweichungen: kein zusätzlicher dritter Fremdnutzer-Testaccount; kein Abschlussblocker
+- Freigabeentscheidung: **B15.25 COMPLETE – LIVE VALIDATION PASSED**

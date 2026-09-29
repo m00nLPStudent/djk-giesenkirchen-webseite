@@ -2,7 +2,7 @@
 
 ## Status
 
-Teilimplementiert. Der produktiv verifizierte Tabellen-, RLS-, ACL- und RPC-Unterbau sowie Core, Repository, Service, Server Actions, responsive Dashboard-Oberfläche und zentrale Notification-/Mail-Anbindung sind implementiert und lokal automatisiert geprüft. Die drei Ticket-Mailtypen bleiben bis zum kontrollierten Live-Test deaktiviert; vollständige Rollen-/Live-Abnahme und Freigabe stehen noch aus.
+**Abgeschlossen.** Tabellen-, RLS-, ACL- und RPC-Unterbau sowie Core, Repository, Service, Server Actions, responsive Dashboard-Oberfläche und zentrale Notification-/Mail-Anbindung sind produktiv verifiziert. Der Rollen-Livetest mit Superadmin und berechtigtem Trainer, alle zentralen Ticketabläufe sowie Dashboard- und Mailzustellung wurden auf `djkvfl-test.de` erfolgreich geprüft. Release 1.0.13 ist freigegeben.
 
 ## Dashboard-Oberfläche
 
@@ -36,11 +36,11 @@ Die Anwendung führt keine direkten Inserts oder Updates auf `support_tickets`, 
 - `ticket_status_changed` wird ausschließlich bei einer echten Statusänderung an den Ticket-Ersteller ausgeliefert. Reine Prioritäts- oder Zuweisungsänderungen bleiben RPC-Audit-Events.
 - Erst nach erfolgreichem Business-RPC wird die zentrale idempotente Notification-Pipeline aufgerufen. Notification- oder Mailfehler ändern den Business-Erfolg nicht und wiederholen niemals den Ticket-RPC.
 - Payload und Mail enthalten Ticketnummer, Betreff und gegebenenfalls den deutschen Status, aber keinen vollständigen Nachrichtentext. Die stabilen Dedupe-Quellen sind Ticket-ID, Reply-Message-ID und Status-Audit-Event-ID.
-- Die drei Renderer verwenden das zentrale Vereinslayout. Globale und typebezogene Steuerung sowie Delivery-Ledger bleiben maßgeblich; alle Ticket-Mailtypen starten deaktiviert.
+- Die drei Renderer verwenden das zentrale Vereinslayout. Globale und typebezogene Steuerung sowie Delivery-Ledger bleiben maßgeblich. `ticket_created`, `ticket_reply_created` und `ticket_status_changed` wurden kontrolliert über die bestehende Dashboard-Konfiguration aktiviert und live erfolgreich zugestellt; der Ticket-CTA führte zum autorisierten Ticket.
 
-## Noch offen
+## Abschluss und nicht blockierende Follow-ups
 
-- vollständige manuelle Rollen-, IDOR-, Desktop-/Mobile- und Live-Abnahme der Oberfläche
-- Release 1.0.13 ist im sichtbaren Dashboard-Changelog vorbereitet; die automatisierte Pre-Release-Prüfung ist bestanden, die finale Live-Freigabe aber noch offen
-- kontrollierte Aktivierung und Zustellprüfung der drei bislang deaktivierten Ticket-Mailtypen
-- formale Go-live-Freigabe des Moduls
+- Der frühere Runtimefehler mit Digest `932740903` ist durch den expliziten Auth-Guard-Kontextvertrag behoben und nach Deployment sowie Node-Neustart live bestätigt.
+- Die Testtickets `ST-00000001` und `ST-00000002` bleiben erhalten. Ein zusätzlicher Test mit einem dritten fremden Nicht-Superadmin wurde bewusst nicht durch Anlegen eines weiteren Accounts erzwungen und blockiert den Abschluss nicht.
+- UX-Follow-up: „Support“ später als eigenen Hauptreiter statt unter „Übersicht“ prüfen.
+- Getrennte technische Follow-ups bleiben `getActorContext is not defined` (Digest `1973645967`) und ältere Meldungen `Failed to find Server Action ...`; sie sind nicht B15.25 zugeordnet.

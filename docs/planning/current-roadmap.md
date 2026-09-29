@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-Stand: **29. September 2026 · Version 1.0.13 vorbereitet**
+Stand: **29. September 2026 · Version 1.0.13 abgeschlossen**
 
 Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go-live- und optionale Arbeiten. Historische B12–B15-Planungs- und SQL-Dateien bleiben Nachweise, bilden aber keine parallele To-do-Liste.
 
@@ -16,6 +16,7 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **Priority 7:** kontrollierte Core-, Auth-, Media- und Storage-Testdatenbereinigung samt finalem Read-only-Gesamtpostcheck.
 - **Preproduction-Betrieb:** Hetzner-Webhosting unter `djkvfl-test.de`, produktionsnaher Node-Betrieb, GitHub-Actions-Deployment, isolierter Lockfile-Build und manueller Node-Neustart in konsoleH als etablierter Betriebsablauf.
 - **Go-live-Vorbereitung 1–3:** All-Inkl-/DNS-Bestand und Hetzner-Zielbetrieb für die endgültige Domain sind analysiert. Der zentrale produktive Mailaufbau für Anwendungs-/Notification-Mails und Supabase Auth verwendet die verifizierte Versanddomain `mail.djkvfl-giesenkirchen.de` und wurde mit realen Zustellungen erfolgreich getestet. Eine DNS-Umschaltung der Hauptdomain hat noch nicht stattgefunden.
+- **B15.25 / Go-live-Punkt 4:** Support Tickets V1 einschließlich DB-/Security-Unterbau, atomarer RPCs, Dashboard-Oberfläche, Rollen- und Ownership-Vertrag, Notifications, kontrolliert aktivierter Ticket-Mails und erfolgreicher Live-Abnahme mit Trainer und Superadmin ist abgeschlossen.
 
 ### Abgeschlossene Releases
 
@@ -28,7 +29,7 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **1.0.10 (implementiert und lokal validiert):** Trainer können Beschreibung, Trainingsdaten, Kader und Kontakt ausschließlich für ihre zugeordneten Mannschaften pflegen. Stammdaten, Wettbewerb, Medien und strukturelle Mutationen bleiben gesperrt. Das zugehörige DB-Hardening ist nach manuellem Proposal mit `overall_ok = true` verifiziert; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
 - **1.0.11 (für Release vorbereitet):** Jugendleiter verwalten Fußball-Ergebnisse über die fünf bestehenden `results.*`-Permissions, besitzen keinen Zugriff mehr auf allgemeine Einstellungen und erhalten weiterhin kein `teams.create`. Bestehende Team-Seasons werden per UPDATE gespeichert; neue Team-Seasons bleiben create-berechtigten Rollen vorbehalten. Der DB-Prozess ist mit `overall_ok = true` abgeschlossen, Code und Tests sind lokal validiert; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
 - **1.0.12 (für Release vorbereitet):** Der Tischtennisvorstand verwaltet News und Termine ausschließlich im Tischtennis-Department. Kassierer behalten die vollständige Beitragsverwaltung, besitzen aber keinen allgemeinen Settings-Zugriff mehr. Der DB-Prozess ist mit 10/10 Diagnoseblöcken und `overall_ok = true` abgeschlossen; Deployment, Node-Neustart und Live-Rollentest stehen noch aus.
-- **1.0.13 (Release vorbereitet, Live-Abnahme offen):** B15.25 Support Tickets V1 ist implementiert und hat die automatisierte Pre-Release-Prüfung bestanden. Der Dashboard-Changelog ist vorbereitet; Ticket-Mailtypen bleiben bis zum kontrollierten Test deaktiviert.
+- **1.0.13:** B15.25 Support Tickets V1 ist implementiert, deployed und nach dem Permission-Guard-Hotfix live abgenommen. Ticket-Erstellung, Antworten, Status, Priorität, Zuweisung, Abschluss/Wiederöffnung, Dashboard-Benachrichtigungen und alle drei aktivierten Ticket-Mailtypen wurden erfolgreich geprüft.
 
 ## In Arbeit / teilweise erledigt
 
@@ -63,13 +64,13 @@ Impressum, Datenschutz, AGB, CMS-/Renderingintegration und Consent-Manager sind 
 
 ### E-Mail und Auth
 
-Der produktive Mailaufbau ist festgelegt und live getestet. Anwendungs- und Notification-Mails verwenden Resend mit `MAIL_PROVIDER=resend`; `MAIL_FROM` enthält im Hosting die reine Adresse `noreply@mail.djkvfl-giesenkirchen.de`, während der Provider zentral den Anzeigenamen `DJK/VfL Giesenkirchen 05/09 e.V.` ergänzt. Alle 30 organisationsweit konfigurierbaren Notification-Typen einschließlich der drei noch deaktivierten Tickettypen besitzen einen Renderer. Eine reale Mannschafts-/Spieler-Notification wurde zugestellt und von Resend als `Delivered` bestätigt.
+Der produktive Mailaufbau ist festgelegt und live getestet. Anwendungs- und Notification-Mails verwenden Resend mit `MAIL_PROVIDER=resend`; `MAIL_FROM` enthält im Hosting die reine Adresse `noreply@mail.djkvfl-giesenkirchen.de`, während der Provider zentral den Anzeigenamen `DJK/VfL Giesenkirchen 05/09 e.V.` ergänzt. Alle 30 organisationsweit konfigurierbaren Notification-Typen besitzen einen Renderer. Neben einer Mannschafts-/Spieler-Notification wurden auch die drei aktivierten Tickettypen erfolgreich zugestellt.
 
 Supabase Auth verwendet weiterhin Custom SMTP über Resend mit demselben Vereinsabsender. Ein realer Passwort-Reset wurde erfolgreich zugestellt. Offen bleiben eine optionale freigegebene Reply-To-Adresse, der erste echte Invite-Smoke sowie die abschließenden Link-/Redirect-Smokes mit der finalen produktiven Website-Domain nach der DNS-Umschaltung.
 
-### Support-/Ticketsystem – VOR PRODUKTIV-GO-LIVE ZWINGEND ABSCHLIESSEN
+### Support-/Ticketsystem – ABGESCHLOSSEN
 
-**Aktiver Go-live-Blocker (teilimplementiert):** Tabellen-, Security-/Permission- und atomarer RPC-Unterbau sind live verifiziert. Core, Repository, Service, Actions, responsive Dashboard-Oberfläche sowie zentrale Notification-Integration und alle drei Mail-Renderer sind implementiert und lokal geprüft. Die Ticket-Mailtypen bleiben bis zur kontrollierten Freigabe deaktiviert; Rollen-, Browser- und Live-Tests stehen noch aus.
+**B15.25 COMPLETE – LIVE VALIDATION PASSED:** Tabellen-, Security-/Permission- und atomarer RPC-Unterbau, Anwendungsschicht, Dashboard-Oberfläche, Notifications und alle drei Ticket-Mailtypen sind live verifiziert. Superadmin und berechtigter Trainer haben den vollständigen V1-Ablauf erfolgreich geprüft. Ein zusätzlicher dritter Fremdnutzer-Test wurde mangels bewusst nicht angelegtem Testaccount nicht durchgeführt und ist kein Abschlussblocker.
 
 - Alle aktiven Dashboard-Benutzer außer dem Superadmin können eigene Tickets erstellen, ausschließlich eigene Tickets und deren Status sehen sowie innerhalb ihres Tickets antworten. Vorgesehene Status sind `Offen`, `In Bearbeitung` und `Abgeschlossen`; Ticketarten umfassen mindestens Problem/Fehler, Frage/Hilfe, Verbesserungsvorschlag und Sonstiges.
 - Auswählbare Ticketbereiche werden serverseitig aus dem bestehenden Permission- und Scope-System abgeleitet. Benutzer erhalten nur tatsächlich freigegebene Arbeitsbereiche sowie einen allgemeinen Bereich wie „Allgemein / Verbesserungsvorschlag“. Manipulierte Bereiche und fremde Ticket-IDs müssen serverseitig abgewiesen werden.
@@ -77,8 +78,8 @@ Supabase Auth verwendet weiterhin Custom SMTP über Resend mit demselben Vereins
 - Tickets erhalten einen nachvollziehbaren Nachrichtenverlauf. Andere Benutzer dürfen weder fremde Tickets noch fremde Antworten lesen oder verändern.
 - Das bestehende Dashboard-Benachrichtigungssystem informiert den Superadmin über neue Tickets und Benutzerantworten sowie den Ticket-Ersteller über Superadmin-Antworten und Statuswechsel.
 - Das finale Vereins-Mail-System versendet Eingangsbestätigung, Superadmin-Benachrichtigung, Antwort-, Status- und Abschlussmails über das zentrale Vereins-Template mit HTML- und Textversion. Mailfehler dürfen erfolgreiche Ticket-, Antworts- oder Statusmutationen nicht zurückrollen und müssen kontrolliert auditiert werden; die Ticketlogik bleibt providerunabhängig.
-- Vor der Umsetzung erfolgt eine Architekturprüfung von Rollen, Permissions, Department-/Team-Scope, Notifications, Mail-System, Templates, Audit, Admin-Profilen und RLS. Notwendige Datenbankarbeiten folgen zwingend dem etablierten Ablauf Read-only-Preflight, Proposal, Rollback und Read-only-Postcheck; Preflight und Postcheck liefern jeweils ein Statement, ein kombiniertes Resultset und einen CSV-Export mit `result_block`, `result_order`, `row_order`, `row_type` und `data`.
-- Der verpflichtende Live-Test umfasst Trainer, Jugendleiter, Tischtennisvorstand, Kassierer, Vorstand, weitere relevante Rollen und Superadmin. Zu prüfen sind erlaubte und verbotene Bereiche, manipulierte Requests, eigene und fremde Tickets, Antworten, Statuswechsel, Dashboard-Benachrichtigungen, alle vorgesehenen E-Mails, das finale Template auf Desktop/Mobil sowie Mailfehler ohne Ticketdatenverlust.
+- Architektur und Datenbankarbeiten wurden über Rollen-/Scope-Analyse, Read-only-Preflight, defensives Proposal, Rollback-Artefakt und erfolgreichen Read-only-Postcheck abgeschlossen.
+- Der Live-Test mit berechtigtem Trainer und Superadmin bestätigte erlaubte Abläufe, die Superadmin-Create-Sperre, Ownership-Grundschutz, Antworten, Statuswechsel, Dashboard-Benachrichtigungen und alle vorgesehenen E-Mails. Ein dritter Fremdnutzer-Testaccount wurde bewusst nicht angelegt und ist kein Abschlussblocker.
 
 ### Contribution Reminder
 
@@ -108,6 +109,8 @@ Widgetintegration, Multi-Team-Unterstützung, Spielplan-/Tabellendarstellung, Li
 
 ## Optional / Post-Go-live
 
+- **Support-Navigation:** „Support“ als eigenen Hauptreiter statt unter „Übersicht“ prüfen; keine Änderung am abgeschlossenen B15.25-Berechtigungsvertrag.
+- **Getrennte Runtime-Diagnosen:** `getActorContext is not defined` (Digest `1973645967`) und ältere Meldungen `Failed to find Server Action ...` unabhängig von B15.25 untersuchen, sofern sie erneut reproduzierbar sind.
 - **Tischtennis-Competition-Provider-Fallback:** Die bestehende myTischtennis-/click-TT-Integration funktioniert wieder. Eine WTTV-Umstellung ist [zurückgestellt und wird nur bei einem erneut wiederholten oder dauerhaften Providerproblem reaktiviert](table-tennis-competition-provider-fallback.md).
 - eigenständige Gesamtvereins-„Vereinsstruktur“ erst nach einem fachlich getrennten Routen- und Datenquellenkonzept
 - zusätzliche Rollen für weitere Abteilungen
@@ -132,8 +135,8 @@ Keine aktiven Aufgaben mehr sind: eine allgemeine `persons`-Tabelle, eine separa
 1. **All-Inkl-Bestandsaufnahme – ABGESCHLOSSEN.** `djkvfl-giesenkirchen.de` wird weiterhin im All-Inkl/KAS verwaltet und zeigt noch auf den bisherigen Webserver. DNS wurde einschließlich Web-, Mail-, Resend-, MX-, SPF- und DKIM-Kontext geprüft und vor jeder Änderung als BIND-Zonefile gesichert. Es fand keine DNS-Umschaltung statt; der gesicherte Bestand ist die Rollback-Grundlage.
 2. **Hetzner für die endgültige Domain analysieren – ABGESCHLOSSEN.** `djkvfl-test.de` läuft mit Next.js, Dashboard, Node.js 24, gültigem HTTPS und dem Workflow `Deploy to Hetzner preproduction`. Nach einem Deployment bleibt der manuelle Node-Neustart in konsoleH erforderlich. Die Hauptdomain zeigt noch nicht auf Hetzner; `djkvfl-test.de` bleibt während der Vorbereitung bestehen.
 3. **Mail endgültig festlegen und testen – ABGESCHLOSSEN.** Anwendungs-/Notification-Mails und Supabase-Auth-Mails verwenden erfolgreich den neuen Vereinsabsender der verifizierten Domain `mail.djkvfl-giesenkirchen.de`. Notification und Passwort-Recovery wurden real zugestellt.
-4. **Ticketsystem fertigstellen – AKTIVER GO-LIVE-BLOCKER.** Bestandsanalyse, DB-/Security-Unterbau, atomare RPCs, serverseitige Anwendungsschicht, Dashboard-UI und Notification-/Renderer-Integration sind abgeschlossen. Als Nächstes folgen kontrollierte Mailtyp-Aktivierung sowie vollständige Rollen-, Browser- und Live-Tests. Die bereits ausgerollten DB-Arbeiten sind postcheck-bestätigt; keine weitere Migration ist erforderlich.
-5. **Hetzner auf Produktivdomain vorbereiten – OFFEN.** Keine normale manuelle SSH-Deploymentmethode einführen.
+4. **Ticketsystem fertigstellen – ABGESCHLOSSEN.** B15.25 und Release 1.0.13 sind einschließlich Rollen-Livetest, Dashboard-Notifications, kontrollierter Mailtyp-Aktivierung, erfolgreicher Zustellung und CTA-Prüfung abgeschlossen.
+5. **Hetzner auf Produktivdomain vorbereiten – NÄCHSTER AKTIVER GO-LIVE-PUNKT.** Hauptdomain, finale Hosting-/Domainkonfiguration, Environment einschließlich `NEXT_PUBLIC_SITE_URL`, Mailparameter und SSL-Voraussetzungen vorbereiten. `djkvfl-test.de` zunächst erhalten; noch keine DNS-Umschaltung und keine normale manuelle SSH-Deploymentmethode einführen.
 6. **Supabase/Auth auf Produktivdomain vorbereiten – TEILWEISE VORBEREITET.** Mailabsender und SMTP sind erledigt; Site URL, Redirect URLs und finale Domainabhängigkeiten bleiben offen.
 7. **Pre-Go-live-Komplettcheck – OFFEN.** Echtdaten, Content, Legal-/Providerfreigabe, Rollen, Public/Dashboard, Consent und responsive Darstellung prüfen.
 8. **DNS bei All-Inkl umstellen – OFFEN.** Erst nach Freigabe mit gesichertem Ausgangsbestand und Rollbackplan.
