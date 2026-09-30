@@ -35,3 +35,18 @@ test("SEO endpoints are environment-controlled and admin/auth remain noindex", a
   assert.match(robots, /buildPublicRobots/);
   assert.match(sitemap, /buildPublicSitemap/);
 });
+
+test("root app icons use the transparent club crest instead of the generic favicon", async () => {
+  const [icon, appleIcon] = await Promise.all([
+    readFile(new URL("../../../app/icon.png", import.meta.url)),
+    readFile(new URL("../../../app/apple-icon.png", import.meta.url)),
+  ]);
+
+  assert.equal(icon.subarray(1, 4).toString("ascii"), "PNG");
+  assert.equal(icon.readUInt32BE(16), 512);
+  assert.equal(icon.readUInt32BE(20), 512);
+  assert.equal(appleIcon.subarray(1, 4).toString("ascii"), "PNG");
+  assert.equal(appleIcon.readUInt32BE(16), 180);
+  assert.equal(appleIcon.readUInt32BE(20), 180);
+  await assert.rejects(readFile(new URL("../../../app/favicon.ico", import.meta.url)), { code: "ENOENT" });
+});

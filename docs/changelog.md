@@ -9,6 +9,7 @@
 - Die vorgesehenen FUSSBALL.DE-/externen Integrationen und der finale Desktop-/Mobile-Live-Smoke sind bestanden. Es besteht kein bekannter Go-live-blockierender Fehler.
 - Automatische Beitragserinnerungen bleiben bewusst inaktiv, bis Kassiererzugang, echte Beitragsdaten und die kontrollierte Aktivierungscheckliste vollständig bereit sind.
 - Die Suchmaschinenindexierung ist kontrolliert freigegeben: `PUBLIC_SITE_INDEXING_ENABLED=true` ist produktiv build-sichtbar aktiv, `robots.txt` erlaubt öffentliche Inhalte und sperrt weiterhin `/admin/`, `/api/` und `/auth/`, die Sitemap enthält die öffentlichen Produktiv-URLs und die Startseite liefert kein `noindex` mehr aus. Production-Build und manueller Node-Neustart wurden erfolgreich abgeschlossen. Es wurde keine neue Release-Version angelegt.
+- Das generische Browser-Icon wurde durch das bestehende, unveränderte Vereinslogo ersetzt. Die Next.js-App stellt daraus ein transparentes Browser-Tab-Icon sowie ein Apple Touch Icon bereit; bestehende SEO- und Indexierungsverträge bleiben unverändert.
 
 ## 2026-09-29
 
