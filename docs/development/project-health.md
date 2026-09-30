@@ -1,12 +1,12 @@
 # Project Health
 
-Stand: **29. September 2026 · Version 1.0.13**
+Stand: **30. September 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
 
 ## Aktueller Stand
 
 - Next.js App Router mit getrennter öffentlicher Website und geschütztem Adminbereich.
-- Hetzner-Preproduction unter `djkvfl-test.de` mit reproduzierbarem GitHub-Actions-Deployment; der Node-Neustart bleibt ein manueller konsoleH-Schritt.
-- All-Inkl-/DNS-Ausgangsbestand und Hetzner-Zielbetrieb für `djkvfl-giesenkirchen.de` sind analysiert. Die Hauptdomain ist noch nicht umgestellt; der private BIND-Export dient als Rollbackgrundlage.
+- Produktivbetrieb unter `https://djkvfl-giesenkirchen.de` auf Hetzner mit reproduzierbarem GitHub-Actions-Deployment; der Node-Neustart bleibt ein manueller konsoleH-Schritt.
+- Hauptdomain und Wildcard zeigen auf Hetzner. Der private BIND-Ausgangsbestand bleibt Rollbackgrundlage; mail-relevante DNS-Einträge wurden beim Cutover nicht verändert.
 - Der produktive Vereinsabsender über `mail.djkvfl-giesenkirchen.de` ist für Resend-Anwendungs-/Notification-Mails und Supabase-Auth-Mails eingerichtet und durch reale Notification-, Ticket- sowie Recovery-Zustellung bestätigt. Die Renderer-Abdeckung beträgt 30/30.
 - Dashboardmodule für Settings/CMS, Membership, Notifications, News, Events, Downloads, Ergebnisse, Teams, Personen, Beiträge, Sponsoren, Medien, Chronik und Abteilungsverwaltung sind integriert.
 - Öffentliche Gesamtvereins-, Fußball-, Tischtennis-, Behindertensport- und Gymnastikbereiche einschließlich responsive Designbasis, Consent, Accessibility-/SEO-Basis und zentralem E-Mail-Layout sind umgesetzt.
@@ -37,11 +37,9 @@ Stand: **29. September 2026 · Version 1.0.13**
 
 ## Offene Gesundheits- und Go-live-Punkte
 
-- Der Pre-Go-live-Komplettcheck ist abgeschlossen: 7.1 bis 7.8 sind erfolgreich geprüft beziehungsweise für den Go-live freigegeben, und der technische Repository-Audit 7.9 fand keinen neuen Produktcode-Go-live-Blocker. Bekannte Baseline-Test-/ESLint-Probleme bleiben separat dokumentiert; die offenen Cutover-Arbeiten folgen unter den Roadmap-Punkten 8 ff. Unvollständiger Behindertensport-Content und kleinere Inhalts-/Rollendetails sind keine Cutover-Blocker.
-- Hetzner-Cutover-Konfiguration für Node.js 24, `app.js`, Working Directory, 384 MB, fehlende Script-Parameter, Varnish aus, `NEXT_PUBLIC_SITE_URL=https://djkvfl-giesenkirchen.de` und den bestehenden `MAIL_FROM`-Vertrag erneut setzen beziehungsweise prüfen.
-- Finale DNS-Umschaltung, SSL-Aktivierung, Supabase Site URL und produktive Indexierung in der kontrollierten Cutover-Reihenfolge durchführen. `djkvfl-test.de` bleibt bis dahin bestehen; `new.djkvfl-giesenkirchen.de` ist kein Ziel.
-- Finale Legal-/Providerprüfung sowie Mail-/Auth-Linksmokes mit der echten Produktivdomain; der produktive Mailabsender selbst ist bereits live getestet.
-- Contribution-Reminder kontrolliert produktiv aktivieren.
-- Abschließender Desktop-/Tablet-/Mobile-Gesamtsmoke auf der finalen Domain.
+- Pre-Go-live-Komplettcheck, DNS-Cutover, SSL, Supabase Site URL, produktive Mail-/Auth-Links, FUSSBALL.DE und finaler geräteübergreifender Live-Smoke sind abgeschlossen. Es besteht kein bekannter Go-live-blockierender Fehler.
+- Node.js 24, `app.js`, Working Directory, 384 MB, keine Script-Parameter, Varnish aus, `NEXT_PUBLIC_SITE_URL=https://djkvfl-giesenkirchen.de` und der bestehende `MAIL_FROM`-Vertrag sind produktiv aktiv.
+- Die öffentliche Suchmaschinenindexierung ist kontrolliert freigegeben. `PUBLIC_SITE_INDEXING_ENABLED=true` ist produktiv build-sichtbar aktiv; `robots.txt`, die nicht leere Produktiv-Sitemap und der Wegfall von `noindex` auf der Startseite wurden live geprüft. `/admin/`, `/api/` und `/auth/` bleiben für Crawler gesperrt. Production-Build und manueller Node-Neustart sind erfolgreich abgeschlossen.
+- Contribution-Reminder erst nach eingerichtetem Kassiererzugang, vollständigen kontrollierten Echtdaten und vollständiger Aktivierungscheckliste produktiv aktivieren.
 
 Die verbindliche Reihenfolge und optionale Folgepunkte stehen in der [aktuellen Roadmap](../planning/current-roadmap.md). Deploymentdetails verbleiben ausschließlich in [deployment.md](deployment.md).

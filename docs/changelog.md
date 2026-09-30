@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-30
+
+### Go-live der neuen Vereinswebsite
+
+- `https://djkvfl-giesenkirchen.de` ist nach kontrollierter DNS-Umschaltung produktiv über Hetzner und HTTPS erreichbar. Let's Encrypt, HTTPS-Weiterleitung, OCSP-Stapling und TLS 1.2+ sind aktiv; mail-relevante DNS-Einträge blieben unverändert.
+- Supabase Site URL, Passwort-Recovery, `/set-password`, Support-/Notification-Mails und Ticket-CTAs wurden mit der Produktivdomain erfolgreich geprüft. Der zuvor beim Build eingefrorene Testdomainwert in der serverseitigen `.env.local` wurde kontrolliert korrigiert, danach wurden der aktuelle Commit neu gebaut und Node manuell neu gestartet.
+- Die vorgesehenen FUSSBALL.DE-/externen Integrationen und der finale Desktop-/Mobile-Live-Smoke sind bestanden. Es besteht kein bekannter Go-live-blockierender Fehler.
+- Automatische Beitragserinnerungen bleiben bewusst inaktiv, bis Kassiererzugang, echte Beitragsdaten und die kontrollierte Aktivierungscheckliste vollständig bereit sind.
+- Die Suchmaschinenindexierung ist kontrolliert freigegeben: `PUBLIC_SITE_INDEXING_ENABLED=true` ist produktiv build-sichtbar aktiv, `robots.txt` erlaubt öffentliche Inhalte und sperrt weiterhin `/admin/`, `/api/` und `/auth/`, die Sitemap enthält die öffentlichen Produktiv-URLs und die Startseite liefert kein `noindex` mehr aus. Production-Build und manueller Node-Neustart wurden erfolgreich abgeschlossen. Es wurde keine neue Release-Version angelegt.
+
 ## 2026-09-29
 
 ### Version 1.0.13 – Support-/Ticketsystem

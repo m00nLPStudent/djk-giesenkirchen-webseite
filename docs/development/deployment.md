@@ -10,12 +10,12 @@ Deployment-bezogene Hinweise.
 
 ## Hetzner Webhosting L: halbautomatisches Preproduction-Deployment
 
-Die produktionsnahe Abnahmeversion läuft auf `djkvfl-test.de`. Ein Push auf
+Die produktive Vereinswebsite läuft auf `https://djkvfl-giesenkirchen.de`. Ein Push auf
 `master` startet den Workflow `.github/workflows/deploy-hetzner.yml`. Der
 Workflow deployt ausschließlich den konkreten Push-Commit und führt keinen
 Datenbank- oder SQL-Schritt aus.
 
-Die endgültige Vereinsdomain ist `djkvfl-giesenkirchen.de`. Der DNS-Bestand wird weiterhin bei All-Inkl/KAS verwaltet, wurde einschließlich Web-, Mail- und Resend-Kontext vollständig inventarisiert und vor jeder Änderung privat als BIND-Zonefile gesichert. Die Hauptdomain zeigt noch auf den bisherigen All-Inkl-Webserver; es wurde keine produktive DNS-Umschaltung vorgenommen. `djkvfl-test.de` bleibt während der Vorbereitung erhalten. Die finale Let's-Encrypt-/HTTPS-Aktivierung für die Hauptdomain erfolgt erst im kontrollierten Domainumschaltungsblock. Normale manuelle SSH-Deployments bleiben ausgeschlossen.
+Die endgültige Vereinsdomain `djkvfl-giesenkirchen.de` zeigt nach kontrollierter DNS-Umschaltung auf Hetzner. Der zuvor einschließlich Web-, Mail- und Resend-Kontext inventarisierte private BIND-Export bleibt Rollbackgrundlage; mail-relevante DNS-Einträge wurden nicht verändert. Let's Encrypt, HTTPS-Weiterleitung, OCSP-Stapling und TLS 1.2+ sind aktiv. Normale manuelle SSH-Deployments bleiben ausgeschlossen.
 
 ### Ablauf
 
@@ -39,12 +39,16 @@ Die endgültige Vereinsdomain ist `djkvfl-giesenkirchen.de`. Der DNS-Bestand wir
 
 10. In konsoleH unter **Node.js-Konfiguration** die Anwendung manuell neu
     starten.
-11. Anschließend `https://djkvfl-test.de` und die zentralen öffentlichen sowie
+11. Anschließend `https://djkvfl-giesenkirchen.de` und die zentralen öffentlichen sowie
     geschützten Routen manuell prüfen.
 
 Der Workflow behauptet vor dem manuellen Neustart nicht, dass der neue Commit
 bereits live ist. Ein Live-Healthcheck ist daher noch kein automatischer
 Deploymentbestandteil.
+
+### Suchmaschinenindexierung
+
+Die öffentliche Indexierung ist seit dem 30. September 2026 produktiv freigegeben. `PUBLIC_SITE_INDEXING_ENABLED=true` und `NEXT_PUBLIC_SITE_URL=https://djkvfl-giesenkirchen.de` sind für den Production-Build aktiv. Nach dem abgesicherten Build und dem manuellen Node-Neustart wurden `robots.txt`, die öffentliche Sitemap und der Wegfall von `noindex` auf der Startseite live geprüft. `/admin/`, `/api/` und `/auth/` bleiben in `robots.txt` gesperrt. Weitere Environment-Werte werden hier nicht dokumentiert.
 
 ### Serverseitige `app.js` und Environment-Dateien
 
@@ -100,7 +104,7 @@ Vereins-/Supportpostfachs gesetzt werden. Alle Werte bleiben ohne
 `NEXT_PUBLIC_`-Präfix ausschließlich serverseitig. Die getrennten Supabase-
 Auth-Mails werden nicht durch diese Variablen umgestellt.
 
-Dieser Anwendungs-Mailvertrag ist produktiv aktiviert und live bestätigt: Eine Mannschafts-/Spieler-Notification wurde zugestellt und bei Resend als `Delivered` ausgewiesen. Supabase Auth verwendet getrennt davon weiterhin Custom SMTP über Resend; Senderadresse und Sendername entsprechen demselben Vereinsabsender, und ein realer Passwort-Reset wurde erfolgreich zugestellt. SMTP-Credentials werden nicht im Repository dokumentiert. Finale Links und Redirects mit `djkvfl-giesenkirchen.de` bleiben bis nach der DNS-Umschaltung ein eigener Smoke-Test.
+Dieser Anwendungs-Mailvertrag ist produktiv aktiviert und live bestätigt: Notifications und Ticket-Mails wurden zugestellt, und die CTAs zeigen korrekt auf `djkvfl-giesenkirchen.de`. Supabase Auth verwendet getrennt davon weiterhin Custom SMTP über Resend; Senderadresse und Sendername entsprechen demselben Vereinsabsender, und Passwort-Reset sowie `/set-password` wurden auf der Produktivdomain erfolgreich geprüft. SMTP-Credentials werden nicht im Repository dokumentiert.
 
 ### Dependency-Vertrag
 

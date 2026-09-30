@@ -1,18 +1,18 @@
 # Projektstatus
 
-Stand: **29. September 2026 · Version 1.0.13 abgeschlossen**
+Stand: **30. September 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
 
 Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene Prioritäten stehen ausschließlich in der [aktuellen Roadmap](current-roadmap.md).
 
 ## Anwendung und Betrieb
 
 - Next.js-App mit öffentlicher Website und permissiongeschütztem Dashboard.
-- Produktionsnahe Original-Webseite unter `djkvfl-test.de` auf Hetzner-Webhosting.
+- Produktive Vereinswebsite unter `https://djkvfl-giesenkirchen.de` auf Hetzner-Webhosting.
 - Pushes auf `master` deployen den exakten Commit über den host-key-verifizierten GitHub-Actions-Workflow in einem isolierten Worktree. Der Node-Neustart erfolgt anschließend bewusst manuell in konsoleH.
-- Die endgültige Vereinsdomain ist `djkvfl-giesenkirchen.de`. Ihr DNS wird weiterhin bei All-Inkl/KAS verwaltet und zeigt noch auf den bisherigen All-Inkl-Webserver. Der vollständige Ausgangsbestand wurde geprüft und als private BIND-Zonefile-Rollbackgrundlage gesichert; eine produktive DNS-Umschaltung ist noch nicht erfolgt.
-- Der Hetzner-Zielbetrieb für die Hauptdomain ist analysiert. `djkvfl-test.de` bleibt bis zur kontrollierten Domainumschaltung als funktionierende Preproduction mit gültigem HTTPS bestehen; finale Hauptdomain-SSL-Aktivierung und -Abnahme stehen noch aus.
-- Die Cutover-Zielkonfiguration ist vorbereitet: Node.js 24, `app.js`, Working Directory `djk-giesenkirchen-webseite`, 384 MB, keine Script-Parameter und Varnish aus. `NEXT_PUBLIC_SITE_URL` wird beim Cutover auf `https://djkvfl-giesenkirchen.de` gesetzt; `MAIL_FROM` bleibt die reine Adresse `noreply@mail.djkvfl-giesenkirchen.de`. Die Produktions-Node-Konfiguration muss beim Cutover erneut gesetzt beziehungsweise kontrolliert werden. `new.djkvfl-giesenkirchen.de` ist nicht Teil der Zielarchitektur.
-- Supabase erlaubt bereits Redirects für Test- und Produktivdomain einschließlich Set-Password-Pfaden. Die Site URL bleibt bewusst bis zur tatsächlichen HTTPS-Erreichbarkeit der Hauptdomain auf `https://djkvfl-test.de`; der Wechsel auf `https://djkvfl-giesenkirchen.de` erfolgt erst beim Cutover.
+- Hauptdomain und Wildcard zeigen über `167.235.125.56` auf Hetzner. Mail-relevante DNS-Einträge blieben unverändert; der private BIND-Ausgangsbestand bleibt die Rollbackgrundlage.
+- HTTPS ist mit Let's Encrypt, Weiterleitung, OCSP-Stapling und TLS 1.2+ aktiv. Node.js 24 läuft mit `app.js`, Working Directory `djk-giesenkirchen-webseite`, 384 MB, ohne Script-Parameter und mit deaktiviertem Varnish.
+- `NEXT_PUBLIC_SITE_URL=https://djkvfl-giesenkirchen.de` und der bestehende produktive `MAIL_FROM`-Vertrag sind aktiv. Nach Korrektur des zuvor build-sichtbaren Testdomainwerts in der serverseitigen `.env.local` wurde der aktuelle Commit über den abgesicherten Deploymentweg neu gebaut und Node manuell neu gestartet.
+- Supabase Site URL ist `https://djkvfl-giesenkirchen.de`; die Redirect-Allowlist enthält weiterhin Test- und Produktivdomain. Recovery, `/set-password`, Support-/Notification-Mails und Produktiv-CTAs wurden erfolgreich geprüft.
 - Version 1.0.7 ist committed, deployed, durch manuellen Node-Neustart aktiviert und live geprüft.
 - Versionen 1.0.8 bis 1.0.12 einschließlich öffentlicher Vorstandskontakte, Ergebnisverwaltung/-ticker sowie der gehärteten Trainer-, Jugendleiter-, Tischtennisvorstand- und Kassierer-Verträge sind deployed und live geprüft.
 - Version 1.0.13 schließt B15.25 Support Tickets V1 ab. Nach dem Permission-Guard-Hotfix wurden Superadmin- und Trainerpfad, Ticket-Erstellung, Antworten, Status/Priorität/Zuweisung, Abschluss/Wiederöffnung, Dashboard-Benachrichtigungen und die drei kontrolliert aktivierten Ticket-Mailtypen live erfolgreich geprüft.
@@ -45,16 +45,17 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 
 ## Technisch abgeschlossen, betrieblich noch offen
 
-- Das verpflichtende Support-/Ticketsystem ist abgeschlossen und kein Go-live-Blocker mehr. DB/RLS/ACL/Permissions, atomare RPCs, Application Layer, Dashboard-UI, Rollen-/Ownership-Vertrag, Notifications und Ticket-Mails sind live verifiziert. Nächster aktiver Go-live-Punkt ist die kontrollierte Hetzner-Vorbereitung für die Produktivdomain; noch ohne DNS-Umschaltung.
+- Das verpflichtende Support-/Ticketsystem ist abgeschlossen und produktiv verifiziert. DB/RLS/ACL/Permissions, atomare RPCs, Application Layer, Dashboard-UI, Rollen-/Ownership-Vertrag, Notifications, Ticket-Mails und Produktiv-CTA funktionieren live.
 - Der Pre-Go-live-Komplettcheck ist abgeschlossen: 7.1 bis 7.8 sind erfolgreich geprüft beziehungsweise für den Go-live freigegeben, und der technische Repository-Audit 7.9 fand keinen neuen Produktcode-Go-live-Blocker. Bekannte Baseline-Test-/ESLint-Probleme bleiben separat dokumentiert; die offenen Cutover-Arbeiten folgen unter den Roadmap-Punkten 8 ff. Noch unvollständiger Behindertensport-Content sowie kleinere Inhalts- oder Rollenfeinheiten sind ausdrücklich keine Cutover-Blocker.
 - Rollback und Backup sind über Git/GitHub, den gesicherten DNS-/BIND-Ausgangszustand und Supabase Scheduled Backups abgedeckt. Das sichtbare physische Backup vom 29.09.2026 03:20:25 UTC umfasst keine Storage-Objekte selbst, sondern nur deren Datenbankmetadaten; dies ist aktuell kein Go-live-Blocker.
-- Kontrollierte Umschaltung der finalen Vereinsdomain, SSL-Endzustand, Environment-URLs, Supabase Site URL/Redirects und produktive Indexierung.
-- Optionales reales Reply-To, erster Invite-Smoke und finale Mail-/Auth-Linktests mit der echten Produktivdomain. Maildomain, zentraler From-Vertrag und Auth-SMTP sind bereits abgeschlossen und live vorgetestet.
+- Die Suchmaschinenindexierung ist kontrolliert freigegeben: `PUBLIC_SITE_INDEXING_ENABLED=true` ist produktiv build-sichtbar aktiv. Nach erfolgreichem Production-Build und manuellem Node-Neustart wurden `robots.txt` mit öffentlicher Freigabe und fortbestehenden Sperren für `/admin/`, `/api/` und `/auth/`, die nicht leere Sitemap mit Produktiv-URLs sowie der Wegfall von `noindex` auf der Startseite live bestätigt.
+- Optionales reales Reply-To und ein weiterer Invite-Smoke bleiben nicht blockierende Follow-ups. Maildomain, From-Vertrag, Auth-SMTP und Produktivlinks sind abgeschlossen und live getestet.
 - Impressum, Datenschutz und Downloads sind vorhanden und erreichbar. Verbleibende redaktionelle oder juristische Feinprüfungen werden getrennt nachgeführt und sind nach aktueller Betreiberbewertung kein Cutover-Blocker.
-- Contribution-Reminder-Cron einschließlich Secret/Vault, Produktivendpunkt, Idempotenzprüfung, Monitoring, Rollen-Livetest und Rotation.
-- FUSSBALL.DE-Domainfreigabe sowie finale reale Widget-/Mannschaftszuordnungen.
-- Finaler geräteübergreifender Go-live-Smoke; nicht blockierende Inhaltsnachpflege bleibt separat.
+- Contribution-Reminder-Cron bleibt bewusst inaktiv, bis Kassiererzugang und vollständige echte Beitragsdaten vorliegen und die bestehende Aktivierungscheckliste vollständig abgearbeitet werden kann.
+- Nicht blockierende Inhaltsnachpflege bleibt separat; der finale geräteübergreifende Go-live-Smoke und die vorgesehenen FUSSBALL.DE-Integrationen sind bestanden.
 - Nicht blockierende, von B15.25 getrennte Follow-ups: mögliche eigene Support-Hauptnavigation sowie eine separate Reproduktionsanalyse für `getActorContext is not defined` (Digest `1973645967`) und ältere `Failed to find Server Action ...`-Meldungen.
+
+Der Go-live ist damit technisch und organisatorisch abgeschlossen. Die automatischen Beitragserinnerungen bleiben als bewusst zurückgestellter, nicht aktiver Folgepunkt bestehen.
 
 ## Qualität
 
