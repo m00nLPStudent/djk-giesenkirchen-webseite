@@ -16,6 +16,7 @@
 - Der gesamte geschützte Adminbereich verwendet im Browser-Tab den eindeutigen Titel `DJK/VfL Dashboard`; Titel, Favicon und SEO-Metadaten der öffentlichen Website bleiben unverändert.
 - Die tageszeitabhängige Begrüßung und beide Dashboard-Uhren verwenden ausdrücklich `Europe/Berlin`. Sommer- und Winterzeit werden regelbasiert berücksichtigt; die Begrüßungsfenster sind 05:00–10:59 `Guten Morgen`, 17:00–21:59 `Guten Abend` und sonst `Hallo`.
 - Support ist mit unveränderter Permission-Sichtbarkeit aus dem Bereich `Übersicht` herausgelöst und steht als eigener letzter Hauptnavigationspunkt auf Desktop sowie in der mobilen Navigation bereit. Der bestehende Schnellzugriff bleibt erhalten.
+- Die Strukturverwaltung unterscheidet organisatorisch unzugeordnete Spieler von aktiven oder inaktiven Spielern ohne aktuelle Mannschaft. Teamlose aktive Spieler derselben Abteilung können wieder im Mannschaftseditor zugeordnet werden; entfernte saisonale Kaderrelationen bleiben deaktiviert als Historie erhalten.
 
 ## 2026-09-29
 

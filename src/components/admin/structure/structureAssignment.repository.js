@@ -1,8 +1,15 @@
 import "server-only";
 
+import { loadCurrentSeasonResolution } from "@/components/admin/persons/currentSeasonRepository";
+import { CURRENT_SEASON_STATUSES } from "@/components/admin/persons/seasonalReadModelCore.mjs";
+
 const TABLES = { player: "players", coach: "coaches", team: "teams", board: "board_members" };
 
 export async function loadStructureInventory(db) {
+  const season = await loadCurrentSeasonResolution(db);
+  if (season.activeSeasonStatus !== CURRENT_SEASON_STATUSES.RESOLVED) {
+    return { data: null, error: { message: "Die aktuelle Saison ist nicht eindeutig auflösbar." } };
+  }
   const [departments, players, coaches, teams, board] = await Promise.all([
     db.from("departments").select("id, slug, name_de, is_active").order("name_de"),
     db.from("players").select("id, first_name, last_name, department_id, is_active").order("last_name"),
@@ -12,7 +19,21 @@ export async function loadStructureInventory(db) {
   ]);
   const failed = [departments, players, coaches, teams, board].find((result) => result.error);
   if (failed) return { data: null, error: failed.error };
-  return { data: { departments: departments.data || [], players: players.data || [], coaches: coaches.data || [], teams: teams.data || [], board: board.data || [] }, error: null };
+  const activeTeamById = new Map((teams.data || []).filter((team) => team.is_active !== false).map((team) => [team.id, team]));
+  const teamSeasons = await db.from("team_seasons").select("id, team_id, is_active").eq("season_id", season.activeSeasonId).eq("is_active", true);
+  if (teamSeasons.error) return { data: null, error: teamSeasons.error };
+  const validTeamSeasonById = new Map((teamSeasons.data || []).filter((item) => activeTeamById.has(item.team_id)).map((item) => [item.id, item]));
+  const teamSeasonIds = [...validTeamSeasonById.keys()];
+  const assignments = teamSeasonIds.length
+    ? await db.from("player_team_seasons").select("player_id, team_season_id").in("team_season_id", teamSeasonIds).eq("is_active", true)
+    : { data: [], error: null };
+  if (assignments.error) return { data: null, error: assignments.error };
+  const playerAssignments = (assignments.data || []).flatMap((assignment) => {
+    const teamSeason = validTeamSeasonById.get(assignment.team_season_id);
+    const team = activeTeamById.get(teamSeason?.team_id);
+    return team ? [{ playerId: assignment.player_id, teamId: team.id, departmentId: team.department_id || null }] : [];
+  });
+  return { data: { departments: departments.data || [], players: players.data || [], coaches: coaches.data || [], teams: teams.data || [], board: board.data || [], playerAssignments }, error: null };
 }
 
 export async function loadStructureRelationConflicts(db) {

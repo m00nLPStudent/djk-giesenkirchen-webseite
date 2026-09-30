@@ -1,5 +1,28 @@
 export const STRUCTURE_ENTITY_TYPES = Object.freeze(["player", "coach", "team", "board"]);
 
+export function resolveStructureRecordScope(entityType, record, playerAssignments = []) {
+  if (!record) return "unassigned";
+  if (entityType === "board") return record.organization_scope === "unassigned" && !record.department_id ? "unassigned" : record.organization_scope;
+  if (!record.department_id) return "unassigned";
+  if (entityType !== "player") return "department";
+
+  const assignments = (playerAssignments || []).filter((assignment) => assignment?.playerId === record.id);
+  if (!assignments.length) return "teamless";
+  if (assignments.some((assignment) => assignment.departmentId !== record.department_id)) return "conflict";
+  return "department";
+}
+
+export function filterStructureItems(items = [], { type = "all", scope = "unassigned", status = "all" } = {}) {
+  return items.filter((item) => {
+    if (type !== "all" && item.type !== type) return false;
+    if (status === "active" && item.is_active === false) return false;
+    if (status === "inactive" && item.is_active !== false) return false;
+    if (scope === "all") return true;
+    if (scope === "assigned") return item.scope === "department" || item.scope === "club";
+    return item.scope === scope;
+  });
+}
+
 export function normalizeStructureAssignmentInput(input = {}) {
   const entityType = String(input.entityType || "").trim();
   const entityId = String(input.entityId || "").trim();

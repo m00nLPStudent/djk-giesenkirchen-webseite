@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { isUnassignedStructureRecord, normalizeStructureAssignmentInput, normalizeStructureRelationConflict, validateRelationCompatibility } from "./structureAssignment.core.mjs";
+import { filterStructureItems, isUnassignedStructureRecord, normalizeStructureAssignmentInput, normalizeStructureRelationConflict, resolveStructureRecordScope, validateRelationCompatibility } from "./structureAssignment.core.mjs";
 
 test("normalizes department assignments and permits club only for board", () => {
   assert.deepEqual(normalizeStructureAssignmentInput({ entityType: "player", entityId: "p1", departmentId: "d1" }), { ok: true, data: { entityType: "player", entityId: "p1", targetType: "department", departmentId: "d1" } });
@@ -30,4 +30,25 @@ test("unassigned contract distinguishes board club from unassigned", () => {
   assert.equal(isUnassignedStructureRecord("player", { department_id: "d1" }), false);
   assert.equal(isUnassignedStructureRecord("board", { organization_scope: "unassigned", department_id: null }), true);
   assert.equal(isUnassignedStructureRecord("board", { organization_scope: "club", department_id: null }), false);
+});
+
+test("player structure scope separates department assignment from current team assignment", () => {
+  const active = { id: "active", department_id: "football", is_active: true };
+  const inactive = { id: "inactive", department_id: "football", is_active: false };
+  assert.equal(resolveStructureRecordScope("player", active, []), "teamless");
+  assert.equal(resolveStructureRecordScope("player", inactive, []), "teamless");
+  assert.equal(resolveStructureRecordScope("player", { id: "none", department_id: null }, []), "unassigned");
+  assert.equal(resolveStructureRecordScope("player", active, [{ playerId: "active", departmentId: "football" }]), "department");
+  assert.equal(resolveStructureRecordScope("player", active, [{ playerId: "active", departmentId: "football" }, { playerId: "active", departmentId: "football" }]), "department");
+  assert.equal(resolveStructureRecordScope("player", active, [{ playerId: "active", departmentId: "table-tennis" }]), "conflict");
+});
+
+test("structure filters keep active and inactive teamless players administratively reachable", () => {
+  const items = [
+    { id: "active", type: "player", scope: "teamless", is_active: true },
+    { id: "inactive", type: "player", scope: "teamless", is_active: false },
+  ];
+  assert.deepEqual(filterStructureItems(items, { scope: "teamless", status: "all" }).map((item) => item.id), ["active", "inactive"]);
+  assert.deepEqual(filterStructureItems(items, { scope: "teamless", status: "active" }).map((item) => item.id), ["active"]);
+  assert.deepEqual(filterStructureItems(items, { scope: "teamless", status: "inactive" }).map((item) => item.id), ["inactive"]);
 });

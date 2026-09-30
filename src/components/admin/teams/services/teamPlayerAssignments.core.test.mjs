@@ -21,7 +21,7 @@ test("retains existing assignments without overwriting player metadata", () => {
 
   assert.deepEqual(plan, {
     addedAssignments: [],
-    removedAssignmentIds: [],
+    deactivatedAssignments: [],
     retainedAssignments: [],
   });
 });
@@ -43,7 +43,7 @@ test("updates only roster ordering for retained assignments", () => {
   assert.equal("position_de" in plan.retainedAssignments[0], false);
 });
 
-test("adds and removes only changed roster assignments", () => {
+test("adds and deactivates only changed roster assignments", () => {
   const plan = createPlayerAssignmentSyncPlan(
     [
       { id: "assignment-a", player_id: "player-a", sort_order: 0, is_active: true },
@@ -55,7 +55,25 @@ test("adds and removes only changed roster assignments", () => {
   assert.deepEqual(plan.addedAssignments, [
     { player_id: "player-c", sort_order: 1, is_active: true },
   ]);
-  assert.deepEqual(plan.removedAssignmentIds, ["assignment-b"]);
+  assert.deepEqual(plan.deactivatedAssignments, [{ id: "assignment-b", is_active: false }]);
+});
+
+test("reactivates an existing seasonal relation instead of inserting a duplicate", () => {
+  const plan = createPlayerAssignmentSyncPlan(
+    [{ id: "assignment-a", player_id: "player-a", sort_order: 4, is_active: false }],
+    ["player-a"],
+  );
+  assert.deepEqual(plan.addedAssignments, []);
+  assert.deepEqual(plan.retainedAssignments, [{ id: "assignment-a", sort_order: 0, is_active: true }]);
+  assert.deepEqual(plan.deactivatedAssignments, []);
+});
+
+test("an empty roster safely deactivates the last active relation", () => {
+  const plan = createPlayerAssignmentSyncPlan(
+    [{ id: "assignment-a", player_id: "player-a", sort_order: 0, is_active: true }],
+    [],
+  );
+  assert.deepEqual(plan.deactivatedAssignments, [{ id: "assignment-a", is_active: false }]);
 });
 
 test("rejects an inconsistent roster with duplicate player assignments", () => {

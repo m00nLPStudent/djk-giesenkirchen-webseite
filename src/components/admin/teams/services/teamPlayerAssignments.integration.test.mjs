@@ -29,3 +29,9 @@ test("retained roster rows update ordering only and never overwrite player metad
   assert.match(updateBlock, /is_active: assignment\.is_active/);
   assert.doesNotMatch(updateBlock, /shirt_number|position_de|position_en|is_captain/);
 });
+
+test("removed roster rows are deactivated and never physically deleted", () => {
+  assert.match(serviceSource, /for \(const assignment of syncPlan\.deactivatedAssignments\)/);
+  assert.match(serviceSource, /\.update\(\{ is_active: false \}\)/);
+  assert.doesNotMatch(serviceSource, /from\("player_team_seasons"\)[\s\S]{0,120}\.delete\(\)/);
+});

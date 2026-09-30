@@ -53,3 +53,12 @@ test("server action rejects malformed, missing and inactive departments after pe
   assert.doesNotMatch(service, /\.upsert\(createTeamSeasonPayload/);
   assert.match(core, /existiert nicht oder ist inaktiv/);
 });
+
+test("team roster guard validates person master department without requiring a prior team relation", async () => {
+  const action = await read("../../../app/admin/teams/actions.js");
+  assert.match(action, /validatePersonMasterDepartment/);
+  assert.match(action, /from\(table\)\.select\("id, department_id, is_active"\)/);
+  assert.match(action, /peopleById\.get\(id\)\.department_id !== departmentId/);
+  assert.doesNotMatch(action, /hasPersonsWithoutDepartmentAssignment/);
+  assert.doesNotMatch(action, /team_seasons!inner\(teams!inner\(department_id\)\)/);
+});

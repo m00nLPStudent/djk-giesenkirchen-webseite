@@ -78,7 +78,8 @@ test("roster changes additionally require players.edit", () => {
   assert.match(roster, /\(auth\.permissions \|\| \[\]\)\.includes\("players\.edit"\)/);
   assert.match(roster, /Fehlende Berechtigung: players\.edit/);
   assert.match(roster, /loadScopedExistingTeamSeason\(auth, teamId, teamSeasonId\)/);
-  assert.match(roster, /hasPersonsWithoutDepartmentAssignment/);
+  assert.match(roster, /validatePersonMasterDepartment\(writeDb, "players", normalizedPlayerIds, context\.team\.department_id\)/);
+  assert.doesNotMatch(roster, /hasPersonsWithoutDepartmentAssignment/);
   assert.match(roster, /replacePlayerAssignments\(context\.teamSeason\.id, normalizedPlayerIds, writeDb\)/);
 
   assert.ok(roster.indexOf('includes("players.edit")') < roster.indexOf("loadScopedExistingTeamSeason"));

@@ -5,6 +5,7 @@ import { sortPlayersByIdentity } from "@/components/admin/players/list/playerLis
 import { createPlayerReadDto } from "@/components/admin/persons/playerReadDto";
 import { getPlayerSeasonalReadModelsMap } from "@/components/admin/persons/playerSeasonalReadModelRepository";
 import { CURRENT_SEASON_STATUSES } from "@/components/admin/persons/seasonalReadModelCore.mjs";
+import { isEligibleTeamEditPlayer } from "./teamEditPlayer.core.mjs";
 
 function uniqueIds(values = []) {
   return Array.from(new Set((values || []).filter(Boolean)));
@@ -20,7 +21,7 @@ function addToSetMap(map, key, value) {
 async function loadActivePlayers(supabaseServer) {
   const { data: players, error } = await supabaseServer
     .from("players")
-    .select("id, first_name, last_name, year_group, is_active, image_url, photo_url")
+    .select("id, first_name, last_name, year_group, is_active, image_url, photo_url, department_id")
     .eq("is_active", true)
     .order("last_name", { ascending: true })
     .order("first_name", { ascending: true })
@@ -165,16 +166,13 @@ export async function loadTeamEditPlayerOptions(supabaseServer, teamId = null, d
   return sortPlayersByIdentity(
     mappedPlayers.filter((player) => {
       const currentTeamIds = currentTeamIdsByPlayerId.get(player.id) || [];
-
-      if (departmentId && !currentTeamIds.some((currentTeamId) => departmentByTeamId.get(currentTeamId) === departmentId)) return false;
-
-      if (currentTeamIds.length === 0) return !departmentId;
-
-      if (!teamId) {
-        return false;
-      }
-
-      return currentTeamIds.includes(teamId) || assignedToTeamIds.has(player.id);
+      return isEligibleTeamEditPlayer(player, {
+        departmentId,
+        teamId,
+        currentTeamIds,
+        assignedToTeam: assignedToTeamIds.has(player.id),
+        departmentByTeamId,
+      });
     }),
   );
 }

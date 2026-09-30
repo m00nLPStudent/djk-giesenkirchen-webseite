@@ -16,13 +16,14 @@ export function createPlayerAssignmentSyncPlan(
   }
 
   const desiredPlayerIdSet = new Set(desiredPlayerIds);
-  const removedAssignmentIds = existingAssignments
+  const deactivatedAssignments = existingAssignments
     .filter(
       (assignment) =>
+        assignment?.is_active === true &&
         !desiredPlayerIdSet.has(String(assignment?.player_id || "")),
     )
-    .map((assignment) => assignment.id)
-    .filter(Boolean);
+    .map((assignment) => ({ id: assignment.id, is_active: false }))
+    .filter((assignment) => assignment.id);
 
   const retainedAssignments = [];
   const addedAssignments = [];
@@ -49,7 +50,7 @@ export function createPlayerAssignmentSyncPlan(
 
   return {
     addedAssignments,
-    removedAssignmentIds,
+    deactivatedAssignments,
     retainedAssignments,
   };
 }

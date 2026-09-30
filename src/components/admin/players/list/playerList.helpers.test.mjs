@@ -73,6 +73,13 @@ test("filterPlayers matches seasonal team filters and team-name search", () => {
   );
 });
 
+test("filterPlayers keeps active, inactive and all status views available", () => {
+  const statusPlayers = [players[0], { ...players[1], is_active: false }];
+  assert.deepEqual(filterPlayers(statusPlayers, { statusFilter: "active" }).map((player) => player.id), ["player-1"]);
+  assert.deepEqual(filterPlayers(statusPlayers, { statusFilter: "inactive" }).map((player) => player.id), ["player-2"]);
+  assert.deepEqual(filterPlayers(statusPlayers, { statusFilter: "all" }).map((player) => player.id), ["player-1", "player-2"]);
+});
+
 test("filterPlayers can filter by contribution status and overdue state", () => {
   const contributionPlayers = [
     {

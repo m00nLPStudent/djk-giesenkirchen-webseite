@@ -69,12 +69,16 @@ async function loadAuthorizedTeamMutationContext(requiredPermission) {
   };
 }
 
-async function hasPersonsWithoutDepartmentAssignment(db, table, personColumn, personIds, departmentId) {
-  if (!personIds?.length) return false;
-  const result = await db.from(table).select(`${personColumn}, team_seasons!inner(teams!inner(department_id))`).in(personColumn, personIds).eq("is_active", true);
+async function validatePersonMasterDepartment(db, table, personIds, departmentId) {
+  const ids = [...new Set((personIds || []).filter(Boolean))];
+  if (!ids.length) return { ok: true };
+  const result = await db.from(table).select("id, department_id, is_active").in("id", ids);
   if (result.error) throw result.error;
-  const matching = new Set((result.data || []).filter((row) => row.team_seasons?.teams?.department_id === departmentId).map((row) => row[personColumn]));
-  return personIds.some((id) => !matching.has(id));
+  const peopleById = new Map((result.data || []).map((person) => [person.id, person]));
+  if (ids.some((id) => !peopleById.has(id))) return { ok: false, reason: "missing" };
+  if (ids.some((id) => peopleById.get(id).is_active === false)) return { ok: false, reason: "inactive" };
+  if (ids.some((id) => peopleById.get(id).department_id !== departmentId)) return { ok: false, reason: "department" };
+  return { ok: true };
 }
 
 export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
@@ -130,9 +134,13 @@ export async function saveTeamWithScopeAction(teamPayload, teamId = null) {
       return buildError("Die Mannschaftsvorlage gehört nicht zur gewählten Abteilung.");
     }
   }
+  const validationDb = createSupabaseAdminClient();
+  if (!validationDb) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
   try {
-    if (await hasPersonsWithoutDepartmentAssignment(supabaseServer, "player_team_seasons", "player_id", teamPayload.selected_player_ids || [], validatedDepartment.data)) return buildError("Der Kader enthält Spieler ohne aktive Zuordnung zu dieser Abteilung.");
-    if (await hasPersonsWithoutDepartmentAssignment(supabaseServer, "coach_team_seasons", "coach_id", teamPayload.selected_coach_ids || [], validatedDepartment.data)) return buildError("Die Trainerliste enthält Trainer ohne aktive Zuordnung zu dieser Abteilung.");
+    const playerContract = await validatePersonMasterDepartment(validationDb, "players", teamPayload.selected_player_ids || [], validatedDepartment.data);
+    if (!playerContract.ok) return buildError("Der Kader enthält fehlende, inaktive oder abteilungsfremde Spieler.");
+    const coachContract = await validatePersonMasterDepartment(validationDb, "coaches", teamPayload.selected_coach_ids || [], validatedDepartment.data);
+    if (!coachContract.ok) return buildError("Die Trainerliste enthält fehlende, inaktive oder abteilungsfremde Trainer.");
   } catch {
     return buildError("Die Abteilungszuordnungen des Kaders konnten nicht geprüft werden.");
   }
@@ -273,15 +281,16 @@ export async function saveTrainerTeamRosterAction(teamId, teamSeasonId, playerId
   const context = await loadScopedExistingTeamSeason(auth, teamId, teamSeasonId);
   if (context.error) return context.error;
   const normalizedPlayerIds = [...new Set((playerIds || []).filter((id) => typeof id === "string" && id))];
+  const writeDb = createSupabaseAdminClient();
+  if (!writeDb) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
   try {
-    if (await hasPersonsWithoutDepartmentAssignment(auth.supabaseServer, "player_team_seasons", "player_id", normalizedPlayerIds, context.team.department_id)) {
-      return buildError("Der Kader enthaelt Spieler ohne aktive Zuordnung zu dieser Abteilung.");
+    const playerContract = await validatePersonMasterDepartment(writeDb, "players", normalizedPlayerIds, context.team.department_id);
+    if (!playerContract.ok) {
+      return buildError("Der Kader enthaelt fehlende, inaktive oder abteilungsfremde Spieler.");
     }
   } catch {
     return buildError("Die Abteilungszuordnungen des Kaders konnten nicht geprueft werden.");
   }
-  const writeDb = createSupabaseAdminClient();
-  if (!writeDb) return buildError("Serverseitiger Datenbankzugriff ist nicht konfiguriert.");
   const result = await replacePlayerAssignments(context.teamSeason.id, normalizedPlayerIds, writeDb);
   if (result.error) return buildError(result.error.message || "Der Kader konnte nicht gespeichert werden.");
   revalidatePath(`/admin/teams/edit/${teamId}`);

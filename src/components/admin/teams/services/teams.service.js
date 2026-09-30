@@ -154,14 +154,14 @@ export async function replacePlayerAssignments(
     if (insertResult.error) return insertResult;
   }
 
-  if (syncPlan.removedAssignmentIds.length) {
-    const deleteResult = await db
+  for (const assignment of syncPlan.deactivatedAssignments) {
+    const deactivateResult = await db
       .from("player_team_seasons")
-      .delete()
+      .update({ is_active: false })
       .eq("team_season_id", teamSeasonId)
-      .in("id", syncPlan.removedAssignmentIds);
+      .eq("id", assignment.id);
 
-    if (deleteResult.error) return deleteResult;
+    if (deactivateResult.error) return deactivateResult;
   }
 
   return { data: null, error: null };
