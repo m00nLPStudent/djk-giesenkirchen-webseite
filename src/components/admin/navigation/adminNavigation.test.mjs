@@ -39,6 +39,21 @@ test("active navigation follows the agreed club, football and system structure",
   assert.deepEqual(keys("club"), ["news", "sponsors", "events", "club-history", "club-board", "downloads", "results", "membership-requests", "media", "settings"]);
   assert.deepEqual(keys("football"), ["teams", "players", "coaches", "contributions", "department"]);
   assert.deepEqual(keys("system"), ["structure-assignment", "users", "roles", "permissions", "notification-email-settings", "notification-monitoring"]);
+  assert.deepEqual(keys("overview"), ["dashboard"]);
+  assert.deepEqual(keys("support"), ["support"]);
+});
+
+test("support is a permission-filtered final main section, not an overview child", () => {
+  const ownSupport = dto(["dashboard.view", "support_tickets.view_own"], globalScope, "/admin/support", ["trainer"]);
+  assert.equal(ownSupport.sections.at(-1)?.key, "support");
+  assert.equal(ownSupport.activeSectionKey, "support");
+  assert.deepEqual(ownSupport.sections.find((section) => section.key === "overview")?.items.map((item) => item.key), ["dashboard"]);
+
+  const managedSupport = dto(["dashboard.view", "support_tickets.manage"], globalScope, "/admin/support", ["superadmin"]);
+  assert.equal(managedSupport.sections.at(-1)?.key, "support");
+
+  const denied = dto(["dashboard.view"], globalScope, "/admin", ["trainer"]);
+  assert.ok(!denied.sections.some((section) => section.key === "support"));
 });
 
 test("active items are valid admin routes with permission metadata", () => {
@@ -177,6 +192,7 @@ test("route matching covers details and avoids similar prefixes", () => {
     ["/admin/news", "news"], ["/admin/events", "events"], ["/admin/settings", "settings"],
     ["/admin/department", null], ["/admin/users", "users"], ["/admin/roles", "roles"],
     ["/admin/permissions", "permissions"], ["/admin/system/notifications", "notification-monitoring"],
+    ["/admin/support", "support"], ["/admin/support/test-id", "support"],
     ["/admin/football/players", "players"], ["/admin/football/teams/test-id", "teams"],
     ["/admin/football/coaches/new", "coaches"], ["/admin/football/board", "department"],
     ["/admin/table-tennis/players/test-id", "table-tennis-players"],

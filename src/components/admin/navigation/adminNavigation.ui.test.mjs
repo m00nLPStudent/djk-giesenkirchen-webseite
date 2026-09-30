@@ -81,6 +81,11 @@ test("moved routes activate their new sections on desktop and mobile", () => {
   const structure = applyActivePathToNavigationDto(superadminDto, "/admin/system/structure");
   assert.equal(structure.activeSectionKey, "system");
   assert.equal(structure.activeItemKey, "structure-assignment");
+  const support = applyActivePathToNavigationDto(superadminDto, "/admin/support/test-id");
+  assert.equal(support.activeSectionKey, "support");
+  assert.equal(support.activeItemKey, "support");
+  assert.equal(support.sections.at(-1)?.key, "support");
+  assert.deepEqual(getInitialOpenSectionKeys(support), ["support"]);
 });
 
 test("runtime DTO has no planned links and no auth or service data", () => {

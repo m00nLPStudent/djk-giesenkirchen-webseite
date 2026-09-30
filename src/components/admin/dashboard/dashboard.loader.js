@@ -15,15 +15,11 @@ import { getAllowedMembershipRequestTypes } from "@/lib/membership/membershipRes
 import {
   buildDashboardNotices, buildDashboardQuickLinks, buildRecentItems, canOpenMembershipRequestTarget,
   createDashboardDto, createDashboardQueryPlan, resolveDashboardDisplayName,
-  loadMembershipRequestCountForDashboard, resolveDashboardIntro, resolveGreeting,
+  getBerlinHour, loadMembershipRequestCountForDashboard, resolveDashboardIntro, resolveGreeting,
 } from "./dashboard.core";
 
 const permissionKeys = (auth) => (auth?.permissions || []).map((item) => item?.key || item).filter(Boolean);
 const roleKeys = (auth) => (auth?.roles || []).map((item) => item?.key).filter(Boolean);
-
-function berlinHour(now) {
-  return Number(new Intl.DateTimeFormat("de-DE", { hour: "2-digit", hour12: false, timeZone: "Europe/Berlin" }).format(now));
-}
 
 async function loadProfileName(db, profileId) {
   if (!profileId) return {};
@@ -88,7 +84,7 @@ export const loadDashboard = cache(async () => {
   const quickLinks = buildDashboardQuickLinks(navigation);
   const recentItems = buildRecentItems({ news: recentNews, events: upcomingEvents });
   return { navigation, dashboard: createDashboardDto({
-    greeting: { text: resolveGreeting(berlinHour(now)), displayName, intro: resolveDashboardIntro({ permissionKeys: permissions, scopeContext: scopeResult.context, navigation }) },
+    greeting: { text: resolveGreeting(getBerlinHour(now)), displayName, intro: resolveDashboardIntro({ permissionKeys: permissions, scopeContext: scopeResult.context, navigation }) },
     notices, quickLinks, upcomingEvents, recentNews, contributionSummary, recentItems, generatedAt: now.toISOString(),
   }) };
 });

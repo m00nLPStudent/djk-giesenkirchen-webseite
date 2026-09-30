@@ -7,13 +7,16 @@ export default function AdminClock() {
   const [now, setNow] = useState(null);
 
   useEffect(() => {
-    setNow(new Date());
+    const initializeTimer = setTimeout(() => setNow(new Date()), 0);
 
     const timer = setInterval(() => {
       setNow(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(initializeTimer);
+      clearInterval(timer);
+    };
   }, []);
 
   if (!now) return null;
@@ -28,11 +31,13 @@ export default function AdminClock() {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
+          timeZone: "Europe/Berlin",
         })}
         {" · "}
         {now.toLocaleTimeString("de-DE", {
           hour: "2-digit",
           minute: "2-digit",
+          timeZone: "Europe/Berlin",
         })}
       </span>
     </div>

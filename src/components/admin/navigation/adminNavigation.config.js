@@ -29,10 +29,6 @@ export const ADMIN_NAVIGATION_SECTIONS = [
     visibility: { strategy: "visible_items" }, implementationStatus: "active",
     items: [
       active("dashboard", "Übersicht", "/admin", "layout-dashboard", "dashboard.view", "permission_only", 10, "Aufgaben und relevante Vereinsinformationen."),
-      {
-        ...active("support", "Support", "/admin/support", "life-buoy", "support_tickets.view_own", "permission_only", 20, "Eigene Support-Tickets und Anfragen verwalten."),
-        permissionKeys: ["support_tickets.view_own", "support_tickets.manage"],
-      },
     ],
   },
   {
@@ -102,5 +98,14 @@ export const ADMIN_NAVIGATION_SECTIONS = [
     description: "Inhalte und Trainingszeiten der Gymnastikdamen.", order: 60,
     visibility: { strategy: "visible_items" }, implementationStatus: "active",
     items: [active("gymnastics-editor", "Bereich verwalten", "/admin/gymnastikdamen", "activity", "department_sections.view", "permission_only", 10, "Inhalte, Kontakt, Gruppenbild und Trainingszeiten pflegen.")],
+  },
+  {
+    key: "support", label: "Support", iconKey: "life-buoy", href: "/admin/support",
+    description: "Eigene Support-Tickets und Anfragen verwalten.", order: 1000,
+    visibility: { strategy: "visible_items" }, implementationStatus: "active",
+    items: [{
+      ...active("support", "Support", "/admin/support", "life-buoy", "support_tickets.view_own", "permission_only", 10, "Eigene Support-Tickets und Anfragen verwalten."),
+      permissionKeys: ["support_tickets.view_own", "support_tickets.manage"],
+    }],
   },
 ];

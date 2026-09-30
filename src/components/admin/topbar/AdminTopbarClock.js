@@ -7,9 +7,12 @@ export default function AdminTopbarClock() {
   const [now, setNow] = useState(null);
 
   useEffect(() => {
-    setNow(new Date());
+    const initializeTimer = setTimeout(() => setNow(new Date()), 0);
     const timer = setInterval(() => setNow(new Date()), 30000);
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(initializeTimer);
+      clearInterval(timer);
+    };
   }, []);
 
   if (!now) return null;
@@ -23,11 +26,13 @@ export default function AdminTopbarClock() {
           day: "2-digit",
           month: "2-digit",
           year: "numeric",
+          timeZone: "Europe/Berlin",
         })}
         {" · "}
         {now.toLocaleTimeString("de-DE", {
           hour: "2-digit",
           minute: "2-digit",
+          timeZone: "Europe/Berlin",
         })}
       </span>
     </div>

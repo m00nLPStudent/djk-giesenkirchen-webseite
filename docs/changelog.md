@@ -11,6 +11,12 @@
 - Die Suchmaschinenindexierung ist kontrolliert freigegeben: `PUBLIC_SITE_INDEXING_ENABLED=true` ist produktiv build-sichtbar aktiv, `robots.txt` erlaubt öffentliche Inhalte und sperrt weiterhin `/admin/`, `/api/` und `/auth/`, die Sitemap enthält die öffentlichen Produktiv-URLs und die Startseite liefert kein `noindex` mehr aus. Production-Build und manueller Node-Neustart wurden erfolgreich abgeschlossen. Es wurde keine neue Release-Version angelegt.
 - Das generische Browser-Icon wurde durch das bestehende, unveränderte Vereinslogo ersetzt. Die Next.js-App stellt daraus ein transparentes Browser-Tab-Icon sowie ein Apple Touch Icon bereit; bestehende SEO- und Indexierungsverträge bleiben unverändert.
 
+### Dashboard-UX und Navigation
+
+- Der gesamte geschützte Adminbereich verwendet im Browser-Tab den eindeutigen Titel `DJK/VfL Dashboard`; Titel, Favicon und SEO-Metadaten der öffentlichen Website bleiben unverändert.
+- Die tageszeitabhängige Begrüßung und beide Dashboard-Uhren verwenden ausdrücklich `Europe/Berlin`. Sommer- und Winterzeit werden regelbasiert berücksichtigt; die Begrüßungsfenster sind 05:00–10:59 `Guten Morgen`, 17:00–21:59 `Guten Abend` und sonst `Hallo`.
+- Support ist mit unveränderter Permission-Sichtbarkeit aus dem Bereich `Übersicht` herausgelöst und steht als eigener letzter Hauptnavigationspunkt auf Desktop sowie in der mobilen Navigation bereit. Der bestehende Schnellzugriff bleibt erhalten.
+
 ## 2026-09-29
 
 ### Version 1.0.13 – Support-/Ticketsystem

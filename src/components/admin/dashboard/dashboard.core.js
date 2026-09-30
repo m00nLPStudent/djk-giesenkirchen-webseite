@@ -1,10 +1,24 @@
 const clean = (value) => String(value || "").trim();
 
+const BERLIN_HOUR_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  hour: "2-digit",
+  hourCycle: "h23",
+  timeZone: "Europe/Berlin",
+});
+
+export function getBerlinHour(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  const hour = Number(BERLIN_HOUR_FORMATTER.formatToParts(date).find((part) => part.type === "hour")?.value);
+  return Number.isInteger(hour) && hour >= 0 && hour <= 23 ? hour : null;
+}
+
 export function resolveGreeting(hour) {
   const normalizedHour = Number(hour);
-  if (normalizedHour < 12) return "Guten Morgen";
-  if (normalizedHour < 18) return "Guten Tag";
-  return "Guten Abend";
+  if (!Number.isInteger(normalizedHour) || normalizedHour < 0 || normalizedHour > 23) return "Hallo";
+  if (normalizedHour >= 5 && normalizedHour < 11) return "Guten Morgen";
+  if (normalizedHour >= 17 && normalizedHour < 22) return "Guten Abend";
+  return "Hallo";
 }
 
 export function resolveDashboardDisplayName(profile = {}) {
@@ -80,7 +94,7 @@ export function buildRecentItems({ news = [], events = [] } = {}) {
 
 export function createDashboardDto(input = {}) {
   const dto = {
-    greeting: input.greeting || { text: "Guten Tag", displayName: null, intro: "" },
+    greeting: input.greeting || { text: "Hallo", displayName: null, intro: "" },
     notices: input.notices || [], quickLinks: input.quickLinks || [],
     upcomingEvents: input.upcomingEvents || [], recentNews: input.recentNews || [],
     contributionSummary: input.contributionSummary || null, recentItems: input.recentItems || [],

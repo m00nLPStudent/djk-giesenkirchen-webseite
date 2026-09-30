@@ -27,10 +27,12 @@ test("SEO endpoints are environment-controlled and admin/auth remain noindex", a
   ]);
   assert.match(root, /resolvePublicSeoConfig/);
   assert.match(root, /template: "%s \| DJK\/VfL Giesenkirchen"/);
+  assert.match(root, /default: "DJK\/VfL Giesenkirchen 05\/09 e\.V\."/);
   assert.match(root, /openGraph/);
   assert.match(root, /twitter/);
   assert.match(root, /PUBLIC_SITE_LOGO_URL/);
   assert.match(admin, /index: false, follow: false/);
+  assert.match(admin, /title: \{ absolute: "DJK\/VfL Dashboard" \}/);
   assert.match(confirmation, /index: false, follow: false/);
   assert.match(robots, /buildPublicRobots/);
   assert.match(sitemap, /buildPublicSitemap/);

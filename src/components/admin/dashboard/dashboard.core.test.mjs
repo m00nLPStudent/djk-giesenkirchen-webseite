@@ -5,15 +5,30 @@ import {
   buildDashboardNotices, buildDashboardQuickLinks, buildRecentItems,
   canOpenMembershipRequestTarget, canViewMembershipRequestsOnDashboard,
   createDashboardDto, createDashboardQueryPlan, resolveDashboardDisplayName,
-  loadMembershipRequestCountForDashboard, resolveDashboardIntro, resolveGreeting,
+  getBerlinHour, loadMembershipRequestCountForDashboard, resolveDashboardIntro, resolveGreeting,
 } from "./dashboard.core.js";
 
 test("greeting follows the required day boundaries", () => {
-  assert.equal(resolveGreeting(8), "Guten Morgen");
-  assert.equal(resolveGreeting(11.59), "Guten Morgen");
-  assert.equal(resolveGreeting(12), "Guten Tag");
-  assert.equal(resolveGreeting(17.59), "Guten Tag");
-  assert.equal(resolveGreeting(18), "Guten Abend");
+  const cases = new Map([
+    ["2026-09-30T02:59:00Z", "Hallo"],
+    ["2026-09-30T03:00:00Z", "Guten Morgen"],
+    ["2026-09-30T08:59:00Z", "Guten Morgen"],
+    ["2026-09-30T09:00:00Z", "Hallo"],
+    ["2026-09-30T14:59:00Z", "Hallo"],
+    ["2026-09-30T15:00:00Z", "Guten Abend"],
+    ["2026-09-30T19:59:00Z", "Guten Abend"],
+    ["2026-09-30T20:00:00Z", "Hallo"],
+  ]);
+  for (const [instant, expected] of cases) {
+    assert.equal(resolveGreeting(getBerlinHour(instant)), expected, instant);
+  }
+  assert.equal(resolveGreeting(Number.NaN), "Hallo");
+});
+
+test("Berlin hour follows summer and winter time without a fixed offset", () => {
+  assert.equal(getBerlinHour("2026-01-15T04:00:00Z"), 5);
+  assert.equal(getBerlinHour("2026-07-15T03:00:00Z"), 5);
+  assert.equal(getBerlinHour("invalid"), null);
 });
 
 test("display name uses explicit, first and full-name fallbacks without invention", () => {
@@ -122,4 +137,11 @@ test("dashboard markup stays compact, responsive and below the canonical layout"
   assert.match(shell, /min-w-0/);
   assert.match(shell, /data-dashboard-layout="compact-workspace"/);
   assert.doesNotMatch(shell, /DashboardStatGrid|DashboardStatCard|overflow-x-auto/);
+});
+
+test("dashboard clocks explicitly use the same Europe Berlin timezone", () => {
+  const clock = readFileSync(new URL("../ui/AdminClock.js", import.meta.url), "utf8");
+  const topbarClock = readFileSync(new URL("../topbar/AdminTopbarClock.js", import.meta.url), "utf8");
+  assert.match(clock, /timeZone: "Europe\/Berlin"/);
+  assert.match(topbarClock, /timeZone: "Europe\/Berlin"/);
 });
