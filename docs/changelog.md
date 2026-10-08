@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-08
+
+### Projektstatus und Vereins-E-Mail-Betrieb
+
+- Roadmap, Projektstatus und Project Health wurden ohne neue Releaseversion auf den nachweisbaren Stand nach Version 1.0.13 synchronisiert. Notification-Mehrfachauswahl, altersabhängige Membership-Mannschaftsauflösung und Support als eigener letzter Dashboard-Hauptpunkt werden nicht mehr als offene Arbeiten geführt.
+- Die Strukturverwaltung unterscheidet `Nicht zugeordnet`, `Ohne Mannschaft`, gültige Zuordnung und Cross-Department-Konflikt. Aktiv-/Inaktiv-/Alle-Filter, teamlose aktive Spieler derselben Abteilung, erlaubte Mehrfachzuordnungen sowie Deaktivierung und Reaktivierung saisonaler Kaderrelationen sind als abgeschlossener Repository-Stand dokumentiert.
+- Das öffentliche BIMI-Asset `public/images/bimi-logo.svg` ist im Repository vorhanden.
+- Der vom Betreiber extern bestätigte ALL-INKL-Betriebsstand wurde getrennt vom Website-Mailtransport dokumentiert: Postfächer und Weiterleitungen, WebMail, HTML-Signaturen, Funktionsidentitäten, fünf Majordomo-Verteiler, SPF, DKIM, DMARC und BIMI. Der Gesamtvereinsverteiler wurde nach Anpassung des Größenlimits erfolgreich real getestet; vier weitere Verteiler warten noch auf die vollständige Echtbetriebsabnahme.
+- Anwendungs-/Notification-Mails über Resend und Supabase-Auth-Mails bleiben technisch und organisatorisch vom ALL-INKL-Vereinsmailsystem getrennt. Automatische Beitragserinnerungen bleiben ausdrücklich technisch vorbereitet, aber produktiv inaktiv.
+
 ## 2026-09-30
 
 ### Go-live der neuen Vereinswebsite

@@ -1,6 +1,6 @@
 # Project Health
 
-Stand: **30. September 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
+Stand: **8. Oktober 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
 
 ## Aktueller Stand
 
@@ -10,11 +10,13 @@ Stand: **30. September 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
 - Der produktive Vereinsabsender über `mail.djkvfl-giesenkirchen.de` ist für Resend-Anwendungs-/Notification-Mails und Supabase-Auth-Mails eingerichtet und durch reale Notification-, Ticket- sowie Recovery-Zustellung bestätigt. Die Renderer-Abdeckung beträgt 30/30.
 - Dashboardmodule für Settings/CMS, Membership, Notifications, News, Events, Downloads, Ergebnisse, Teams, Personen, Beiträge, Sponsoren, Medien, Chronik und Abteilungsverwaltung sind integriert.
 - Öffentliche Gesamtvereins-, Fußball-, Tischtennis-, Behindertensport- und Gymnastikbereiche einschließlich responsive Designbasis, Consent, Accessibility-/SEO-Basis und zentralem E-Mail-Layout sind umgesetzt.
-- Priority 7 hat die kontrollierte Testdatenbereinigung abgeschlossen. Die echte Vereinsdatenbefüllung läuft und ist noch nicht vollständig.
+- Priority 7 hat die kontrollierte Testdatenbereinigung abgeschlossen. Der für den Go-live erforderliche Echtdatenbestand ist vorhanden; Behindertensport und kleinere redaktionelle Inhalts-/Rollendetails sind noch nicht vollständig.
 - Version 1.0.7 mit vertikalen Trainer-/Vorstandskarten ist live geprüft.
 - Version 1.0.8 wurde mit öffentlichen Kontaktaktionen auf den Gesamtvorstandskarten begonnen.
 - Versionen 1.0.9 bis 1.0.12 einschließlich Ergebnisverwaltung/-ticker sowie der gehärteten Trainer-, Jugendleiter-, Tischtennisvorstand- und Kassierer-Verträge sind deployed und live geprüft.
 - Version 1.0.13 schließt das Support-/Ticketsystem einschließlich Rollen-Livetest, Dashboard-Notifications, kontrollierter Mailtyp-Aktivierung, realer Zustellung und CTA-Prüfung ab.
+- Nach Version 1.0.13 sind Support als eigener letzter Dashboard-Hauptpunkt, die Berlin-basierte Begrüßungs-/Uhrlogik und die präzisierte Spieler-/Mannschaftszuordnung einschließlich `Ohne Mannschaft`, Statusfiltern und deaktivierbaren saisonalen Relationen umgesetzt und automatisiert geprüft. Eine neue Releaseversion wurde dafür nicht angelegt.
+- Das öffentliche Repositoryasset `public/images/bimi-logo.svg` ist vorhanden. BIMI-DNS und Erreichbarkeit wurden vom Betreiber extern bestätigt; Mailclient-Anzeige und Zertifikatsfragen sind kein Anwendungscodevertrag.
 - Die server-only myTischtennis-/click-TT-Competition-Integration ist wieder funktionsfähig. Der zeitweise Hetzner-Providerfehler (`/verify`, HTTP `429`) ist kein aktueller Blocker; der bestehende Revalidate-Vertrag beträgt 15 Minuten. Ein [WTTV-Fallback](../planning/table-tennis-competition-provider-fallback.md) wird nur bei einem erneut wiederholten oder dauerhaften Ausfall reaktiviert.
 
 ## Architekturregeln
@@ -41,5 +43,8 @@ Stand: **30. September 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
 - Node.js 24, `app.js`, Working Directory, 384 MB, keine Script-Parameter, Varnish aus, `NEXT_PUBLIC_SITE_URL=https://djkvfl-giesenkirchen.de` und der bestehende `MAIL_FROM`-Vertrag sind produktiv aktiv.
 - Die öffentliche Suchmaschinenindexierung ist kontrolliert freigegeben. `PUBLIC_SITE_INDEXING_ENABLED=true` ist produktiv build-sichtbar aktiv; `robots.txt`, die nicht leere Produktiv-Sitemap und der Wegfall von `noindex` auf der Startseite wurden live geprüft. `/admin/`, `/api/` und `/auth/` bleiben für Crawler gesperrt. Production-Build und manueller Node-Neustart sind erfolgreich abgeschlossen.
 - Contribution-Reminder erst nach eingerichtetem Kassiererzugang, vollständigen kontrollierten Echtdaten und vollständiger Aktivierungscheckliste produktiv aktivieren.
+- Vier eingerichtete Majordomo-Verteiler für Fußball, Fußballvorstand, Trainer und Tischtennis noch kontrolliert im Echtbetrieb abnehmen. Nur der Gesamtvereinsverteiler ist extern bereits als erfolgreich getestet gemeldet.
+- Redaktionelle beziehungsweise juristische Feinprüfungen und die verbleibende Content-Nachpflege fortführen. Google Maps Inline/Embed bleibt ohne `GOOGLE_MAPS_EMBED_API_KEY` und kontrollierten Consent-/Go-live-Test optional inaktiv.
+- Die extern bestätigte ALL-INKL-Postfach-, Weiterleitungs-, Signatur-, SPF-, DKIM-, DMARC- und BIMI-Konfiguration ist vom produktiven Resend-/Supabase-Mailtransport der Website unabhängig. Zugangsdaten und Konfigurationswerte verbleiben außerhalb des Repositorys.
 
 Die verbindliche Reihenfolge und optionale Folgepunkte stehen in der [aktuellen Roadmap](../planning/current-roadmap.md). Deploymentdetails verbleiben ausschließlich in [deployment.md](deployment.md).

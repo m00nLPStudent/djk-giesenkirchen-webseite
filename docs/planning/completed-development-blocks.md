@@ -2,6 +2,8 @@
 
 Dieses Dokument ist bewusst ein kompaktes Facharchiv ausschließlich für B15.18 und B15.19. Spätere Abschlüsse und der aktuelle offene Stand werden nicht hier dupliziert; maßgeblich ist die [aktuelle Roadmap](current-roadmap.md).
 
+Stand der Einordnung: **8. Oktober 2026.** B15.21D11 mit Notification-Mehrfachauswahl/Sammellöschung, die altersabhängige Membership-Mannschaftsauflösung, Support Tickets V1, die spätere Dashboard-Navigation sowie die Spieler-/Mannschaftszuordnung sind abgeschlossen, gehören aber nicht in dieses auf B15.18/B15.19 begrenzte Facharchiv. Sie werden ausschließlich in der aktuellen Roadmap und den jeweiligen As-built-Dokumenten geführt.
+
 ## B15.18 – Notifications und Reminder
 
 Umgesetzt sind persönliche Notifications, Notification Center und Glocke, Preferences, fachliche Assignment-/Membership-/Contribution-/Editorial-/Training-Notifications, persistentes Audit, Monitoring, Idempotenz, zentraler Notification-Service, kontrollierter serverseitiger Audit-Append sowie die technische Contribution-Reminder-Dispatcher-/Cron-Vorbereitung. Die operative Cron-Aktivierung bleibt bewusst unter Go-live in der [aktuellen Roadmap](current-roadmap.md).

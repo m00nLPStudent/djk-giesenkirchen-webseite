@@ -1,6 +1,6 @@
 # Projektstatus
 
-Stand: **30. September 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
+Stand: **8. Oktober 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
 
 Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene Prioritäten stehen ausschließlich in der [aktuellen Roadmap](current-roadmap.md).
 
@@ -16,6 +16,9 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Version 1.0.7 ist committed, deployed, durch manuellen Node-Neustart aktiviert und live geprüft.
 - Versionen 1.0.8 bis 1.0.12 einschließlich öffentlicher Vorstandskontakte, Ergebnisverwaltung/-ticker sowie der gehärteten Trainer-, Jugendleiter-, Tischtennisvorstand- und Kassierer-Verträge sind deployed und live geprüft.
 - Version 1.0.13 schließt B15.25 Support Tickets V1 ab. Nach dem Permission-Guard-Hotfix wurden Superadmin- und Trainerpfad, Ticket-Erstellung, Antworten, Status/Priorität/Zuweisung, Abschluss/Wiederöffnung, Dashboard-Benachrichtigungen und die drei kontrolliert aktivierten Ticket-Mailtypen live erfolgreich geprüft.
+- Nach Version 1.0.13 wurden ohne neue Releaseversion der Dashboardtitel, die `Europe/Berlin`-Begrüßung und -Uhren sowie Support als eigener letzter permissiongefilterter Hauptnavigationspunkt implementiert und automatisiert geprüft.
+- Ebenfalls umgesetzt ist die präzisierte Spieler-/Mannschaftszuordnung mit eigenem Zustand `Ohne Mannschaft`, Aktiv-/Inaktiv-/Alle-Filtern, Auswahl aktiver teamloser Spieler derselben Abteilung sowie Deaktivierung und Wiederaufnahme vorhandener saisonaler Relationen ohne Dubletten. Cross-Department-Schutz und gültige Mehrfachzuordnungen bleiben erhalten.
+- `public/images/bimi-logo.svg` stellt das Vereinslogo als öffentliches Repositoryasset für den extern konfigurierten BIMI-Vertrag bereit.
 
 ## Fachlicher Stand
 
@@ -30,11 +33,20 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Die server-only myTischtennis-/click-TT-Competition-Integration funktioniert auf der Preproduction wieder. Der vorübergehende Hetzner-Fehler mit Provider-Weiterleitung und HTTP `429` ist dokumentiert; eine WTTV-Umstellung bleibt ein inaktiver [Fallback nur bei erneutem oder dauerhaftem Problem](table-tennis-competition-provider-fallback.md). Es besteht keine aktive Datenbankmigration.
 - Version 1.0.6 ergänzte Board Responsibilities und die sichere öffentliche Lizenzanzeige. Version 1.0.7 vereinheitlichte Trainer-, Vorstands- und gemeinsam verwendete Personenkarten vertikal und responsiv. Version 1.0.8 ergänzt öffentliche Kontaktaktionen auf den Karten des Gesamtvorstands.
 
+## Vereins-E-Mail-System bei ALL-INKL – extern bestätigt
+
+Der folgende Stand wurde am 8. Oktober 2026 administrativ außerhalb des Repositorys bestätigt und ist vom Resend-/Supabase-Mailtransport der Website getrennt:
+
+- Eigenständige Postfächer für Vorstands- und Funktionsträger, Trainerweiterleitungen sowie mehrere Funktions-/Absenderidentitäten je Postfach sind eingerichtet.
+- ALL-INKL WebMail, einheitliche HTML-Signaturen und E-Mail-Vorlagen mit Vereinslogo sowie mehrere funktionsbezogene Signaturen sind eingerichtet. Externe Mailprogramme benötigen eine separate Signaturkonfiguration; Zugangsdaten werden nicht im Repository verwaltet.
+- Fünf Majordomo-Verteiler mit Empfängerlisten und Versandberechtigungen sind eingerichtet. Der Gesamtvereinsverteiler wurde nach Anpassung der Nachrichtengrößenbegrenzung erfolgreich real getestet; Fußball, Fußballvorstand, Trainer und Tischtennis sind eingerichtet, aber noch nicht vollständig im Echtbetrieb abgenommen.
+- SPF und DKIM sind getestet, DMARC ist mit `p=quarantine` und `pct=100` aktiv. BIMI-DNS und öffentliches SVG wurden extern geprüft. Eine flächendeckende Logoanzeige bei Mailanbietern ist nicht bestätigt; ein kostenpflichtiges VMC-/CMC-Zertifikat ist bewusst nicht vorgesehen.
+
 ## Datenstand
 
 - Priority 7 Core-, Auth-, Media- und Storage-Testdatenbereinigung ist abgeschlossen; der finale Read-only-Gesamtpostcheck war erfolgreich.
 - Die Datenbank ist für echte Vereinsdaten freigegeben.
-- Die für den Cutover freigegebenen Vereins-/Produktivdaten sind eingepflegt. Unvollständiger Behindertensport-Content sowie kleinere redaktionelle Inhalts- und Rollendetails werden nachgeführt und blockieren den Go-live nicht.
+- Der für den Go-live erforderliche Vereins-/Produktivdatenbestand ist eingepflegt. Die redaktionelle Vollständigkeit ist noch nicht erreicht: Behindertensport-Content sowie kleinere Inhalts- und Rollendetails werden nachgeführt und blockieren den Betrieb nicht.
 
 ## Security- und Betriebsverträge
 
@@ -53,7 +65,8 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Impressum, Datenschutz und Downloads sind vorhanden und erreichbar. Verbleibende redaktionelle oder juristische Feinprüfungen werden getrennt nachgeführt und sind nach aktueller Betreiberbewertung kein Cutover-Blocker.
 - Contribution-Reminder-Cron bleibt bewusst inaktiv, bis Kassiererzugang und vollständige echte Beitragsdaten vorliegen und die bestehende Aktivierungscheckliste vollständig abgearbeitet werden kann.
 - Nicht blockierende Inhaltsnachpflege bleibt separat; der finale geräteübergreifende Go-live-Smoke und die vorgesehenen FUSSBALL.DE-Integrationen sind bestanden.
-- Nicht blockierende, von B15.25 getrennte Follow-ups: mögliche eigene Support-Hauptnavigation sowie eine separate Reproduktionsanalyse für `getActorContext is not defined` (Digest `1973645967`) und ältere `Failed to find Server Action ...`-Meldungen.
+- Nicht blockierende, von B15.25 getrennte Follow-ups: eine separate Reproduktionsanalyse für `getActorContext is not defined` (Digest `1973645967`) und ältere `Failed to find Server Action ...`-Meldungen, sofern sie mit aktuellem Build erneut auftreten. Die eigene Support-Hauptnavigation ist bereits umgesetzt und kein offener Punkt mehr.
+- Google Maps Inline/Embed bleibt optional offen. Bei Aktivierung sind `GOOGLE_MAPS_EMBED_API_KEY`, Maps Embed API, API-/Referrer-Beschränkung, Consent-Gate und ein kontrollierter Go-live-Test erforderlich.
 
 Der Go-live ist damit technisch und organisatorisch abgeschlossen. Die automatischen Beitragserinnerungen bleiben als bewusst zurückgestellter, nicht aktiver Folgepunkt bestehen.
 
