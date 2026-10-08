@@ -165,6 +165,23 @@ test("all footer text actions share red hover and visible keyboard focus", () =>
   assert.doesNotMatch(globalStylesSource, /footer[^}]*#[0-9a-f]{3,8}/i);
 });
 
+test("footer lists the local partner links first and opens them safely in new tabs", () => {
+  const furtherLinks = footerSource.match(/title: "Weitere Links",[\s\S]*?\n  },/)?.[0] || "";
+  const expectedOrder = ["Heimatverein", "Gewerbekreis", "Mitglied werden", "Sponsoren", "Kontakt"];
+
+  let previousIndex = -1;
+  for (const label of expectedOrder) {
+    const currentIndex = furtherLinks.indexOf(`label: "${label}"`);
+    assert.ok(currentIndex > previousIndex, `${label} must follow the agreed footer order`);
+    previousIndex = currentIndex;
+  }
+
+  assert.match(furtherLinks, /label: "Heimatverein", href: "https:\/\/www\.heimatverein-giesenkirchen\.de\/", target: "_blank", rel: "noopener noreferrer"/);
+  assert.match(furtherLinks, /label: "Gewerbekreis", href: "https:\/\/www\.gewerbekreis-giesenkirchen\.de\/", target: "_blank", rel: "noopener noreferrer"/);
+  assert.match(footerSource, /target=\{link\.target\}/);
+  assert.match(footerSource, /rel=\{link\.rel\}/);
+});
+
 test("CMS page saves revalidate the shared website layout and generic page route", () => {
   assert.match(revalidationSource, /"pages\/settings": \[/);
   assert.match(revalidationSource, /path: "\/", type: "layout"/);

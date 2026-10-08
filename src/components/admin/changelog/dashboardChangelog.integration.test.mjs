@@ -67,18 +67,23 @@ test("the modal is accessible, responsive and only confirmation can close it", (
 });
 
 test("version and visible copy have a single central source", () => {
+  assert.match(config, /version: "1\.0\.14"/);
+  assert.match(config, /releaseDate: "2026-10-08"/);
+  assert.match(config, /Erweiterung der Footer-Navigation/);
+  assert.match(config, /Heimatverein und den Gewerbekreis Giesenkirchen/);
+  assert.match(config, /neuen Browser-Tab/);
+  assert.match(config, /responsive Design bleiben unverändert/);
+  assert.match(config, /previousReleases/);
   assert.match(config, /version: "1\.0\.13"/);
-  assert.match(config, /releaseDate: "2026-09-29"/);
   assert.match(config, /Neuer Supportbereich/);
   assert.match(config, /Übersichtlicher Bearbeitungsstand/);
   assert.match(config, /Supportverwaltung/);
-  assert.match(config, /previousReleases/);
   assert.match(config, /version: "1\.0\.12"/);
   assert.match(config, /Tischtennis – News & Termine/);
   assert.match(config, /Kassierer-Berechtigungen/);
   assert.match(config, /News und Termine der Tischtennisabteilung/);
   assert.match(config, /vollständige Beitragsverwaltung bleibt erhalten/);
   assert.match(dialog, /changelog\.previousReleases/);
-  assert.doesNotMatch(gate, /version:\s*"1\.0\.13"/);
-  assert.doesNotMatch(dialog, /version:\s*"1\.0\.13"/);
+  assert.doesNotMatch(gate, /version:\s*"1\.0\.14"/);
+  assert.doesNotMatch(dialog, /version:\s*"1\.0\.14"/);
 });

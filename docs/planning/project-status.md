@@ -1,6 +1,6 @@
 # Projektstatus
 
-Stand: **8. Oktober 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
+Stand: **8. Oktober 2026 · Version 1.0.14 · ZUR VERÖFFENTLICHUNG FREIGEGEBEN**
 
 Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene Prioritäten stehen ausschließlich in der [aktuellen Roadmap](current-roadmap.md).
 
@@ -16,6 +16,7 @@ Dieses Dokument beschreibt den aktuellen As-built-Zustand. Verbindliche offene P
 - Version 1.0.7 ist committed, deployed, durch manuellen Node-Neustart aktiviert und live geprüft.
 - Versionen 1.0.8 bis 1.0.12 einschließlich öffentlicher Vorstandskontakte, Ergebnisverwaltung/-ticker sowie der gehärteten Trainer-, Jugendleiter-, Tischtennisvorstand- und Kassierer-Verträge sind deployed und live geprüft.
 - Version 1.0.13 schließt B15.25 Support Tickets V1 ab. Nach dem Permission-Guard-Hotfix wurden Superadmin- und Trainerpfad, Ticket-Erstellung, Antworten, Status/Priorität/Zuweisung, Abschluss/Wiederöffnung, Dashboard-Benachrichtigungen und die drei kontrolliert aktivierten Ticket-Mailtypen live erfolgreich geprüft.
+- Version 1.0.14 erweitert den öffentlichen Footer unter „Weitere Links“ um Heimatverein und Gewerbekreis Giesenkirchen. Beide externen Links öffnen sicher in einem neuen Browser-Tab; vorhandene Links und responsive Darstellung bleiben unverändert. Der Dashboard-Changelog führt 1.0.14 als aktuelle Version, während 1.0.13 und 1.0.12 vollständig erhalten bleiben. Der Release ist zur Veröffentlichung freigegeben; Commit und Deployment stehen noch aus.
 - Nach Version 1.0.13 wurden ohne neue Releaseversion der Dashboardtitel, die `Europe/Berlin`-Begrüßung und -Uhren sowie Support als eigener letzter permissiongefilterter Hauptnavigationspunkt implementiert und automatisiert geprüft.
 - Ebenfalls umgesetzt ist die präzisierte Spieler-/Mannschaftszuordnung mit eigenem Zustand `Ohne Mannschaft`, Aktiv-/Inaktiv-/Alle-Filtern, Auswahl aktiver teamloser Spieler derselben Abteilung sowie Deaktivierung und Wiederaufnahme vorhandener saisonaler Relationen ohne Dubletten. Cross-Department-Schutz und gültige Mehrfachzuordnungen bleiben erhalten.
 - `public/images/bimi-logo.svg` stellt das Vereinslogo als öffentliches Repositoryasset für den extern konfigurierten BIMI-Vertrag bereit.

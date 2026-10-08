@@ -41,6 +41,8 @@ const footerColumns = [
   {
     title: "Weitere Links",
     links: [
+      { label: "Heimatverein", href: "https://www.heimatverein-giesenkirchen.de/", target: "_blank", rel: "noopener noreferrer" },
+      { label: "Gewerbekreis", href: "https://www.gewerbekreis-giesenkirchen.de/", target: "_blank", rel: "noopener noreferrer" },
       { label: "Mitglied werden", href: "/mitglied-werden" },
       { label: "Sponsoren", href: "/fussball/sponsoren" },
       { label: "Kontakt", href: "/kontakt" },
@@ -58,7 +60,7 @@ function FooterLinkColumn({ title, links }) {
       <ul className="mt-5 space-y-3">
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className={`${FOOTER_TEXT_LINK_CLASS} text-sm text-white/60`}>
+            <Link href={link.href} target={link.target} rel={link.rel} className={`${FOOTER_TEXT_LINK_CLASS} text-sm text-white/60`}>
               {link.label}
             </Link>
           </li>

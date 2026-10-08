@@ -2,6 +2,11 @@
 
 ## 2026-10-08
 
+### Version 1.0.14 – Erweiterung der Footer-Navigation
+
+- **Kategorie:** Verbesserung / Erweiterung · **Status:** Abgeschlossen
+- Die öffentliche Vereinswebseite wurde im Footer-Bereich „Weitere Links“ um den Heimatverein und den Gewerbekreis Giesenkirchen ergänzt. Beide externen Links öffnen sich sicher in einem neuen Browser-Tab. Die bestehenden Links „Mitglied werden“, „Sponsoren“ und „Kontakt“ bleiben erhalten und folgen darunter in unveränderter Reihenfolge; das responsive Design bleibt unverändert.
+
 ### Projektstatus und Vereins-E-Mail-Betrieb
 
 - Roadmap, Projektstatus und Project Health wurden ohne neue Releaseversion auf den nachweisbaren Stand nach Version 1.0.13 synchronisiert. Notification-Mehrfachauswahl, altersabhängige Membership-Mannschaftsauflösung und Support als eigener letzter Dashboard-Hauptpunkt werden nicht mehr als offene Arbeiten geführt.

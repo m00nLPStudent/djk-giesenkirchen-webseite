@@ -1,6 +1,6 @@
 # Aktuelle Roadmap
 
-Stand: **8. Oktober 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
+Stand: **8. Oktober 2026 · Version 1.0.14 · ZUR VERÖFFENTLICHUNG FREIGEGEBEN**
 
 Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go-live- und optionale Arbeiten. Historische B12–B15-Planungs- und SQL-Dateien bleiben Nachweise, bilden aber keine parallele To-do-Liste.
 
@@ -33,6 +33,9 @@ Dieses Dokument ist die verbindliche Quelle für offene, teilweise erledigte, Go
 - **1.0.11:** gehärteter Jugendleiter-Vertrag und getrennte Team-Season-Update-/Create-Rechte; deployed und live geprüft.
 - **1.0.12:** Tischtennis-Scope für News/Termine und präzisierter Kassierer-Vertrag; deployed und live geprüft.
 - **1.0.13:** B15.25 Support Tickets V1 ist implementiert, deployed und nach dem Permission-Guard-Hotfix live abgenommen. Ticket-Erstellung, Antworten, Status, Priorität, Zuweisung, Abschluss/Wiederöffnung, Dashboard-Benachrichtigungen und alle drei aktivierten Ticket-Mailtypen wurden erfolgreich geprüft.
+- **1.0.14:** Die öffentliche Footer-Navigation wurde unter „Weitere Links“ um Heimatverein und Gewerbekreis Giesenkirchen ergänzt. Beide externen Ziele öffnen sicher in einem neuen Browser-Tab; bestehende Links und responsives Layout bleiben unverändert. Implementierung, Dashboard-Changelog und automatisierte Prüfung sind abgeschlossen und zur Veröffentlichung freigegeben; Commit und Deployment stehen noch aus.
+
+Die nächste reguläre Versionsnummer für künftige Änderungen ist **1.0.15**; sie ist noch nicht angelegt.
 
 ## In Arbeit / teilweise erledigt
 

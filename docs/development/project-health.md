@@ -1,6 +1,6 @@
 # Project Health
 
-Stand: **8. Oktober 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
+Stand: **8. Oktober 2026 · Version 1.0.14 · ZUR VERÖFFENTLICHUNG FREIGEGEBEN**
 
 ## Aktueller Stand
 
@@ -15,6 +15,7 @@ Stand: **8. Oktober 2026 · Version 1.0.13 · PRODUKTIV / LIVE**
 - Version 1.0.8 wurde mit öffentlichen Kontaktaktionen auf den Gesamtvorstandskarten begonnen.
 - Versionen 1.0.9 bis 1.0.12 einschließlich Ergebnisverwaltung/-ticker sowie der gehärteten Trainer-, Jugendleiter-, Tischtennisvorstand- und Kassierer-Verträge sind deployed und live geprüft.
 - Version 1.0.13 schließt das Support-/Ticketsystem einschließlich Rollen-Livetest, Dashboard-Notifications, kontrollierter Mailtyp-Aktivierung, realer Zustellung und CTA-Prüfung ab.
+- Version 1.0.14 ergänzt die öffentliche Footer-Navigation um sichere externe Links zum Heimatverein und Gewerbekreis Giesenkirchen. Bestehende Links und responsives Layout bleiben unverändert; Dashboard-Changelog, fokussierte Verträge und Build-Prüfung gehören zum bestandenen Release-Gate. Der Release ist zur Veröffentlichung freigegeben; Commit und Deployment stehen noch aus.
 - Nach Version 1.0.13 sind Support als eigener letzter Dashboard-Hauptpunkt, die Berlin-basierte Begrüßungs-/Uhrlogik und die präzisierte Spieler-/Mannschaftszuordnung einschließlich `Ohne Mannschaft`, Statusfiltern und deaktivierbaren saisonalen Relationen umgesetzt und automatisiert geprüft. Eine neue Releaseversion wurde dafür nicht angelegt.
 - Das öffentliche Repositoryasset `public/images/bimi-logo.svg` ist vorhanden. BIMI-DNS und Erreichbarkeit wurden vom Betreiber extern bestätigt; Mailclient-Anzeige und Zertifikatsfragen sind kein Anwendungscodevertrag.
 - Die server-only myTischtennis-/click-TT-Competition-Integration ist wieder funktionsfähig. Der zeitweise Hetzner-Providerfehler (`/verify`, HTTP `429`) ist kein aktueller Blocker; der bestehende Revalidate-Vertrag beträgt 15 Minuten. Ein [WTTV-Fallback](../planning/table-tennis-competition-provider-fallback.md) wird nur bei einem erneut wiederholten oder dauerhaften Ausfall reaktiviert.
